@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 
 type Msg = { role: "assistant" | "user"; content: string };
 
@@ -12,8 +13,11 @@ export default function Home() {
   const [step, setStep] = useState(1); // 1..5
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
-  const endRef = useRef<HTMLDivElement | null>(null);
 
+  // NEW: reliable storage of answers per step
+  const [answers, setAnswers] = useState<Record<number, string>>({});
+
+  const endRef = useRef<HTMLDivElement | null>(null);
   const stepLabel = useMemo(() => `Step ${step} of 5`, [step]);
 
   useEffect(() => {
@@ -21,56 +25,123 @@ export default function Home() {
   }, [messages, loading]);
 
   async function send() {
+
     if (loading || done) return;
+
     const answer = input.trim();
+
     if (!answer) return;
 
-    // add user message immediately
+    // Show user message immediately
+
     setMessages((prev) => [...prev, { role: "user", content: answer }]);
+
     setInput("");
+
     setLoading(true);
 
     try {
+
       const res = await fetch("/api/chat", {
+
         method: "POST",
+
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          step,
-          answer,
-          // include chat context if you want later; backend currently ignores it
-          messages,
-        }),
+
+        body: JSON.stringify({ step, answer }),
+
       });
 
       const data = await res.json();
 
-      // Always show assistant reply if present
+      // Show assistant reply
+
       if (data?.reply) {
-        setMessages((prev) => [...prev, { role: "assistant", content: String(data.reply) }]);
-      } else {
+
         setMessages((prev) => [
+
           ...prev,
-          { role: "assistant", content: "Sorry — I didn’t catch that. Could you try again?" },
+
+          { role: "assistant", content: String(data.reply) },
+
         ]);
+
       }
 
-      // CRITICAL: completion only depends on API `done`
       const apiDone = Boolean(data?.done);
+
       setDone(apiDone);
 
-      // CRITICAL: step only moves if API says so
+      // Build answers synchronously (no React timing issues)
+
+      const updatedAnswers = { ...answers, [step]: answer };
+
+      setAnswers(updatedAnswers);
+
+      // Move step only if API says so
+
       const nextStep = Number(data?.nextStep);
+
       if (Number.isFinite(nextStep) && nextStep >= 1 && nextStep <= 5) {
+
         setStep(nextStep);
+
       }
-    } catch (e) {
+
+      // ✅ SAVE TO localStorage ONLY WHEN COMPLETED
+
+      if (apiDone) {
+
+        const record = {
+
+          id: Math.random().toString(36).slice(2),
+
+          name: updatedAnswers[1] ?? "",
+
+          department: updatedAnswers[2] ?? "",
+
+          supervisor: updatedAnswers[3] ?? "",
+
+          email: updatedAnswers[4] ?? "",
+
+          startDate: updatedAnswers[5] ?? "",
+
+          completedAt: new Date().toISOString(),
+
+        };
+
+
+
+        const raw = localStorage.getItem("onboardings");
+
+        const list = raw ? JSON.parse(raw) : [];
+
+        const next = Array.isArray(list) ? [...list, record] : [record];
+
+        localStorage.setItem("onboardings", JSON.stringify(next));
+
+
+
+        console.log("✅ Saved onboarding", record);
+
+      }
+
+    } catch {
+
       setMessages((prev) => [
+
         ...prev,
+
         { role: "assistant", content: "Network error — please try again." },
+
       ]);
+
     } finally {
+
       setLoading(false);
+
     }
+
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -149,6 +220,14 @@ export default function Home() {
               <div className="text-white text-lg font-semibold">Done! 🚀</div>
               <div className="text-white/70 text-sm">
                 If you need more help, ask your manager anytime.
+              </div>
+              <div className="mt-3">
+                <Link
+                  href="/manager"
+                  className="inline-block rounded-2xl px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm"
+                >
+                  View Manager Dashboard
+                </Link>
               </div>
             </div>
           )}
