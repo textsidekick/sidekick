@@ -19,17 +19,27 @@ export async function POST(req: Request) {
     const companyId = String(form.get("companyId") ?? "demo");
     const userProvidedType = form.get("type") as string | null;
 
+    console.log("Upload request received:", { 
+      filename: file instanceof File ? file.name : "not a file",
+      companyId,
+      userProvidedType 
+    });
+
     if (!file || !(file instanceof File)) {
       return NextResponse.json({ error: "Missing PDF file" }, { status: 400 });
     }
 
     const buf = Buffer.from(await file.arrayBuffer());
+    console.log("PDF buffer size:", buf.length);
+
     const parsed = await pdfParse(buf);
     const text = String(parsed?.text ?? "").replace(/\u0000/g, "").trim();
 
+    console.log("Extracted text length:", text.length);
+
     if (text.length < 50) {
       return NextResponse.json(
-        { error: "Could not extract enough text from PDF" },
+        { error: "Could not extract enough text from PDF (only " + text.length + " chars)" },
         { status: 400 }
       );
     }
@@ -65,8 +75,9 @@ export async function POST(req: Request) {
     });
   } catch (e: any) {
     console.error("Upload error:", e);
+    console.error("Error stack:", e.stack);
     return NextResponse.json(
-      { error: "Upload failed", detail: String(e?.message ?? e) },
+      { error: "Upload failed: " + e.message, detail: String(e?.message ?? e) },
       { status: 500 }
     );
   }
