@@ -1,238 +1,182 @@
-"use client";
-
-import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 
-type Msg = { role: "assistant" | "user"; content: string };
-
-export default function Home() {
-  const [messages, setMessages] = useState<Msg[]>([
-    { role: "assistant", content: "👋 Hi, and welcome! What’s your preferred first name?" },
-  ]);
-  const [input, setInput] = useState("");
-  const [step, setStep] = useState(1); // 1..5
-  const [done, setDone] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  // NEW: reliable storage of answers per step
-  const [answers, setAnswers] = useState<Record<number, string>>({});
-
-  const endRef = useRef<HTMLDivElement | null>(null);
-  const stepLabel = useMemo(() => `Step ${step} of 5`, [step]);
-
-  useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading]);
-
-  async function send() {
-
-    if (loading || done) return;
-
-    const answer = input.trim();
-
-    if (!answer) return;
-
-    // Show user message immediately
-
-    setMessages((prev) => [...prev, { role: "user", content: answer }]);
-
-    setInput("");
-
-    setLoading(true);
-
-    try {
-
-      const res = await fetch("/api/chat", {
-
-        method: "POST",
-
-        headers: { "Content-Type": "application/json" },
-
-        body: JSON.stringify({ step, answer }),
-
-      });
-
-      const data = await res.json();
-
-      // Show assistant reply
-
-      if (data?.reply) {
-
-        setMessages((prev) => [
-
-          ...prev,
-
-          { role: "assistant", content: String(data.reply) },
-
-        ]);
-
-      }
-
-      const apiDone = Boolean(data?.done);
-
-      setDone(apiDone);
-
-      // Build answers synchronously (no React timing issues)
-
-      const updatedAnswers = { ...answers, [step]: answer };
-
-      setAnswers(updatedAnswers);
-
-      // Move step only if API says so
-
-      const nextStep = Number(data?.nextStep);
-
-      if (Number.isFinite(nextStep) && nextStep >= 1 && nextStep <= 5) {
-
-        setStep(nextStep);
-
-      }
-
-      // ✅ SAVE TO localStorage ONLY WHEN COMPLETED
-
-      if (apiDone) {
-
-        const record = {
-
-          id: Math.random().toString(36).slice(2),
-
-          name: updatedAnswers[1] ?? "",
-
-          department: updatedAnswers[2] ?? "",
-
-          supervisor: updatedAnswers[3] ?? "",
-
-          email: updatedAnswers[4] ?? "",
-
-          startDate: updatedAnswers[5] ?? "",
-
-          completedAt: new Date().toISOString(),
-
-        };
-
-
-
-        const raw = localStorage.getItem("onboardings");
-
-        const list = raw ? JSON.parse(raw) : [];
-
-        const next = Array.isArray(list) ? [...list, record] : [record];
-
-        localStorage.setItem("onboardings", JSON.stringify(next));
-
-
-
-        console.log("✅ Saved onboarding", record);
-
-      }
-
-    } catch {
-
-      setMessages((prev) => [
-
-        ...prev,
-
-        { role: "assistant", content: "Network error — please try again." },
-
-      ]);
-
-    } finally {
-
-      setLoading(false);
-
-    }
-
-  }
-
-  function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Enter") send();
-  }
-
+export default function HomePage() {
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-6">
-      <div className="w-full max-w-xl rounded-3xl bg-black/40 border border-white/10 shadow-2xl overflow-hidden">
-        <div className="p-6">
-          <div className="flex items-start gap-3">
-            <div className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center">
-              💬
-            </div>
-            <div>
-              <h1 className="text-white text-2xl font-semibold">New Hire Onboarding</h1>
-              <p className="text-white/70 text-sm">Hourly Employee Welcome Chat</p>
-            </div>
-            <div className="ml-auto text-white/70 text-sm">{stepLabel}</div>
+    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
+      {/* Navigation Bar */}
+      <nav className="border-b border-white/10 bg-black/20">
+        <div className="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="text-3xl">🤖</div>
+            <h1 className="text-2xl font-bold text-white">Sidekick AI</h1>
           </div>
-
-          <div className="mt-4 h-2 w-full rounded-full bg-white/10 overflow-hidden">
-            <div
-              className="h-full bg-emerald-400"
-              style={{ width: `${(step / 5) * 100}%` }}
-            />
+          <div className="flex gap-6">
+            <Link href="/about" className="text-white/70 hover:text-white transition">About</Link>
+            <Link href="/contact" className="text-white/70 hover:text-white transition">Contact</Link>
+            <Link href="/privacy" className="text-white/70 hover:text-white transition">Privacy</Link>
+            <Link href="/terms" className="text-white/70 hover:text-white transition">Terms</Link>
           </div>
+        </div>
+      </nav>
 
-          <div className="mt-6 space-y-3 max-h-[52vh] overflow-auto pr-1">
-            {messages.map((m, i) => (
-              <div
-                key={i}
-                className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                    m.role === "user"
-                      ? "bg-emerald-500/25 border border-emerald-400/30 text-white"
-                      : "bg-sky-500/20 border border-sky-400/25 text-white"
-                  }`}
-                >
-                  {m.content}
-                </div>
-              </div>
-            ))}
-            {loading && (
-              <div className="flex justify-start">
-                <div className="max-w-[85%] rounded-2xl px-4 py-3 text-sm bg-sky-500/20 border border-sky-400/25 text-white/80">
-                  Typing…
-                </div>
-              </div>
-            )}
-            <div ref={endRef} />
-          </div>
-
-          <div className="mt-6 flex gap-3">
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={onKeyDown}
-              disabled={loading || done}
-              placeholder={done ? "All set!" : "Type your answer…"}
-              className="flex-1 rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder:text-white/40 outline-none focus:border-white/25"
-            />
-            <button
-              onClick={send}
-              disabled={loading || done}
-              className="rounded-2xl px-5 py-3 bg-emerald-500/70 hover:bg-emerald-500 text-white font-medium disabled:opacity-40"
-            >
-              Send
-            </button>
-          </div>
-
-          {done && (
-            <div className="mt-6 text-center">
-              <div className="text-white text-lg font-semibold">Done! 🚀</div>
-              <div className="text-white/70 text-sm">
-                If you need more help, ask your manager anytime.
-              </div>
-              <div className="mt-3">
-                <Link
-                  href="/manager"
-                  className="inline-block rounded-2xl px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm"
-                >
-                  View Manager Dashboard
-                </Link>
-              </div>
-            </div>
-          )}
+      {/* Hero Section */}
+      <div className="max-w-6xl mx-auto px-8 pt-20 pb-16 text-center">
+        <h1 className="text-6xl font-bold text-white mb-6">
+          AI-Powered Onboarding<br/>for Hourly Workers
+        </h1>
+        <p className="text-2xl text-white/70 mb-12 max-w-3xl mx-auto">
+          Instant answers to employee questions via SMS. Save managers time, 
+          help workers succeed from day one.
+        </p>
+        
+        <div className="flex gap-4 justify-center">
+          <Link 
+            href="/qa"
+            className="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white text-lg font-semibold rounded-xl transition"
+          >
+            Try Demo →
+          </Link>
+          <Link 
+            href="/contact"
+            className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white text-lg font-semibold rounded-xl transition"
+          >
+            Contact Sales
+          </Link>
         </div>
       </div>
+
+      {/* Features Section */}
+      <div className="max-w-6xl mx-auto px-8 py-16">
+        <h2 className="text-4xl font-bold text-white text-center mb-12">How It Works</h2>
+        
+        <div className="grid md:grid-cols-3 gap-8">
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
+            <div className="text-5xl mb-4">📄</div>
+            <h3 className="text-2xl font-semibold text-white mb-3">1. Upload Documents</h3>
+            <p className="text-white/70">
+              Upload your handbooks, safety manuals, schedules, and policies. Our AI automatically 
+              classifies and understands them.
+            </p>
+          </div>
+
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
+            <div className="text-5xl mb-4">💬</div>
+            <h3 className="text-2xl font-semibold text-white mb-3">2. Workers Ask Questions</h3>
+            <p className="text-white/70">
+              Employees text their questions to your dedicated phone number. No app download required - 
+              just simple SMS.
+            </p>
+          </div>
+
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
+            <div className="text-5xl mb-4">⚡</div>
+            <h3 className="text-2xl font-semibold text-white mb-3">3. Get Instant Answers</h3>
+            <p className="text-white/70">
+              AI searches your documents and provides accurate answers with source citations. 
+              Managers save hours every week.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Demo/Manager Links Section */}
+      <div className="max-w-6xl mx-auto px-8 py-16">
+        <h2 className="text-4xl font-bold text-white text-center mb-12">Quick Links</h2>
+        
+        <div className="grid md:grid-cols-2 gap-8">
+          <Link 
+            href="/qa"
+            className="bg-blue-500/20 border border-blue-400/25 rounded-2xl p-8 hover:bg-blue-500/30 transition group"
+          >
+            <div className="text-5xl mb-4">💬</div>
+            <h3 className="text-2xl font-semibold text-white mb-3 group-hover:text-blue-300 transition">
+              Worker Q&A Demo
+            </h3>
+            <p className="text-white/70">
+              See how workers interact with Sidekick - ask questions and get instant answers
+            </p>
+          </Link>
+
+          <Link 
+            href="/manager"
+            className="bg-emerald-500/20 border border-emerald-400/25 rounded-2xl p-8 hover:bg-emerald-500/30 transition group"
+          >
+            <div className="text-5xl mb-4">📊</div>
+            <h3 className="text-2xl font-semibold text-white mb-3 group-hover:text-emerald-300 transition">
+              Manager Dashboard
+            </h3>
+            <p className="text-white/70">
+              Upload documents, view analytics, and manage your Sidekick deployment
+            </p>
+          </Link>
+        </div>
+      </div>
+
+      {/* Stats Section */}
+      <div className="max-w-6xl mx-auto px-8 py-16">
+        <div className="bg-gradient-to-r from-emerald-500/10 to-blue-500/10 border border-white/10 rounded-2xl p-12">
+          <h2 className="text-4xl font-bold text-white text-center mb-12">Why Sidekick?</h2>
+          
+          <div className="grid md:grid-cols-3 gap-8 text-center">
+            <div>
+              <div className="text-5xl font-bold text-emerald-400 mb-2">5 min</div>
+              <p className="text-white/70">Average time saved per question</p>
+            </div>
+            <div>
+              <div className="text-5xl font-bold text-blue-400 mb-2">24/7</div>
+              <p className="text-white/70">Always available for workers</p>
+            </div>
+            <div>
+              <div className="text-5xl font-bold text-purple-400 mb-2">90%+</div>
+              <p className="text-white/70">Question accuracy rate</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="border-t border-white/10 mt-16">
+        <div className="max-w-6xl mx-auto px-8 py-8">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="text-white font-semibold mb-3">Product</h3>
+              <div className="space-y-2">
+                <Link href="/qa" className="block text-white/60 hover:text-white transition">Demo</Link>
+                <Link href="/manager" className="block text-white/60 hover:text-white transition">Dashboard</Link>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-white font-semibold mb-3">Company</h3>
+              <div className="space-y-2">
+                <Link href="/about" className="block text-white/60 hover:text-white transition">About</Link>
+                <Link href="/contact" className="block text-white/60 hover:text-white transition">Contact</Link>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-white font-semibold mb-3">Legal</h3>
+              <div className="space-y-2">
+                <Link href="/privacy" className="block text-white/60 hover:text-white transition">Privacy Policy</Link>
+                <Link href="/terms" className="block text-white/60 hover:text-white transition">Terms of Service</Link>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-white font-semibold mb-3">Contact</h3>
+              <div className="space-y-2">
+                <a href="mailto:support@sidekick-ai.com" className="block text-white/60 hover:text-white transition">
+                  support@sidekick-ai.com
+                </a>
+              </div>
+            </div>
+          </div>
+          
+          <div className="mt-8 pt-8 border-t border-white/10 text-center text-white/60">
+            © 2024 Sidekick AI. All rights reserved.
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }
