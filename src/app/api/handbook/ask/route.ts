@@ -1,95 +1,125 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { getDocumentsByCompany, getDocumentText } from "@/lib/documentClassifier";
 
 export const runtime = "nodejs";
 
-// TEMP handbook (later replaced by uploaded PDFs)
-const TEST_HANDBOOK = `
-COMPANY HANDBOOK
-
-PARKING:
-Employees park in Lot B behind the building. Visitor parking is in front.
-
-WORK HOURS:
-Shifts start at 8:00 AM. Arrive 10 minutes early to clock in.
-
-DRESS CODE:
-Safety shoes and company uniform are required on the floor.
-
-BREAK ROOM:
-Second floor. Microwave and coffee available.
-
-TIME CLOCK:
-Use your badge at the main entrance.
-
-SAFETY:
-Hard hats required in manufacturing areas.
-`;
-
-function chunk(text: string, size = 1200) {
+function simpleChunks(text: string, size = 1200) {
   const clean = text.replace(/\s+/g, " ").trim();
   const chunks: string[] = [];
   for (let i = 0; i < clean.length; i += size) {
     chunks.push(clean.slice(i, i + size));
   }
-  return chunks;
+  return chunks.slice(0, 200);
+}
+
+function determineRelevantDocTypes(question: string): string[] {
+  const q = question.toLowerCase();
+  
+  // Simple keyword matching (can be improved with AI)
+  if (q.includes("work") || q.includes("shift") || q.includes("schedule") || q.includes("when")) {
+    return ["shift_schedule", "handbook"];
+  }
+  if (q.includes("safe") || q.includes("ppe") || q.includes("equipment") || q.includes("wear")) {
+    return ["safety_manual", "equipment_manual", "handbook"];
+  }
+  if (q.includes("pay") || q.includes("commission") || q.includes("salary") || q.includes("wage")) {
+    return ["payroll_info", "commission_sheet", "handbook"];
+  }
+  if (q.includes("train") || q.includes("learn") || q.includes("how to")) {
+    return ["training_material", "equipment_manual", "handbook"];
+  }
+  
+  // Default: search all
+  return ["handbook", "safety_manual", "shift_schedule", "training_material", "equipment_manual"];
 }
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const question = String(body?.question ?? "").trim();
-
-    if (!question) {
-      return NextResponse.json(
-        { ok: false, error: "Missing question" },
-        { status: 400 }
-      );
+    const { question, companyId = "demo" } = await req.json();
+    const q = String(question ?? "").trim();
+    
+    if (!q) {
+      return NextResponse.json({ error: "Missing question" }, { status: 400 });
     }
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
-      return NextResponse.json(
-        { ok: false, error: "Missing ANTHROPIC_API_KEY" },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Missing ANTHROPIC_API_KEY" }, { status: 500 });
     }
 
+    // Get all documents for company
+    const allDocs = getDocumentsByCompany(companyId);
+    
+    if (allDocs.length === 0) {
+      return NextResponse.json({
+        ok: true,
+        answer: "No documents have been uploaded yet. Please ask your manager to upload company documents.",
+        sources: [],
+      });
+    }
+
+    // Determine relevant document types for this question
+    const relevantTypes = determineRelevantDocTypes(q);
+    
+    // Filter documents by relevant types
+    const relevantDocs = allDocs.filter(doc => relevantTypes.includes(doc.type));
+    
+    // Gather text from relevant documents
+    let allText = "";
+    const sourceDocs: any[] = [];
+    
+    for (const doc of relevantDocs.slice(0, 5)) { // Max 5 documents
+      const text = getDocumentText(companyId, doc.id);
+      if (text) {
+        allText += `\n\n=== ${doc.title} (${doc.type}) ===\n${text}`;
+        sourceDocs.push({ id: doc.id, title: doc.title, type: doc.type });
+      }
+    }
+
+    if (!allText) {
+      return NextResponse.json({
+        ok: true,
+        answer: "I found documents but couldn't read their content. Please ask your manager for help.",
+        sources: [],
+      });
+    }
+
+    // Create chunks
+    const chunks = simpleChunks(allText);
+    const context = chunks.slice(0, 10).map((c, i) => `SECTION ${i + 1}:\n${c}`).join("\n\n");
+
+    // Call Claude
     const anthropic = new Anthropic({ apiKey });
-
-    const sources = chunk(TEST_HANDBOOK).slice(0, 5);
-    const context = sources
-      .map((c, i) => `SOURCE ${i + 1}: ${c}`)
-      .join("\n\n");
-
+    
     const response = await anthropic.messages.create({
-      model: "claude-3-haiku-20240307", // ✅ SAFE + AVAILABLE
-      max_tokens: 250,
-      system:
-        "You are Sidekick, an onboarding assistant for hourly workers. " +
-        "Answer using ONLY the provided sources. " +
-        "If the answer is not in the sources, say you are not sure and suggest asking a manager. " +
-        "Keep answers short.",
-      messages: [
-        {
-          role: "user",
-          content: `Question: ${question}\n\nSources:\n${context}`,
-        },
-      ],
+      model: "claude-3-5-sonnet-20241022",
+      max_tokens: 400,
+      system: `You are Sidekick, an onboarding assistant for hourly workers. 
+Answer questions using ONLY the provided document sections.
+If the answer isn't in the documents, say: "I'm not sure based on the available documents. Please ask your manager."
+Keep answers concise and practical.`,
+      messages: [{
+        role: "user",
+        content: `Question: ${q}\n\nAvailable Documents:\n${context}`
+      }]
     });
 
-    const answer =
-      response.content?.[0]?.type === "text"
-        ? response.content[0].text.trim()
-        : "I’m not sure based on the handbook. Please ask your manager.";
+    const answer = response.content[0].type === "text"
+      ? response.content[0].text
+      : "I'm not sure based on the available documents.";
 
-    return NextResponse.json({ ok: true, answer });
-  } catch (e: any) {
-    console.error("Ask route error:", e);
     return NextResponse.json({
-      ok: true, // IMPORTANT: UI never breaks
-      answer:
-        "Sorry — I’m having trouble answering right now. Please ask your manager.",
+      ok: true,
+      answer,
+      sources: sourceDocs,
+      searchedDocTypes: relevantTypes,
     });
+  } catch (e: any) {
+    console.error("Ask error:", e);
+    return NextResponse.json(
+      { error: "Ask failed", detail: String(e?.message ?? e) },
+      { status: 500 }
+    );
   }
 }
