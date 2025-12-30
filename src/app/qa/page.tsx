@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import Image from "next/image";
 
 type Message = {
   role: "user" | "assistant";
@@ -122,7 +121,7 @@ export default function QAPage() {
           {messages.map((msg, i) => (
             <div key={i}>
               <div className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[80%] ${msg.role === "user" ? "" : ""}`}>
+                <div className={`max-w-[80%]`}>
                   {msg.image && (
                     <div className="mb-2">
                       <img 
@@ -163,7 +162,7 @@ export default function QAPage() {
           {loading && (
             <div className="flex justify-start">
               <div className="bg-blue-500/20 border border-blue-400/25 rounded-2xl px-4 py-3 text-white/70">
-                Thinking...
+                Analyzing...
               </div>
             </div>
           )}

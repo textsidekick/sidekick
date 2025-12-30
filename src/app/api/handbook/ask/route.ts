@@ -92,7 +92,11 @@ export async function POST(req: Request) {
         answer,
         sources: documents.filter(d => 
           d.type === "safety_manual" || d.type === "equipment_manual"
-        ).slice(0, 2),
+        ).slice(0, 2).map(d => ({
+          id: d.id,
+          title: d.title,
+          type: d.type
+        })),
       });
     }
 
