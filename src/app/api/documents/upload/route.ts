@@ -6,6 +6,8 @@ import { classifyDocument, saveDocumentMetadata, DocumentMetadata } from "@/lib/
 
 export const runtime = "nodejs";
 
+const STORAGE_DIR = "/tmp/sidekick-documents";
+
 function ensureDir(p: string) {
   if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
 }
@@ -50,7 +52,7 @@ export async function POST(req: Request) {
 
     const documentId = nanoid(10);
 
-    const docDir = path.join(process.cwd(), "data", "documents", companyId);
+    const docDir = path.join(STORAGE_DIR, companyId);
     ensureDir(docDir);
     const textPath = path.join(docDir, `${documentId}.txt`);
     fs.writeFileSync(textPath, text, "utf-8");

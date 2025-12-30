@@ -37,7 +37,7 @@ export async function classifyDocument(textContent: string): Promise<{
   const sample = textContent.slice(0, 2000);
 
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",  // ← FIXED: Using the correct model name
+    model: "claude-sonnet-4-20250514",
     max_tokens: 500,
     system: `You are a document classification expert for workplace documents. 
 Analyze the document content and classify it into ONE of these types:
@@ -82,8 +82,11 @@ Return ONLY a JSON object with this exact format (no markdown, no explanation):
   }
 }
 
+// Store in /tmp for Vercel (ephemeral, but works for demo)
+const STORAGE_DIR = "/tmp/sidekick-documents";
+
 export function saveDocumentMetadata(companyId: string, metadata: DocumentMetadata) {
-  const metaDir = path.join(process.cwd(), "data", "documents", companyId);
+  const metaDir = path.join(STORAGE_DIR, companyId);
   if (!fs.existsSync(metaDir)) {
     fs.mkdirSync(metaDir, { recursive: true });
   }
@@ -100,7 +103,7 @@ export function saveDocumentMetadata(companyId: string, metadata: DocumentMetada
 }
 
 export function getDocumentsByCompany(companyId: string): DocumentMetadata[] {
-  const metaFile = path.join(process.cwd(), "data", "documents", companyId, "metadata.json");
+  const metaFile = path.join(STORAGE_DIR, companyId, "metadata.json");
   if (!fs.existsSync(metaFile)) {
     return [];
   }
@@ -108,7 +111,7 @@ export function getDocumentsByCompany(companyId: string): DocumentMetadata[] {
 }
 
 export function getDocumentText(companyId: string, documentId: string): string {
-  const docFile = path.join(process.cwd(), "data", "documents", companyId, `${documentId}.txt`);
+  const docFile = path.join(STORAGE_DIR, companyId, `${documentId}.txt`);
   if (!fs.existsSync(docFile)) {
     return "";
   }
