@@ -1,210 +1,140 @@
 "use client";
-import { useRef } from "react";
-
-function HandbookUpload() {
-  const [companyId, setCompanyId] = useState("demo");
-  const [file, setFile] = useState<File | null>(null);
-  const [status, setStatus] = useState<{ ok?: boolean; message: string } | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  async function handleUpload(e: React.FormEvent) {
-    e.preventDefault();
-    setStatus(null);
-
-    if (!file) {
-      setStatus({ message: "Please select a PDF file." });
-      return;
-    }
-
-    setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append("companyId", companyId);
-      formData.append("file", file);
-
-      const res = await fetch("/api/handbook/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.ok) {
-        setStatus({
-          ok: true,
-          message: `Uploaded: ${data.chars} chars (saved to: ${data.savedTo})`,
-        });
-        setFile(null);
-        if (fileInputRef.current) fileInputRef.current.value = "";
-      } else {
-        setStatus({
-          message: data?.error || "Upload failed.",
-        });
-      }
-    } catch (err) {
-      setStatus({ message: "Upload failed due to a network error." });
-    } finally {
-      setUploading(false);
-    }
-  }
-
-  return (
-    <div className="mb-8 p-4 rounded-2xl bg-white/5 border border-white/10">
-      <h2 className="text-lg font-semibold text-white mb-2">Handbook Upload</h2>
-      <form className="flex flex-col sm:flex-row items-stretch gap-3" onSubmit={handleUpload}>
-        <input
-          type="text"
-          className="rounded-xl px-3 py-2 border border-white/20 bg-black/20 text-white"
-          placeholder="Company ID"
-          value={companyId}
-          onChange={(e) => setCompanyId(e.target.value)}
-          disabled={uploading}
-          style={{ minWidth: 120 }}
-        />
-        <input
-          type="file"
-          accept="application/pdf"
-          className="rounded-xl px-3 py-2 border border-white/20 bg-black/20 text-white"
-          onChange={(e) => {
-            const f = e.target.files?.[0] ?? null;
-            setFile(f);
-          }}
-          ref={fileInputRef}
-          disabled={uploading}
-          style={{ minWidth: 180 }}
-        />
-        <button
-          type="submit"
-          className="rounded-xl px-5 py-2 bg-emerald-500/80 text-white font-semibold hover:bg-emerald-500 disabled:opacity-60"
-          disabled={uploading}
-        >
-          {uploading ? "Uploading..." : "Upload"}
-        </button>
-      </form>
-      {status && (
-        <div
-          className={`mt-2 text-sm ${
-            status.ok ? "text-emerald-400" : "text-red-400"
-          }`}
-        >
-          {status.message}
-        </div>
-      )}
-    </div>
-  );
-}
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-type Onboarding = {
+type Document = {
   id: string;
-  name: string;
-  department: string;
-  supervisor: string;
-  email: string;
-  startDate: string;
-  completedAt: string;
+  filename: string;
+  type: string;
+  title: string;
+  uploadedAt: number;
+  pageCount?: number;
 };
 
-export default function ManagerPage() {
-  const [rows, setRows] = useState<Onboarding[]>([]);
-
-  function load() {
-    try {
-      const raw = localStorage.getItem("onboardings");
-      const parsed = raw ? (JSON.parse(raw) as Onboarding[]) : [];
-      setRows(Array.isArray(parsed) ? parsed : []);
-    } catch {
-      setRows([]);
-    }
-  }
-
-  function clear() {
-    localStorage.removeItem("onboardings");
-    setRows([]);
-  }
+export default function ManagerDashboard() {
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [grouped, setGrouped] = useState<Record<string, Document[]>>({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    load();
+    fetch("/api/documents/list?companyId=demo")
+      .then(res => res.json())
+      .then(data => {
+        if (data.ok) {
+          setDocuments(data.documents);
+          setGrouped(data.grouped);
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
   }, []);
 
-  return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-6">
-      <div className="w-full max-w-5xl rounded-3xl bg-black/40 border border-white/10 shadow-2xl overflow-hidden">
-        <div className="p-6">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h1 className="text-white text-2xl font-semibold">Manager Dashboard</h1>
-              <p className="text-white/70 text-sm">
-                Completed onboardings: <span className="text-white">{rows.length}</span>
-              </p>
-            </div>
+  const typeLabels: Record<string, string> = {
+    handbook: "📘 Employee Handbooks",
+    safety_manual: "⚠️ Safety Manuals",
+    shift_schedule: "📅 Shift Schedules",
+    payroll_info: "💰 Payroll Information",
+    training_material: "📚 Training Materials",
+    equipment_manual: "🔧 Equipment Manuals",
+    emergency_procedures: "🚨 Emergency Procedures",
+    inventory_manifest: "📦 Inventory",
+    commission_sheet: "💵 Commission Sheets",
+    other: "📄 Other Documents",
+  };
 
-            <div className="flex gap-2">
-              <button
-                onClick={load}
-                className="rounded-2xl px-4 py-2 bg-white/10 hover:bg-white/15 text-white text-sm border border-white/10"
-              >
-                Refresh
-              </button>
-              <button
-                onClick={clear}
-                className="rounded-2xl px-4 py-2 bg-rose-500/60 hover:bg-rose-500/80 text-white text-sm"
-              >
-                Clear Data
-              </button>
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-8">
+        <div className="text-center text-white text-xl">Loading...</div>
+      </main>
+    );
+  }
+
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl font-bold text-white mb-2">Manager Dashboard</h1>
+            <p className="text-white/70">
+              {documents.length} document{documents.length !== 1 ? 's' : ''} uploaded
+            </p>
+          </div>
+          <Link 
+            href="/manager/upload"
+            className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition"
+          >
+            + Upload Documents
+          </Link>
+        </div>
+
+        {/* No documents state */}
+        {documents.length === 0 && (
+          <div className="text-center py-16">
+            <div className="text-6xl mb-4">📁</div>
+            <h2 className="text-2xl font-semibold text-white mb-2">No documents yet</h2>
+            <p className="text-white/70 mb-6">Upload your first company document to get started</p>
+            <Link 
+              href="/manager/upload"
+              className="inline-block px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition"
+            >
+              Upload Documents
+            </Link>
+          </div>
+        )}
+
+        {/* Documents grouped by type */}
+        {Object.entries(grouped).map(([type, docs]) => (
+          <div key={type} className="mb-8">
+            <h2 className="text-2xl font-semibold text-white mb-4">
+              {typeLabels[type] || "📄 " + type}
+            </h2>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {docs.map(doc => (
+                <div
+                  key={doc.id}
+                  className="bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-white/10 transition"
+                >
+                  <h3 className="text-white font-semibold mb-2 line-clamp-2">
+                    {doc.title}
+                  </h3>
+                  <p className="text-white/50 text-sm mb-3">{doc.filename}</p>
+                  <div className="flex items-center justify-between text-xs text-white/40">
+                    <span>{doc.pageCount ? `${doc.pageCount} pages` : "PDF"}</span>
+                    <span>{new Date(doc.uploadedAt).toLocaleDateString()}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+
+        {/* Quick actions */}
+        {documents.length > 0 && (
+          <div className="mt-12 bg-white/5 border border-white/10 rounded-xl p-8">
+            <h2 className="text-2xl font-semibold text-white mb-4">Quick Actions</h2>
+            <div className="grid gap-4 md:grid-cols-2">
               <Link
-                href="/"
-                className="rounded-2xl px-4 py-2 bg-emerald-500/60 hover:bg-emerald-500/80 text-white text-sm"
+                href="/qa"
+                className="p-6 bg-blue-500/20 border border-blue-400/25 rounded-xl hover:bg-blue-500/30 transition"
               >
-                Back to Worker
+                <div className="text-3xl mb-2">💬</div>
+                <h3 className="text-white font-semibold mb-1">Test Q&A Interface</h3>
+                <p className="text-white/70 text-sm">See how workers will ask questions</p>
+              </Link>
+              <Link
+                href="/manager/upload"
+                className="p-6 bg-emerald-500/20 border border-emerald-400/25 rounded-xl hover:bg-emerald-500/30 transition"
+              >
+                <div className="text-3xl mb-2">📄</div>
+                <h3 className="text-white font-semibold mb-1">Upload More Documents</h3>
+                <p className="text-white/70 text-sm">Add handbooks, schedules, manuals</p>
               </Link>
             </div>
           </div>
-
-          <div className="mt-6 overflow-auto rounded-2xl border border-white/10">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-white/5 text-white/80">
-                <tr>
-                  <th className="p-3">Name</th>
-                  <th className="p-3">Department</th>
-                  <th className="p-3">Supervisor</th>
-                  <th className="p-3">Email</th>
-                  <th className="p-3">Start Date</th>
-                  <th className="p-3">Completed At</th>
-                </tr>
-              </thead>
-              <tbody className="text-white">
-                {rows.length === 0 ? (
-                  <tr>
-                    <td className="p-4 text-white/70" colSpan={6}>
-                      No completed onboardings yet. Complete the worker flow, then come back here.
-                    </td>
-                  </tr>
-                ) : (
-                  rows.map((r) => (
-                    <tr key={r.id} className="border-t border-white/10">
-                      <td className="p-3">{r.name}</td>
-                      <td className="p-3">{r.department}</td>
-                      <td className="p-3">{r.supervisor}</td>
-                      <td className="p-3">{r.email}</td>
-                      <td className="p-3">{r.startDate}</td>
-                      <td className="p-3">
-                        {new Date(r.completedAt).toLocaleString()}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="mt-4 text-white/60 text-xs">
-            Tip: If you don’t see updates, click “Refresh” after completing onboarding.
-          </div>
-        </div>
+        )}
       </div>
     </main>
   );
