@@ -13,11 +13,9 @@ function simpleChunks(text: string, size = 1200) {
   return chunks.slice(0, 200);
 }
 
-// PHASE 3: Intelligent routing based on question
 function determineRelevantDocTypes(question: string): string[] {
   const q = question.toLowerCase();
   
-  // Direct queries that need structured data
   if (q.match(/when (do|does) (i|[a-z]+) work/i)) {
     return ["shift_schedule"];
   }
@@ -31,7 +29,6 @@ function determineRelevantDocTypes(question: string): string[] {
     return ["vehicle_inventory"];
   }
   
-  // Broader queries
   if (q.includes("safe") || q.includes("ppe") || q.includes("boots") || q.includes("gear")) {
     return ["safety_manual", "equipment_manual", "handbook"];
   }
@@ -45,14 +42,12 @@ function determineRelevantDocTypes(question: string): string[] {
   return ["handbook", "safety_manual", "shift_schedule", "other"];
 }
 
-// Use structured data for direct queries
 function answerFromStructuredData(question: string, docs: any[]): string | null {
   const q = question.toLowerCase();
   
   for (const doc of docs) {
     if (!doc.extractedData) continue;
     
-    // Shift schedule queries
     if (doc.type === "shift_schedule" && doc.extractedData.shifts) {
       if (q.match(/when (do|does) (i|[a-z]+) work/i)) {
         const name = q.match(/when does ([a-z]+) work/i)?.[1];
@@ -66,7 +61,6 @@ function answerFromStructuredData(question: string, docs: any[]): string | null 
             return `${matchedShift.employeeName} works on ${matchedShift.date} from ${matchedShift.startTime} to ${matchedShift.endTime} at ${matchedShift.location}.`;
           }
         } else {
-          // "When do I work?" - return first shift
           const shift = shifts[0];
           if (shift) {
             return `Your next shift is on ${shift.date} from ${shift.startTime} to ${shift.endTime} at ${shift.location}.`;
@@ -75,7 +69,6 @@ function answerFromStructuredData(question: string, docs: any[]): string | null 
       }
     }
     
-    // Commission queries
     if (doc.type === "commission_sheet" && doc.extractedData.commissions) {
       if (q.includes("commission")) {
         const comm = doc.extractedData.commissions[0];
@@ -85,7 +78,6 @@ function answerFromStructuredData(question: string, docs: any[]): string | null 
       }
     }
     
-    // Safety requirements
     if (doc.type === "safety_manual" && doc.extractedData.requirements) {
       if (q.includes("ppe") || q.includes("safety gear") || q.includes("boots")) {
         const req = doc.extractedData.requirements[0];
@@ -100,6 +92,8 @@ function answerFromStructuredData(question: string, docs: any[]): string | null 
 }
 
 export async function POST(req: Request) {
+  const startTime = Date.now();
+  
   try {
     const { question = "" } = await req.json();
     const q = String(question).trim();
@@ -127,18 +121,33 @@ export async function POST(req: Request) {
     const relevantTypes = determineRelevantDocTypes(q);
     const relevantDocs = allDocs.filter(doc => relevantTypes.includes(doc.type));
     
-    // Try structured data first (FAST!)
     const structuredAnswer = answerFromStructuredData(q, relevantDocs);
     if (structuredAnswer) {
-      return NextResponse.json({
+      const responseTime = Date.now() - startTime;
+      const result = {
         ok: true,
         answer: structuredAnswer,
         sources: relevantDocs.map(d => ({ title: d.title, type: d.type })),
-        method: "structured_data" // For debugging
-      });
+        method: "structured_data"
+      };
+      
+      // Log analytics (fire and forget)
+      fetch(new URL("/api/analytics/log", req.url), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question: q,
+          answer: structuredAnswer,
+          sources: result.sources,
+          companyId,
+          method: "structured_data",
+          responseTime,
+        }),
+      }).catch(console.error);
+      
+      return NextResponse.json(result);
     }
     
-    // Fall back to full-text search
     let allText = "";
     const sourceDocs: any[] = [];
     
@@ -180,12 +189,29 @@ Keep answers concise and practical.`,
       ? response.content[0].text
       : "I'm not sure. Please ask your manager.";
 
-    return NextResponse.json({
+    const responseTime = Date.now() - startTime;
+    const result = {
       ok: true,
       answer,
       sources: sourceDocs,
       method: "full_text_search"
-    });
+    };
+    
+    // Log analytics (fire and forget)
+    fetch(new URL("/api/analytics/log", req.url), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        question: q,
+        answer,
+        sources: sourceDocs,
+        companyId,
+        method: "full_text_search",
+        responseTime,
+      }),
+    }).catch(console.error);
+
+    return NextResponse.json(result);
   } catch (e: any) {
     console.error("Ask error:", e);
     return NextResponse.json(

@@ -69,12 +69,20 @@ export default function ManagerDashboard() {
               )}
             </p>
           </div>
-          <Link 
-            href="/manager/upload"
-            className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition"
-          >
-            + Upload Documents
-          </Link>
+          <div className="flex gap-3">
+            <Link 
+              href="/manager/analytics"
+              className="px-6 py-3 bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-xl transition"
+            >
+              📊 Analytics
+            </Link>
+            <Link 
+              href="/manager/upload"
+              className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition"
+            >
+              + Upload
+            </Link>
+          </div>
         </div>
 
         {documents.length === 0 && (
@@ -127,14 +135,22 @@ export default function ManagerDashboard() {
         {documents.length > 0 && (
           <div className="mt-12 bg-white/5 border border-white/10 rounded-xl p-8">
             <h2 className="text-2xl font-semibold text-white mb-4">Quick Actions</h2>
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-3">
+              <Link
+                href="/manager/analytics"
+                className="p-6 bg-purple-500/20 border border-purple-400/25 rounded-xl hover:bg-purple-500/30 transition"
+              >
+                <div className="text-3xl mb-2">📊</div>
+                <h3 className="text-white font-semibold mb-1">View Analytics</h3>
+                <p className="text-white/70 text-sm">See usage stats and ROI</p>
+              </Link>
               <Link
                 href="/qa"
                 className="p-6 bg-blue-500/20 border border-blue-400/25 rounded-xl hover:bg-blue-500/30 transition"
               >
                 <div className="text-3xl mb-2">💬</div>
                 <h3 className="text-white font-semibold mb-1">Test Q&A Interface</h3>
-                <p className="text-white/70 text-sm">See how workers will ask questions</p>
+                <p className="text-white/70 text-sm">See how workers ask questions</p>
               </Link>
               <Link
                 href="/manager/upload"
@@ -149,7 +165,6 @@ export default function ManagerDashboard() {
         )}
       </div>
 
-      {/* Document detail modal */}
       {selectedDoc && (
         <div 
           className="fixed inset-0 bg-black/80 flex items-center justify-center p-8 z-50"
