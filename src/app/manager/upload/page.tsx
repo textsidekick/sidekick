@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-type DocumentWithType = {
+type DocumentWithStatus = {
   id: string;
   file: File;
   type: string;
@@ -13,16 +13,17 @@ type DocumentWithType = {
     title: string;
     confidence: number;
   };
+  error?: string;
 };
 
 export default function UploadPage() {
   const router = useRouter();
-  const [documents, setDocuments] = useState<DocumentWithType[]>([]);
+  const [documents, setDocuments] = useState<DocumentWithStatus[]>([]);
   const [uploading, setUploading] = useState(false);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const newDocs: DocumentWithType[] = files.map(file => ({
+    const newDocs: DocumentWithStatus[] = files.map(file => ({
       id: Math.random().toString(36).substr(2, 9),
       file,
       type: "auto",
@@ -47,8 +48,9 @@ export default function UploadPage() {
     setUploading(true);
 
     for (const doc of documents) {
+      if (doc.status !== "pending") continue;
+
       try {
-        // Update status
         setDocuments(prev => prev.map(d =>
           d.id === doc.id ? { ...d, status: "uploading" as const } : d
         ));
@@ -75,21 +77,26 @@ export default function UploadPage() {
           ));
         } else {
           setDocuments(prev => prev.map(d =>
-            d.id === doc.id ? { ...d, status: "error" as const } : d
+            d.id === doc.id 
+              ? { ...d, status: "error" as const, error: data.error || "Upload failed" }
+              : d
           ));
         }
       } catch (err) {
         setDocuments(prev => prev.map(d =>
-          d.id === doc.id ? { ...d, status: "error" as const } : d
+          d.id === doc.id 
+            ? { ...d, status: "error" as const, error: "Network error" }
+            : d
         ));
       }
     }
 
     setUploading(false);
     
-    // Check if all successful
-    const allSuccess = documents.every(d => d.status === "success");
-    if (allSuccess) {
+    const allSuccess = documents.every(d => d.status === "success" || d.status === "error");
+    const hasSuccess = documents.some(d => d.status === "success");
+    
+    if (allSuccess && hasSuccess) {
       setTimeout(() => {
         router.push("/manager");
       }, 2000);
@@ -122,7 +129,6 @@ export default function UploadPage() {
           <p className="text-white/70">AI will automatically classify each document type</p>
         </div>
 
-        {/* File Upload Zone */}
         <div className="mb-8">
           <label className="block w-full p-12 border-2 border-dashed border-white/20 rounded-2xl text-center cursor-pointer hover:border-emerald-500/50 hover:bg-white/5 transition">
             <input
@@ -142,7 +148,6 @@ export default function UploadPage() {
           </label>
         </div>
 
-        {/* Document List */}
         {documents.length > 0 && (
           <div className="mb-8 space-y-4">
             {documents.map(doc => (
@@ -165,6 +170,12 @@ export default function UploadPage() {
                         <span className="text-white/50 ml-2">
                           ({doc.classification.type}, {Math.round(doc.classification.confidence * 100)}% confidence)
                         </span>
+                      </div>
+                    )}
+
+                    {doc.error && (
+                      <div className="text-red-400 text-sm mb-2">
+                        Error: {doc.error}
                       </div>
                     )}
 
@@ -204,7 +215,6 @@ export default function UploadPage() {
           </div>
         )}
 
-        {/* Upload Button */}
         {documents.length > 0 && documents.some(d => d.status === "pending") && (
           <button
             onClick={uploadAll}
@@ -218,10 +228,14 @@ export default function UploadPage() {
           </button>
         )}
 
-        {documents.length > 0 && documents.every(d => d.status === "success") && (
+        {documents.length > 0 && documents.every(d => d.status !== "pending") && (
           <div className="text-center">
-            <div className="text-green-400 text-xl font-semibold mb-2">✓ All documents uploaded successfully!</div>
-            <div className="text-white/70">Redirecting to dashboard...</div>
+            <div className="text-green-400 text-xl font-semibold mb-2">
+              ✓ Upload complete! {documents.filter(d => d.status === "success").length} successful, {documents.filter(d => d.status === "error").length} failed
+            </div>
+            {documents.some(d => d.status === "success") && (
+              <div className="text-white/70">Redirecting to dashboard...</div>
+            )}
           </div>
         )}
       </div>
