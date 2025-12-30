@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from "react";
 type Message = {
   role: "user" | "assistant";
   content: string;
+  sources?: Array<{ title: string; type: string }>;
 };
 
 export default function QAPage() {
@@ -21,7 +22,7 @@ export default function QAPage() {
 
   async function sendQuestion() {
     if (!input.trim() || loading) return;
-
+    
     const question = input.trim();
     setInput("");
     setMessages(prev => [...prev, { role: "user", content: question }]);
@@ -34,23 +35,24 @@ export default function QAPage() {
         body: JSON.stringify({ question })
       });
 
-      const data = await res.json().catch(() => ({}));
+      const data = await res.json();
 
-      if (res.ok && data?.ok && data?.answer) {
-        setMessages(prev => [...prev, { role: "assistant", content: String(data.answer) }]);
+      if (data.ok && data.answer) {
+        setMessages(prev => [...prev, {
+          role: "assistant",
+          content: data.answer,
+          sources: data.sources
+        }]);
       } else {
-        const msg =
-          data?.detail
-            ? `Ask failed: ${data.detail}`
-            : data?.error
-              ? `Ask failed: ${data.error}`
-              : `Ask failed: HTTP ${res.status}`;
-        setMessages(prev => [...prev, { role: "assistant", content: msg }]);
+        setMessages(prev => [...prev, {
+          role: "assistant",
+          content: "Sorry, I couldn't find an answer. Please ask your manager."
+        }]);
       }
-    } catch (err: any) {
+    } catch (err) {
       setMessages(prev => [...prev, {
         role: "assistant",
-        content: `Network error: ${String(err?.message ?? err)}`
+        content: "Network error. Please try again."
       }]);
     } finally {
       setLoading(false);
@@ -74,14 +76,27 @@ export default function QAPage() {
 
         <div className="flex-1 overflow-auto p-6 space-y-4">
           {messages.map((msg, i) => (
-            <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-              <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                msg.role === "user"
-                  ? "bg-emerald-500/25 border border-emerald-400/30 text-white"
-                  : "bg-blue-500/20 border border-blue-400/25 text-white"
-              }`}>
-                {msg.content}
+            <div key={i}>
+              <div
+                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+              >
+                <div
+                  className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                    msg.role === "user"
+                      ? "bg-emerald-500/25 border border-emerald-400/30 text-white"
+                      : "bg-blue-500/20 border border-blue-400/25 text-white"
+                  }`}
+                >
+                  {msg.content}
+                </div>
               </div>
+              {msg.sources && msg.sources.length > 0 && (
+                <div className="flex justify-start mt-2">
+                  <div className="max-w-[80%] text-xs text-white/50 px-4">
+                    📚 Sources: {msg.sources.map(s => s.title).join(", ")}
+                  </div>
+                </div>
+              )}
             </div>
           ))}
           {loading && (

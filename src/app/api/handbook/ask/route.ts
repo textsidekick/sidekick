@@ -16,28 +16,26 @@ function simpleChunks(text: string, size = 1200) {
 function determineRelevantDocTypes(question: string): string[] {
   const q = question.toLowerCase();
   
-  // Simple keyword matching (can be improved with AI)
   if (q.includes("work") || q.includes("shift") || q.includes("schedule") || q.includes("when")) {
     return ["shift_schedule", "handbook"];
   }
-  if (q.includes("safe") || q.includes("ppe") || q.includes("equipment") || q.includes("wear")) {
+  if (q.includes("safe") || q.includes("ppe") || q.includes("equipment") || q.includes("wear") || q.includes("boots") || q.includes("gear")) {
     return ["safety_manual", "equipment_manual", "handbook"];
   }
   if (q.includes("pay") || q.includes("commission") || q.includes("salary") || q.includes("wage")) {
     return ["payroll_info", "commission_sheet", "handbook"];
   }
-  if (q.includes("train") || q.includes("learn") || q.includes("how to")) {
-    return ["training_material", "equipment_manual", "handbook"];
+  if (q.includes("park") || q.includes("where") || q.includes("break") || q.includes("lunch")) {
+    return ["handbook", "other"];
   }
   
-  // Default: search all
-  return ["handbook", "safety_manual", "shift_schedule", "training_material", "equipment_manual"];
+  return ["handbook", "safety_manual", "shift_schedule", "training_material", "equipment_manual", "other"];
 }
 
 export async function POST(req: Request) {
   try {
-    const { question, companyId = "demo" } = await req.json();
-    const q = String(question ?? "").trim();
+    const { question = "" } = await req.json();
+    const q = String(question).trim();
     
     if (!q) {
       return NextResponse.json({ error: "Missing question" }, { status: 400 });
@@ -48,8 +46,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing ANTHROPIC_API_KEY" }, { status: 500 });
     }
 
-    // Get all documents for company
+    const companyId = "demo";
     const allDocs = getDocumentsByCompany(companyId);
+    
+    console.log("Found documents:", allDocs.length);
     
     if (allDocs.length === 0) {
       return NextResponse.json({
@@ -59,17 +59,16 @@ export async function POST(req: Request) {
       });
     }
 
-    // Determine relevant document types for this question
     const relevantTypes = determineRelevantDocTypes(q);
+    console.log("Relevant document types:", relevantTypes);
     
-    // Filter documents by relevant types
     const relevantDocs = allDocs.filter(doc => relevantTypes.includes(doc.type));
+    console.log("Relevant documents:", relevantDocs.length);
     
-    // Gather text from relevant documents
     let allText = "";
     const sourceDocs: any[] = [];
     
-    for (const doc of relevantDocs.slice(0, 5)) { // Max 5 documents
+    for (const doc of relevantDocs.slice(0, 5)) {
       const text = getDocumentText(companyId, doc.id);
       if (text) {
         allText += `\n\n=== ${doc.title} (${doc.type}) ===\n${text}`;
@@ -85,17 +84,15 @@ export async function POST(req: Request) {
       });
     }
 
-    // Create chunks
     const chunks = simpleChunks(allText);
     const context = chunks.slice(0, 10).map((c, i) => `SECTION ${i + 1}:\n${c}`).join("\n\n");
 
-    // Call Claude
     const anthropic = new Anthropic({ apiKey });
-    
+
     const response = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022",
+      model: "claude-sonnet-4-20250514",
       max_tokens: 400,
-      system: `You are Sidekick, an onboarding assistant for hourly workers. 
+      system: `You are Sidekick, an onboarding assistant for hourly workers.
 Answer questions using ONLY the provided document sections.
 If the answer isn't in the documents, say: "I'm not sure based on the available documents. Please ask your manager."
 Keep answers concise and practical.`,
