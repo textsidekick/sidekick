@@ -37,7 +37,7 @@ export async function classifyDocument(textContent: string): Promise<{
   const sample = textContent.slice(0, 2000);
 
   const response = await anthropic.messages.create({
-    model: "claude-3-5-sonnet-20241022",
+    model: "claude-sonnet-4-20250514",  // ← FIXED: Using the correct model name
     max_tokens: 500,
     system: `You are a document classification expert for workplace documents. 
 Analyze the document content and classify it into ONE of these types:
