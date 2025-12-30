@@ -1,4 +1,99 @@
 "use client";
+import { useRef } from "react";
+
+function HandbookUpload() {
+  const [companyId, setCompanyId] = useState("demo");
+  const [file, setFile] = useState<File | null>(null);
+  const [status, setStatus] = useState<{ ok?: boolean; message: string } | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  async function handleUpload(e: React.FormEvent) {
+    e.preventDefault();
+    setStatus(null);
+
+    if (!file) {
+      setStatus({ message: "Please select a PDF file." });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("companyId", companyId);
+      formData.append("file", file);
+
+      const res = await fetch("/api/handbook/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.ok) {
+        setStatus({
+          ok: true,
+          message: `Uploaded: ${data.chars} chars (saved to: ${data.savedTo})`,
+        });
+        setFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+      } else {
+        setStatus({
+          message: data?.error || "Upload failed.",
+        });
+      }
+    } catch (err) {
+      setStatus({ message: "Upload failed due to a network error." });
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div className="mb-8 p-4 rounded-2xl bg-white/5 border border-white/10">
+      <h2 className="text-lg font-semibold text-white mb-2">Handbook Upload</h2>
+      <form className="flex flex-col sm:flex-row items-stretch gap-3" onSubmit={handleUpload}>
+        <input
+          type="text"
+          className="rounded-xl px-3 py-2 border border-white/20 bg-black/20 text-white"
+          placeholder="Company ID"
+          value={companyId}
+          onChange={(e) => setCompanyId(e.target.value)}
+          disabled={uploading}
+          style={{ minWidth: 120 }}
+        />
+        <input
+          type="file"
+          accept="application/pdf"
+          className="rounded-xl px-3 py-2 border border-white/20 bg-black/20 text-white"
+          onChange={(e) => {
+            const f = e.target.files?.[0] ?? null;
+            setFile(f);
+          }}
+          ref={fileInputRef}
+          disabled={uploading}
+          style={{ minWidth: 180 }}
+        />
+        <button
+          type="submit"
+          className="rounded-xl px-5 py-2 bg-emerald-500/80 text-white font-semibold hover:bg-emerald-500 disabled:opacity-60"
+          disabled={uploading}
+        >
+          {uploading ? "Uploading..." : "Upload"}
+        </button>
+      </form>
+      {status && (
+        <div
+          className={`mt-2 text-sm ${
+            status.ok ? "text-emerald-400" : "text-red-400"
+          }`}
+        >
+          {status.message}
+        </div>
+      )}
+    </div>
+  );
+}
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
