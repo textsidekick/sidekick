@@ -4,7 +4,7 @@ export default function TermsPage() {
       <div className="max-w-4xl mx-auto">
         <div className="bg-white/5 border border-white/10 rounded-2xl p-12">
           <h1 className="text-5xl font-bold text-white mb-6">Terms of Service</h1>
-          <p className="text-white/60 mb-8">Last Updated: December 30, 2024</p>
+          <p className="text-white/60 mb-8">Last Updated: December 30, 2025</p>
           
           <div className="space-y-6 text-white/80">
             <section>
@@ -87,7 +87,7 @@ export default function TermsPage() {
               <h2 className="text-2xl font-semibold text-white mb-3">9. Contact Information</h2>
               <p>
                 For questions about these terms, contact:<br/>
-                <strong className="text-white">legal@sidekick-ai.com</strong>
+                <strong className="text-white">so.justin8@gmail.com</strong>
               </p>
             </section>
           </div>

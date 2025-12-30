@@ -82,7 +82,7 @@ export default function SMSConsentPage() {
                   Automatic response when worker texts HELP:<br/>
                   "Sidekick AI helps answer your onboarding questions. Just text any question about 
                   your job! Msg&data rates may apply. Text STOP to opt out. 
-                  Need human help? Contact: support@sidekick-ai.com"
+                  Need human help? Contact: so.justin8@gmail.com"
                 </p>
               </div>
             </section>
@@ -112,7 +112,7 @@ export default function SMSConsentPage() {
               <h2 className="text-3xl font-semibold text-white mb-4">Contact Information</h2>
               <p>
                 For questions about SMS consent or to request opt-out:<br/>
-                <strong className="text-white">Email:</strong> support@sidekick-ai.com<br/>
+                <strong className="text-white">Email:</strong> so.justin8@gmail.com<br/>
                 <strong className="text-white">Phone:</strong> Toll-free number (pending approval)
               </p>
             </section>

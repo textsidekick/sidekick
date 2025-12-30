@@ -14,13 +14,13 @@ export default function ContactPage() {
               <div className="bg-white/5 border border-white/10 rounded-xl p-6">
                 <h2 className="text-2xl font-semibold text-white mb-4">📧 Email Support</h2>
                 <p className="mb-2">General Inquiries:</p>
-                <a href="mailto:support@sidekick-ai.com" className="text-emerald-400 hover:text-emerald-300">
-                  support@sidekick-ai.com
+                <a href="mailto:so.justin8@gmail.com" className="text-emerald-400 hover:text-emerald-300">
+                  so.justin8@gmail.com
                 </a>
                 
                 <p className="mt-4 mb-2">Sales & Partnerships:</p>
-                <a href="mailto:sales@sidekick-ai.com" className="text-emerald-400 hover:text-emerald-300">
-                  sales@sidekick-ai.com
+                <a href="mailto:so.justin8@gmail.com" className="text-emerald-400 hover:text-emerald-300">
+                  so.justin8@gmail.com
                 </a>
               </div>
 
@@ -38,7 +38,7 @@ export default function ContactPage() {
               <h2 className="text-2xl font-semibold text-emerald-400 mb-3">🚀 Interested in Sidekick for your business?</h2>
               <p className="mb-4">
                 We're currently working with select manufacturing and retail partners to pilot our 
-                SMS-based onboarding assistant. Email us at sales@sidekick-ai.com to learn more!
+                SMS-based onboarding assistant. Email us at so.justin8@gmail.com to learn more!
               </p>
             </div>
 

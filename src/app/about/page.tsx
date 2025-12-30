@@ -38,7 +38,7 @@ export default function AboutPage() {
               <p className="text-white/60">
                 <strong>Company:</strong> Sidekick AI<br/>
                 <strong>Location:</strong> Menlo Park, CA<br/>
-                <strong>Email:</strong> support@sidekick-ai.com
+                <strong>Email:</strong> so.justin8@gmail.com
               </p>
             </div>
           </div>

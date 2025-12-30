@@ -165,15 +165,15 @@ export default function HomePage() {
             <div>
               <h3 className="text-white font-semibold mb-3">Contact</h3>
               <div className="space-y-2">
-                <a href="mailto:support@sidekick-ai.com" className="block text-white/60 hover:text-white transition">
-                  support@sidekick-ai.com
+                <a href="mailto:so.justin8@gmail.com" className="block text-white/60 hover:text-white transition">
+                  so.justin8@gmail.com
                 </a>
               </div>
             </div>
           </div>
           
           <div className="mt-8 pt-8 border-t border-white/10 text-center text-white/60">
-            © 2024 Sidekick AI. All rights reserved.
+            © 2025 Sidekick AI. All rights reserved.
           </div>
         </div>
       </footer>
