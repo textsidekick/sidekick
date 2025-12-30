@@ -29,14 +29,21 @@ export async function POST(req: Request) {
 
     // If there's an image, use vision capabilities
     if (image) {
+      console.log("Processing image question...");
+      console.log("Image data length:", image?.length || 0);
+      
       // Extract base64 data and media type
       const matches = image.match(/^data:(.+?);base64,(.+)$/);
       if (!matches) {
+        console.error("Invalid image format - no base64 match");
         return NextResponse.json({ error: "Invalid image format" }, { status: 400 });
       }
       
       const mediaType = matches[1];
       const base64Data = matches[2];
+      
+      console.log("Media type:", mediaType);
+      console.log("Base64 data length:", base64Data.length);
 
       // Get document context for additional information
       const companyId = "demo";
@@ -44,7 +51,6 @@ export async function POST(req: Request) {
       
       let contextText = "";
       if (documents.length > 0) {
-        // Get safety and equipment manuals for context
         const relevantDocs = documents.filter(d => 
           d.type === "safety_manual" || d.type === "equipment_manual"
         );
@@ -57,6 +63,8 @@ export async function POST(req: Request) {
         }
       }
 
+      console.log("Calling Claude Vision API...");
+      
       const response = await anthropic.messages.create({
         model: "claude-3-5-sonnet-20241022",
         max_tokens: 500,
@@ -82,6 +90,8 @@ export async function POST(req: Request) {
           ]
         }]
       });
+
+      console.log("Got response from Claude Vision");
 
       const answer = response.content[0].type === "text"
         ? response.content[0].text
@@ -112,7 +122,6 @@ export async function POST(req: Request) {
       });
     }
 
-    // Smart document selection based on question
     const questionLower = q.toLowerCase();
     const keywords = {
       parking: ["parking", "park", "car", "vehicle"],
@@ -173,8 +182,14 @@ Keep answers concise and practical.`,
     });
   } catch (e: any) {
     console.error("Ask error:", e);
+    console.error("Error message:", e.message);
+    console.error("Error stack:", e.stack);
     return NextResponse.json(
-      { error: "Ask failed", detail: String(e?.message ?? e) },
+      { 
+        error: "Ask failed", 
+        detail: String(e?.message ?? e),
+        ok: false 
+      },
       { status: 500 }
     );
   }
