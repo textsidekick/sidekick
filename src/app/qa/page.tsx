@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from "react";
 type Message = {
   role: "user" | "assistant";
   content: string;
-  sources?: Array<{ title: string; type: string }>;
+  sources?: Array<{ id: string; title: string; type: string }>;
 };
 
 export default function QAPage() {
@@ -24,6 +24,7 @@ export default function QAPage() {
     if (!input.trim() || loading) return;
     
     const question = input.trim();
+    const startTime = Date.now();
     setInput("");
     setMessages(prev => [...prev, { role: "user", content: question }]);
     setLoading(true);
@@ -36,13 +37,28 @@ export default function QAPage() {
       });
 
       const data = await res.json();
+      const responseTime = Date.now() - startTime;
 
       if (data.ok && data.answer) {
         setMessages(prev => [...prev, {
           role: "assistant",
           content: data.answer,
-          sources: data.sources
+          sources: data.sources || []
         }]);
+
+        // Log analytics
+        fetch("/api/analytics/log", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            companyId: "demo",
+            question,
+            answer: data.answer,
+            sources: data.sources || [],
+            method: "web",
+            responseTime
+          })
+        }).catch(err => console.error("Analytics log failed:", err));
       } else {
         setMessages(prev => [...prev, {
           role: "assistant",
@@ -90,10 +106,18 @@ export default function QAPage() {
                   {msg.content}
                 </div>
               </div>
+              
               {msg.sources && msg.sources.length > 0 && (
                 <div className="flex justify-start mt-2">
-                  <div className="max-w-[80%] text-xs text-white/50 px-4">
-                    📚 Sources: {msg.sources.map(s => s.title).join(", ")}
+                  <div className="flex gap-2 flex-wrap">
+                    {msg.sources.map((source, idx) => (
+                      <div
+                        key={idx}
+                        className="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-white/60"
+                      >
+                        📄 {source.title}
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
