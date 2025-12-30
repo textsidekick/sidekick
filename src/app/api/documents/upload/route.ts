@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import { nanoid } from "nanoid";
-import { classifyDocument, saveDocumentMetadata, DocumentMetadata } from "@/lib/documentClassifier";
+import { classifyDocument, extractStructuredData, saveDocumentMetadata, DocumentMetadata } from "@/lib/documentClassifier";
 
 export const runtime = "nodejs";
 
@@ -21,23 +21,13 @@ export async function POST(req: Request) {
     const companyId = String(form.get("companyId") ?? "demo");
     const userProvidedType = form.get("type") as string | null;
 
-    console.log("Upload request received:", { 
-      filename: file instanceof File ? file.name : "not a file",
-      companyId,
-      userProvidedType 
-    });
-
     if (!file || !(file instanceof File)) {
       return NextResponse.json({ error: "Missing PDF file" }, { status: 400 });
     }
 
     const buf = Buffer.from(await file.arrayBuffer());
-    console.log("PDF buffer size:", buf.length);
-
     const parsed = await pdfParse(buf);
     const text = String(parsed?.text ?? "").replace(/\u0000/g, "").trim();
-
-    console.log("Extracted text length:", text.length);
 
     if (text.length < 50) {
       return NextResponse.json(
@@ -46,9 +36,15 @@ export async function POST(req: Request) {
       );
     }
 
+    // PHASE 1: Classify
     console.log("Classifying document...");
     const classification = await classifyDocument(text);
     console.log("Classification result:", classification);
+
+    // PHASE 2: Extract structured data
+    console.log("Extracting structured data...");
+    const extractedData = await extractStructuredData(text, classification.type);
+    console.log("Extracted data:", JSON.stringify(extractedData).slice(0, 200));
 
     const documentId = nanoid(10);
 
@@ -65,6 +61,7 @@ export async function POST(req: Request) {
       title: classification.title,
       uploadedAt: Date.now(),
       pageCount: parsed.numpages,
+      extractedData: extractedData, // Store structured data!
     };
 
     saveDocumentMetadata(companyId, metadata);
@@ -73,13 +70,13 @@ export async function POST(req: Request) {
       ok: true,
       document: metadata,
       classification,
+      extractedData,
       chars: text.length,
     });
   } catch (e: any) {
     console.error("Upload error:", e);
-    console.error("Error stack:", e.stack);
     return NextResponse.json(
-      { error: "Upload failed: " + e.message, detail: String(e?.message ?? e) },
+      { error: "Upload failed: " + e.message },
       { status: 500 }
     );
   }
