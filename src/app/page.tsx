@@ -77,6 +77,51 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Trusted By Section - NEW */}
+      <section className="pb-20 px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-8">
+            <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">
+              Trusted by
+            </p>
+          </div>
+          <div className="flex items-center justify-center gap-12 flex-wrap">
+            {/* EDS Manufacturing */}
+            <div className="group flex items-center gap-3 px-6 py-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-white transition-all">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white font-bold text-lg">
+                E
+              </div>
+              <div>
+                <div className="font-semibold text-gray-900 text-lg">EDS Manufacturing</div>
+                <div className="text-xs text-gray-500">100 employees</div>
+              </div>
+            </div>
+
+            {/* Trinethra */}
+            <div className="group flex items-center gap-3 px-6 py-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-white transition-all">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white font-bold text-lg">
+                T
+              </div>
+              <div>
+                <div className="font-semibold text-gray-900 text-lg">Trinethra Supermarket</div>
+                <div className="text-xs text-gray-500">80 employees</div>
+              </div>
+            </div>
+
+            {/* Jim Falk Motors */}
+            <div className="group flex items-center gap-3 px-6 py-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-white transition-all">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center text-white font-bold text-lg">
+                JF
+              </div>
+              <div>
+                <div className="font-semibold text-gray-900 text-lg">Jim Falk Motors</div>
+                <div className="text-xs text-gray-500">Automotive dealership</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Demo Preview - Show actual product */}
       <section className="pb-20 px-8">
         <div className="max-w-7xl mx-auto">
@@ -167,6 +212,29 @@ export default function HomePage() {
                 <p className="text-gray-600 leading-relaxed">{item.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof with Customer Quote */}
+      <section className="py-20 px-8 bg-blue-50">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="mb-6">
+            <svg className="w-12 h-12 mx-auto text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+            </svg>
+          </div>
+          <blockquote className="text-2xl font-medium text-gray-900 mb-6">
+            "Sidekick has completely transformed how we onboard new workers. Questions that used to take hours to answer now get resolved instantly."
+          </blockquote>
+          <div className="flex items-center justify-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white font-bold">
+              E
+            </div>
+            <div className="text-left">
+              <div className="font-semibold text-gray-900">EDS Manufacturing</div>
+              <div className="text-sm text-gray-600">Santa Clara, CA</div>
+            </div>
           </div>
         </div>
       </section>
