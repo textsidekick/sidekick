@@ -4,6 +4,7 @@ import { getDocumentsByCompany, getDocumentText } from "@/lib/documentClassifier
 
 export const runtime = "nodejs";
 
+// Fallback handbook when no documents are uploaded
 const FALLBACK_HANDBOOK = `
 COMPANY HANDBOOK - DEMO
 
@@ -24,20 +25,31 @@ Use your badge to clock in/out at the entrance. If you forget your badge, see yo
 
 SAFETY:
 Hard hats required in manufacturing areas. Report all accidents to your supervisor immediately.
+
+EQUIPMENT:
+All equipment must be operated by trained personnel only. Never bypass safety guards.
+
+EMERGENCY PROCEDURES:
+Fire exits are marked in red. Assembly point is in the parking lot.
 `;
 
 function simpleChunks(text: string, size = 1200) {
   const clean = text.replace(/\s+/g, " ").trim();
   const chunks: string[] = [];
-  for (let i = 0; i < clean.length; i += size) chunks.push(clean.slice(i, i + size));
+  for (let i = 0; i < clean.length; i += size) {
+    chunks.push(clean.slice(i, i + size));
+  }
   return chunks.slice(0, 200);
 }
 
 export async function POST(req: Request) {
   try {
-    const { question = "" } = await req.json();
+    const { question = "", image = null } = await req.json();
     const q = String(question).trim();
-    if (!q) return NextResponse.json({ error: "Missing question" }, { status: 400 });
+    
+    if (!q && !image) {
+      return NextResponse.json({ error: "Missing question" }, { status: 400 });
+    }
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
@@ -45,19 +57,26 @@ export async function POST(req: Request) {
     }
 
     const companyId = "demo";
+    
+    // Try to load uploaded documents
     const documents = getDocumentsByCompany(companyId);
     
     let textToSearch = FALLBACK_HANDBOOK;
-    let sources: any[] = [];
+    let sources: Array<{ id: string; title: string; type: string }> = [];
     
+    // If we have uploaded documents, use those instead
     if (documents.length > 0) {
       const docTexts = documents.map(d => getDocumentText(companyId, d.id));
-      textToSearch = docTexts.join("\n\n");
-      sources = documents.slice(0, 3).map(d => ({
-        id: d.id,
-        title: d.title,
-        type: d.type
-      }));
+      const allText = docTexts.join("\n\n");
+      
+      if (allText.trim().length > 50) {
+        textToSearch = allText;
+        sources = documents.map(d => ({
+          id: d.id,
+          title: d.title,
+          type: d.type
+        }));
+      }
     }
 
     const chunks = simpleChunks(textToSearch);
