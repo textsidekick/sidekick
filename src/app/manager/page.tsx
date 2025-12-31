@@ -1,200 +1,106 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
-type Document = {
-  id: string;
-  filename: string;
-  type: string;
-  title: string;
-  uploadedAt: number;
-  pageCount?: number;
-  extractedData?: any;
-};
+function Logo({ size = 48 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 8 Q4 4 8 4 L40 4 Q44 4 44 8 L44 32 Q44 36 40 36 L16 36 L8 44 L8 36 Q4 36 4 32 Z" fill="#0ea5e9"/>
+      <rect x="20" y="16" width="8" height="3" rx="1.5" fill="white"/>
+      <circle cx="15" cy="17" r="7" stroke="white" strokeWidth="3" fill="none"/>
+      <circle cx="33" cy="17" r="7" stroke="white" strokeWidth="3" fill="none"/>
+      <circle cx="15" cy="16" r="2.5" fill="#1e293b"/>
+      <circle cx="33" cy="16" r="2.5" fill="#1e293b"/>
+      <path d="M19 28 Q24 31 29 28" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+    </svg>
+  );
+}
 
-export default function ManagerDashboard() {
+type Document = { id: string; filename: string; type: string; title: string; uploadedAt: number };
+
+export default function ManagerPage() {
   const [documents, setDocuments] = useState<Document[]>([]);
-  const [grouped, setGrouped] = useState<Record<string, Document[]>>({});
   const [loading, setLoading] = useState(true);
-  const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
 
   useEffect(() => {
     fetch("/api/documents/list?companyId=demo")
       .then(res => res.json())
-      .then(data => {
-        if (data.ok) {
-          setDocuments(data.documents);
-          setGrouped(data.grouped);
-        }
-        setLoading(false);
-      })
+      .then(data => { setDocuments(data.documents || []); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
 
-  const typeLabels: Record<string, string> = {
-    handbook: "📘 Employee Handbooks",
-    safety_manual: "⚠️ Safety Manuals",
-    shift_schedule: "📅 Shift Schedules",
-    payroll_info: "💰 Payroll Information",
-    training_material: "📚 Training Materials",
-    equipment_manual: "🔧 Equipment Manuals",
-    emergency_procedures: "🚨 Emergency Procedures",
-    inventory_manifest: "📦 Inventory",
-    commission_sheet: "💵 Commission Sheets",
-    repair_order: "🔨 Repair Orders",
-    vehicle_inventory: "🚗 Vehicle Inventory",
-    supplier_invoice: "📄 Supplier Invoices",
-    other: "📄 Other Documents",
+  const typeColors: Record<string, string> = {
+    handbook: "bg-sky-500/20 text-sky-300 border-sky-500/30",
+    safety_manual: "bg-red-500/20 text-red-300 border-red-500/30",
+    training_material: "bg-green-500/20 text-green-300 border-green-500/30",
   };
 
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-8">
-        <div className="text-center text-white text-xl">Loading...</div>
-      </main>
-    );
-  }
-
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
+    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-sky-900">
+      <nav className="px-6 md:px-24 py-4 flex items-center justify-between border-b border-white/10 bg-white/5 backdrop-blur-md">
+        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <Logo size={32} />
+          <span className="text-white text-xl font-bold">Sidekick</span>
+        </Link>
+        <Link href="/qa" className="text-white/70 text-sm hover:text-white transition-colors">Test Q&A →</Link>
+      </nav>
+
+      <div className="max-w-6xl mx-auto p-6 md:p-12">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">Manager Dashboard</h1>
-            <p className="text-white/70">
-              {documents.length} document{documents.length !== 1 ? 's' : ''} • 
-              {Object.values(grouped).some(docs => docs.some(d => d.extractedData)) && (
-                <span className="text-emerald-400 ml-2">✨ Smart data extraction enabled</span>
-              )}
-            </p>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Manager Dashboard</h1>
+            <p className="text-sky-200">Manage your company documents and monitor usage</p>
           </div>
-          <div className="flex gap-3">
-            <Link 
-              href="/manager/analytics"
-              className="px-6 py-3 bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-xl transition"
-            >
-              📊 Analytics
-            </Link>
-            <Link 
-              href="/manager/upload"
-              className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition"
-            >
-              + Upload
-            </Link>
-          </div>
+          <Link href="/manager/upload" className="px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white font-semibold rounded-xl transition-all shadow-lg shadow-sky-500/25 hover:shadow-xl flex items-center gap-2">
+            <span className="text-xl">+</span> Upload Documents
+          </Link>
         </div>
 
-        {documents.length === 0 && (
-          <div className="text-center py-16">
-            <div className="text-6xl mb-4">📁</div>
-            <h2 className="text-2xl font-semibold text-white mb-2">No documents yet</h2>
-            <p className="text-white/70 mb-6">Upload your first company document to get started</p>
-            <Link 
-              href="/manager/upload"
-              className="inline-block px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition"
-            >
-              Upload Documents
-            </Link>
-          </div>
-        )}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {[
+            { label: "Documents", value: documents.length, icon: "📄" },
+            { label: "Questions Today", value: "—", icon: "💬" },
+            { label: "Accuracy Rate", value: "95%", icon: "✅" },
+            { label: "Time Saved", value: "12h", icon: "⏱️" },
+          ].map((stat) => (
+            <div key={stat.label} className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all">
+              <div className="text-3xl mb-2">{stat.icon}</div>
+              <div className="text-2xl font-bold text-white">{stat.value}</div>
+              <div className="text-sky-200 text-sm">{stat.label}</div>
+            </div>
+          ))}
+        </div>
 
-        {Object.entries(grouped).map(([type, docs]) => (
-          <div key={type} className="mb-8">
-            <h2 className="text-2xl font-semibold text-white mb-4">
-              {typeLabels[type] || "📄 " + type}
-            </h2>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {docs.map(doc => (
-                <div
-                  key={doc.id}
-                  onClick={() => setSelectedDoc(doc)}
-                  className="bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-white/10 transition cursor-pointer"
-                >
-                  <h3 className="text-white font-semibold mb-2 line-clamp-2">
-                    {doc.title}
-                  </h3>
-                  <p className="text-white/50 text-sm mb-3">{doc.filename}</p>
-                  {doc.extractedData && Object.keys(doc.extractedData).length > 0 && (
-                    <div className="mb-3">
-                      <span className="text-emerald-400 text-xs">
-                        ✨ {Object.keys(doc.extractedData)[0]} extracted
-                      </span>
+        <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6">
+          <h2 className="text-xl font-semibold text-white mb-6">Uploaded Documents</h2>
+          {loading ? (
+            <div className="text-center py-12 text-white/60">Loading...</div>
+          ) : documents.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">📁</div>
+              <h3 className="text-xl font-semibold text-white mb-2">No documents yet</h3>
+              <p className="text-white/60 mb-6">Upload your first handbook to get started</p>
+              <Link href="/manager/upload" className="inline-block px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white font-semibold rounded-xl transition-all">Upload Documents</Link>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {documents.map((doc) => (
+                <div key={doc.id} className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-sky-500/20 rounded-xl flex items-center justify-center text-2xl">📄</div>
+                    <div>
+                      <h3 className="text-white font-medium">{doc.title || doc.filename}</h3>
+                      <p className="text-white/60 text-sm">{doc.filename}</p>
                     </div>
-                  )}
-                  <div className="flex items-center justify-between text-xs text-white/40">
-                    <span>{doc.pageCount ? `${doc.pageCount} pages` : "PDF"}</span>
-                    <span>{new Date(doc.uploadedAt).toLocaleDateString()}</span>
                   </div>
+                  <span className={`px-3 py-1 rounded-full text-xs border ${typeColors[doc.type] || "bg-gray-500/20 text-gray-300 border-gray-500/30"}`}>{doc.type.replace("_", " ")}</span>
                 </div>
               ))}
             </div>
-          </div>
-        ))}
-
-        {documents.length > 0 && (
-          <div className="mt-12 bg-white/5 border border-white/10 rounded-xl p-8">
-            <h2 className="text-2xl font-semibold text-white mb-4">Quick Actions</h2>
-            <div className="grid gap-4 md:grid-cols-3">
-              <Link
-                href="/manager/analytics"
-                className="p-6 bg-purple-500/20 border border-purple-400/25 rounded-xl hover:bg-purple-500/30 transition"
-              >
-                <div className="text-3xl mb-2">📊</div>
-                <h3 className="text-white font-semibold mb-1">View Analytics</h3>
-                <p className="text-white/70 text-sm">See usage stats and ROI</p>
-              </Link>
-              <Link
-                href="/qa"
-                className="p-6 bg-blue-500/20 border border-blue-400/25 rounded-xl hover:bg-blue-500/30 transition"
-              >
-                <div className="text-3xl mb-2">💬</div>
-                <h3 className="text-white font-semibold mb-1">Test Q&A Interface</h3>
-                <p className="text-white/70 text-sm">See how workers ask questions</p>
-              </Link>
-              <Link
-                href="/manager/upload"
-                className="p-6 bg-emerald-500/20 border border-emerald-400/25 rounded-xl hover:bg-emerald-500/30 transition"
-              >
-                <div className="text-3xl mb-2">📄</div>
-                <h3 className="text-white font-semibold mb-1">Upload More Documents</h3>
-                <p className="text-white/70 text-sm">Add handbooks, schedules, manuals</p>
-              </Link>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {selectedDoc && (
-        <div 
-          className="fixed inset-0 bg-black/80 flex items-center justify-center p-8 z-50"
-          onClick={() => setSelectedDoc(null)}
-        >
-          <div 
-            className="bg-slate-900 border border-white/20 rounded-2xl p-8 max-w-3xl max-h-[80vh] overflow-auto"
-            onClick={e => e.stopPropagation()}
-          >
-            <h2 className="text-2xl font-bold text-white mb-4">{selectedDoc.title}</h2>
-            <p className="text-white/70 mb-6">{selectedDoc.filename}</p>
-            
-            {selectedDoc.extractedData && Object.keys(selectedDoc.extractedData).length > 0 && (
-              <div className="bg-emerald-500/10 border border-emerald-400/20 rounded-xl p-6 mb-6">
-                <h3 className="text-emerald-400 font-semibold mb-3">✨ Extracted Data</h3>
-                <pre className="text-white/80 text-sm overflow-auto">
-                  {JSON.stringify(selectedDoc.extractedData, null, 2)}
-                </pre>
-              </div>
-            )}
-            
-            <button
-              onClick={() => setSelectedDoc(null)}
-              className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition"
-            >
-              Close
-            </button>
-          </div>
+          )}
         </div>
-      )}
+      </div>
     </main>
   );
 }

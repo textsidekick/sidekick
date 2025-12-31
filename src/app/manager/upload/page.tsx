@@ -1,242 +1,117 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-type DocumentWithStatus = {
-  id: string;
-  file: File;
-  type: string;
-  status: "pending" | "uploading" | "success" | "error";
-  classification?: {
-    type: string;
-    title: string;
-    confidence: number;
-  };
-  error?: string;
-};
+function Logo({ size = 48 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 8 Q4 4 8 4 L40 4 Q44 4 44 8 L44 32 Q44 36 40 36 L16 36 L8 44 L8 36 Q4 36 4 32 Z" fill="#0ea5e9"/>
+      <rect x="20" y="16" width="8" height="3" rx="1.5" fill="white"/>
+      <circle cx="15" cy="17" r="7" stroke="white" strokeWidth="3" fill="none"/>
+      <circle cx="33" cy="17" r="7" stroke="white" strokeWidth="3" fill="none"/>
+      <circle cx="15" cy="16" r="2.5" fill="#1e293b"/>
+      <circle cx="33" cy="16" r="2.5" fill="#1e293b"/>
+      <path d="M19 28 Q24 31 29 28" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+    </svg>
+  );
+}
+
+type UploadDoc = { id: string; file: File; status: "pending" | "uploading" | "success" | "error"; result?: string };
 
 export default function UploadPage() {
   const router = useRouter();
-  const [documents, setDocuments] = useState<DocumentWithStatus[]>([]);
+  const [documents, setDocuments] = useState<UploadDoc[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const newDocs: DocumentWithStatus[] = files.map(file => ({
-      id: Math.random().toString(36).substr(2, 9),
+  const handleFiles = useCallback((files: FileList) => {
+    const newDocs = Array.from(files).filter(f => f.type === "application/pdf").map(file => ({
+      id: Math.random().toString(36).slice(2),
       file,
-      type: "auto",
-      status: "pending" as const,
+      status: "pending" as const
     }));
     setDocuments(prev => [...prev, ...newDocs]);
-  };
+  }, []);
 
-  const removeDocument = (id: string) => {
-    setDocuments(prev => prev.filter(d => d.id !== id));
-  };
-
-  const updateDocType = (id: string, type: string) => {
-    setDocuments(prev => prev.map(d =>
-      d.id === id ? { ...d, type } : d
-    ));
-  };
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragActive(false);
+    if (e.dataTransfer.files) handleFiles(e.dataTransfer.files);
+  }, [handleFiles]);
 
   const uploadAll = async () => {
     if (documents.length === 0) return;
-
     setUploading(true);
-
     for (const doc of documents) {
       if (doc.status !== "pending") continue;
-
+      setDocuments(prev => prev.map(d => d.id === doc.id ? { ...d, status: "uploading" } : d));
       try {
-        setDocuments(prev => prev.map(d =>
-          d.id === doc.id ? { ...d, status: "uploading" as const } : d
-        ));
-
         const formData = new FormData();
         formData.append("file", doc.file);
         formData.append("companyId", "demo");
-        if (doc.type !== "auto") {
-          formData.append("type", doc.type);
-        }
-
-        const res = await fetch("/api/documents/upload", {
-          method: "POST",
-          body: formData
-        });
-
+        const res = await fetch("/api/documents/upload", { method: "POST", body: formData });
         const data = await res.json();
-
-        if (data.ok) {
-          setDocuments(prev => prev.map(d =>
-            d.id === doc.id 
-              ? { ...d, status: "success" as const, classification: data.classification }
-              : d
-          ));
-        } else {
-          setDocuments(prev => prev.map(d =>
-            d.id === doc.id 
-              ? { ...d, status: "error" as const, error: data.error || "Upload failed" }
-              : d
-          ));
-        }
-      } catch (err) {
-        setDocuments(prev => prev.map(d =>
-          d.id === doc.id 
-            ? { ...d, status: "error" as const, error: "Network error" }
-            : d
-        ));
+        setDocuments(prev => prev.map(d => d.id === doc.id ? { ...d, status: data.ok ? "success" : "error", result: data.classification?.title || data.error } : d));
+      } catch {
+        setDocuments(prev => prev.map(d => d.id === doc.id ? { ...d, status: "error", result: "Upload failed" } : d));
       }
     }
-
     setUploading(false);
-    
-    const allSuccess = documents.every(d => d.status === "success" || d.status === "error");
-    const hasSuccess = documents.some(d => d.status === "success");
-    
-    if (allSuccess && hasSuccess) {
-      setTimeout(() => {
-        router.push("/manager");
-      }, 2000);
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "success": return "text-green-400";
-      case "error": return "text-red-400";
-      case "uploading": return "text-yellow-400";
-      default: return "text-white/70";
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "success": return "✓";
-      case "error": return "✗";
-      case "uploading": return "⟳";
-      default: return "○";
-    }
+    setTimeout(() => router.push("/manager"), 2000);
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Upload Company Documents</h1>
-          <p className="text-white/70">AI will automatically classify each document type</p>
-        </div>
+    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-sky-900">
+      <nav className="px-6 md:px-24 py-4 flex items-center justify-between border-b border-white/10 bg-white/5 backdrop-blur-md">
+        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <Logo size={32} />
+          <span className="text-white text-xl font-bold">Sidekick</span>
+        </Link>
+        <Link href="/manager" className="text-white/70 text-sm hover:text-white transition-colors">← Back to Dashboard</Link>
+      </nav>
 
-        <div className="mb-8">
-          <label className="block w-full p-12 border-2 border-dashed border-white/20 rounded-2xl text-center cursor-pointer hover:border-emerald-500/50 hover:bg-white/5 transition">
-            <input
-              type="file"
-              multiple
-              accept=".pdf"
-              onChange={handleFileSelect}
-              className="hidden"
-            />
-            <div className="text-6xl mb-4">📄</div>
-            <div className="text-white text-lg font-semibold mb-2">
-              Drop PDFs here or click to browse
-            </div>
-            <div className="text-white/50 text-sm">
-              Handbooks, schedules, safety manuals, etc.
-            </div>
-          </label>
+      <div className="max-w-4xl mx-auto p-6 md:p-12">
+        <h1 className="text-3xl font-bold text-white mb-2">Upload Documents</h1>
+        <p className="text-sky-200 mb-8">Add handbooks, safety manuals, and procedures</p>
+
+        <div
+          className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all ${dragActive ? "border-sky-500 bg-sky-500/10" : "border-white/20 hover:border-white/40"}`}
+          onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
+          onDragLeave={() => setDragActive(false)}
+          onDrop={handleDrop}
+        >
+          <div className="text-6xl mb-4">📄</div>
+          <h3 className="text-xl font-semibold text-white mb-2">Drop PDF files here</h3>
+          <p className="text-white/60 mb-4">or click to browse</p>
+          <input type="file" accept=".pdf" multiple onChange={(e) => e.target.files && handleFiles(e.target.files)} className="hidden" id="file-input" />
+          <label htmlFor="file-input" className="inline-block px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white font-semibold rounded-xl cursor-pointer transition-all">Select Files</label>
         </div>
 
         {documents.length > 0 && (
-          <div className="mb-8 space-y-4">
+          <div className="mt-8 space-y-3">
             {documents.map(doc => (
-              <div
-                key={doc.id}
-                className="bg-white/5 border border-white/10 rounded-xl p-6"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className={`text-2xl ${getStatusColor(doc.status)}`}>
-                        {getStatusIcon(doc.status)}
-                      </span>
-                      <h3 className="text-white font-semibold">{doc.file.name}</h3>
-                    </div>
-                    
-                    {doc.classification && (
-                      <div className="text-emerald-400 text-sm mb-2">
-                        AI classified as: <strong>{doc.classification.title}</strong>
-                        <span className="text-white/50 ml-2">
-                          ({doc.classification.type}, {Math.round(doc.classification.confidence * 100)}% confidence)
-                        </span>
-                      </div>
-                    )}
-
-                    {doc.error && (
-                      <div className="text-red-400 text-sm mb-2">
-                        Error: {doc.error}
-                      </div>
-                    )}
-
-                    <div className="text-white/50 text-sm">
-                      {(doc.file.size / 1024).toFixed(1)} KB
-                    </div>
+              <div key={doc.id} className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="text-2xl">{doc.status === "success" ? "✅" : doc.status === "error" ? "❌" : doc.status === "uploading" ? "⏳" : "📄"}</div>
+                  <div>
+                    <p className="text-white font-medium">{doc.file.name}</p>
+                    {doc.result && <p className="text-white/60 text-sm">{doc.result}</p>}
                   </div>
-
-                  {doc.status === "pending" && (
-                    <div className="flex gap-2">
-                      <select
-                        value={doc.type}
-                        onChange={(e) => updateDocType(doc.id, e.target.value)}
-                        className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm"
-                      >
-                        <option value="auto">Auto-detect</option>
-                        <option value="handbook">Handbook</option>
-                        <option value="safety_manual">Safety Manual</option>
-                        <option value="shift_schedule">Shift Schedule</option>
-                        <option value="payroll_info">Payroll Info</option>
-                        <option value="training_material">Training Material</option>
-                        <option value="equipment_manual">Equipment Manual</option>
-                        <option value="emergency_procedures">Emergency Procedures</option>
-                      </select>
-
-                      <button
-                        onClick={() => removeDocument(doc.id)}
-                        className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  )}
                 </div>
+                {doc.status === "pending" && (
+                  <button onClick={() => setDocuments(prev => prev.filter(d => d.id !== doc.id))} className="text-red-400 hover:text-red-300 text-sm">Remove</button>
+                )}
               </div>
             ))}
           </div>
         )}
 
-        {documents.length > 0 && documents.some(d => d.status === "pending") && (
-          <button
-            onClick={uploadAll}
-            disabled={uploading}
-            className="w-full px-6 py-4 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-600 text-white text-lg font-semibold rounded-xl transition"
-          >
-            {uploading 
-              ? "Uploading & Classifying..." 
-              : `Upload ${documents.filter(d => d.status === "pending").length} Document${documents.filter(d => d.status === "pending").length > 1 ? 's' : ''}`
-            }
+        {documents.some(d => d.status === "pending") && (
+          <button onClick={uploadAll} disabled={uploading} className="mt-6 w-full px-6 py-4 bg-sky-500 hover:bg-sky-600 disabled:bg-gray-600 text-white font-semibold rounded-xl transition-all">
+            {uploading ? "Uploading..." : `Upload ${documents.filter(d => d.status === "pending").length} Document(s)`}
           </button>
-        )}
-
-        {documents.length > 0 && documents.every(d => d.status !== "pending") && (
-          <div className="text-center">
-            <div className="text-green-400 text-xl font-semibold mb-2">
-              ✓ Upload complete! {documents.filter(d => d.status === "success").length} successful, {documents.filter(d => d.status === "error").length} failed
-            </div>
-            {documents.some(d => d.status === "success") && (
-              <div className="text-white/70">Redirecting to dashboard...</div>
-            )}
-          </div>
         )}
       </div>
     </main>

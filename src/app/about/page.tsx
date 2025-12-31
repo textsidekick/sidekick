@@ -1,47 +1,57 @@
+import Link from "next/link";
+
+function Logo({ size = 48 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 8 Q4 4 8 4 L40 4 Q44 4 44 8 L44 32 Q44 36 40 36 L16 36 L8 44 L8 36 Q4 36 4 32 Z" fill="#0ea5e9"/>
+      <rect x="20" y="16" width="8" height="3" rx="1.5" fill="white"/>
+      <circle cx="15" cy="17" r="7" stroke="white" strokeWidth="3" fill="none"/>
+      <circle cx="33" cy="17" r="7" stroke="white" strokeWidth="3" fill="none"/>
+      <circle cx="15" cy="16" r="2.5" fill="#1e293b"/>
+      <circle cx="33" cy="16" r="2.5" fill="#1e293b"/>
+      <path d="M19 28 Q24 31 29 28" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+    </svg>
+  );
+}
+
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-12">
-          <h1 className="text-5xl font-bold text-white mb-6">About Sidekick AI</h1>
-          
-          <div className="space-y-6 text-white/80 text-lg">
-            <p>
-              Sidekick AI is an intelligent onboarding assistant designed specifically for hourly workers 
-              in manufacturing, retail, and service industries. We help new employees get instant answers 
-              to their questions without bothering their managers.
-            </p>
+    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-sky-900">
+      <nav className="px-6 md:px-24 py-4 flex items-center justify-between border-b border-white/10 bg-white/5 backdrop-blur-md">
+        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <Logo size={32} />
+          <span className="text-white text-xl font-bold">Sidekick</span>
+        </Link>
+      </nav>
 
-            <h2 className="text-3xl font-semibold text-white mt-8 mb-4">What We Do</h2>
-            <p>
-              Our AI-powered platform allows workers to ask questions via SMS text message and receive 
-              instant, accurate answers based on your company's handbooks, safety manuals, schedules, 
-              and policies. No app download required - just text and get answers.
-            </p>
+      <div className="max-w-4xl mx-auto p-6 md:p-12">
+        <div className="text-center mb-12">
+          <Logo size={80} />
+          <h1 className="text-4xl font-bold text-white mt-6 mb-4">About Sidekick</h1>
+          <p className="text-xl text-sky-200">AI-powered onboarding for the workforce that builds America</p>
+        </div>
 
-            <h2 className="text-3xl font-semibold text-white mt-8 mb-4">How It Works</h2>
-            <ol className="list-decimal list-inside space-y-2 ml-4">
-              <li>Companies upload their employee handbooks and training materials</li>
-              <li>Our AI analyzes and understands the content</li>
-              <li>Workers text their questions to our phone number</li>
-              <li>They receive instant, accurate answers with source citations</li>
-            </ol>
+        <div className="space-y-12">
+          <section className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-8">
+            <h2 className="text-2xl font-semibold text-white mb-4">Our Mission</h2>
+            <p className="text-white/80 text-lg leading-relaxed">We believe every worker deserves instant access to the information they need to do their job safely and effectively. Sidekick uses AI to turn complex handbooks into simple, conversational answers.</p>
+          </section>
 
-            <h2 className="text-3xl font-semibold text-white mt-8 mb-4">Our Mission</h2>
-            <p>
-              We believe every worker deserves quick, reliable access to the information they need to 
-              succeed in their role. By automating repetitive onboarding questions, we save managers 
-              time and help workers feel confident and supported from day one.
-            </p>
+          <section className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-8">
+            <h2 className="text-2xl font-semibold text-white mb-4">The Problem</h2>
+            <p className="text-white/80 text-lg leading-relaxed">Blue-collar workers often struggle with lengthy onboarding processes and dense documentation. They need answers fast but have to dig through hundreds of pages or wait for a manager.</p>
+          </section>
 
-            <div className="mt-12 pt-8 border-t border-white/10">
-              <p className="text-white/60">
-                <strong>Company:</strong> Sidekick AI<br/>
-                <strong>Location:</strong> Menlo Park, CA<br/>
-                <strong>Email:</strong> so.justin8@gmail.com
-              </p>
-            </div>
-          </div>
+          <section className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-8">
+            <h2 className="text-2xl font-semibold text-white mb-4">Our Solution</h2>
+            <p className="text-white/80 text-lg leading-relaxed">Sidekick lets workers text questions and get instant, accurate answers from company documents. No app download required, works on any phone, available 24/7.</p>
+          </section>
+
+          <section className="bg-sky-500/20 border border-sky-500/30 rounded-2xl p-8 text-center">
+            <h2 className="text-2xl font-semibold text-white mb-4">Interested in Sidekick?</h2>
+            <p className="text-white/80 mb-6">We are looking for pilot customers and partners.</p>
+            <a href="mailto:so.justin8@gmail.com" className="inline-block px-8 py-4 bg-sky-500 hover:bg-sky-600 text-white font-semibold rounded-xl transition-all">Contact Us</a>
+          </section>
         </div>
       </div>
     </main>
