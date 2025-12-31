@@ -17,70 +17,6 @@ function Logo({ size = 48 }: { size?: number }) {
   );
 }
 
-// EDS Korea Logo - horizontal bars in circular pattern
-function EDSLogo() {
-  return (
-    <div className="flex items-center gap-3">
-      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-        {/* Globe made of horizontal teal bars */}
-        <ellipse cx="20" cy="8" rx="6" ry="2" fill="#0891b2"/>
-        <ellipse cx="20" cy="13" rx="9" ry="2.5" fill="#0891b2"/>
-        <ellipse cx="20" cy="18" rx="10" ry="2.5" fill="#0891b2"/>
-        <ellipse cx="20" cy="23" rx="10" ry="2.5" fill="#0891b2"/>
-        <ellipse cx="20" cy="28" rx="8" ry="2.5" fill="#0891b2"/>
-        <ellipse cx="20" cy="33" rx="5" ry="2" fill="#0891b2"/>
-      </svg>
-      <div className="flex flex-col">
-        <span className="text-[#0891b2] font-bold text-base tracking-wide">EDS KOREA</span>
-        <span className="text-[#0891b2] text-[9px] tracking-[0.2em]">MANUFACTURING</span>
-      </div>
-    </div>
-  );
-}
-
-// Trinethra Logo - three overlapping leaves (green sides, orange center)
-function TrinethaLogo() {
-  return (
-    <div className="flex items-center gap-2">
-      <svg width="36" height="40" viewBox="0 0 36 40" fill="none">
-        {/* Left green leaf */}
-        <path d="M8 36 Q0 28 4 18 Q8 8 14 4 Q16 14 16 24 Q16 32 8 36Z" fill="#7cb342"/>
-        {/* Right green leaf */}
-        <path d="M28 36 Q36 28 32 18 Q28 8 22 4 Q20 14 20 24 Q20 32 28 36Z" fill="#8bc34a"/>
-        {/* Center orange leaf */}
-        <path d="M18 2 Q24 10 24 20 Q24 30 18 38 Q12 30 12 20 Q12 10 18 2Z" fill="#f9a825"/>
-        {/* Overlap shadows */}
-        <path d="M14 4 Q16 14 16 24 Q16 28 14 32 Q12 24 12 16 Q12 10 14 4Z" fill="#689f38" opacity="0.6"/>
-        <path d="M22 4 Q20 14 20 24 Q20 28 22 32 Q24 24 24 16 Q24 10 22 4Z" fill="#c17900" opacity="0.5"/>
-      </svg>
-      <div className="flex flex-col">
-        <span className="text-[#2e7d32] font-bold text-base">Trinethra</span>
-        <span className="text-[#f9a825] text-[10px] font-medium">Super Market</span>
-      </div>
-    </div>
-  );
-}
-
-// Jim Falk Motors Logo - JFM with blue/red stripes
-function JimFalkLogo() {
-  return (
-    <div className="flex flex-col items-center">
-      <svg width="70" height="40" viewBox="0 0 70 40" fill="none">
-        {/* JFM Letters */}
-        <text x="5" y="24" fontFamily="Arial Black, sans-serif" fontSize="24" fontWeight="900">
-          <tspan fill="#1e3a8a">J</tspan>
-          <tspan fill="#dc2626">F</tspan>
-          <tspan fill="#1e3a8a">M</tspan>
-        </text>
-        {/* Blue and red stripes underneath */}
-        <rect x="5" y="28" width="60" height="3" fill="#1e3a8a"/>
-        <rect x="10" y="32" width="50" height="2.5" fill="#1e3a8a"/>
-        <rect x="15" y="36" width="40" height="2" fill="#dc2626"/>
-      </svg>
-    </div>
-  );
-}
-
 function useScrollAnimation() {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -166,8 +102,6 @@ export default function Home() {
         .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
         .animate-marquee-slow { animation: marquee 35s linear infinite; }
         .animate-marquee-reverse { animation: marquee-reverse 40s linear infinite; }
-        .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .hover-lift:hover { transform: translateY(-8px); box-shadow: 0 25px 50px rgba(0,0,0,0.15); }
         .parallax-section { background-attachment: fixed; background-size: cover; background-position: center; }
         @media (max-width: 768px) { .parallax-section { background-attachment: scroll; } }
         .testimonial-scroll::-webkit-scrollbar { display: none; }
@@ -252,7 +186,9 @@ export default function Home() {
                 <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800" alt="EDS Manufacturing" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-cyan-900/95 via-cyan-900/60 to-cyan-900/20" />
                 <div className="absolute inset-0 p-8 flex flex-col justify-between">
-                  <div className="bg-white rounded-lg px-4 py-3 inline-block self-start shadow-lg"><EDSLogo /></div>
+                  <div className="bg-white rounded-lg px-4 py-3 inline-flex items-center gap-3 self-start shadow-lg">
+                    <img src="/logos/eds.png" alt="EDS Korea" className="h-12 w-auto" />
+                  </div>
                   <div>
                     <p className="text-white/90 text-lg leading-relaxed mb-4">"Sidekick cut our onboarding time by 70%. New hires get answers instantly instead of hunting down supervisors. It's been a game-changer for our floor operations."</p>
                     <p className="text-cyan-300 font-semibold">— Plant Manager, Santa Clara</p>
@@ -263,7 +199,9 @@ export default function Home() {
                 <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800" alt="Trinethra Supermarket" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-green-900/95 via-green-900/60 to-green-900/20" />
                 <div className="absolute inset-0 p-8 flex flex-col justify-between">
-                  <div className="bg-white rounded-lg px-4 py-3 inline-block self-start shadow-lg"><TrinethaLogo /></div>
+                  <div className="bg-white rounded-lg px-4 py-3 inline-flex items-center gap-3 self-start shadow-lg">
+                    <img src="/logos/trinethra.png" alt="Trinethra" className="h-12 w-auto" />
+                  </div>
                   <div>
                     <p className="text-white/90 text-lg leading-relaxed mb-4">"Our staff turnover was killing us. With Sidekick, new employees feel confident from day one. Customer complaints about untrained staff dropped 50%."</p>
                     <p className="text-green-300 font-semibold">— Store Director</p>
@@ -274,7 +212,9 @@ export default function Home() {
                 <img src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800" alt="Jim Falk Motors" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-blue-900/95 via-blue-900/60 to-blue-900/20" />
                 <div className="absolute inset-0 p-8 flex flex-col justify-between">
-                  <div className="bg-white rounded-lg px-4 py-3 inline-block self-start shadow-lg"><JimFalkLogo /></div>
+                  <div className="bg-white rounded-lg px-4 py-3 inline-flex items-center gap-3 self-start shadow-lg">
+                    <img src="/logos/jfm.png" alt="Jim Falk Motors" className="h-12 w-auto" />
+                  </div>
                   <div>
                     <p className="text-white/90 text-lg leading-relaxed mb-4">"Service technicians used to waste 20 minutes finding repair procedures. Now they text Sidekick and get answers in seconds. Productivity is through the roof."</p>
                     <p className="text-blue-300 font-semibold">— Service Manager</p>
