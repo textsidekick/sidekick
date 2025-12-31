@@ -17,44 +17,66 @@ function Logo({ size = 48 }: { size?: number }) {
   );
 }
 
+// EDS Korea Logo - horizontal bars in circular pattern
 function EDSLogo() {
   return (
-    <div className="flex items-center gap-2">
-      <svg width="28" height="20" viewBox="0 0 28 20" fill="none">
-        <path d="M2 4H12M2 8H10M2 12H12M2 16H8" stroke="#0891b2" strokeWidth="2.5" strokeLinecap="round"/>
-        <circle cx="18" cy="10" r="6" stroke="#0891b2" strokeWidth="2"/>
-        <path d="M22 6L26 10L22 14" stroke="#0891b2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <div className="flex items-center gap-3">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        {/* Globe made of horizontal teal bars */}
+        <ellipse cx="20" cy="8" rx="6" ry="2" fill="#0891b2"/>
+        <ellipse cx="20" cy="13" rx="9" ry="2.5" fill="#0891b2"/>
+        <ellipse cx="20" cy="18" rx="10" ry="2.5" fill="#0891b2"/>
+        <ellipse cx="20" cy="23" rx="10" ry="2.5" fill="#0891b2"/>
+        <ellipse cx="20" cy="28" rx="8" ry="2.5" fill="#0891b2"/>
+        <ellipse cx="20" cy="33" rx="5" ry="2" fill="#0891b2"/>
       </svg>
       <div className="flex flex-col">
-        <span className="text-[#0891b2] font-bold text-sm tracking-wide">EDS KOREA</span>
-        <span className="text-[#0891b2] text-[8px] tracking-widest">MANUFACTURING</span>
+        <span className="text-[#0891b2] font-bold text-base tracking-wide">EDS KOREA</span>
+        <span className="text-[#0891b2] text-[9px] tracking-[0.2em]">MANUFACTURING</span>
       </div>
     </div>
   );
 }
 
+// Trinethra Logo - three overlapping leaves (green sides, orange center)
 function TrinethaLogo() {
   return (
     <div className="flex items-center gap-2">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-        <path d="M16 2C16 2 20 8 20 14C20 18 18 20 16 20C14 20 12 18 12 14C12 8 16 2 16 2Z" fill="#d97706"/>
-        <path d="M8 8C8 8 6 14 8 18C10 22 14 22 16 20C12 18 10 14 8 8Z" fill="#15803d"/>
-        <path d="M24 8C24 8 26 14 24 18C22 22 18 22 16 20C20 18 22 14 24 8Z" fill="#15803d"/>
-        <path d="M16 20V28" stroke="#78350f" strokeWidth="2"/>
+      <svg width="36" height="40" viewBox="0 0 36 40" fill="none">
+        {/* Left green leaf */}
+        <path d="M8 36 Q0 28 4 18 Q8 8 14 4 Q16 14 16 24 Q16 32 8 36Z" fill="#7cb342"/>
+        {/* Right green leaf */}
+        <path d="M28 36 Q36 28 32 18 Q28 8 22 4 Q20 14 20 24 Q20 32 28 36Z" fill="#8bc34a"/>
+        {/* Center orange leaf */}
+        <path d="M18 2 Q24 10 24 20 Q24 30 18 38 Q12 30 12 20 Q12 10 18 2Z" fill="#f9a825"/>
+        {/* Overlap shadows */}
+        <path d="M14 4 Q16 14 16 24 Q16 28 14 32 Q12 24 12 16 Q12 10 14 4Z" fill="#689f38" opacity="0.6"/>
+        <path d="M22 4 Q20 14 20 24 Q20 28 22 32 Q24 24 24 16 Q24 10 22 4Z" fill="#c17900" opacity="0.5"/>
       </svg>
       <div className="flex flex-col">
-        <span className="text-[#15803d] font-bold text-sm">Trinethra</span>
-        <span className="text-[#d97706] text-[9px]">Super Market</span>
+        <span className="text-[#2e7d32] font-bold text-base">Trinethra</span>
+        <span className="text-[#f9a825] text-[10px] font-medium">Super Market</span>
       </div>
     </div>
   );
 }
 
+// Jim Falk Motors Logo - JFM with blue/red stripes
 function JimFalkLogo() {
   return (
-    <div className="flex flex-col">
-      <span className="text-[#1e40af] font-black text-sm tracking-tight">JIM FALK MOTORS</span>
-      <span className="text-[#dc2626] text-[8px] font-medium italic">No Hidden Fees - Just Real Pricing</span>
+    <div className="flex flex-col items-center">
+      <svg width="70" height="40" viewBox="0 0 70 40" fill="none">
+        {/* JFM Letters */}
+        <text x="5" y="24" fontFamily="Arial Black, sans-serif" fontSize="24" fontWeight="900">
+          <tspan fill="#1e3a8a">J</tspan>
+          <tspan fill="#dc2626">F</tspan>
+          <tspan fill="#1e3a8a">M</tspan>
+        </text>
+        {/* Blue and red stripes underneath */}
+        <rect x="5" y="28" width="60" height="3" fill="#1e3a8a"/>
+        <rect x="10" y="32" width="50" height="2.5" fill="#1e3a8a"/>
+        <rect x="15" y="36" width="40" height="2" fill="#dc2626"/>
+      </svg>
     </div>
   );
 }
