@@ -17,6 +17,48 @@ function Logo({ size = 48 }: { size?: number }) {
   );
 }
 
+function EDSLogo() {
+  return (
+    <div className="flex items-center gap-2">
+      <svg width="28" height="20" viewBox="0 0 28 20" fill="none">
+        <path d="M2 4H12M2 8H10M2 12H12M2 16H8" stroke="#0891b2" strokeWidth="2.5" strokeLinecap="round"/>
+        <circle cx="18" cy="10" r="6" stroke="#0891b2" strokeWidth="2"/>
+        <path d="M22 6L26 10L22 14" stroke="#0891b2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+      <div className="flex flex-col">
+        <span className="text-[#0891b2] font-bold text-sm tracking-wide">EDS KOREA</span>
+        <span className="text-[#0891b2] text-[8px] tracking-widest">MANUFACTURING</span>
+      </div>
+    </div>
+  );
+}
+
+function TrinethaLogo() {
+  return (
+    <div className="flex items-center gap-2">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <path d="M16 2C16 2 20 8 20 14C20 18 18 20 16 20C14 20 12 18 12 14C12 8 16 2 16 2Z" fill="#d97706"/>
+        <path d="M8 8C8 8 6 14 8 18C10 22 14 22 16 20C12 18 10 14 8 8Z" fill="#15803d"/>
+        <path d="M24 8C24 8 26 14 24 18C22 22 18 22 16 20C20 18 22 14 24 8Z" fill="#15803d"/>
+        <path d="M16 20V28" stroke="#78350f" strokeWidth="2"/>
+      </svg>
+      <div className="flex flex-col">
+        <span className="text-[#15803d] font-bold text-sm">Trinethra</span>
+        <span className="text-[#d97706] text-[9px]">Super Market</span>
+      </div>
+    </div>
+  );
+}
+
+function JimFalkLogo() {
+  return (
+    <div className="flex flex-col">
+      <span className="text-[#1e40af] font-black text-sm tracking-tight">JIM FALK MOTORS</span>
+      <span className="text-[#dc2626] text-[8px] font-medium italic">No Hidden Fees - Just Real Pricing</span>
+    </div>
+  );
+}
+
 function useScrollAnimation() {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -83,14 +125,8 @@ export default function Home() {
   return (
     <main ref={scrollRef} className="bg-white overflow-x-hidden">
       <style jsx global>{`
-        .scroll-animate {
-          opacity: 0;
-          transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-        }
-        .scroll-animate.animate-in {
-          opacity: 1;
-          transform: translate(0, 0) !important;
-        }
+        .scroll-animate { opacity: 0; transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+        .scroll-animate.animate-in { opacity: 1; transform: translate(0, 0) !important; }
         .from-bottom { transform: translateY(60px); }
         .from-left { transform: translateX(-80px); }
         .from-right { transform: translateX(80px); }
@@ -100,41 +136,22 @@ export default function Home() {
         .delay-3 { transition-delay: 0.3s; }
         .delay-4 { transition-delay: 0.4s; }
         .delay-5 { transition-delay: 0.5s; }
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-        @keyframes pulse-glow {
-          0%, 100% { box-shadow: 0 0 20px rgba(14, 165, 233, 0.4); }
-          50% { box-shadow: 0 0 40px rgba(14, 165, 233, 0.7); }
-        }
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        @keyframes marquee-reverse {
-          0% { transform: translateX(-50%); }
-          100% { transform: translateX(0); }
-        }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(14, 165, 233, 0.4); } 50% { box-shadow: 0 0 40px rgba(14, 165, 233, 0.7); } }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        @keyframes marquee-reverse { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
         .animate-float { animation: float 3s ease-in-out infinite; }
         .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
         .animate-marquee-slow { animation: marquee 35s linear infinite; }
         .animate-marquee-reverse { animation: marquee-reverse 40s linear infinite; }
         .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .hover-lift:hover { transform: translateY(-8px); box-shadow: 0 25px 50px rgba(0,0,0,0.15); }
-        .parallax-section {
-          background-attachment: fixed;
-          background-size: cover;
-          background-position: center;
-        }
-        @media (max-width: 768px) {
-          .parallax-section { background-attachment: scroll; }
-        }
+        .parallax-section { background-attachment: fixed; background-size: cover; background-position: center; }
+        @media (max-width: 768px) { .parallax-section { background-attachment: scroll; } }
         .testimonial-scroll::-webkit-scrollbar { display: none; }
         .testimonial-scroll { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
 
-      {/* Fixed Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-24 py-4 bg-white/80 backdrop-blur-md border-b border-gray-200/50">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <Link href="/" className="flex items-center gap-2 hover:scale-105 transition-transform">
@@ -148,11 +165,7 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* SECTION 1: Hero */}
-      <section 
-        className="parallax-section min-h-screen flex items-center relative"
-        style={{ backgroundImage: "url(https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1920)" }}
-      >
+      <section className="parallax-section min-h-screen flex items-center relative" style={{ backgroundImage: "url(https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1920)" }}>
         <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-slate-900/50" />
         <div className="relative z-10 px-6 md:px-24 py-32 max-w-7xl mx-auto w-full">
           <div className="max-w-2xl">
@@ -166,12 +179,8 @@ export default function Home() {
               Our AI assistant seamlessly answers worker questions from your handbooks, simulates countless scenarios, and delivers the best response.
             </p>
             <div className="scroll-animate from-left delay-3 flex flex-wrap gap-4">
-              <Link href="/qa" className="px-8 py-4 bg-sky-500 hover:bg-sky-600 text-white font-semibold rounded-xl transition-all hover:-translate-y-1 animate-pulse-glow">
-                Try Demo
-              </Link>
-              <Link href="/contact" className="px-8 py-4 bg-white/10 backdrop-blur border border-white/30 text-white font-semibold rounded-xl hover:bg-white/20 transition-all hover:-translate-y-1">
-                Contact Sales
-              </Link>
+              <Link href="/qa" className="px-8 py-4 bg-sky-500 hover:bg-sky-600 text-white font-semibold rounded-xl transition-all hover:-translate-y-1 animate-pulse-glow">Try Demo</Link>
+              <Link href="/contact" className="px-8 py-4 bg-white/10 backdrop-blur border border-white/30 text-white font-semibold rounded-xl hover:bg-white/20 transition-all hover:-translate-y-1">Contact Sales</Link>
             </div>
           </div>
         </div>
@@ -182,20 +191,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 2: How It Works */}
       <section className="bg-white py-32 px-6 md:px-24">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <p className="scroll-animate from-bottom text-sky-500 font-semibold mb-4">HOW IT WORKS</p>
-            <h2 className="scroll-animate from-bottom delay-1 text-4xl md:text-5xl font-bold text-gray-900">
-              Simple setup,<br/>powerful results.
-            </h2>
+            <h2 className="scroll-animate from-bottom delay-1 text-4xl md:text-5xl font-bold text-gray-900">Simple setup,<br/>powerful results.</h2>
           </div>
-          
           <div className="scroll-animate from-scale delay-2 mb-20 rounded-2xl overflow-hidden shadow-2xl border border-gray-200">
             <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200" alt="Dashboard Preview" className="w-full h-auto" />
           </div>
-
           <div className="grid md:grid-cols-4 gap-8">
             {[
               { step: "Step 1", title: "Upload Documents", desc: "Connect your handbooks, SOPs, and safety manuals. We process any format." },
@@ -213,79 +217,44 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 3: Testimonials with Real Logos */}
       <section className="bg-gray-50 py-32 px-6 md:px-24">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <p className="scroll-animate from-bottom text-sky-500 font-semibold mb-4">CUSTOMER SUCCESS</p>
-            <h2 className="scroll-animate from-bottom delay-1 text-4xl md:text-5xl font-bold text-gray-900">
-              The best teams use Sidekick
-            </h2>
-            <p className="scroll-animate from-bottom delay-2 text-gray-600 mt-4 max-w-2xl mx-auto">
-              See how companies transformed their onboarding and reduced incidents with Sidekick
-            </p>
+            <h2 className="scroll-animate from-bottom delay-1 text-4xl md:text-5xl font-bold text-gray-900">The best teams use Sidekick</h2>
+            <p className="scroll-animate from-bottom delay-2 text-gray-600 mt-4 max-w-2xl mx-auto">See how companies transformed their onboarding and reduced incidents with Sidekick</p>
           </div>
-
           <div className="scroll-animate from-bottom delay-3 -mx-6 md:-mx-24">
             <div className="flex gap-6 overflow-x-auto testimonial-scroll px-6 md:px-24 pb-4">
-              {/* EDS Manufacturing */}
               <div className="flex-shrink-0 w-[500px] h-[380px] rounded-2xl overflow-hidden relative group cursor-pointer">
                 <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800" alt="EDS Manufacturing" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                <div className="absolute inset-0 bg-gradient-to-t from-sky-900/95 via-sky-900/70 to-sky-900/30" />
+                <div className="absolute inset-0 bg-gradient-to-t from-cyan-900/95 via-cyan-900/60 to-cyan-900/20" />
                 <div className="absolute inset-0 p-8 flex flex-col justify-between">
-                  <div className="bg-white rounded-lg px-4 py-2 inline-flex items-center gap-2 self-start">
-                    <svg width="24" height="24" viewBox="0 0 100 30" className="text-teal-600">
-                      <text x="0" y="22" fill="currentColor" fontFamily="Arial Black" fontSize="18" fontWeight="bold">EDS</text>
-                    </svg>
-                    <span className="text-teal-700 font-bold text-sm">MANUFACTURING</span>
-                  </div>
+                  <div className="bg-white rounded-lg px-4 py-3 inline-block self-start shadow-lg"><EDSLogo /></div>
                   <div>
-                    <p className="text-white/90 text-lg leading-relaxed mb-4">
-                      "Sidekick cut our onboarding time by 70%. New hires get answers instantly instead of hunting down supervisors. It's been a game-changer for our floor operations."
-                    </p>
-                    <p className="text-sky-300 font-semibold">— Plant Manager, Santa Clara</p>
+                    <p className="text-white/90 text-lg leading-relaxed mb-4">"Sidekick cut our onboarding time by 70%. New hires get answers instantly instead of hunting down supervisors. It's been a game-changer for our floor operations."</p>
+                    <p className="text-cyan-300 font-semibold">— Plant Manager, Santa Clara</p>
                   </div>
                 </div>
               </div>
-
-              {/* Trinethra Supermarket */}
               <div className="flex-shrink-0 w-[500px] h-[380px] rounded-2xl overflow-hidden relative group cursor-pointer">
                 <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800" alt="Trinethra Supermarket" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                <div className="absolute inset-0 bg-gradient-to-t from-green-900/95 via-green-900/70 to-green-900/30" />
+                <div className="absolute inset-0 bg-gradient-to-t from-green-900/95 via-green-900/60 to-green-900/20" />
                 <div className="absolute inset-0 p-8 flex flex-col justify-between">
-                  <div className="bg-white rounded-lg px-4 py-3 inline-flex items-center gap-2 self-start">
-                    <svg width="32" height="32" viewBox="0 0 50 50">
-                      <path d="M25 5 L30 20 L25 15 L20 20 Z" fill="#8B7355"/>
-                      <path d="M25 8 L35 25 L25 18 L15 25 Z" fill="#DAA520"/>
-                      <path d="M25 12 L40 30 L25 22 L10 30 Z" fill="#228B22"/>
-                    </svg>
-                    <div className="flex flex-col">
-                      <span className="text-green-800 font-bold text-sm leading-none">Trinethra</span>
-                      <span className="text-green-600 text-xs">Super Market</span>
-                    </div>
-                  </div>
+                  <div className="bg-white rounded-lg px-4 py-3 inline-block self-start shadow-lg"><TrinethaLogo /></div>
                   <div>
-                    <p className="text-white/90 text-lg leading-relaxed mb-4">
-                      "Our staff turnover was killing us. With Sidekick, new employees feel confident from day one. Customer complaints about untrained staff dropped 50%."
-                    </p>
+                    <p className="text-white/90 text-lg leading-relaxed mb-4">"Our staff turnover was killing us. With Sidekick, new employees feel confident from day one. Customer complaints about untrained staff dropped 50%."</p>
                     <p className="text-green-300 font-semibold">— Store Director</p>
                   </div>
                 </div>
               </div>
-
-              {/* Jim Falk Motors */}
               <div className="flex-shrink-0 w-[500px] h-[380px] rounded-2xl overflow-hidden relative group cursor-pointer">
                 <img src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800" alt="Jim Falk Motors" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/95 via-blue-900/70 to-blue-900/30" />
+                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/95 via-blue-900/60 to-blue-900/20" />
                 <div className="absolute inset-0 p-8 flex flex-col justify-between">
-                  <div className="bg-white rounded-lg px-4 py-2 inline-flex flex-col self-start">
-                    <span className="text-blue-800 font-black text-lg leading-none tracking-tight">JIM FALK MOTORS</span>
-                    <span className="text-red-600 text-xs font-semibold">No Hidden Fees - Just Real Pricing</span>
-                  </div>
+                  <div className="bg-white rounded-lg px-4 py-3 inline-block self-start shadow-lg"><JimFalkLogo /></div>
                   <div>
-                    <p className="text-white/90 text-lg leading-relaxed mb-4">
-                      "Service technicians used to waste 20 minutes finding repair procedures. Now they text Sidekick and get answers in seconds. Productivity is through the roof."
-                    </p>
+                    <p className="text-white/90 text-lg leading-relaxed mb-4">"Service technicians used to waste 20 minutes finding repair procedures. Now they text Sidekick and get answers in seconds. Productivity is through the roof."</p>
                     <p className="text-blue-300 font-semibold">— Service Manager</p>
                   </div>
                 </div>
@@ -295,39 +264,22 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 4: Floating Pills - Fixed Layout */}
       <section className="bg-gray-50 py-32 px-6 md:px-24 overflow-hidden">
         <div className="max-w-4xl mx-auto text-center mb-16">
           <p className="scroll-animate from-bottom text-sky-500 font-semibold mb-4">REAL-TIME INTELLIGENCE</p>
-          <h2 className="scroll-animate from-bottom delay-1 text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            AI that knows your workforce
-          </h2>
-          <p className="scroll-animate from-bottom delay-2 text-gray-600 text-lg max-w-2xl mx-auto">
-            Answer questions instantly. Track what workers are asking. Identify training gaps before they become incidents.
-          </p>
+          <h2 className="scroll-animate from-bottom delay-1 text-4xl md:text-5xl font-bold text-gray-900 mb-6">AI that knows your workforce</h2>
+          <p className="scroll-animate from-bottom delay-2 text-gray-600 text-lg max-w-2xl mx-auto">Answer questions instantly. Track what workers are asking. Identify training gaps before they become incidents.</p>
         </div>
-        
-        {/* Top Row of Pills */}
-        <div className="mb-8 -mx-6 md:-mx-24 overflow-hidden">
-          <FloatingPillsTop />
-        </div>
-        
-        {/* Bottom Row of Pills */}
-        <div className="-mx-6 md:-mx-24 overflow-hidden">
-          <FloatingPillsBottom />
-        </div>
+        <div className="mb-8 -mx-6 md:-mx-24 overflow-hidden"><FloatingPillsTop /></div>
+        <div className="-mx-6 md:-mx-24 overflow-hidden"><FloatingPillsBottom /></div>
       </section>
 
-      {/* SECTION 5: Features */}
       <section className="bg-white py-32 px-6 md:px-24">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div>
               <p className="scroll-animate from-left text-sky-500 font-semibold mb-4">CORE CAPABILITIES</p>
-              <h2 className="scroll-animate from-left delay-1 text-4xl font-bold text-gray-900 mb-12">
-                Every tool, one<br/>centralized platform
-              </h2>
-              
+              <h2 className="scroll-animate from-left delay-1 text-4xl font-bold text-gray-900 mb-12">Every tool, one<br/>centralized platform</h2>
               <div className="space-y-6">
                 {[
                   { title: "Document Intelligence", desc: "AI automatically classifies and indexes handbooks, safety manuals, SOPs, and more." },
@@ -345,7 +297,6 @@ export default function Home() {
                 ))}
               </div>
             </div>
-
             <div className="scroll-animate from-right delay-2">
               <div className="bg-white rounded-2xl shadow-2xl p-6 border border-gray-200">
                 <div className="flex items-center gap-2 mb-4">
@@ -360,33 +311,18 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 6: ROI CTA */}
-      <section 
-        className="parallax-section py-32 px-6 md:px-24 relative"
-        style={{ backgroundImage: "url(https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1920)" }}
-      >
+      <section className="parallax-section py-32 px-6 md:px-24 relative" style={{ backgroundImage: "url(https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1920)" }}>
         <div className="absolute inset-0 bg-gradient-to-r from-sky-600/90 to-sky-500/80" />
         <div className="relative z-10 max-w-4xl mx-auto">
           <div className="scroll-animate from-bottom bg-white/10 backdrop-blur-xl rounded-3xl p-12 md:p-16 border border-white/20">
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
-                <h2 className="scroll-animate from-left delay-1 text-4xl md:text-5xl font-bold text-white mb-4">
-                  ROI guarantees.<br/>Constant innovation.
-                </h2>
-                <p className="scroll-animate from-left delay-2 text-white/80 text-lg mb-6">
-                  See measurable results within 30 days or your money back.
-                </p>
-                <Link href="/qa" className="scroll-animate from-left delay-3 inline-block px-8 py-4 bg-white text-sky-600 font-semibold rounded-xl hover:bg-gray-100 transition-all hover:-translate-y-1">
-                  Get a demo
-                </Link>
+                <h2 className="scroll-animate from-left delay-1 text-4xl md:text-5xl font-bold text-white mb-4">ROI guarantees.<br/>Constant innovation.</h2>
+                <p className="scroll-animate from-left delay-2 text-white/80 text-lg mb-6">See measurable results within 30 days or your money back.</p>
+                <Link href="/qa" className="scroll-animate from-left delay-3 inline-block px-8 py-4 bg-white text-sky-600 font-semibold rounded-xl hover:bg-gray-100 transition-all hover:-translate-y-1">Get a demo</Link>
               </div>
               <div className="scroll-animate from-right delay-2 grid grid-cols-2 gap-4">
-                {[
-                  { v: "70%", l: "Faster onboarding" },
-                  { v: "50%", l: "Fewer incidents" },
-                  { v: "$15K", l: "Annual savings" },
-                  { v: "24/7", l: "Availability" }
-                ].map(s => (
+                {[{ v: "70%", l: "Faster onboarding" }, { v: "50%", l: "Fewer incidents" }, { v: "$15K", l: "Annual savings" }, { v: "24/7", l: "Availability" }].map(s => (
                   <div key={s.l} className="bg-white/10 backdrop-blur rounded-xl p-4 text-center border border-white/20">
                     <div className="text-3xl font-bold text-white">{s.v}</div>
                     <div className="text-white/70 text-sm">{s.l}</div>
@@ -398,16 +334,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 7: Industries */}
       <section className="bg-white py-32 px-6 md:px-24">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <p className="scroll-animate from-bottom text-sky-500 font-semibold mb-4">INDUSTRIES</p>
-            <h2 className="scroll-animate from-bottom delay-1 text-4xl md:text-5xl font-bold text-gray-900">
-              Built for teams that<br/>build America.
-            </h2>
+            <h2 className="scroll-animate from-bottom delay-1 text-4xl md:text-5xl font-bold text-gray-900">Built for teams that<br/>build America.</h2>
           </div>
-
           <div className="grid md:grid-cols-3 gap-8">
             {[
               { img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600", icon: "🏭", t: "Manufacturing", d: "Safety protocols, equipment SOPs, quality control procedures" },
@@ -428,28 +360,18 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 8: Final CTA */}
       <section className="bg-slate-900 py-32 px-6 md:px-24">
         <div className="max-w-4xl mx-auto text-center">
           <div className="scroll-animate from-scale mb-8"><Logo size={80} /></div>
-          <h2 className="scroll-animate from-bottom delay-1 text-4xl md:text-5xl font-bold text-white mb-6">
-            Ready to transform<br/>your onboarding?
-          </h2>
-          <p className="scroll-animate from-bottom delay-2 text-xl text-white/70 mb-10 max-w-2xl mx-auto">
-            Join companies who trust Sidekick to train their teams faster and safer.
-          </p>
+          <h2 className="scroll-animate from-bottom delay-1 text-4xl md:text-5xl font-bold text-white mb-6">Ready to transform<br/>your onboarding?</h2>
+          <p className="scroll-animate from-bottom delay-2 text-xl text-white/70 mb-10 max-w-2xl mx-auto">Join companies who trust Sidekick to train their teams faster and safer.</p>
           <div className="scroll-animate from-bottom delay-3 flex flex-wrap justify-center gap-4">
-            <Link href="/qa" className="px-10 py-5 bg-sky-500 hover:bg-sky-600 text-white text-lg font-semibold rounded-xl transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-sky-500/30">
-              Get Started Free
-            </Link>
-            <Link href="/contact" className="px-10 py-5 border-2 border-white/30 text-white text-lg font-semibold rounded-xl hover:bg-white/10 transition-all hover:-translate-y-1">
-              Talk to Sales
-            </Link>
+            <Link href="/qa" className="px-10 py-5 bg-sky-500 hover:bg-sky-600 text-white text-lg font-semibold rounded-xl transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-sky-500/30">Get Started Free</Link>
+            <Link href="/contact" className="px-10 py-5 border-2 border-white/30 text-white text-lg font-semibold rounded-xl hover:bg-white/10 transition-all hover:-translate-y-1">Talk to Sales</Link>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="bg-slate-900 px-6 md:px-24 py-16 border-t border-white/10">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start gap-12 mb-12">
