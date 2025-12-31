@@ -37,47 +37,40 @@ function useScrollAnimation() {
   return ref;
 }
 
-function FloatingPills() {
+function FloatingPillsTop() {
   const pills = [
-    { text: '"Where do I clock in?"', icon: "💬", row: 0, delay: 0 },
-    { text: "New hire completed safety training", icon: "✅", row: 1, delay: 2 },
-    { text: '"What PPE do I need?"', icon: "💬", row: 2, delay: 4 },
-    { text: "Question answered in 2.3s", icon: "⚡", row: 0, delay: 6 },
-    { text: '"How do I report an incident?"', icon: "💬", row: 1, delay: 8 },
-    { text: "Manager viewed analytics", icon: "📊", row: 2, delay: 1 },
-    { text: '"What are the break times?"', icon: "💬", row: 0, delay: 3 },
-    { text: "Document uploaded: Safety Manual", icon: "📄", row: 1, delay: 5 },
-    { text: '"Who is my supervisor?"', icon: "💬", row: 2, delay: 7 },
-    { text: "95% accuracy rate achieved", icon: "🎯", row: 0, delay: 9 },
-    { text: '"Where is the first aid kit?"', icon: "💬", row: 1, delay: 10 },
-    { text: "Onboarding time reduced 70%", icon: "📈", row: 2, delay: 11 },
+    { text: '"Where do I clock in?"', icon: "💬" },
+    { text: "95% accuracy rate achieved", icon: "🎯" },
+    { text: '"What PPE do I need?"', icon: "💬" },
+    { text: "Question answered in 2.3s", icon: "⚡" },
+    { text: '"What are the break times?"', icon: "💬" },
   ];
-
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[0, 1, 2].map(row => (
-        <div 
-          key={row} 
-          className="absolute w-full"
-          style={{ top: `${20 + row * 30}%` }}
-        >
-          <div 
-            className="flex gap-6 animate-marquee"
-            style={{ 
-              animationDuration: `${30 + row * 5}s`,
-              animationDirection: row % 2 === 0 ? 'normal' : 'reverse'
-            }}
-          >
-            {pills.filter(p => p.row === row).concat(pills.filter(p => p.row === row)).map((pill, i) => (
-              <div 
-                key={i}
-                className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-lg border border-gray-100"
-              >
-                <span>{pill.icon}</span>
-                <span className="text-gray-700 text-sm whitespace-nowrap">{pill.text}</span>
-              </div>
-            ))}
-          </div>
+    <div className="flex gap-6 animate-marquee-slow">
+      {[...pills, ...pills].map((pill, i) => (
+        <div key={i} className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-lg border border-gray-100">
+          <span>{pill.icon}</span>
+          <span className="text-gray-700 text-sm whitespace-nowrap">{pill.text}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function FloatingPillsBottom() {
+  const pills = [
+    { text: "New hire completed safety training", icon: "✅" },
+    { text: '"How do I report an incident?"', icon: "💬" },
+    { text: "Manager viewed analytics", icon: "📊" },
+    { text: '"Who is my supervisor?"', icon: "💬" },
+    { text: "Onboarding time reduced 70%", icon: "📈" },
+  ];
+  return (
+    <div className="flex gap-6 animate-marquee-reverse">
+      {[...pills, ...pills].map((pill, i) => (
+        <div key={i} className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-lg border border-gray-100">
+          <span>{pill.icon}</span>
+          <span className="text-gray-700 text-sm whitespace-nowrap">{pill.text}</span>
         </div>
       ))}
     </div>
@@ -119,9 +112,14 @@ export default function Home() {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
+        @keyframes marquee-reverse {
+          0% { transform: translateX(-50%); }
+          100% { transform: translateX(0); }
+        }
         .animate-float { animation: float 3s ease-in-out infinite; }
         .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
-        .animate-marquee { animation: marquee 30s linear infinite; }
+        .animate-marquee-slow { animation: marquee 35s linear infinite; }
+        .animate-marquee-reverse { animation: marquee-reverse 40s linear infinite; }
         .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .hover-lift:hover { transform: translateY(-8px); box-shadow: 0 25px 50px rgba(0,0,0,0.15); }
         .parallax-section {
@@ -150,7 +148,7 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* SECTION 1: Hero with Factory/Worker Background */}
+      {/* SECTION 1: Hero */}
       <section 
         className="parallax-section min-h-screen flex items-center relative"
         style={{ backgroundImage: "url(https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1920)" }}
@@ -184,7 +182,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 2: How It Works - White Background with Dashboard Image */}
+      {/* SECTION 2: How It Works */}
       <section className="bg-white py-32 px-6 md:px-24">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -194,16 +192,10 @@ export default function Home() {
             </h2>
           </div>
           
-          {/* Dashboard Preview Image */}
           <div className="scroll-animate from-scale delay-2 mb-20 rounded-2xl overflow-hidden shadow-2xl border border-gray-200">
-            <img 
-              src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200" 
-              alt="Dashboard Preview"
-              className="w-full h-auto"
-            />
+            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200" alt="Dashboard Preview" className="w-full h-auto" />
           </div>
 
-          {/* Steps */}
           <div className="grid md:grid-cols-4 gap-8">
             {[
               { step: "Step 1", title: "Upload Documents", desc: "Connect your handbooks, SOPs, and safety manuals. We process any format." },
@@ -221,7 +213,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 3: Testimonials Carousel (like Nautilus) */}
+      {/* SECTION 3: Testimonials with Real Logos */}
       <section className="bg-gray-50 py-32 px-6 md:px-24">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -234,79 +226,102 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Horizontal Scrolling Testimonial Cards */}
           <div className="scroll-animate from-bottom delay-3 -mx-6 md:-mx-24">
             <div className="flex gap-6 overflow-x-auto testimonial-scroll px-6 md:px-24 pb-4">
-              {[
-                {
-                  company: "EDS Manufacturing",
-                  logo: "🏭",
-                  image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800",
-                  quote: "Sidekick cut our onboarding time by 70%. New hires get answers instantly instead of hunting down supervisors. It's been a game-changer for our floor operations.",
-                  color: "from-blue-600/90 to-blue-800/90"
-                },
-                {
-                  company: "Trinethra Supermarket",
-                  logo: "🛒",
-                  image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800",
-                  quote: "Our staff turnover was killing us. With Sidekick, new employees feel confident from day one. Customer complaints about untrained staff dropped 50%.",
-                  color: "from-green-600/90 to-green-800/90"
-                },
-                {
-                  company: "Pacific Construction",
-                  logo: "🔧",
-                  image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800",
-                  quote: "Safety incidents dropped dramatically. Workers can check protocols instantly instead of guessing. Worth every penny for the liability reduction alone.",
-                  color: "from-orange-600/90 to-orange-800/90"
-                }
-              ].map((testimonial, i) => (
-                <div 
-                  key={testimonial.company}
-                  className="flex-shrink-0 w-[500px] h-[350px] rounded-2xl overflow-hidden relative group cursor-pointer"
-                >
-                  <img 
-                    src={testimonial.image} 
-                    alt={testimonial.company}
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className={`absolute inset-0 bg-gradient-to-t ${testimonial.color}`} />
-                  <div className="absolute inset-0 p-8 flex flex-col justify-end">
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="text-4xl">{testimonial.logo}</span>
-                      <span className="text-white text-2xl font-bold">{testimonial.company}</span>
-                    </div>
-                    <p className="text-white/90 text-lg leading-relaxed">
-                      {testimonial.quote}
+              {/* EDS Manufacturing */}
+              <div className="flex-shrink-0 w-[500px] h-[380px] rounded-2xl overflow-hidden relative group cursor-pointer">
+                <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800" alt="EDS Manufacturing" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-t from-sky-900/95 via-sky-900/70 to-sky-900/30" />
+                <div className="absolute inset-0 p-8 flex flex-col justify-between">
+                  <div className="bg-white rounded-lg px-4 py-2 inline-flex items-center gap-2 self-start">
+                    <svg width="24" height="24" viewBox="0 0 100 30" className="text-teal-600">
+                      <text x="0" y="22" fill="currentColor" fontFamily="Arial Black" fontSize="18" fontWeight="bold">EDS</text>
+                    </svg>
+                    <span className="text-teal-700 font-bold text-sm">MANUFACTURING</span>
+                  </div>
+                  <div>
+                    <p className="text-white/90 text-lg leading-relaxed mb-4">
+                      "Sidekick cut our onboarding time by 70%. New hires get answers instantly instead of hunting down supervisors. It's been a game-changer for our floor operations."
                     </p>
+                    <p className="text-sky-300 font-semibold">— Plant Manager, Santa Clara</p>
                   </div>
                 </div>
-              ))}
+              </div>
+
+              {/* Trinethra Supermarket */}
+              <div className="flex-shrink-0 w-[500px] h-[380px] rounded-2xl overflow-hidden relative group cursor-pointer">
+                <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800" alt="Trinethra Supermarket" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-t from-green-900/95 via-green-900/70 to-green-900/30" />
+                <div className="absolute inset-0 p-8 flex flex-col justify-between">
+                  <div className="bg-white rounded-lg px-4 py-3 inline-flex items-center gap-2 self-start">
+                    <svg width="32" height="32" viewBox="0 0 50 50">
+                      <path d="M25 5 L30 20 L25 15 L20 20 Z" fill="#8B7355"/>
+                      <path d="M25 8 L35 25 L25 18 L15 25 Z" fill="#DAA520"/>
+                      <path d="M25 12 L40 30 L25 22 L10 30 Z" fill="#228B22"/>
+                    </svg>
+                    <div className="flex flex-col">
+                      <span className="text-green-800 font-bold text-sm leading-none">Trinethra</span>
+                      <span className="text-green-600 text-xs">Super Market</span>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-white/90 text-lg leading-relaxed mb-4">
+                      "Our staff turnover was killing us. With Sidekick, new employees feel confident from day one. Customer complaints about untrained staff dropped 50%."
+                    </p>
+                    <p className="text-green-300 font-semibold">— Store Director</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Jim Falk Motors */}
+              <div className="flex-shrink-0 w-[500px] h-[380px] rounded-2xl overflow-hidden relative group cursor-pointer">
+                <img src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800" alt="Jim Falk Motors" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/95 via-blue-900/70 to-blue-900/30" />
+                <div className="absolute inset-0 p-8 flex flex-col justify-between">
+                  <div className="bg-white rounded-lg px-4 py-2 inline-flex flex-col self-start">
+                    <span className="text-blue-800 font-black text-lg leading-none tracking-tight">JIM FALK MOTORS</span>
+                    <span className="text-red-600 text-xs font-semibold">No Hidden Fees - Just Real Pricing</span>
+                  </div>
+                  <div>
+                    <p className="text-white/90 text-lg leading-relaxed mb-4">
+                      "Service technicians used to waste 20 minutes finding repair procedures. Now they text Sidekick and get answers in seconds. Productivity is through the roof."
+                    </p>
+                    <p className="text-blue-300 font-semibold">— Service Manager</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* SECTION 4: Floating Pills Animation (like Nautilus Smart Triggers) */}
-      <section className="bg-white py-32 px-6 md:px-24 relative min-h-[600px]">
-        <div className="max-w-4xl mx-auto text-center relative z-10">
+      {/* SECTION 4: Floating Pills - Fixed Layout */}
+      <section className="bg-gray-50 py-32 px-6 md:px-24 overflow-hidden">
+        <div className="max-w-4xl mx-auto text-center mb-16">
           <p className="scroll-animate from-bottom text-sky-500 font-semibold mb-4">REAL-TIME INTELLIGENCE</p>
           <h2 className="scroll-animate from-bottom delay-1 text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            AI that knows your<br/>workforce
+            AI that knows your workforce
           </h2>
           <p className="scroll-animate from-bottom delay-2 text-gray-600 text-lg max-w-2xl mx-auto">
-            Answer questions instantly. Track what workers are asking. Identify training gaps before they become incidents - all powered by real-time AI.
+            Answer questions instantly. Track what workers are asking. Identify training gaps before they become incidents.
           </p>
         </div>
         
-        {/* Floating Pills Background */}
-        <FloatingPills />
+        {/* Top Row of Pills */}
+        <div className="mb-8 -mx-6 md:-mx-24 overflow-hidden">
+          <FloatingPillsTop />
+        </div>
+        
+        {/* Bottom Row of Pills */}
+        <div className="-mx-6 md:-mx-24 overflow-hidden">
+          <FloatingPillsBottom />
+        </div>
       </section>
 
-      {/* SECTION 5: Features - With Side Image */}
-      <section className="bg-gray-50 py-32 px-6 md:px-24">
+      {/* SECTION 5: Features */}
+      <section className="bg-white py-32 px-6 md:px-24">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-16 items-center">
-            {/* Left: Feature List */}
             <div>
               <p className="scroll-animate from-left text-sky-500 font-semibold mb-4">CORE CAPABILITIES</p>
               <h2 className="scroll-animate from-left delay-1 text-4xl font-bold text-gray-900 mb-12">
@@ -320,10 +335,7 @@ export default function Home() {
                   { title: "Manager Dashboard", desc: "Track usage, monitor questions, and measure training effectiveness." },
                   { title: "AI Sidekick", desc: "24/7 assistant that knows your company policies inside and out." }
                 ].map((item, i) => (
-                  <div 
-                    key={item.title} 
-                    className={`scroll-animate from-left delay-${i+2} border-b border-gray-200 pb-6 cursor-pointer hover:bg-white p-4 -mx-4 rounded-lg transition-colors`}
-                  >
+                  <div key={item.title} className={`scroll-animate from-left delay-${i+2} border-b border-gray-200 pb-6`}>
                     <div className="flex justify-between items-center">
                       <h3 className="text-lg font-semibold text-gray-900">{item.title}</h3>
                       <span className="text-sky-500">+</span>
@@ -334,7 +346,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right: Screenshot/Image */}
             <div className="scroll-animate from-right delay-2">
               <div className="bg-white rounded-2xl shadow-2xl p-6 border border-gray-200">
                 <div className="flex items-center gap-2 mb-4">
@@ -342,18 +353,14 @@ export default function Home() {
                   <div className="w-3 h-3 rounded-full bg-yellow-400" />
                   <div className="w-3 h-3 rounded-full bg-green-400" />
                 </div>
-                <img 
-                  src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800" 
-                  alt="Analytics Dashboard"
-                  className="rounded-lg w-full"
-                />
+                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800" alt="Analytics Dashboard" className="rounded-lg w-full" />
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* SECTION 6: CTA with Warehouse Background */}
+      {/* SECTION 6: ROI CTA */}
       <section 
         className="parallax-section py-32 px-6 md:px-24 relative"
         style={{ backgroundImage: "url(https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1920)" }}
@@ -367,7 +374,7 @@ export default function Home() {
                   ROI guarantees.<br/>Constant innovation.
                 </h2>
                 <p className="scroll-animate from-left delay-2 text-white/80 text-lg mb-6">
-                  See measurable results within 30 days or your money back. Our AI keeps learning and improving.
+                  See measurable results within 30 days or your money back.
                 </p>
                 <Link href="/qa" className="scroll-animate from-left delay-3 inline-block px-8 py-4 bg-white text-sky-600 font-semibold rounded-xl hover:bg-gray-100 transition-all hover:-translate-y-1">
                   Get a demo
@@ -391,7 +398,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 7: Industries - Cards */}
+      {/* SECTION 7: Industries */}
       <section className="bg-white py-32 px-6 md:px-24">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
