@@ -44,10 +44,25 @@ export default function HomePage() {
         {/* Trusted By */}
         <section className="py-16 border-t border-gray-200">
           <p className="text-center text-sm text-gray-500 mb-8">TRUSTED BY</p>
-          <div className="flex justify-center items-center gap-12">
-            <div className="text-2xl font-bold text-gray-700">EDS Manufacturing</div>
-            <div className="text-2xl font-bold text-gray-700">Trinethra</div>
-            <div className="text-2xl font-bold text-gray-700">Jim Falk Motors</div>
+          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <div className="bg-gray-50 rounded-xl p-8 flex items-center justify-center border border-gray-200">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-900">EDS Manufacturing</div>
+                <div className="text-sm text-gray-600 mt-1">100 employees</div>
+              </div>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-8 flex items-center justify-center border border-gray-200">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-900">Trinethra</div>
+                <div className="text-sm text-gray-600 mt-1">80 employees</div>
+              </div>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-8 flex items-center justify-center border border-gray-200">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-900">Jim Falk Motors</div>
+                <div className="text-sm text-gray-600 mt-1">150 employees</div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -80,12 +95,14 @@ export default function HomePage() {
         </section>
 
         {/* Testimonial */}
-        <section className="py-16 bg-gray-50 -mx-6 px-6 rounded-2xl">
+        <section className="py-16 bg-blue-50 -mx-6 px-6 rounded-2xl">
           <div className="max-w-3xl mx-auto text-center">
+            <div className="text-4xl mb-4">💬</div>
             <p className="text-xl text-gray-900 mb-6">
               "Sidekick reduced onboarding questions by 80%. Our new hires are productive faster, and managers can focus on actual work instead of answering the same questions repeatedly."
             </p>
-            <p className="font-semibold text-gray-900">Operations Manager, EDS Manufacturing</p>
+            <p className="font-semibold text-gray-900">Operations Manager</p>
+            <p className="text-gray-600">EDS Manufacturing</p>
           </div>
         </section>
 
