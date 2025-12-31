@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     const anthropic = new Anthropic({ apiKey });
 
     const response = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022",
+      model: "claude-sonnet-4-20250514",
       max_tokens: 300,
       system: "You are Sidekick, an onboarding assistant. Answer using ONLY the provided sources. If not in sources, say: 'I'm not sure based on the handbook. Please ask your manager.' Keep it under 2 sentences.",
       messages: [{
