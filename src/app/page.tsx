@@ -37,6 +37,53 @@ function useScrollAnimation() {
   return ref;
 }
 
+function FloatingPills() {
+  const pills = [
+    { text: '"Where do I clock in?"', icon: "💬", row: 0, delay: 0 },
+    { text: "New hire completed safety training", icon: "✅", row: 1, delay: 2 },
+    { text: '"What PPE do I need?"', icon: "💬", row: 2, delay: 4 },
+    { text: "Question answered in 2.3s", icon: "⚡", row: 0, delay: 6 },
+    { text: '"How do I report an incident?"', icon: "💬", row: 1, delay: 8 },
+    { text: "Manager viewed analytics", icon: "📊", row: 2, delay: 1 },
+    { text: '"What are the break times?"', icon: "💬", row: 0, delay: 3 },
+    { text: "Document uploaded: Safety Manual", icon: "📄", row: 1, delay: 5 },
+    { text: '"Who is my supervisor?"', icon: "💬", row: 2, delay: 7 },
+    { text: "95% accuracy rate achieved", icon: "🎯", row: 0, delay: 9 },
+    { text: '"Where is the first aid kit?"', icon: "💬", row: 1, delay: 10 },
+    { text: "Onboarding time reduced 70%", icon: "📈", row: 2, delay: 11 },
+  ];
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {[0, 1, 2].map(row => (
+        <div 
+          key={row} 
+          className="absolute w-full"
+          style={{ top: `${20 + row * 30}%` }}
+        >
+          <div 
+            className="flex gap-6 animate-marquee"
+            style={{ 
+              animationDuration: `${30 + row * 5}s`,
+              animationDirection: row % 2 === 0 ? 'normal' : 'reverse'
+            }}
+          >
+            {pills.filter(p => p.row === row).concat(pills.filter(p => p.row === row)).map((pill, i) => (
+              <div 
+                key={i}
+                className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-lg border border-gray-100"
+              >
+                <span>{pill.icon}</span>
+                <span className="text-gray-700 text-sm whitespace-nowrap">{pill.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function Home() {
   const scrollRef = useScrollAnimation();
 
@@ -68,8 +115,13 @@ export default function Home() {
           0%, 100% { box-shadow: 0 0 20px rgba(14, 165, 233, 0.4); }
           50% { box-shadow: 0 0 40px rgba(14, 165, 233, 0.7); }
         }
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
         .animate-float { animation: float 3s ease-in-out infinite; }
         .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+        .animate-marquee { animation: marquee 30s linear infinite; }
         .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .hover-lift:hover { transform: translateY(-8px); box-shadow: 0 25px 50px rgba(0,0,0,0.15); }
         .parallax-section {
@@ -80,6 +132,8 @@ export default function Home() {
         @media (max-width: 768px) {
           .parallax-section { background-attachment: scroll; }
         }
+        .testimonial-scroll::-webkit-scrollbar { display: none; }
+        .testimonial-scroll { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
 
       {/* Fixed Navigation */}
@@ -167,7 +221,88 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 3: Features - With Side Image */}
+      {/* SECTION 3: Testimonials Carousel (like Nautilus) */}
+      <section className="bg-gray-50 py-32 px-6 md:px-24">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="scroll-animate from-bottom text-sky-500 font-semibold mb-4">CUSTOMER SUCCESS</p>
+            <h2 className="scroll-animate from-bottom delay-1 text-4xl md:text-5xl font-bold text-gray-900">
+              The best teams use Sidekick
+            </h2>
+            <p className="scroll-animate from-bottom delay-2 text-gray-600 mt-4 max-w-2xl mx-auto">
+              See how companies transformed their onboarding and reduced incidents with Sidekick
+            </p>
+          </div>
+
+          {/* Horizontal Scrolling Testimonial Cards */}
+          <div className="scroll-animate from-bottom delay-3 -mx-6 md:-mx-24">
+            <div className="flex gap-6 overflow-x-auto testimonial-scroll px-6 md:px-24 pb-4">
+              {[
+                {
+                  company: "EDS Manufacturing",
+                  logo: "🏭",
+                  image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800",
+                  quote: "Sidekick cut our onboarding time by 70%. New hires get answers instantly instead of hunting down supervisors. It's been a game-changer for our floor operations.",
+                  color: "from-blue-600/90 to-blue-800/90"
+                },
+                {
+                  company: "Trinethra Supermarket",
+                  logo: "🛒",
+                  image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800",
+                  quote: "Our staff turnover was killing us. With Sidekick, new employees feel confident from day one. Customer complaints about untrained staff dropped 50%.",
+                  color: "from-green-600/90 to-green-800/90"
+                },
+                {
+                  company: "Pacific Construction",
+                  logo: "🔧",
+                  image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800",
+                  quote: "Safety incidents dropped dramatically. Workers can check protocols instantly instead of guessing. Worth every penny for the liability reduction alone.",
+                  color: "from-orange-600/90 to-orange-800/90"
+                }
+              ].map((testimonial, i) => (
+                <div 
+                  key={testimonial.company}
+                  className="flex-shrink-0 w-[500px] h-[350px] rounded-2xl overflow-hidden relative group cursor-pointer"
+                >
+                  <img 
+                    src={testimonial.image} 
+                    alt={testimonial.company}
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
+                  <div className={`absolute inset-0 bg-gradient-to-t ${testimonial.color}`} />
+                  <div className="absolute inset-0 p-8 flex flex-col justify-end">
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="text-4xl">{testimonial.logo}</span>
+                      <span className="text-white text-2xl font-bold">{testimonial.company}</span>
+                    </div>
+                    <p className="text-white/90 text-lg leading-relaxed">
+                      {testimonial.quote}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 4: Floating Pills Animation (like Nautilus Smart Triggers) */}
+      <section className="bg-white py-32 px-6 md:px-24 relative min-h-[600px]">
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <p className="scroll-animate from-bottom text-sky-500 font-semibold mb-4">REAL-TIME INTELLIGENCE</p>
+          <h2 className="scroll-animate from-bottom delay-1 text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            AI that knows your<br/>workforce
+          </h2>
+          <p className="scroll-animate from-bottom delay-2 text-gray-600 text-lg max-w-2xl mx-auto">
+            Answer questions instantly. Track what workers are asking. Identify training gaps before they become incidents - all powered by real-time AI.
+          </p>
+        </div>
+        
+        {/* Floating Pills Background */}
+        <FloatingPills />
+      </section>
+
+      {/* SECTION 5: Features - With Side Image */}
       <section className="bg-gray-50 py-32 px-6 md:px-24">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-16 items-center">
@@ -180,7 +315,7 @@ export default function Home() {
               
               <div className="space-y-6">
                 {[
-                  { title: "Document Intelligence", desc: "AI automatically classifies and indexes handbooks, safety manuals, SOPs, and more.", open: true },
+                  { title: "Document Intelligence", desc: "AI automatically classifies and indexes handbooks, safety manuals, SOPs, and more." },
                   { title: "SMS Q&A", desc: "Workers text questions, get instant answers. No app download required." },
                   { title: "Manager Dashboard", desc: "Track usage, monitor questions, and measure training effectiveness." },
                   { title: "AI Sidekick", desc: "24/7 assistant that knows your company policies inside and out." }
@@ -191,9 +326,9 @@ export default function Home() {
                   >
                     <div className="flex justify-between items-center">
                       <h3 className="text-lg font-semibold text-gray-900">{item.title}</h3>
-                      <span className="text-gray-400">+</span>
+                      <span className="text-sky-500">+</span>
                     </div>
-                    {item.open && <p className="text-gray-600 mt-2">{item.desc}</p>}
+                    <p className="text-gray-600 mt-2">{item.desc}</p>
                   </div>
                 ))}
               </div>
@@ -218,7 +353,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 4: CTA with Warehouse Background */}
+      {/* SECTION 6: CTA with Warehouse Background */}
       <section 
         className="parallax-section py-32 px-6 md:px-24 relative"
         style={{ backgroundImage: "url(https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1920)" }}
@@ -256,7 +391,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 5: Industries - Cards */}
+      {/* SECTION 7: Industries - Cards */}
       <section className="bg-white py-32 px-6 md:px-24">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -286,7 +421,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 6: Final CTA */}
+      {/* SECTION 8: Final CTA */}
       <section className="bg-slate-900 py-32 px-6 md:px-24">
         <div className="max-w-4xl mx-auto text-center">
           <div className="scroll-animate from-scale mb-8"><Logo size={80} /></div>
