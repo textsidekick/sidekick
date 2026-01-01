@@ -192,7 +192,6 @@ export default function QAPage() {
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Sidekick AI Q&A</h1>
         <p className="text-gray-600 mb-8">Upload company documents and ask questions</p>
 
-        {/* Upload Section */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <h2 className="text-lg font-semibold mb-4">📁 Documents</h2>
           
@@ -220,7 +219,6 @@ export default function QAPage() {
             />
           </label>
 
-          {/* Upload Result with Classification */}
           {uploadResult && (
             <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
               <div className="flex items-start gap-3">
@@ -269,7 +267,6 @@ export default function QAPage() {
             </div>
           )}
 
-          {/* Document List */}
           {documents.length > 0 && (
             <div className="mt-4 space-y-2">
               {documents.map((doc) => (
@@ -298,7 +295,6 @@ export default function QAPage() {
           )}
         </div>
 
-        {/* Q&A Section */}
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h2 className="text-lg font-semibold mb-4">💬 Ask a Question</h2>
 
@@ -321,7 +317,6 @@ export default function QAPage() {
             </button>
           </div>
 
-          {/* Quick Questions */}
           <div className="flex gap-2 mt-3 flex-wrap">
             {["Where do I park?", "What PPE do I need?", "What are break times?", "Who do I call for emergencies?"].map((q) => (
               <button
@@ -337,7 +332,6 @@ export default function QAPage() {
             ))}
           </div>
 
-          {/* Answer */}
           {answer && (
             <div className="mt-6 p-4 bg-gray-50 rounded-lg">
               <div className="prose prose-sm max-w-none">
@@ -359,7 +353,6 @@ export default function QAPage() {
           )}
         </div>
 
-        {/* Footer */}
         <p className="text-center text-sm text-gray-400 mt-8">
           Powered by Sidekick AI • Document Intelligence
         </p>
