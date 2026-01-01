@@ -17,6 +17,58 @@ function Logo({ size = 48 }: { size?: number }) {
   );
 }
 
+function EDSLogo() {
+  return (
+    <div className="flex items-center gap-3">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+        <rect x="4" y="6" width="18" height="3" rx="1.5" fill="#0891b2"/>
+        <rect x="6" y="11" width="22" height="3" rx="1.5" fill="#0891b2"/>
+        <rect x="4" y="16" width="26" height="3" rx="1.5" fill="#0891b2"/>
+        <rect x="6" y="21" width="22" height="3" rx="1.5" fill="#0891b2"/>
+        <rect x="4" y="26" width="18" height="3" rx="1.5" fill="#0891b2"/>
+      </svg>
+      <div>
+        <div className="text-[#0891b2] font-bold text-sm">EDS KOREA</div>
+        <div className="text-[#0891b2] text-[10px] tracking-widest">MANUFACTURING</div>
+      </div>
+    </div>
+  );
+}
+
+function TrinethaLogo() {
+  return (
+    <div className="flex items-center gap-3">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+        <path d="M18 4C18 4 22 10 22 16C22 20 20 22 18 22C16 22 14 20 14 16C14 10 18 4 18 4Z" fill="#f59e0b"/>
+        <path d="M10 10C10 10 7 16 9 20C11 24 15 24 18 22C14 20 11 16 10 10Z" fill="#22c55e"/>
+        <path d="M26 10C26 10 29 16 27 20C25 24 21 24 18 22C22 20 25 16 26 10Z" fill="#22c55e"/>
+      </svg>
+      <div>
+        <div className="text-[#22c55e] font-bold text-sm">Trinethra</div>
+        <div className="text-[#f59e0b] text-[10px]">Super Market</div>
+      </div>
+    </div>
+  );
+}
+
+function JFMLogo() {
+  return (
+    <div className="flex flex-col items-start">
+      <div className="flex items-center">
+        <span className="text-[#1e40af] font-black text-xl">J</span>
+        <span className="text-[#dc2626] font-black text-xl">F</span>
+        <span className="text-[#1e40af] font-black text-xl">M</span>
+      </div>
+      <div className="w-full space-y-0.5 mt-1">
+        <div className="h-1 bg-[#1e40af] rounded-full w-12"></div>
+        <div className="h-1 bg-[#1e40af] rounded-full w-10"></div>
+        <div className="h-1 bg-[#dc2626] rounded-full w-8"></div>
+      </div>
+      <div className="text-[10px] text-gray-600 mt-1">Jim Falk Motors</div>
+    </div>
+  );
+}
+
 function useScrollAnimation() {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -116,6 +168,7 @@ export default function Home() {
           </Link>
           <div className="flex items-center gap-6">
             <Link href="/about" className="text-gray-600 hover:text-gray-900 text-sm transition-colors">About</Link>
+            <Link href="/pricing" className="text-gray-600 hover:text-gray-900 text-sm transition-colors">Pricing</Link>
             <Link href="/qa" className="px-5 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-sm font-medium transition-all hover:shadow-lg hover:shadow-sky-500/25">Try Demo</Link>
           </div>
         </div>
@@ -186,8 +239,8 @@ export default function Home() {
                 <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800" alt="EDS Manufacturing" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-cyan-900/95 via-cyan-900/60 to-cyan-900/20" />
                 <div className="absolute inset-0 p-8 flex flex-col justify-between">
-                  <div className="bg-white rounded-lg px-4 py-3 inline-flex items-center gap-3 self-start shadow-lg">
-                    <img src="/logos/eds.png" alt="EDS Korea" className="h-12 w-auto" />
+                  <div className="bg-white rounded-lg px-4 py-3 inline-block self-start shadow-lg">
+                    <EDSLogo />
                   </div>
                   <div>
                     <p className="text-white/90 text-lg leading-relaxed mb-4">"Sidekick cut our onboarding time by 70%. New hires get answers instantly instead of hunting down supervisors. It's been a game-changer for our floor operations."</p>
@@ -199,8 +252,8 @@ export default function Home() {
                 <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800" alt="Trinethra Supermarket" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-green-900/95 via-green-900/60 to-green-900/20" />
                 <div className="absolute inset-0 p-8 flex flex-col justify-between">
-                  <div className="bg-white rounded-lg px-4 py-3 inline-flex items-center gap-3 self-start shadow-lg">
-                    <img src="/logos/trinethra.png" alt="Trinethra" className="h-12 w-auto" />
+                  <div className="bg-white rounded-lg px-4 py-3 inline-block self-start shadow-lg">
+                    <TrinethaLogo />
                   </div>
                   <div>
                     <p className="text-white/90 text-lg leading-relaxed mb-4">"Our staff turnover was killing us. With Sidekick, new employees feel confident from day one. Customer complaints about untrained staff dropped 50%."</p>
@@ -212,8 +265,8 @@ export default function Home() {
                 <img src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800" alt="Jim Falk Motors" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-blue-900/95 via-blue-900/60 to-blue-900/20" />
                 <div className="absolute inset-0 p-8 flex flex-col justify-between">
-                  <div className="bg-white rounded-lg px-4 py-3 inline-flex items-center gap-3 self-start shadow-lg">
-                    <img src="/logos/jfm.png" alt="Jim Falk Motors" className="h-12 w-auto" />
+                  <div className="bg-white rounded-lg px-4 py-3 inline-block self-start shadow-lg">
+                    <JFMLogo />
                   </div>
                   <div>
                     <p className="text-white/90 text-lg leading-relaxed mb-4">"Service technicians used to waste 20 minutes finding repair procedures. Now they text Sidekick and get answers in seconds. Productivity is through the roof."</p>
@@ -346,6 +399,7 @@ export default function Home() {
                 <span className="text-white font-semibold mb-2">Product</span>
                 <Link href="/qa" className="text-white/60 hover:text-white text-sm transition-colors">Demo</Link>
                 <Link href="/manager" className="text-white/60 hover:text-white text-sm transition-colors">Dashboard</Link>
+                <Link href="/pricing" className="text-white/60 hover:text-white text-sm transition-colors">Pricing</Link>
               </div>
               <div className="flex flex-col gap-3">
                 <span className="text-white font-semibold mb-2">Company</span>
