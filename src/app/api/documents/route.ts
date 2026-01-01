@@ -1,18 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-
-// In-memory store (would be database in production)
-let documents: Array<{
-  id: string;
-  name: string;
-  type: string;
-  size: number;
-  content: string;
-  uploadedAt: string;
-  chunks: string[];
-}> = [];
+import { getDocuments, addDocument, deleteDocument } from "./store";
 
 export async function GET() {
-  return NextResponse.json({ documents });
+  return NextResponse.json({ documents: getDocuments() });
 }
 
 export async function POST(request: NextRequest) {
@@ -36,12 +26,12 @@ export async function POST(request: NextRequest) {
     name: file.name,
     type: file.type || "text/plain",
     size: file.size,
-    content: content.slice(0, 10000), // Store first 10k chars
+    content: content.slice(0, 10000),
     uploadedAt: new Date().toISOString(),
     chunks,
   };
 
-  documents.push(doc);
+  addDocument(doc);
 
   return NextResponse.json({ success: true, document: doc });
 }
@@ -54,6 +44,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: "No ID provided" }, { status: 400 });
   }
 
-  documents = documents.filter(d => d.id !== id);
+  deleteDocument(id);
   return NextResponse.json({ success: true });
 }
