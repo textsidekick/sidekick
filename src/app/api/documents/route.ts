@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDocuments, addDocument, deleteDocument, updateDocumentEmbeddings } from "./store";
 import { getEmbeddings } from "@/lib/embeddings";
+import { classifyDocument, extractStructuredData, DocumentType } from "@/lib/documentClassifier";
 
 async function extractPdfText(buffer: Buffer): Promise<string> {
   try {
@@ -61,7 +62,30 @@ export async function POST(request: NextRequest) {
 
   addDocument(doc);
 
-  // Generate embeddings in background (don't block response)
+  // Run classification and embeddings in parallel
+  let classification = null;
+  let extractedData = null;
+  let summary = null;
+
+  // Document Intelligence: Classify and extract
+  if (process.env.ANTHROPIC_API_KEY) {
+    try {
+      console.log("Classifying document:", file.name);
+      classification = await classifyDocument(content);
+      console.log("Classification:", classification);
+
+      // Extract structured data based on type
+      extractedData = await extractStructuredData(content, classification.type);
+      console.log("Extracted data:", JSON.stringify(extractedData).slice(0, 200));
+
+      // Generate summary
+      summary = formatSummary(classification, extractedData);
+    } catch (err) {
+      console.error("Classification error:", err);
+    }
+  }
+
+  // Generate embeddings in background
   if (process.env.OPENAI_API_KEY && chunks.length > 0) {
     getEmbeddings(chunks)
       .then(embeddings => {
@@ -71,7 +95,61 @@ export async function POST(request: NextRequest) {
       .catch(err => console.error("Embedding error:", err));
   }
 
-  return NextResponse.json({ success: true, document: doc, chunksCount: chunks.length });
+  return NextResponse.json({
+    success: true,
+    document: doc,
+    chunksCount: chunks.length,
+    classification,
+    extractedData,
+    summary,
+  });
+}
+
+function formatSummary(classification: { type: DocumentType; title: string; confidence: number }, extractedData: any): string {
+  const typeLabels: Record<string, string> = {
+    handbook: "📘 Employee Handbook",
+    safety_manual: "🦺 Safety Manual",
+    shift_schedule: "📅 Shift Schedule",
+    payroll_info: "💰 Payroll Info",
+    training_material: "🎓 Training Material",
+    equipment_manual: "⚙️ Equipment Manual",
+    emergency_procedures: "🚨 Emergency Procedures",
+    inventory_manifest: "📦 Inventory",
+    commission_sheet: "💵 Commission Sheet",
+    repair_order: "🔧 Repair Order",
+    vehicle_inventory: "🚗 Vehicle Inventory",
+    supplier_invoice: "🧾 Supplier Invoice",
+    other: "📄 Document",
+  };
+
+  const lines: string[] = [];
+  lines.push(`**${typeLabels[classification.type] || "Document"}**: ${classification.title}`);
+  lines.push(`*Confidence: ${Math.round(classification.confidence * 100)}%*`);
+  lines.push("");
+
+  // Add extracted data summary
+  if (extractedData) {
+    if (extractedData.policies?.length) {
+      lines.push("**Key Policies:**");
+      extractedData.policies.slice(0, 3).forEach((p: any) => {
+        lines.push(`• ${p.category}: ${p.rule}`);
+      });
+    }
+    if (extractedData.requirements?.length) {
+      const req = extractedData.requirements[0];
+      if (req.ppe?.length) {
+        lines.push(`**PPE Required:** ${req.ppe.join(", ")}`);
+      }
+    }
+    if (extractedData.shifts?.length) {
+      lines.push(`**Shifts Found:** ${extractedData.shifts.length} shift entries`);
+    }
+    if (extractedData.vehicles?.length) {
+      lines.push(`**Vehicles:** ${extractedData.vehicles.length} in inventory`);
+    }
+  }
+
+  return lines.join("\n");
 }
 
 export async function DELETE(request: NextRequest) {
