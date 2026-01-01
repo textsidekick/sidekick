@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDocuments, addDocument, deleteDocument } from "./store";
+import { getDocuments, addDocument, deleteDocument, updateDocumentEmbeddings } from "./store";
+import { getEmbeddings } from "@/lib/embeddings";
 
-// Dynamic import for pdf-parse to avoid build issues
 async function extractPdfText(buffer: Buffer): Promise<string> {
   try {
     const pdfParse = (await import("pdf-parse")).default;
@@ -20,14 +20,13 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const formData = await request.formData();
   const file = formData.get("file") as File;
-  
+
   if (!file) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
   }
 
   let content: string;
-  
-  // Handle PDFs differently
+
   if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
@@ -36,17 +35,17 @@ export async function POST(request: NextRequest) {
   } else {
     content = await file.text();
   }
-  
+
   if (!content || content.trim().length === 0) {
     return NextResponse.json({ error: "Could not extract text from file" }, { status: 400 });
   }
-  
-  // Improved chunking - split by sections/paragraphs
+
+  // Improved chunking
   const chunks = content
     .split(/\n\s*\n|\r\n\s*\r\n/)
     .map(chunk => chunk.trim())
     .filter(chunk => chunk.length > 30)
-    .map(chunk => chunk.replace(/\s+/g, ' '));
+    .map(chunk => chunk.replace(/\s+/g, " "));
 
   console.log("Created", chunks.length, "chunks from", file.name);
 
@@ -62,13 +61,23 @@ export async function POST(request: NextRequest) {
 
   addDocument(doc);
 
+  // Generate embeddings in background (don't block response)
+  if (process.env.OPENAI_API_KEY && chunks.length > 0) {
+    getEmbeddings(chunks)
+      .then(embeddings => {
+        updateDocumentEmbeddings(doc.id, embeddings);
+        console.log("Generated", embeddings.length, "embeddings for", file.name);
+      })
+      .catch(err => console.error("Embedding error:", err));
+  }
+
   return NextResponse.json({ success: true, document: doc, chunksCount: chunks.length });
 }
 
 export async function DELETE(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
-  
+
   if (!id) {
     return NextResponse.json({ error: "No ID provided" }, { status: 400 });
   }

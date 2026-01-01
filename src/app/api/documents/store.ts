@@ -1,4 +1,3 @@
-// Shared document store
 export interface Document {
   id: string;
   name: string;
@@ -7,15 +6,11 @@ export interface Document {
   content: string;
   uploadedAt: string;
   chunks: string[];
+  embeddings?: number[][];
 }
 
-// Global store that persists across requests in dev mode
 declare global {
   var documentStore: Document[] | undefined;
-}
-
-if (!global.documentStore) {
-  global.documentStore = [];
 }
 
 export function getDocuments(): Document[] {
@@ -27,6 +22,14 @@ export function addDocument(doc: Document): void {
     global.documentStore = [];
   }
   global.documentStore.push(doc);
+}
+
+export function updateDocumentEmbeddings(id: string, embeddings: number[][]): void {
+  const docs = getDocuments();
+  const doc = docs.find(d => d.id === id);
+  if (doc) {
+    doc.embeddings = embeddings;
+  }
 }
 
 export function deleteDocument(id: string): void {
