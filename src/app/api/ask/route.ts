@@ -7,7 +7,6 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 });
 
-// Language detection and response
 const SUPPORTED_LANGUAGES: Record<string, string> = {
   en: "English",
   es: "Spanish",
@@ -19,6 +18,40 @@ const SUPPORTED_LANGUAGES: Record<string, string> = {
   fr: "French",
 };
 
+// Detect if question is non-English and translate for search
+async function translateForSearch(question: string): Promise<{ translated: string; originalLang: string }> {
+  const isEnglish = /^[a-zA-Z0-9\s.,!?'"()-]+$/.test(question);
+  
+  if (isEnglish && !/[¿¡áéíóúñü]/i.test(question)) {
+    return { translated: question, originalLang: "en" };
+  }
+
+  try {
+    const response = await anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 200,
+      system: "Translate the following question to English. Return ONLY the English translation, nothing else.",
+      messages: [{ role: "user", content: question }]
+    });
+    
+    const text = response.content[0];
+    if (text.type === "text") {
+      // Detect original language
+      let lang = "en";
+      if (/[¿¡áéíóúñü]/i.test(question) || /\b(donde|como|que|cuando)\b/i.test(question)) lang = "es";
+      else if (/[\u4e00-\u9fff]/.test(question)) lang = "zh";
+      else if (/[\uac00-\ud7af]/.test(question)) lang = "ko";
+      else if (/[\u0600-\u06ff]/.test(question)) lang = "ar";
+      
+      return { translated: text.text.trim(), originalLang: lang };
+    }
+  } catch (e) {
+    console.error("Translation error:", e);
+  }
+  
+  return { translated: question, originalLang: "en" };
+}
+
 export async function POST(request: NextRequest) {
   const { question } = await request.json();
 
@@ -26,10 +59,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No question provided" }, { status: 400 });
   }
 
+  // Translate question for search if needed
+  const { translated: searchQuery, originalLang } = await translateForSearch(question);
+  console.log("Original:", question, "| Search query:", searchQuery, "| Lang:", originalLang);
+
   const documents = getDocuments();
   console.log("Got", documents.length, "documents");
 
-  // Find relevant chunks using embeddings or keyword fallback
   let relevantChunks: { text: string; score: number }[] = [];
 
   // Try semantic search first
@@ -37,7 +73,7 @@ export async function POST(request: NextRequest) {
   
   if (hasEmbeddings && process.env.OPENAI_API_KEY) {
     try {
-      const [questionEmbedding] = await getEmbeddings([question]);
+      const [questionEmbedding] = await getEmbeddings([searchQuery]);
       
       for (const doc of documents) {
         if (doc.embeddings && doc.chunks) {
@@ -60,12 +96,14 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // Fallback to keyword search
+  // Fallback to keyword search using translated query
   if (relevantChunks.length === 0) {
-    const questionWords = question.toLowerCase()
+    const questionWords = searchQuery.toLowerCase()
       .replace(/[?.,!]/g, "")
       .split(" ")
       .filter((w: string) => w.length > 3);
+
+    console.log("Keyword search with:", questionWords);
 
     for (const doc of documents) {
       for (const chunk of doc.chunks || []) {
@@ -82,13 +120,14 @@ export async function POST(request: NextRequest) {
 
     relevantChunks.sort((a, b) => b.score - a.score);
     relevantChunks = relevantChunks.slice(0, 5);
+    console.log("Keyword search found", relevantChunks.length, "chunks");
   }
 
   let answer = "";
   let confidence = 0;
   let sources = 0;
   let needsDocuments = false;
-  let detectedLanguage = "en";
+  let detectedLanguage = originalLang;
 
   if (relevantChunks.length > 0 && process.env.ANTHROPIC_API_KEY) {
     const context = relevantChunks.map(c => c.text).join("\n\n---\n\n");
@@ -99,49 +138,33 @@ export async function POST(request: NextRequest) {
         max_tokens: 1024,
         system: `You are a helpful workplace assistant for blue-collar workers.
 
-CRITICAL LANGUAGE RULES:
-1. DETECT the language of the worker's question
-2. RESPOND in the SAME language as the question
-3. If Spanish question → Spanish answer
-4. If Chinese question → Chinese answer
-5. If English question → English answer
+CRITICAL: The worker asked their question in ${SUPPORTED_LANGUAGES[originalLang] || originalLang}. 
+You MUST respond in ${SUPPORTED_LANGUAGES[originalLang] || originalLang}.
 
 Your role:
-- Answer questions based ONLY on the provided documents
-- Be concise and direct - workers need quick answers
-- Use simple language appropriate for the detected language
-- If the answer is not in the documents, say so (in the worker's language)
-- Format answers for easy reading
-
-At the end of your response, add a new line with just the detected language code in brackets, like: [es] or [en] or [zh]`,
+- Answer based ONLY on the provided documents
+- Be concise and direct
+- Use simple language
+- If the answer is not in the documents, say so`,
         messages: [
           {
             role: "user",
-            content: `Here are relevant sections from company documents (in English):
+            content: `Documents (English):
 
 ${context}
 
 ---
 
-Worker question: ${question}
+Worker's original question (in ${SUPPORTED_LANGUAGES[originalLang] || originalLang}): ${question}
 
-Answer in the SAME LANGUAGE as the question. End with [language_code].`
+Respond in ${SUPPORTED_LANGUAGES[originalLang] || originalLang}.`
           }
         ]
       });
 
       const textContent = message.content.find(block => block.type === "text");
       if (textContent && textContent.type === "text") {
-        let responseText = textContent.text;
-        
-        // Extract language code from response
-        const langMatch = responseText.match(/\[([a-z]{2})\]\s*$/i);
-        if (langMatch) {
-          detectedLanguage = langMatch[1].toLowerCase();
-          responseText = responseText.replace(/\[([a-z]{2})\]\s*$/i, "").trim();
-        }
-        
-        answer = responseText;
+        answer = textContent.text;
         confidence = Math.min(95, 70 + relevantChunks.length * 5);
         sources = relevantChunks.length;
       }
@@ -156,19 +179,12 @@ Answer in the SAME LANGUAGE as the question. End with [language_code].`
     confidence = 70;
     sources = relevantChunks.length;
   } else {
-    // No documents - respond in detected language
-    const isSpanish = /[¿¡áéíóúñü]/i.test(question) || 
-      /\b(donde|como|que|cuando|por que|hola|gracias)\b/i.test(question);
-    const isChinese = /[\u4e00-\u9fff]/.test(question);
-    
-    if (isSpanish) {
-      answer = "No tengo suficiente información para responder eso todavía.\n\nPor favor, pida a su gerente que suba los documentos relevantes (manual del empleado, manual de seguridad, procedimientos) para que pueda ayudarle mejor.";
-      detectedLanguage = "es";
-    } else if (isChinese) {
-      answer = "我目前没有足够的信息来回答这个问题。\n\n请让您的经理上传相关文件（员工手册、安全手册、操作程序），以便我能更好地帮助您。";
-      detectedLanguage = "zh";
+    if (originalLang === "es") {
+      answer = "No tengo suficiente información para responder eso todavía.\n\nPor favor, pida a su gerente que suba los documentos relevantes.";
+    } else if (originalLang === "zh") {
+      answer = "我目前没有足够的信息来回答这个问题。\n\n请让您的经理上传相关文件。";
     } else {
-      answer = "I don't have enough information to answer that yet.\n\nPlease ask your manager to upload relevant documents (employee handbook, safety manual, SOPs) so I can help you better.";
+      answer = "I don't have enough information to answer that yet.\n\nPlease ask your manager to upload relevant documents.";
     }
     confidence = 0;
     needsDocuments = true;
