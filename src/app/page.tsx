@@ -256,17 +256,14 @@ export default function Home() {
               
               <div className="space-y-5">
                 {[
-                  { value: "60%", label: "of hourly workers quit within 90 days", source: "SHRM" },
-                  { value: "$4,700", label: "average cost to replace one employee", source: "SHRM" },
-                  { value: "23%", label: "leave due to poor training & support", source: "Gallup" },
-                  { value: "40 hrs", label: "manager time lost monthly on repeat Q's", source: "Industry avg" },
+                  { value: "60%", label: "of hourly workers quit within 90 days" },
+                  { value: "$4,700", label: "average cost to replace one employee" },
+                  { value: "23%", label: "leave due to poor training & support" },
+                  { value: "40 hrs", label: "of manager time lost monthly to repeat questions" },
                 ].map((stat, i) => (
-                  <div key={i} className="flex items-center justify-between py-2 border-b border-zinc-200 last:border-0">
-                    <div>
-                      <p className="text-sm text-zinc-600">{stat.label}</p>
-                      <p className="text-xs text-zinc-400">{stat.source}</p>
-                    </div>
-                    <p className="text-2xl font-bold text-zinc-400">{stat.value}</p>
+                  <div key={i} className="flex items-center gap-4 py-3 border-b border-zinc-200 last:border-0">
+                    <p className="text-3xl font-bold text-zinc-400 w-24 flex-shrink-0">{stat.value}</p>
+                    <p className="text-sm text-zinc-600">{stat.label}</p>
                   </div>
                 ))}
               </div>
@@ -283,17 +280,14 @@ export default function Home() {
               
               <div className="space-y-5">
                 {[
-                  { value: "50%", label: "reduction in early turnover", desc: "Workers feel supported" },
-                  { value: "70%", label: "faster time to productivity", desc: "Answers in seconds" },
-                  { value: "15 hrs", label: "saved per manager per month", desc: "No repeat questions" },
-                  { value: "$18K", label: "annual savings per 50 employees", desc: "ROI in weeks" },
+                  { value: "50%", label: "reduction in early turnover" },
+                  { value: "70%", label: "faster time to productivity" },
+                  { value: "15 hrs", label: "saved per manager per month" },
+                  { value: "$18K", label: "annual savings per 50 employees" },
                 ].map((stat, i) => (
-                  <div key={i} className="flex items-center justify-between py-2 border-b border-green-200 last:border-0">
-                    <div>
-                      <p className="text-sm text-green-800">{stat.label}</p>
-                      <p className="text-xs text-green-600">{stat.desc}</p>
-                    </div>
-                    <p className="text-2xl font-bold text-green-600">{stat.value}</p>
+                  <div key={i} className="flex items-center gap-4 py-3 border-b border-green-200 last:border-0">
+                    <p className="text-3xl font-bold text-green-600 w-24 flex-shrink-0">{stat.value}</p>
+                    <p className="text-sm text-green-800">{stat.label}</p>
                   </div>
                 ))}
               </div>
