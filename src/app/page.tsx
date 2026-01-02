@@ -21,7 +21,6 @@ import {
   Users,
   TrendingUp,
   X,
-  AlertCircle,
   CheckCircle,
   Mail,
   Phone,
@@ -29,7 +28,8 @@ import {
   DollarSign,
   Timer,
   UserMinus,
-  TrendingDown
+  UserCheck,
+  Sparkles
 } from "lucide-react";
 
 export default function Home() {
@@ -234,90 +234,70 @@ export default function Home() {
       </section>
 
       {/* ============================================ */}
-      {/* THE PROBLEM - With Stakes */}
+      {/* THE OPPORTUNITY - Problem vs Impact Side by Side */}
       {/* ============================================ */}
       <section className="py-20 px-6 bg-white">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <p className="text-red-500 text-sm font-semibold mb-2">The Problem</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-4">Onboarding is broken for deskless workers</h2>
-            <p className="text-zinc-500 max-w-xl mx-auto">80% of the global workforce doesn&apos;t sit at a desk. Yet they&apos;re stuck with outdated training and no way to get quick answers.</p>
+            <p className="text-blue-600 text-sm font-semibold mb-2">The Opportunity</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-4">Why onboarding matters</h2>
+            <p className="text-zinc-500 max-w-2xl mx-auto">80% of the global workforce doesn&apos;t sit at a desk. Poor onboarding costs businesses billions—but it doesn&apos;t have to.</p>
           </div>
           
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { icon: AlertCircle, problem: "New hires don't know who to ask" },
-              { icon: Clock, problem: "Managers get interrupted constantly" },
-              { icon: TrendingUp, problem: "Early confusion → early quitting" },
-              { icon: X, problem: "Turnover costs $4,000+ per hire" },
-            ].map((item, i) => (
-              <div key={i} className="bg-red-50 border border-red-100 rounded-xl p-5">
-                <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mb-3">
-                  <item.icon className="w-5 h-5 text-red-500" />
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* The Challenge - Neutral/Gray */}
+            <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-8">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-8 h-8 bg-zinc-200 rounded-lg flex items-center justify-center">
+                  <TrendingUp className="w-4 h-4 text-zinc-600" />
                 </div>
-                <p className="text-sm text-red-900 font-medium">{item.problem}</p>
+                <h3 className="font-semibold text-zinc-700">Industry Reality</h3>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ============================================ */}
-      {/* MARKET STATS - The Cost of Bad Onboarding */}
-      {/* ============================================ */}
-      <section className="relative py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-zinc-950" />
-        <div 
-          className="absolute inset-0 opacity-20"
-          style={{
-            backgroundImage: `linear-gradient(rgba(239,68,68,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(239,68,68,0.15) 1px, transparent 1px)`,
-            backgroundSize: '50px 50px',
-          }}
-        />
-        
-        <div className="relative z-10 max-w-5xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <p className="text-red-400 text-sm font-semibold mb-2">The Industry Problem</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Turnover is crushing frontline businesses</h2>
-            <p className="text-zinc-400 max-w-2xl mx-auto">Poor onboarding leads to confusion, frustration, and employees quitting within the first 90 days. The costs add up fast.</p>
-          </div>
-          
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { 
-                value: "60%", 
-                label: "of hourly workers quit within 90 days",
-                subtext: "SHRM Research",
-                icon: UserMinus
-              },
-              { 
-                value: "$4,700", 
-                label: "average cost to replace one employee",
-                subtext: "SHRM Benchmark",
-                icon: DollarSign
-              },
-              { 
-                value: "23%", 
-                label: "leave due to poor training & support",
-                subtext: "Gallup Survey",
-                icon: TrendingDown
-              },
-              { 
-                value: "40 hrs", 
-                label: "manager time lost per month on repeat questions",
-                subtext: "Industry Average",
-                icon: Timer
-              },
-            ].map((stat, i) => (
-              <div key={i} className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 text-center">
-                <div className="w-12 h-12 bg-red-500/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <stat.icon className="w-6 h-6 text-red-400" />
+              
+              <div className="space-y-5">
+                {[
+                  { value: "60%", label: "of hourly workers quit within 90 days", source: "SHRM" },
+                  { value: "$4,700", label: "average cost to replace one employee", source: "SHRM" },
+                  { value: "23%", label: "leave due to poor training & support", source: "Gallup" },
+                  { value: "40 hrs", label: "manager time lost monthly on repeat Q's", source: "Industry avg" },
+                ].map((stat, i) => (
+                  <div key={i} className="flex items-center justify-between py-2 border-b border-zinc-200 last:border-0">
+                    <div>
+                      <p className="text-sm text-zinc-600">{stat.label}</p>
+                      <p className="text-xs text-zinc-400">{stat.source}</p>
+                    </div>
+                    <p className="text-2xl font-bold text-zinc-400">{stat.value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* With Sidekick - Green/Positive */}
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-8">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-white" />
                 </div>
-                <p className="text-3xl md:text-4xl font-bold text-white mb-2">{stat.value}</p>
-                <p className="text-sm text-zinc-300 mb-2">{stat.label}</p>
-                <p className="text-xs text-zinc-500">{stat.subtext}</p>
+                <h3 className="font-semibold text-green-800">With Sidekick</h3>
               </div>
-            ))}
+              
+              <div className="space-y-5">
+                {[
+                  { value: "50%", label: "reduction in early turnover", desc: "Workers feel supported" },
+                  { value: "70%", label: "faster time to productivity", desc: "Answers in seconds" },
+                  { value: "15 hrs", label: "saved per manager per month", desc: "No repeat questions" },
+                  { value: "$18K", label: "annual savings per 50 employees", desc: "ROI in weeks" },
+                ].map((stat, i) => (
+                  <div key={i} className="flex items-center justify-between py-2 border-b border-green-200 last:border-0">
+                    <div>
+                      <p className="text-sm text-green-800">{stat.label}</p>
+                      <p className="text-xs text-green-600">{stat.desc}</p>
+                    </div>
+                    <p className="text-2xl font-bold text-green-600">{stat.value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -328,9 +308,9 @@ export default function Home() {
       <section id="how-it-works" className="py-20 px-6 bg-[#fafafa]">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <p className="text-green-600 text-sm font-semibold mb-2">The Solution</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-4">How Sidekick works</h2>
-            <p className="text-zinc-500 max-w-xl mx-auto">Concrete mechanics, not buzzwords. Here&apos;s exactly what happens.</p>
+            <p className="text-blue-600 text-sm font-semibold mb-2">How It Works</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-4">Simple for everyone</h2>
+            <p className="text-zinc-500 max-w-xl mx-auto">No app downloads. No training required. Just text and get answers.</p>
           </div>
           
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -340,73 +320,15 @@ export default function Home() {
               { icon: BarChart3, step: '03', title: 'Managers see', desc: 'Where onboarding breaks down. What questions repeat.' },
               { icon: Brain, step: '04', title: 'System learns', desc: 'Gets smarter over time as more questions flow in.' },
             ].map((item, i) => (
-              <div key={i} className="bg-white border border-zinc-200 rounded-xl p-5 hover:border-green-200 hover:shadow-md transition-all">
+              <div key={i} className="bg-white border border-zinc-200 rounded-xl p-5 hover:border-blue-200 hover:shadow-md transition-all">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
-                    <item.icon className="w-5 h-5 text-green-600" />
+                  <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                    <item.icon className="w-5 h-5 text-blue-600" />
                   </div>
                   <span className="text-xs font-bold text-zinc-300">{item.step}</span>
                 </div>
                 <h3 className="font-semibold text-zinc-900 mb-1">{item.title}</h3>
                 <p className="text-sm text-zinc-500">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ============================================ */}
-      {/* SIDEKICK IMPACT - Results */}
-      {/* ============================================ */}
-      <section className="py-20 px-6 bg-white">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-green-600 text-sm font-semibold mb-2">The Impact</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-4">What Sidekick delivers</h2>
-            <p className="text-zinc-500 max-w-xl mx-auto">Real results from real customers. Less frustration, faster onboarding, happier teams.</p>
-          </div>
-          
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { 
-                value: "50%", 
-                label: "reduction in early turnover",
-                desc: "Workers feel supported from day one",
-                color: "green"
-              },
-              { 
-                value: "70%", 
-                label: "faster time to productivity",
-                desc: "Answers in seconds, not hours",
-                color: "blue"
-              },
-              { 
-                value: "15 hrs", 
-                label: "saved per manager per month",
-                desc: "No more repeat questions",
-                color: "violet"
-              },
-              { 
-                value: "$18K", 
-                label: "annual savings per 50 employees",
-                desc: "Reduced turnover + manager time",
-                color: "amber"
-              },
-            ].map((stat, i) => (
-              <div key={i} className={`rounded-xl p-6 text-center border ${
-                stat.color === 'green' ? 'bg-green-50 border-green-100' :
-                stat.color === 'blue' ? 'bg-blue-50 border-blue-100' :
-                stat.color === 'violet' ? 'bg-violet-50 border-violet-100' :
-                'bg-amber-50 border-amber-100'
-              }`}>
-                <p className={`text-4xl md:text-5xl font-bold mb-2 ${
-                  stat.color === 'green' ? 'text-green-600' :
-                  stat.color === 'blue' ? 'text-blue-600' :
-                  stat.color === 'violet' ? 'text-violet-600' :
-                  'text-amber-600'
-                }`}>{stat.value}</p>
-                <p className="text-sm font-medium text-zinc-900 mb-1">{stat.label}</p>
-                <p className="text-xs text-zinc-500">{stat.desc}</p>
               </div>
             ))}
           </div>
@@ -505,7 +427,7 @@ export default function Home() {
       {/* ============================================ */}
       {/* WHY DIFFERENT - Document Intelligence */}
       {/* ============================================ */}
-      <section className="py-20 px-6 bg-[#fafafa]">
+      <section className="py-20 px-6 bg-white">
         <div className="max-w-5xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div>
@@ -534,20 +456,20 @@ export default function Home() {
             
             {/* Old vs New comparison */}
             <div className="space-y-4">
-              <div className="bg-red-50 border border-red-100 rounded-xl p-6">
+              <div className="bg-zinc-100 border border-zinc-200 rounded-xl p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <X className="w-5 h-5 text-red-500" />
-                  <span className="font-semibold text-red-900">The Old Way</span>
+                  <X className="w-5 h-5 text-zinc-400" />
+                  <span className="font-semibold text-zinc-600">The Old Way</span>
                 </div>
-                <ul className="space-y-2.5 text-sm text-red-800">
-                  <li className="flex items-start gap-2"><span className="text-red-400">•</span> Hunt down a supervisor who&apos;s busy</li>
-                  <li className="flex items-start gap-2"><span className="text-red-400">•</span> Dig through a 200-page handbook</li>
-                  <li className="flex items-start gap-2"><span className="text-red-400">•</span> Ask coworkers who might be wrong</li>
-                  <li className="flex items-start gap-2"><span className="text-red-400">•</span> Give up and guess</li>
+                <ul className="space-y-2.5 text-sm text-zinc-500">
+                  <li className="flex items-start gap-2"><span className="text-zinc-400">•</span> Hunt down a supervisor who&apos;s busy</li>
+                  <li className="flex items-start gap-2"><span className="text-zinc-400">•</span> Dig through a 200-page handbook</li>
+                  <li className="flex items-start gap-2"><span className="text-zinc-400">•</span> Ask coworkers who might be wrong</li>
+                  <li className="flex items-start gap-2"><span className="text-zinc-400">•</span> Give up and guess</li>
                 </ul>
               </div>
               
-              <div className="bg-green-50 border border-green-100 rounded-xl p-6">
+              <div className="bg-green-50 border border-green-200 rounded-xl p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <CheckCircle className="w-5 h-5 text-green-600" />
                   <span className="font-semibold text-green-900">With Sidekick</span>
@@ -567,7 +489,7 @@ export default function Home() {
       {/* ============================================ */}
       {/* TESTIMONIALS */}
       {/* ============================================ */}
-      <section className="py-20 px-6 bg-white">
+      <section className="py-20 px-6 bg-[#fafafa]">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <p className="text-blue-600 text-sm font-semibold mb-2">Testimonials</p>
@@ -598,14 +520,14 @@ export default function Home() {
                 logo: "/logos/jfm.png"
               },
             ].map((item, i) => (
-              <div key={i} className="bg-[#fafafa] border border-zinc-200 rounded-2xl p-6 hover:shadow-lg transition-all">
+              <div key={i} className="bg-white border border-zinc-200 rounded-2xl p-6 hover:shadow-lg transition-all">
                 <div className="mb-4">
                   <Quote className="w-8 h-8 text-blue-100" />
                 </div>
                 <p className="text-zinc-600 text-sm leading-relaxed mb-6">
                   &quot;{item.quote}&quot;
                 </p>
-                <div className="flex items-center gap-3 pt-4 border-t border-zinc-200">
+                <div className="flex items-center gap-3 pt-4 border-t border-zinc-100">
                   <Image 
                     src={item.logo} 
                     alt={item.company} 
@@ -627,9 +549,9 @@ export default function Home() {
       {/* ============================================ */}
       {/* PROOF / TRACTION */}
       {/* ============================================ */}
-      <section className="py-16 px-6 bg-[#fafafa]">
+      <section className="py-16 px-6 bg-white">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white border border-zinc-200 rounded-2xl p-8 md:p-10">
+          <div className="bg-[#fafafa] border border-zinc-200 rounded-2xl p-8 md:p-10">
             <p className="text-blue-600 text-sm font-semibold mb-6 text-center">Early traction</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 mb-6">
               <div className="text-center">
@@ -659,7 +581,7 @@ export default function Home() {
       {/* ============================================ */}
       {/* TRUST & COMPLIANCE */}
       {/* ============================================ */}
-      <section className="py-16 px-6 bg-white">
+      <section className="py-16 px-6 bg-[#fafafa]">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
             <p className="text-blue-600 text-sm font-semibold mb-2">Trust & Security</p>
@@ -673,8 +595,8 @@ export default function Home() {
               { icon: Phone, title: 'SMS Compliant', desc: 'STOP/HELP supported' },
               { icon: Mail, title: 'Privacy First', desc: 'GDPR & CCPA ready' },
             ].map((item, i) => (
-              <div key={i} className="bg-[#fafafa] border border-zinc-200 rounded-xl p-5 text-center">
-                <div className="w-10 h-10 bg-white border border-zinc-200 rounded-lg flex items-center justify-center mx-auto mb-3">
+              <div key={i} className="bg-white border border-zinc-200 rounded-xl p-5 text-center">
+                <div className="w-10 h-10 bg-zinc-100 rounded-lg flex items-center justify-center mx-auto mb-3">
                   <item.icon className="w-5 h-5 text-zinc-600" />
                 </div>
                 <h3 className="font-semibold text-zinc-900 text-sm mb-1">{item.title}</h3>
