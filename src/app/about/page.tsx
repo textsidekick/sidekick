@@ -2,15 +2,13 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState, useRef } from "react";
-import { ArrowRight, Target, Zap, Globe } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowRight, Target, Zap, Globe, Users, Linkedin, Twitter } from "lucide-react";
 
 export default function About() {
   const calLink = "https://cal.com/justin-so-xnr0oc/sidekick-demo";
   const [scrollY, setScrollY] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -19,44 +17,30 @@ export default function About() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (heroRef.current) {
-        const rect = heroRef.current.getBoundingClientRect();
-        const isInside = e.clientY < rect.bottom + 100;
-        if (isInside) {
-          setMousePosition({
-            x: e.clientX,
-            y: e.clientY - rect.top,
-          });
-        }
-      }
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
-
   const team = [
     {
       name: "Justin So",
       role: "Co-Founder & CEO",
-      company: "Strategic Analyst @ Arm",
-      university: "University of Pennsylvania",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+      bio: "Previously Strategic Analyst at Arm. Passionate about bringing technology to underserved workforces.",
+      school: "University of Pennsylvania",
+      image: "/team/justin.jpg",
+      linkedin: "#",
     },
     {
       name: "Aadip Khanal",
       role: "Co-Founder & CTO",
-      company: "Software Engineer @ Amazon",
-      university: "UC Berkeley",
-      image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=face",
+      bio: "Former Software Engineer at Amazon. Expert in scalable systems and AI infrastructure.",
+      school: "UC Berkeley",
+      image: "/team/aadip.jpg",
+      linkedin: "#",
     },
     {
       name: "Aayush Bandopadhyay",
       role: "Co-Founder & CPO",
-      company: "Associate PM @ Google",
-      university: "UIUC",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+      bio: "Previously Associate PM at Google. Focused on building products that solve real problems.",
+      school: "UIUC",
+      image: "/team/aayush.jpg",
+      linkedin: "#",
     },
   ];
 
@@ -71,8 +55,6 @@ export default function About() {
           to { opacity: 1; transform: translateY(0); }
         }
         .fade-up { animation: fade-up 0.6s ease-out forwards; }
-        .delay-100 { animation-delay: 0.1s; opacity: 0; }
-        .delay-200 { animation-delay: 0.2s; opacity: 0; }
       `}</style>
 
       {/* Navigation */}
@@ -84,85 +66,50 @@ export default function About() {
             </div>
             <span className="font-semibold text-zinc-900">Sidekick</span>
           </Link>
-          <div className="flex items-center gap-8">
-            <Link href="/about" className="text-zinc-900 text-sm font-medium transition-colors">About</Link>
-            <Link href="/contact" className="text-zinc-500 hover:text-zinc-900 text-sm transition-colors">Contact</Link>
+          <div className="flex items-center gap-6">
+            <Link href="/#how-it-works" className="text-zinc-500 hover:text-zinc-900 text-sm transition-colors hidden md:block">How it works</Link>
+            <Link href="/about" className="text-zinc-900 font-medium text-sm transition-colors hidden md:block">About</Link>
+            <Link href="/contact" className="text-zinc-500 hover:text-zinc-900 text-sm transition-colors hidden md:block">Contact</Link>
             <a 
               href={calLink}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             >
-              Book Demo
+              Request Demo
             </a>
           </div>
         </div>
       </nav>
 
-      {/* HERO */}
-      <section 
-        ref={heroRef}
-        className="relative pt-28 pb-20 overflow-hidden"
-        style={{ background: 'linear-gradient(180deg, #f0f7ff 0%, #fafafa 100%)' }}
-      >
-        {/* Cursor-following gradients */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div 
-            className="absolute transition-all duration-300 ease-out"
-            style={{
-              width: '700px',
-              height: '700px',
-              left: mousePosition.x - 350,
-              top: mousePosition.y - 350,
-              background: 'radial-gradient(circle, rgba(59,130,246,0.2) 0%, rgba(59,130,246,0.08) 30%, transparent 60%)',
-              borderRadius: '50%',
-              filter: 'blur(60px)',
-            }}
-          />
-          <div 
-            className="absolute transition-all duration-500 ease-out"
-            style={{
-              width: '500px',
-              height: '500px',
-              left: mousePosition.x - 250 + 80,
-              top: mousePosition.y - 250 - 60,
-              background: 'radial-gradient(circle, rgba(139,92,246,0.15) 0%, rgba(139,92,246,0.05) 40%, transparent 70%)',
-              borderRadius: '50%',
-              filter: 'blur(60px)',
-            }}
-          />
-          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-200/30 rounded-full blur-[100px]" />
-        </div>
-
-        <div className={`relative z-10 max-w-4xl mx-auto px-6 text-center ${isLoaded ? 'fade-up' : 'opacity-0'}`}>
-          <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur border border-zinc-200 px-4 py-2 rounded-full text-sm text-zinc-600 font-medium mb-6 shadow-sm">
-            About Us
-          </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-[1.1]">
+      {/* Hero */}
+      <section className="pt-28 pb-16 px-6 bg-gradient-to-b from-blue-50/50 to-[#fafafa]">
+        <div className={`max-w-4xl mx-auto text-center ${isLoaded ? 'fade-up' : 'opacity-0'}`}>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
             Empowering the workforce
             <br />
             <span className="text-blue-600">that builds America.</span>
           </h1>
-          <p className="text-xl text-zinc-500 max-w-2xl mx-auto leading-relaxed">
-            We&apos;re building AI tools that help blue-collar workers get instant answers—no app, no login, just text.
+          <p className="text-xl text-zinc-500 max-w-2xl mx-auto">
+            We&apos;re building AI tools that help deskless workers get instant answers—no app, no login, just text.
           </p>
         </div>
       </section>
 
       {/* Mission */}
-      <section className="py-24 px-6 bg-[#fafafa]">
+      <section className="py-20 px-6 bg-white">
         <div className="max-w-5xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
             <div>
-              <p className="text-blue-600 text-sm font-semibold mb-4">Our Mission</p>
+              <p className="text-blue-600 text-sm font-semibold mb-3">Our Mission</p>
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
                 Knowledge should be accessible to everyone.
               </h2>
               <p className="text-zinc-600 leading-relaxed mb-6">
-                80% of the global workforce doesn&apos;t sit at a desk. They&apos;re on factory floors, in warehouses, behind retail counters. Yet enterprise software ignores them.
+                80% of the global workforce doesn&apos;t sit at a desk. They&apos;re on factory floors, in warehouses, behind retail counters. Yet enterprise software ignores them completely.
               </p>
               <p className="text-zinc-600 leading-relaxed">
-                Sidekick changes that. We meet workers where they are—on their phones, via SMS—delivering instant answers from company handbooks, safety manuals, and SOPs.
+                Sidekick changes that. We meet workers where they are—on their phones, via SMS—delivering instant answers from company handbooks, safety manuals, and SOPs. No app downloads. No training required.
               </p>
             </div>
             
@@ -170,10 +117,10 @@ export default function About() {
               {[
                 { value: "80%", label: "of workforce is deskless" },
                 { value: "2.7B", label: "frontline workers globally" },
-                { value: "70%", label: "feel undertrained" },
-                { value: "5min", label: "avg time to find info" },
+                { value: "70%", label: "feel undertrained at work" },
+                { value: "5 min", label: "avg time to find info" },
               ].map((stat, i) => (
-                <div key={i} className="bg-white border border-zinc-200 rounded-xl p-5 text-center shadow-sm">
+                <div key={i} className="bg-[#fafafa] border border-zinc-200 rounded-xl p-5 text-center">
                   <div className="text-2xl md:text-3xl font-bold text-blue-600 mb-1">{stat.value}</div>
                   <div className="text-zinc-500 text-sm">{stat.label}</div>
                 </div>
@@ -183,49 +130,64 @@ export default function About() {
         </div>
       </section>
 
-      {/* Team - Dark Section */}
-      <section className="relative py-28 overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&q=80)' }}
-        />
-        <div className="absolute inset-0 bg-zinc-950/92" />
-        <div 
-          className="absolute inset-0 opacity-30"
-          style={{
-            backgroundImage: `linear-gradient(rgba(59,130,246,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.08) 1px, transparent 1px)`,
-            backgroundSize: '50px 50px',
-          }}
-        />
-        
-        <div className="relative z-10 max-w-5xl mx-auto px-6">
-          <div className="text-center mb-14">
-            <p className="text-blue-400 text-sm font-semibold mb-2">Our Team</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Meet the founders.</h2>
-            <p className="text-zinc-400 max-w-xl mx-auto">
-              A team from top tech companies, united by a mission to democratize workplace knowledge.
+      {/* Why We Started */}
+      <section className="py-20 px-6 bg-[#fafafa]">
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white rounded-2xl p-8 md:p-10 border border-zinc-200">
+            <p className="text-blue-600 text-sm font-semibold mb-4">Why We Started</p>
+            <p className="text-xl md:text-2xl text-zinc-700 leading-relaxed mb-8 italic">
+              &quot;My dad runs a manufacturing plant with 100+ workers. Every new hire has the same questions—where to park, what to wear, how to clock in. Managers spend hours answering them. We built Sidekick so workers get instant answers and managers get their time back.&quot;
             </p>
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 bg-zinc-200 rounded-full overflow-hidden">
+                <Image 
+                  src="/team/justin.jpg" 
+                  alt="Justin So"
+                  width={56}
+                  height={56}
+                  className="object-cover w-full h-full"
+                />
+              </div>
+              <div>
+                <p className="font-semibold text-zinc-900">Justin So</p>
+                <p className="text-zinc-500 text-sm">Co-founder & CEO</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Team */}
+      <section className="py-20 px-6 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-14">
+            <p className="text-blue-600 text-sm font-semibold mb-2">Our Team</p>
+            <h2 className="text-3xl md:text-4xl font-bold">Meet the founders</h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-8">
             {team.map((member, index) => (
-              <div key={index} className="bg-white rounded-2xl overflow-hidden shadow-2xl">
-                <div className="relative h-64">
+              <div key={index} className="bg-[#fafafa] border border-zinc-200 rounded-2xl overflow-hidden hover:shadow-lg transition-all">
+                <div className="aspect-square bg-zinc-200 relative">
                   <Image
                     src={member.image}
                     alt={member.name}
                     fill
                     className="object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-white via-white/30 to-transparent" />
                 </div>
-                <div className="p-6 -mt-8 relative">
-                  <h3 className="text-xl font-bold text-zinc-900 mb-1">{member.name}</h3>
-                  <p className="text-blue-600 font-medium text-sm mb-3">{member.role}</p>
-                  <div className="space-y-1 text-sm">
-                    <p className="text-zinc-600">{member.company}</p>
-                    <p className="text-zinc-500">{member.university}</p>
+                <div className="p-6">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 className="text-lg font-bold text-zinc-900">{member.name}</h3>
+                      <p className="text-blue-600 text-sm font-medium">{member.role}</p>
+                    </div>
+                    <a href={member.linkedin} className="text-zinc-400 hover:text-blue-600 transition-colors">
+                      <Linkedin className="w-5 h-5" />
+                    </a>
                   </div>
+                  <p className="text-zinc-500 text-sm mb-3">{member.bio}</p>
+                  <p className="text-zinc-400 text-xs">{member.school}</p>
                 </div>
               </div>
             ))}
@@ -234,11 +196,11 @@ export default function About() {
       </section>
 
       {/* Values */}
-      <section className="py-24 px-6 bg-white">
+      <section className="py-20 px-6 bg-[#fafafa]">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-14">
             <p className="text-blue-600 text-sm font-semibold mb-2">Our Values</p>
-            <h2 className="text-3xl md:text-4xl font-bold">What drives us.</h2>
+            <h2 className="text-3xl md:text-4xl font-bold">What drives us</h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
@@ -246,12 +208,12 @@ export default function About() {
               {
                 icon: Target,
                 title: "Worker-First",
-                desc: "Every feature we build starts with the frontline worker. If it doesn't help them, we don't ship it."
+                desc: "Every feature starts with the frontline worker. If it doesn't help them, we don't ship it."
               },
               {
                 icon: Zap,
                 title: "Instant Value",
-                desc: "No lengthy onboarding, no training required. Workers should get answers in seconds, not hours."
+                desc: "No lengthy onboarding or training required. Workers should get answers in seconds, not hours."
               },
               {
                 icon: Globe,
@@ -259,8 +221,8 @@ export default function About() {
                 desc: "Language, device, or tech literacy shouldn't be barriers. We build for everyone."
               },
             ].map((value, i) => (
-              <div key={i} className="p-8 rounded-xl bg-[#fafafa] hover:bg-zinc-100 transition-all">
-                <div className="w-12 h-12 bg-white border border-zinc-200 rounded-xl flex items-center justify-center mb-6 shadow-sm">
+              <div key={i} className="bg-white border border-zinc-200 rounded-xl p-8 hover:shadow-md transition-all">
+                <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-5">
                   <value.icon className="w-6 h-6 text-blue-600" />
                 </div>
                 <h3 className="font-bold text-zinc-900 text-xl mb-3">{value.title}</h3>
@@ -272,55 +234,75 @@ export default function About() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-6 bg-zinc-900">
+      <section className="py-20 px-6 bg-zinc-900">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-white mb-3">Ready to empower your workforce?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Ready to empower your workforce?</h2>
           <p className="text-zinc-400 mb-8">Join leading companies using Sidekick to train teams faster.</p>
-          <a
-            href={calLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-white hover:bg-zinc-100 text-zinc-900 px-6 py-3 rounded-lg font-medium transition-colors"
-          >
-            Book a Demo <ArrowRight className="w-4 h-4" />
-          </a>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a
+              href={calLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 bg-white hover:bg-zinc-100 text-zinc-900 px-6 py-3.5 rounded-xl font-medium transition-colors w-full sm:w-auto justify-center"
+            >
+              Request a Demo <ArrowRight className="w-4 h-4" />
+            </a>
+            <Link 
+              href="/contact"
+              className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-medium border border-zinc-700 text-white hover:bg-zinc-800 transition-colors w-full sm:w-auto justify-center"
+            >
+              Get in Touch
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="py-12 px-6 bg-zinc-950">
         <div className="max-w-5xl mx-auto">
-          <div className="flex flex-col md:flex-row items-start justify-between gap-8">
-            <div>
+          <div className="grid md:grid-cols-4 gap-8 mb-12">
+            <div className="md:col-span-2">
               <Link href="/" className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                   <span className="font-bold text-white text-sm">S</span>
                 </div>
                 <span className="font-semibold text-white">Sidekick</span>
               </Link>
-              <p className="text-zinc-500 text-sm max-w-xs">AI-powered onboarding assistant for blue-collar teams.</p>
+              <p className="text-zinc-500 text-sm mb-4 max-w-xs">
+                AI onboarding assistant for deskless workers. Reduce turnover, free up managers.
+              </p>
+              <p className="text-zinc-500 text-sm">
+                <a href="mailto:hello@sidekick.ai" className="hover:text-white transition-colors">hello@sidekick.ai</a>
+              </p>
             </div>
             
-            <div className="flex gap-16">
-              <div>
-                <h4 className="text-zinc-400 text-xs font-medium uppercase tracking-wider mb-3">Company</h4>
-                <ul className="space-y-2">
-                  <li><Link href="/about" className="text-zinc-500 text-sm hover:text-white transition-colors">About</Link></li>
-                  <li><Link href="/contact" className="text-zinc-500 text-sm hover:text-white transition-colors">Contact</Link></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="text-zinc-400 text-xs font-medium uppercase tracking-wider mb-3">Resources</h4>
-                <ul className="space-y-2">
-                  <li><Link href="/privacy" className="text-zinc-500 text-sm hover:text-white transition-colors">Privacy</Link></li>
-                  <li><Link href="/terms" className="text-zinc-500 text-sm hover:text-white transition-colors">Terms</Link></li>
-                </ul>
-              </div>
+            <div>
+              <h4 className="text-zinc-400 text-xs font-medium uppercase tracking-wider mb-4">Company</h4>
+              <ul className="space-y-3">
+                <li><Link href="/about" className="text-zinc-500 text-sm hover:text-white transition-colors">About</Link></li>
+                <li><Link href="/contact" className="text-zinc-500 text-sm hover:text-white transition-colors">Contact</Link></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-zinc-400 text-xs font-medium uppercase tracking-wider mb-4">Legal</h4>
+              <ul className="space-y-3">
+                <li><Link href="/privacy" className="text-zinc-500 text-sm hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="text-zinc-500 text-sm hover:text-white transition-colors">Terms of Service</Link></li>
+                <li><Link href="/sms-terms" className="text-zinc-500 text-sm hover:text-white transition-colors">SMS Terms</Link></li>
+              </ul>
             </div>
           </div>
           
-          <div className="border-t border-zinc-800 mt-12 pt-8">
-            <p className="text-zinc-600 text-xs text-center">© 2025 Sidekick AI. All rights reserved.</p>
+          <div className="border-t border-zinc-800 pt-8 mb-8">
+            <p className="text-zinc-600 text-xs text-center">
+              SMS: Reply STOP to unsubscribe. Reply HELP for help. Msg & data rates may apply.
+            </p>
+          </div>
+          
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-zinc-600 text-xs">© 2025 Sidekick AI Inc. All rights reserved.</p>
+            <p className="text-zinc-700 text-xs">Santa Clara, CA</p>
           </div>
         </div>
       </footer>

@@ -1,339 +1,286 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { ArrowRight, Mail, MapPin, Calendar, MessageSquare } from "lucide-react";
 
-function Logo({ size = 48 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M4 8 Q4 4 8 4 L40 4 Q44 4 44 8 L44 32 Q44 36 40 36 L16 36 L8 44 L8 36 Q4 36 4 32 Z" fill="#0ea5e9"/>
-      <rect x="20" y="16" width="8" height="3" rx="1.5" fill="white"/>
-      <circle cx="15" cy="17" r="7" stroke="white" strokeWidth="3" fill="none"/>
-      <circle cx="33" cy="17" r="7" stroke="white" strokeWidth="3" fill="none"/>
-      <circle cx="15" cy="16" r="2.5" fill="#1e293b"/>
-      <circle cx="33" cy="16" r="2.5" fill="#1e293b"/>
-      <path d="M19 28 Q24 31 29 28" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
-    </svg>
-  );
-}
-
-const industries = [
-  "Manufacturing",
-  "Retail & Grocery",
-  "Automotive",
-  "Construction",
-  "Warehouse & Logistics",
-  "Hospitality",
-  "Healthcare",
-  "Other",
-];
-
-const companySizes = [
-  "1-50 employees",
-  "51-200 employees",
-  "201-500 employees",
-  "500+ employees",
-];
-
-const interests = [
-  "Schedule a demo",
-  "Get pricing info",
-  "Enterprise inquiry",
-  "Partnership opportunity",
-  "General question",
-];
-
-export default function ContactPage() {
+export default function Contact() {
+  const calLink = "https://cal.com/justin-so-xnr0oc/sidekick-demo";
+  const [scrollY, setScrollY] = useState(0);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    company: "",
-    industry: "",
-    size: "",
-    interest: "",
-    message: "",
+    name: '',
+    email: '',
+    company: '',
+    employees: '',
+    message: ''
   });
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  useEffect(() => {
+    setIsLoaded(true);
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    setLoading(false);
-    setSubmitted(true);
+    setIsSubmitting(true);
+    // Simulate form submission
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsSubmitting(false);
+    setIsSubmitted(true);
   };
 
-  const isValid = formData.firstName && formData.lastName && formData.email && formData.company && formData.interest;
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#fafafa] text-zinc-900 overflow-x-hidden">
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        @keyframes fade-up {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-up { animation: fade-up 0.6s ease-out forwards; }
+      `}</style>
+
       {/* Navigation */}
-      <nav className="bg-white border-b border-gray-200 px-6 md:px-24 py-4">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrollY > 50 ? 'bg-[#fafafa]/90 backdrop-blur-md shadow-sm' : 'bg-transparent'}`}>
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <Logo size={32} />
-            <span className="text-gray-900 text-xl font-bold">Sidekick</span>
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <span className="font-bold text-white text-sm">S</span>
+            </div>
+            <span className="font-semibold text-zinc-900">Sidekick</span>
           </Link>
           <div className="flex items-center gap-6">
-            <Link href="/pricing" className="text-gray-600 hover:text-gray-900 text-sm">Pricing</Link>
-            <Link href="/qa" className="px-5 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-sm font-medium transition-all">Try Demo</Link>
+            <Link href="/#how-it-works" className="text-zinc-500 hover:text-zinc-900 text-sm transition-colors hidden md:block">How it works</Link>
+            <Link href="/about" className="text-zinc-500 hover:text-zinc-900 text-sm transition-colors hidden md:block">About</Link>
+            <Link href="/contact" className="text-zinc-900 font-medium text-sm transition-colors hidden md:block">Contact</Link>
+            <a 
+              href={calLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            >
+              Request Demo
+            </a>
           </div>
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-24 py-16">
-        <div className="grid lg:grid-cols-2 gap-16">
-          {/* Left Side - Info */}
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-6">
-              Let's talk about your<br />onboarding challenges
-            </h1>
-            <p className="text-xl text-gray-600 mb-12">
-              Whether you're looking for a demo, have questions about pricing, or want to explore enterprise solutions, we're here to help.
-            </p>
+      {/* Hero */}
+      <section className="pt-28 pb-16 px-6 bg-gradient-to-b from-blue-50/50 to-[#fafafa]">
+        <div className={`max-w-4xl mx-auto text-center ${isLoaded ? 'fade-up' : 'opacity-0'}`}>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
+            Let&apos;s talk
+          </h1>
+          <p className="text-xl text-zinc-500 max-w-2xl mx-auto">
+            Have questions about Sidekick? Want to see a demo? We&apos;d love to hear from you.
+          </p>
+        </div>
+      </section>
 
-            {/* Benefits */}
-            <div className="space-y-6 mb-12">
-              {[
-                {
-                  icon: "🚀",
-                  title: "Quick setup",
-                  desc: "Get started in less than 15 minutes. Upload docs and your team can start asking questions immediately.",
-                },
-                {
-                  icon: "💰",
-                  title: "Proven ROI",
-                  desc: "Our customers save an average of 4.5 minutes per question. That adds up to thousands in savings.",
-                },
-                {
-                  icon: "🔒",
-                  title: "Enterprise ready",
-                  desc: "SOC 2 compliant, SSO support, and dedicated success managers for large deployments.",
-                },
-              ].map((item) => (
-                <div key={item.title} className="flex gap-4">
-                  <div className="text-2xl">{item.icon}</div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">{item.title}</h3>
-                    <p className="text-gray-600 text-sm">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Contact Info */}
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
-              <h3 className="font-semibold text-gray-900 mb-4">Other ways to reach us</h3>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <span className="text-gray-400">📧</span>
-                  <a href="mailto:hello@sidekick.ai" className="text-sky-500 hover:underline">hello@sidekick.ai</a>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-gray-400">📞</span>
-                  <a href="tel:+15551234567" className="text-sky-500 hover:underline">+1 (555) 123-4567</a>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-gray-400">📍</span>
-                  <span className="text-gray-600">San Francisco, CA</span>
-                </div>
+      {/* Contact Options */}
+      <section className="py-12 px-6 bg-white border-y border-zinc-100">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6">
+            <a 
+              href={calLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-blue-50 border border-blue-100 rounded-xl p-6 hover:shadow-md transition-all group"
+            >
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
+                <Calendar className="w-6 h-6 text-blue-600" />
               </div>
-            </div>
-
-            {/* Testimonial */}
-            <div className="mt-8 bg-sky-50 rounded-xl p-6 border border-sky-100">
-              <p className="text-gray-700 italic mb-4">
-                "Sidekick cut our onboarding time by 70%. The team was incredibly responsive and helped us get set up in no time."
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-sky-200 rounded-full flex items-center justify-center text-sky-700 font-medium">MG</div>
-                <div>
-                  <p className="font-medium text-gray-900">Maria Garcia</p>
-                  <p className="text-sm text-gray-600">Plant Manager, EDS Manufacturing</p>
-                </div>
+              <h3 className="font-semibold text-zinc-900 mb-2">Book a Demo</h3>
+              <p className="text-sm text-zinc-500 mb-3">See Sidekick in action with a personalized walkthrough.</p>
+              <span className="text-sm text-blue-600 font-medium flex items-center gap-1">
+                Schedule now <ArrowRight className="w-3 h-3" />
+              </span>
+            </a>
+            
+            <a 
+              href="mailto:hello@sidekick.ai"
+              className="bg-[#fafafa] border border-zinc-200 rounded-xl p-6 hover:shadow-md transition-all group"
+            >
+              <div className="w-12 h-12 bg-zinc-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-zinc-200 transition-colors">
+                <Mail className="w-6 h-6 text-zinc-600" />
               </div>
+              <h3 className="font-semibold text-zinc-900 mb-2">Email Us</h3>
+              <p className="text-sm text-zinc-500 mb-3">Reach out directly and we&apos;ll respond within 24 hours.</p>
+              <span className="text-sm text-zinc-600 font-medium">hello@sidekick.ai</span>
+            </a>
+            
+            <div className="bg-[#fafafa] border border-zinc-200 rounded-xl p-6">
+              <div className="w-12 h-12 bg-zinc-100 rounded-xl flex items-center justify-center mb-4">
+                <MapPin className="w-6 h-6 text-zinc-600" />
+              </div>
+              <h3 className="font-semibold text-zinc-900 mb-2">Location</h3>
+              <p className="text-sm text-zinc-500 mb-3">We&apos;re based in the San Francisco Bay Area.</p>
+              <span className="text-sm text-zinc-600 font-medium">Santa Clara, CA</span>
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Right Side - Form */}
-          <div>
-            {submitted ? (
-              <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-3xl">✓</span>
+      {/* Contact Form */}
+      <section className="py-20 px-6 bg-[#fafafa]">
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-white border border-zinc-200 rounded-2xl p-8 md:p-10">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-zinc-900 mb-2">Send us a message</h2>
+              <p className="text-zinc-500">Fill out the form below and we&apos;ll get back to you shortly.</p>
+            </div>
+
+            {isSubmitted ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <MessageSquare className="w-8 h-8 text-green-600" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Thanks for reaching out!</h2>
-                <p className="text-gray-600 mb-8">
-                  We've received your message and will get back to you within 24 hours. In the meantime, feel free to explore our demo.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link
-                    href="/qa"
-                    className="px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl font-medium transition-colors"
-                  >
-                    Try the Demo
-                  </Link>
-                  <Link
-                    href="/"
-                    className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition-colors"
-                  >
-                    Back to Home
-                  </Link>
-                </div>
+                <h3 className="text-xl font-semibold text-zinc-900 mb-2">Message sent!</h3>
+                <p className="text-zinc-500 mb-6">Thanks for reaching out. We&apos;ll be in touch soon.</p>
+                <a
+                  href={calLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-colors"
+                >
+                  Book a Demo <ArrowRight className="w-4 h-4" />
+                </a>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Get in touch</h2>
-
-                <div className="grid sm:grid-cols-2 gap-4 mb-4">
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="grid md:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">First name *</label>
+                    <label className="block text-sm font-medium text-zinc-700 mb-2">Name *</label>
                     <input
                       type="text"
-                      value={formData.firstName}
-                      onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
-                      placeholder="John"
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      className="w-full px-4 py-3 rounded-lg border border-zinc-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                      placeholder="Your name"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Last name *</label>
+                    <label className="block text-sm font-medium text-zinc-700 mb-2">Email *</label>
                     <input
-                      type="text"
-                      value={formData.lastName}
-                      onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
-                      placeholder="Smith"
+                      type="email"
+                      required
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      className="w-full px-4 py-3 rounded-lg border border-zinc-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                      placeholder="you@company.com"
                     />
                   </div>
                 </div>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Work email *</label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
-                    placeholder="john@company.com"
-                  />
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone number</label>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
-                    placeholder="(555) 123-4567"
-                  />
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Company name *</label>
-                  <input
-                    type="text"
-                    value={formData.company}
-                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
-                    placeholder="Acme Inc."
-                  />
-                </div>
-
-                <div className="grid sm:grid-cols-2 gap-4 mb-4">
+                
+                <div className="grid md:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Industry</label>
-                    <select
-                      value={formData.industry}
-                      onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-white"
-                    >
-                      <option value="">Select industry</option>
-                      {industries.map((ind) => (
-                        <option key={ind} value={ind}>{ind}</option>
-                      ))}
-                    </select>
+                    <label className="block text-sm font-medium text-zinc-700 mb-2">Company</label>
+                    <input
+                      type="text"
+                      value={formData.company}
+                      onChange={(e) => setFormData({...formData, company: e.target.value})}
+                      className="w-full px-4 py-3 rounded-lg border border-zinc-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                      placeholder="Company name"
+                    />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Company size</label>
+                    <label className="block text-sm font-medium text-zinc-700 mb-2">Number of Employees</label>
                     <select
-                      value={formData.size}
-                      onChange={(e) => setFormData({ ...formData, size: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-white"
+                      value={formData.employees}
+                      onChange={(e) => setFormData({...formData, employees: e.target.value})}
+                      className="w-full px-4 py-3 rounded-lg border border-zinc-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all bg-white"
                     >
-                      <option value="">Select size</option>
-                      {companySizes.map((size) => (
-                        <option key={size} value={size}>{size}</option>
-                      ))}
+                      <option value="">Select...</option>
+                      <option value="1-50">1-50</option>
+                      <option value="51-200">51-200</option>
+                      <option value="201-500">201-500</option>
+                      <option value="501-1000">501-1000</option>
+                      <option value="1000+">1000+</option>
                     </select>
                   </div>
                 </div>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">What are you interested in? *</label>
-                  <select
-                    value={formData.interest}
-                    onChange={(e) => setFormData({ ...formData, interest: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-white"
-                  >
-                    <option value="">Select an option</option>
-                    {interests.map((int) => (
-                      <option key={int} value={int}>{int}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                
+                <div>
+                  <label className="block text-sm font-medium text-zinc-700 mb-2">Message *</label>
                   <textarea
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    required
                     rows={4}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent resize-none"
-                    placeholder="Tell us about your onboarding challenges or questions..."
+                    value={formData.message}
+                    onChange={(e) => setFormData({...formData, message: e.target.value})}
+                    className="w-full px-4 py-3 rounded-lg border border-zinc-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all resize-none"
+                    placeholder="How can we help?"
                   />
                 </div>
-
+                
                 <button
                   type="submit"
-                  disabled={!isValid || loading}
-                  className="w-full py-4 bg-sky-500 hover:bg-sky-600 disabled:bg-gray-200 disabled:text-gray-400 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
+                  disabled={isSubmitting}
+                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-6 py-3.5 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
                 >
-                  {loading ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    "Send Message"
-                  )}
+                  {isSubmitting ? 'Sending...' : 'Send Message'}
+                  {!isSubmitting && <ArrowRight className="w-4 h-4" />}
                 </button>
-
-                <p className="text-center text-gray-500 text-sm mt-4">
-                  By submitting, you agree to our{" "}
-                  <Link href="/privacy" className="text-sky-500 hover:underline">Privacy Policy</Link>
-                </p>
               </form>
             )}
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 px-6 md:px-24 py-8">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Logo size={24} />
-            <span className="text-gray-900 font-bold">Sidekick</span>
+      <footer className="py-12 px-6 bg-zinc-950">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-12">
+            <div className="md:col-span-2">
+              <Link href="/" className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <span className="font-bold text-white text-sm">S</span>
+                </div>
+                <span className="font-semibold text-white">Sidekick</span>
+              </Link>
+              <p className="text-zinc-500 text-sm mb-4 max-w-xs">
+                AI onboarding assistant for deskless workers. Reduce turnover, free up managers.
+              </p>
+              <p className="text-zinc-500 text-sm">
+                <a href="mailto:hello@sidekick.ai" className="hover:text-white transition-colors">hello@sidekick.ai</a>
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="text-zinc-400 text-xs font-medium uppercase tracking-wider mb-4">Company</h4>
+              <ul className="space-y-3">
+                <li><Link href="/about" className="text-zinc-500 text-sm hover:text-white transition-colors">About</Link></li>
+                <li><Link href="/contact" className="text-zinc-500 text-sm hover:text-white transition-colors">Contact</Link></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-zinc-400 text-xs font-medium uppercase tracking-wider mb-4">Legal</h4>
+              <ul className="space-y-3">
+                <li><Link href="/privacy" className="text-zinc-500 text-sm hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="text-zinc-500 text-sm hover:text-white transition-colors">Terms of Service</Link></li>
+                <li><Link href="/sms-terms" className="text-zinc-500 text-sm hover:text-white transition-colors">SMS Terms</Link></li>
+              </ul>
+            </div>
           </div>
-          <p className="text-gray-500 text-sm">© 2025 Sidekick AI. All rights reserved.</p>
+          
+          <div className="border-t border-zinc-800 pt-8 mb-8">
+            <p className="text-zinc-600 text-xs text-center">
+              SMS: Reply STOP to unsubscribe. Reply HELP for help. Msg & data rates may apply.
+            </p>
+          </div>
+          
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-zinc-600 text-xs">© 2025 Sidekick AI Inc. All rights reserved.</p>
+            <p className="text-zinc-700 text-xs">Santa Clara, CA</p>
+          </div>
         </div>
       </footer>
     </div>
