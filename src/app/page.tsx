@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { 
   FileText, 
   Brain, 
@@ -17,13 +17,16 @@ import {
   Factory,
   ShoppingCart,
   Wrench,
-  ChevronDown
+  Users,
+  TrendingUp
 } from "lucide-react";
 
 export default function Home() {
   const calLink = "https://cal.com/justin-so-xnr0oc/sidekick-demo";
   const [scrollY, setScrollY] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -32,63 +35,56 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (heroRef.current) {
+        const rect = heroRef.current.getBoundingClientRect();
+        const isInside = e.clientY < rect.bottom + 100;
+        if (isInside) {
+          setMousePosition({
+            x: e.clientX,
+            y: e.clientY - rect.top,
+          });
+        }
+      }
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-zinc-950 text-white overflow-x-hidden">
+    <div className="min-h-screen bg-[#fafafa] text-zinc-900 overflow-x-hidden">
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
         
-        .grid-bg {
-          background-image: 
-            linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
-          background-size: 40px 40px;
-        }
-        
-        @keyframes slide-up {
-          from { opacity: 0; transform: translateY(30px); }
+        @keyframes fade-up {
+          from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        
-        @keyframes fade-in {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        
-        .slide-up { animation: slide-up 0.6s ease-out forwards; }
-        .fade-in { animation: fade-in 0.8s ease-out forwards; }
-        
+        .fade-up { animation: fade-up 0.6s ease-out forwards; }
         .delay-100 { animation-delay: 0.1s; opacity: 0; }
         .delay-200 { animation-delay: 0.2s; opacity: 0; }
         .delay-300 { animation-delay: 0.3s; opacity: 0; }
-        .delay-400 { animation-delay: 0.4s; opacity: 0; }
       `}</style>
 
-      {/* Fixed Grid Background */}
-      <div className="fixed inset-0 grid-bg opacity-60 pointer-events-none" />
-
       {/* Navigation */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrollY > 50 ? 'bg-zinc-950/95 backdrop-blur-sm' : ''}`}>
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between border-b-2 border-zinc-800">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-md flex items-center justify-center">
-              <span className="font-black text-lg">S</span>
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrollY > 50 ? 'bg-[#fafafa]/90 backdrop-blur-md shadow-sm' : 'bg-transparent'}`}>
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <span className="font-bold text-white text-sm">S</span>
             </div>
-            <span className="font-bold text-lg tracking-tight">SIDEKICK</span>
+            <span className="font-semibold text-zinc-900">Sidekick</span>
           </Link>
-          <div className="flex items-center gap-6">
-            <Link href="/about" className="text-zinc-400 hover:text-white text-sm font-semibold uppercase tracking-wider transition-colors">
-              About
-            </Link>
-            <Link href="/contact" className="text-zinc-400 hover:text-white text-sm font-semibold uppercase tracking-wider transition-colors">
-              Contact
-            </Link>
+          <div className="flex items-center gap-8">
+            <Link href="/about" className="text-zinc-500 hover:text-zinc-900 text-sm transition-colors">About</Link>
+            <Link href="/contact" className="text-zinc-500 hover:text-zinc-900 text-sm transition-colors">Contact</Link>
             <a 
-              href={calLink} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="bg-blue-600 hover:bg-blue-500 px-5 py-2.5 rounded-md text-sm font-bold uppercase tracking-wider transition-colors"
+              href={calLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             >
               Book Demo
             </a>
@@ -96,295 +92,319 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center px-6 pt-20">
-        {/* Background Image with Parallax */}
-        <div 
-          className="absolute inset-0 z-0"
-          style={{ transform: `translateY(${scrollY * 0.3}px)` }}
-        >
-          <Image
-            src="https://images.unsplash.com/photo-1504917595217-d4dc5ebb6122?w=1920&q=80"
-            alt="Industrial background"
-            fill
-            className="object-cover opacity-20"
-            priority
+      {/* HERO */}
+      <section 
+        ref={heroRef}
+        className="relative pt-28 pb-24 overflow-hidden"
+        style={{ background: 'linear-gradient(180deg, #f0f7ff 0%, #fafafa 100%)' }}
+      >
+        {/* Cursor-following gradients */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div 
+            className="absolute transition-all duration-300 ease-out"
+            style={{
+              width: '800px',
+              height: '800px',
+              left: mousePosition.x - 400,
+              top: mousePosition.y - 400,
+              background: 'radial-gradient(circle, rgba(59,130,246,0.25) 0%, rgba(59,130,246,0.1) 30%, transparent 60%)',
+              borderRadius: '50%',
+              filter: 'blur(60px)',
+            }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/50 via-zinc-950/80 to-zinc-950" />
+          <div 
+            className="absolute transition-all duration-500 ease-out"
+            style={{
+              width: '600px',
+              height: '600px',
+              left: mousePosition.x - 300 + 100,
+              top: mousePosition.y - 300 - 80,
+              background: 'radial-gradient(circle, rgba(139,92,246,0.18) 0%, rgba(139,92,246,0.05) 40%, transparent 70%)',
+              borderRadius: '50%',
+              filter: 'blur(60px)',
+            }}
+          />
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-200/30 rounded-full blur-[100px]" />
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-violet-200/20 rounded-full blur-[80px]" />
         </div>
 
-        <div className="relative z-10 max-w-6xl mx-auto w-full">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Column */}
-            <div className={isLoaded ? 'slide-up' : 'opacity-0'}>
-              <div className="inline-flex items-center gap-2 bg-blue-600/10 border-2 border-blue-600/30 px-4 py-2 rounded-md text-sm text-blue-400 font-semibold uppercase tracking-wider mb-8">
-                <Zap className="w-4 h-4" />
-                AI-Powered Onboarding
+        <div className="relative z-10 max-w-5xl mx-auto px-6">
+          <div className={`text-center max-w-3xl mx-auto mb-14 ${isLoaded ? 'fade-up' : 'opacity-0'}`}>
+            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur border border-zinc-200 px-4 py-2 rounded-full text-sm text-zinc-600 font-medium mb-6 shadow-sm">
+              <Zap className="w-4 h-4 text-blue-600" />
+              AI-Powered Onboarding Assistant
+            </div>
+            
+            <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 leading-[1.1]">
+              Every question
+              <br />
+              <span className="text-blue-600">answered right.</span>
+            </h1>
+            
+            <p className="text-xl text-zinc-500 mb-10 leading-relaxed max-w-xl mx-auto">
+              Our AI reads your handbooks and answers worker questions instantly via SMS. No app. No training required.
+            </p>
+            
+            <div className="flex items-center justify-center gap-4">
+              <a 
+                href={calLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3.5 rounded-xl font-medium transition-all shadow-lg shadow-blue-600/20"
+              >
+                Book a Demo <ArrowRight className="w-4 h-4" />
+              </a>
+              <Link 
+                href="/contact"
+                className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-medium bg-white border border-zinc-200 hover:border-zinc-300 transition-all shadow-sm"
+              >
+                Contact Sales
+              </Link>
+            </div>
+          </div>
+
+          {/* Product cards */}
+          <div className={`grid md:grid-cols-2 gap-6 max-w-3xl mx-auto ${isLoaded ? 'fade-up delay-200' : 'opacity-0'}`}>
+            <div className="bg-white rounded-2xl p-6 border border-zinc-200 shadow-sm hover:shadow-md transition-all">
+              <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mb-4">
+                <MessageSquare className="w-5 h-5 text-blue-600" />
               </div>
-              
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6 leading-[0.9]">
-                EVERY
-                <br />
-                QUESTION
-                <br />
-                <span className="text-blue-500">ANSWERED.</span>
-              </h1>
-              
-              <p className="text-lg text-zinc-400 mb-10 leading-relaxed max-w-lg">
-                Our AI reads your handbooks and answers worker questions instantly via SMS. No app download. No training required.
-              </p>
-              
-              <div className="flex flex-wrap items-center gap-4">
-                <a 
-                  href={calLink} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 px-6 py-4 rounded-md font-bold uppercase tracking-wider transition-colors"
-                >
-                  Book a Demo <ArrowRight className="w-5 h-5" />
-                </a>
-                <Link 
-                  href="/contact" 
-                  className="flex items-center gap-2 px-6 py-4 rounded-md font-bold uppercase tracking-wider border-2 border-zinc-700 hover:border-blue-600 hover:text-blue-400 transition-colors"
-                >
-                  Contact Sales
-                </Link>
+              <h3 className="font-semibold text-zinc-900 mb-2">SMS Q&A for Workers</h3>
+              <p className="text-sm text-zinc-500 mb-4">Instant answers to policy questions via text message. No app download needed.</p>
+              <a href="#demo" className="text-sm text-blue-600 font-medium flex items-center gap-1 hover:gap-2 transition-all">
+                Learn more <ArrowRight className="w-3 h-3" />
+              </a>
+            </div>
+            <div className="bg-white rounded-2xl p-6 border border-zinc-200 shadow-sm hover:shadow-md transition-all">
+              <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mb-4">
+                <BarChart3 className="w-5 h-5 text-blue-600" />
+              </div>
+              <h3 className="font-semibold text-zinc-900 mb-2">Analytics for Managers</h3>
+              <p className="text-sm text-zinc-500 mb-4">Track common questions, identify training gaps, and measure onboarding ROI.</p>
+              <a href="#features" className="text-sm text-blue-600 font-medium flex items-center gap-1 hover:gap-2 transition-all">
+                Learn more <ArrowRight className="w-3 h-3" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Logos */}
+      <section className="py-12 px-6 bg-[#fafafa]">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-center text-zinc-400 text-xs font-medium uppercase tracking-wider mb-6">Trusted by leading companies</p>
+          <div className="flex items-center justify-center gap-12 flex-wrap">
+            {[
+              { src: "/logos/eds.png", name: "EDS Manufacturing" },
+              { src: "/logos/trinethra.png", name: "Trinethra" },
+              { src: "/logos/jfm.png", name: "Jim Falk Motors" },
+            ].map((logo, i) => (
+              <div key={i} className="flex items-center gap-2 opacity-50 hover:opacity-80 transition-opacity">
+                <Image src={logo.src} alt={logo.name} width={32} height={32} className="object-contain rounded" />
+                <span className="text-zinc-500 font-medium text-sm">{logo.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* DARK SECTION 1 - Demo */}
+      <section id="demo" className="relative py-28 overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=80)' }}
+        />
+        <div className="absolute inset-0 bg-zinc-950/90" />
+        <div 
+          className="absolute inset-0 opacity-40"
+          style={{
+            backgroundImage: `linear-gradient(rgba(59,130,246,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.07) 1px, transparent 1px)`,
+            backgroundSize: '60px 60px',
+          }}
+        />
+        
+        <div className="relative z-10 max-w-5xl mx-auto px-6">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Instant answers for your workforce</h2>
+            <p className="text-zinc-400 max-w-xl mx-auto">
+              Workers text questions about policies, procedures, and safety—and get accurate answers in seconds.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="bg-white rounded-2xl overflow-hidden shadow-2xl">
+              <div className="relative h-48">
+                <Image
+                  src="https://images.unsplash.com/photo-1504917595217-d4dc5ebb6122?w=800&q=80"
+                  alt="Manufacturing"
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-white via-white/60 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur rounded-xl p-4 shadow-lg border border-zinc-100">
+                  <div className="flex items-center gap-2 text-xs text-zinc-500 mb-1">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                    Incoming SMS
+                  </div>
+                  <p className="text-sm text-zinc-700">&quot;Where do I park on my first day?&quot;</p>
+                </div>
+              </div>
+              <div className="p-6">
+                <h3 className="font-semibold text-zinc-900 mb-1">SMS Support</h3>
+                <p className="text-sm text-zinc-500">Workers text questions and receive instant, accurate responses from your company docs.</p>
               </div>
             </div>
+            
+            <div className="bg-white rounded-2xl overflow-hidden shadow-2xl">
+              <div className="relative h-48">
+                <Image
+                  src="https://images.unsplash.com/photo-1565793298595-6a879b1d9492?w=800&q=80"
+                  alt="Warehouse"
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-white via-white/60 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur rounded-xl p-4 shadow-lg border border-zinc-100">
+                  <div className="flex items-center gap-2 text-xs text-blue-600 mb-1">
+                    <Check className="w-3 h-3" />
+                    Answered in 2s
+                  </div>
+                  <p className="text-sm text-zinc-700">&quot;Park in Lot B. Your badge activates at 8am.&quot;</p>
+                </div>
+              </div>
+              <div className="p-6">
+                <h3 className="font-semibold text-zinc-900 mb-1">AI Responses</h3>
+                <p className="text-sm text-zinc-500">Powered by your handbooks, SOPs, and safety manuals. Always accurate.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-            {/* Right Column - Stats */}
-            <div className={`space-y-4 ${isLoaded ? 'slide-up delay-200' : 'opacity-0'}`}>
+      {/* How it works */}
+      <section className="py-28 px-6 bg-[#fafafa]">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-4">How it works</h2>
+            <p className="text-zinc-500 max-w-lg mx-auto">Get started in minutes, not months. Simple setup with powerful results.</p>
+          </div>
+          
+          <div className="grid md:grid-cols-4 gap-8">
+            {[
+              { icon: FileText, num: '01', title: 'Upload documents', desc: 'Drop in handbooks, SOPs, safety manuals' },
+              { icon: Brain, num: '02', title: 'AI processes', desc: 'Automatically classifies and indexes content' },
+              { icon: MessageSquare, num: '03', title: 'Workers ask', desc: 'Text any question via SMS' },
+              { icon: BarChart3, num: '04', title: 'Track insights', desc: 'Monitor usage and identify gaps' },
+            ].map((item, i) => (
+              <div key={i} className="text-center">
+                <div className="w-14 h-14 bg-white border border-zinc-200 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                  <item.icon className="w-6 h-6 text-blue-600" />
+                </div>
+                <p className="text-xs text-blue-600 font-semibold mb-2">{item.num}</p>
+                <h3 className="font-semibold text-zinc-900 mb-2">{item.title}</h3>
+                <p className="text-sm text-zinc-500">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* DARK SECTION 2 - Stats & Industries */}
+      <section className="relative py-28 overflow-hidden">
+        <div className="absolute inset-0 bg-zinc-950" />
+        <div 
+          className="absolute inset-0 opacity-30"
+          style={{
+            backgroundImage: `linear-gradient(rgba(59,130,246,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.1) 1px, transparent 1px)`,
+            backgroundSize: '50px 50px',
+          }}
+        />
+        {/* Abstract network SVG */}
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1/3 h-96 opacity-20">
+          <svg viewBox="0 0 400 400" className="w-full h-full">
+            <circle cx="100" cy="100" r="4" fill="#3b82f6" />
+            <circle cx="200" cy="150" r="4" fill="#3b82f6" />
+            <circle cx="150" cy="250" r="4" fill="#3b82f6" />
+            <circle cx="300" cy="200" r="4" fill="#3b82f6" />
+            <circle cx="250" cy="300" r="4" fill="#3b82f6" />
+            <circle cx="350" cy="100" r="3" fill="#3b82f6" />
+            <circle cx="80" cy="320" r="3" fill="#3b82f6" />
+            <line x1="100" y1="100" x2="200" y2="150" stroke="#3b82f6" strokeWidth="1" opacity="0.5" />
+            <line x1="200" y1="150" x2="150" y2="250" stroke="#3b82f6" strokeWidth="1" opacity="0.5" />
+            <line x1="200" y1="150" x2="300" y2="200" stroke="#3b82f6" strokeWidth="1" opacity="0.5" />
+            <line x1="300" y1="200" x2="250" y2="300" stroke="#3b82f6" strokeWidth="1" opacity="0.5" />
+            <line x1="150" y1="250" x2="250" y2="300" stroke="#3b82f6" strokeWidth="1" opacity="0.5" />
+            <line x1="100" y1="100" x2="350" y2="100" stroke="#3b82f6" strokeWidth="1" opacity="0.3" />
+            <line x1="150" y1="250" x2="80" y2="320" stroke="#3b82f6" strokeWidth="1" opacity="0.3" />
+          </svg>
+        </div>
+        
+        <div className="relative z-10 max-w-5xl mx-auto px-6">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Built for frontline teams</h2>
+              <p className="text-zinc-400 mb-10">
+                80% of the global workforce doesn&apos;t sit at a desk. We built Sidekick for them—instant answers via SMS, no app required.
+              </p>
+              
+              <div className="space-y-4">
+                {[
+                  { label: 'Faster onboarding', value: '70%' },
+                  { label: 'Reduction in incidents', value: '50%' },
+                  { label: 'Annual savings per site', value: '$15K' },
+                ].map((stat, i) => (
+                  <div key={i} className="flex items-center justify-between py-4 border-b border-zinc-800">
+                    <span className="text-zinc-400">{stat.label}</span>
+                    <span className="text-3xl font-bold text-blue-400">{stat.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="space-y-4">
               {[
-                { value: "70%", label: "Faster Onboarding" },
-                { value: "50%", label: "Fewer Incidents" },
-                { value: "$15K", label: "Annual Savings" },
-                { value: "24/7", label: "Availability" },
-              ].map((stat, i) => (
-                <div 
-                  key={i} 
-                  className="bg-zinc-900/80 border-2 border-zinc-800 rounded-md p-5 flex items-center justify-between hover:border-blue-600/50 transition-colors"
-                >
-                  <span className="text-zinc-400 font-semibold uppercase tracking-wider">{stat.label}</span>
-                  <span className="text-4xl font-black text-blue-500">{stat.value}</span>
+                { icon: Factory, title: 'Manufacturing', desc: 'Safety protocols, equipment SOPs, quality control' },
+                { icon: ShoppingCart, title: 'Retail', desc: 'Store policies, inventory, customer service' },
+                { icon: Wrench, title: 'Automotive', desc: 'Repair procedures, parts lookup, compliance' },
+              ].map((item, i) => (
+                <div key={i} className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5 flex items-start gap-4 hover:border-zinc-700 transition-colors">
+                  <div className="w-11 h-11 bg-zinc-800 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <item.icon className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-white mb-1">{item.title}</h4>
+                    <p className="text-sm text-zinc-500">{item.desc}</p>
+                  </div>
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* Scroll Indicator */}
-          <div className={`absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 ${isLoaded ? 'fade-in delay-400' : 'opacity-0'}`}>
-            <span className="text-xs text-zinc-600 uppercase tracking-wider">Scroll</span>
-            <ChevronDown className="w-5 h-5 text-zinc-600 animate-bounce" />
-          </div>
-        </div>
-      </section>
-
-      {/* Logos Section */}
-      <section className="py-12 border-y-2 border-zinc-800 relative z-10">
-        <div className="max-w-6xl mx-auto px-6">
-          <p className="text-center text-zinc-600 text-sm font-semibold uppercase tracking-wider mb-8">Trusted By</p>
-          <div className="flex items-center justify-center gap-16 flex-wrap">
-            {[
-              { src: "/logos/eds.png", name: "EDS Manufacturing" },
-              { src: "/logos/trinethra.png", name: "Trinethra Supermarket" },
-              { src: "/logos/jfm.png", name: "Jim Falk Motors" },
-            ].map((logo, i) => (
-              <div key={i} className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity">
-                <Image src={logo.src} alt={logo.name} width={40} height={40} className="object-contain rounded" />
-                <span className="text-zinc-500 font-medium">{logo.name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="py-24 px-6 relative z-10">
-        <div 
-          className="absolute inset-0 z-0"
-          style={{ transform: `translateY(${(scrollY - 800) * 0.1}px)` }}
-        >
-          <Image
-            src="https://images.unsplash.com/photo-1565793298595-6a879b1d9492?w=1920&q=80"
-            alt="Warehouse"
-            fill
-            className="object-cover opacity-10"
-          />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 via-zinc-950/95 to-zinc-950" />
-        
-        <div className="max-w-6xl mx-auto relative z-10">
-          <div className="flex items-center justify-between mb-16">
-            <div>
-              <p className="text-blue-500 text-sm font-bold uppercase tracking-wider mb-2">Process</p>
-              <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tight">How It Works</h2>
-            </div>
-            <div className="hidden md:flex items-center gap-4">
-              <div className="h-0.5 w-32 bg-zinc-800" />
-              <span className="text-zinc-600 font-mono text-sm">4 STEPS</span>
-            </div>
-          </div>
-          
-          <div className="grid md:grid-cols-4 gap-4">
-            {[
-              { icon: FileText, num: "01", title: "Upload", desc: "Drop in handbooks, SOPs, and safety manuals" },
-              { icon: Brain, num: "02", title: "Process", desc: "AI classifies and indexes your documents" },
-              { icon: MessageSquare, num: "03", title: "Ask", desc: "Workers text questions via SMS" },
-              { icon: BarChart3, num: "04", title: "Track", desc: "Monitor usage and identify gaps" },
-            ].map((item, i) => (
-              <div key={i} className="group bg-zinc-900/80 border-2 border-zinc-800 rounded-md p-6 hover:border-blue-600 transition-all">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="w-14 h-14 bg-zinc-800 border-2 border-zinc-700 group-hover:border-blue-600 rounded-md flex items-center justify-center transition-colors">
-                    <item.icon className="w-7 h-7 text-blue-500" />
-                  </div>
-                  <span className="text-3xl font-black text-zinc-800 group-hover:text-blue-600 transition-colors">{item.num}</span>
-                </div>
-                <h3 className="font-bold text-white text-lg mb-2 uppercase tracking-wide">{item.title}</h3>
-                <p className="text-sm text-zinc-500 leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Demo Preview */}
-      <section className="py-24 px-6 relative z-10">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-blue-500 text-sm font-bold uppercase tracking-wider mb-2">Live Demo</p>
-            <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tight">See It In Action</h2>
-          </div>
-          
-          <div className="bg-zinc-900 border-2 border-zinc-800 rounded-lg overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b-2 border-zinc-800 bg-zinc-900">
-              <div className="flex gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-500" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                <div className="w-3 h-3 rounded-full bg-green-500" />
-              </div>
-              <div className="px-4 py-1 bg-zinc-800 rounded text-xs text-zinc-400 font-mono uppercase">SMS Interface</div>
-              <div className="w-16" />
-            </div>
-            <div className="p-6 space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-zinc-800 border-2 border-zinc-700 rounded-md flex items-center justify-center flex-shrink-0">
-                  <MessageSquare className="w-5 h-5 text-zinc-500" />
-                </div>
-                <div className="bg-zinc-800 border-2 border-zinc-700 px-4 py-3 rounded-md">
-                  <p className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Worker Question</p>
-                  <p className="text-white font-medium">&quot;Where do I park on my first day?&quot;</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 justify-end">
-                <div className="bg-blue-600/10 border-2 border-blue-600/30 px-4 py-3 rounded-md max-w-md">
-                  <p className="text-xs text-blue-400 uppercase tracking-wider mb-1">Sidekick Response</p>
-                  <p className="text-white font-medium">&quot;Park in Lot B behind the main building. Your badge will activate at 8am. See Section 3.2 of the Employee Handbook for full parking policies.&quot;</p>
-                </div>
-                <div className="w-10 h-10 bg-blue-600 rounded-md flex items-center justify-center flex-shrink-0">
-                  <Check className="w-5 h-5" />
-                </div>
-              </div>
-              <div className="text-center pt-2">
-                <span className="inline-flex items-center gap-2 text-xs text-zinc-600 uppercase tracking-wider">
-                  <Clock className="w-3 h-3" />
-                  Response time: 2 seconds
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Industries */}
-      <section className="py-24 px-6 relative z-10 border-t-2 border-zinc-800">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-blue-500 text-sm font-bold uppercase tracking-wider mb-2">Industries</p>
-            <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tight">Built For Teams That Build America</h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { 
-                icon: Factory,
-                title: "Manufacturing", 
-                items: ["Safety protocols", "Equipment SOPs", "Quality control"],
-                image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&h=400&fit=crop"
-              },
-              { 
-                icon: ShoppingCart,
-                title: "Retail", 
-                items: ["Store policies", "Inventory management", "Customer service"],
-                image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=400&fit=crop"
-              },
-              { 
-                icon: Wrench,
-                title: "Automotive", 
-                items: ["Repair procedures", "Parts lookup", "Compliance docs"],
-                image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=600&h=400&fit=crop"
-              },
-            ].map((industry, index) => (
-              <div key={index} className="group relative rounded-lg overflow-hidden border-2 border-zinc-800 hover:border-blue-600 transition-all">
-                <div className="relative h-48">
-                  <Image
-                    src={industry.image}
-                    alt={industry.title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-transparent" />
-                </div>
-                <div className="relative p-6 bg-zinc-900">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-zinc-800 border-2 border-zinc-700 rounded-md flex items-center justify-center">
-                      <industry.icon className="w-5 h-5 text-blue-500" />
-                    </div>
-                    <h3 className="text-xl font-bold uppercase tracking-wide">{industry.title}</h3>
-                  </div>
-                  <ul className="space-y-2">
-                    {industry.items.map((item, i) => (
-                      <li key={i} className="text-zinc-400 text-sm flex items-center gap-2">
-                        <div className="w-1 h-1 bg-blue-500" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
 
       {/* Features */}
-      <section className="py-24 px-6 relative z-10 border-t-2 border-zinc-800">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-16">
-            <div>
-              <p className="text-blue-500 text-sm font-bold uppercase tracking-wider mb-2">Capabilities</p>
-              <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tight">Features</h2>
-            </div>
-            <div className="hidden md:flex items-center gap-4">
-              <div className="h-0.5 w-32 bg-zinc-800" />
-              <span className="text-zinc-600 font-mono text-sm">6 TOOLS</span>
-            </div>
+      <section id="features" className="py-28 px-6 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-4">Platform your team will trust</h2>
+            <p className="text-zinc-500 max-w-lg mx-auto">Enterprise-ready security and reliability without sacrificing ease of use.</p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-3 gap-6">
             {[
-              { icon: FileText, title: "Document Intelligence", desc: "AI auto-classifies handbooks and SOPs" },
-              { icon: MessageSquare, title: "SMS Q&A", desc: "Workers text questions, get instant answers" },
-              { icon: Globe, title: "Multi-Language", desc: "English, Spanish, Chinese, and 10+ more" },
-              { icon: BarChart3, title: "Manager Dashboard", desc: "Track questions and measure ROI" },
-              { icon: Shield, title: "Enterprise Security", desc: "SOC 2 compliant, encrypted data" },
-              { icon: Zap, title: "Instant Setup", desc: "Get started in under 5 minutes" },
+              { icon: Shield, title: 'SOC 2 and privacy first', desc: 'Your data stays yours. Enterprise-grade security and compliance.' },
+              { icon: Globe, title: 'Multi-language support', desc: 'English, Spanish, Chinese, and 10+ more languages supported.' },
+              { icon: Zap, title: 'Instant setup', desc: 'Go live in under 5 minutes. No IT department required.' },
+              { icon: Users, title: 'Unlimited users', desc: 'Scale to your entire workforce with no per-seat pricing.' },
+              { icon: FileText, title: 'Document intelligence', desc: 'AI automatically classifies and indexes your content.' },
+              { icon: TrendingUp, title: 'Insights & analytics', desc: 'Track questions, identify gaps, measure ROI.' },
             ].map((f, i) => (
-              <div key={i} className="group bg-zinc-900/80 border-2 border-zinc-800 rounded-md p-6 hover:border-blue-600 transition-colors">
-                <div className="w-12 h-12 bg-zinc-800 border-2 border-zinc-700 group-hover:border-blue-600 rounded-md flex items-center justify-center mb-4 transition-colors">
-                  <f.icon className="w-6 h-6 text-blue-500" />
+              <div key={i} className="p-6 rounded-xl border border-zinc-200 hover:border-zinc-300 hover:shadow-sm transition-all bg-white">
+                <div className="w-10 h-10 bg-zinc-100 rounded-lg flex items-center justify-center mb-4">
+                  <f.icon className="w-5 h-5 text-zinc-600" />
                 </div>
-                <h3 className="font-bold text-white mb-2 uppercase tracking-wide">{f.title}</h3>
-                <p className="text-sm text-zinc-500">{f.desc}</p>
+                <h3 className="font-semibold text-zinc-900 mb-2">{f.title}</h3>
+                <p className="text-sm text-zinc-500 leading-relaxed">{f.desc}</p>
               </div>
             ))}
           </div>
@@ -392,11 +412,10 @@ export default function Home() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-24 px-6 relative z-10 border-t-2 border-zinc-800">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-blue-500 text-sm font-bold uppercase tracking-wider mb-2">Testimonials</p>
-            <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tight">Real Results</h2>
+      <section className="py-24 px-6 bg-[#fafafa]">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-4">What our customers say</h2>
           </div>
           
           <div className="grid md:grid-cols-3 gap-6">
@@ -405,15 +424,15 @@ export default function Home() {
               { quote: "With Sidekick, new employees feel confident from day one. Questions about store policies are answered in seconds.", name: "Store Director", company: "Trinethra Supermarket", logo: "/logos/trinethra.png" },
               { quote: "Our technicians text questions and get accurate answers immediately. Productivity is through the roof.", name: "Service Manager", company: "Jim Falk Motors", logo: "/logos/jfm.png" },
             ].map((item, i) => (
-              <div key={i} className="bg-zinc-900/80 border-2 border-zinc-800 rounded-md p-6 hover:border-zinc-700 transition-colors">
-                <div className="flex items-center gap-3 mb-6">
-                  <Image src={item.logo} alt={item.company} width={40} height={40} className="rounded bg-white p-1" />
+              <div key={i} className="p-6 rounded-xl bg-white border border-zinc-200 hover:shadow-md transition-all">
+                <div className="flex items-center gap-3 mb-4">
+                  <Image src={item.logo} alt={item.company} width={40} height={40} className="rounded" />
                   <div>
-                    <p className="font-bold text-white text-sm">{item.name}</p>
+                    <p className="font-semibold text-zinc-900 text-sm">{item.name}</p>
                     <p className="text-zinc-500 text-xs">{item.company}</p>
                   </div>
                 </div>
-                <p className="text-zinc-400 leading-relaxed">&quot;{item.quote}&quot;</p>
+                <p className="text-zinc-600 text-sm leading-relaxed">&quot;{item.quote}&quot;</p>
               </div>
             ))}
           </div>
@@ -421,78 +440,55 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="py-24 px-6 relative z-10 border-t-2 border-zinc-800">
-        <div 
-          className="absolute inset-0 z-0"
-          style={{ transform: `translateY(${(scrollY - 4000) * 0.1}px)` }}
-        >
-          <Image
-            src="https://images.unsplash.com/photo-1504917595217-d4dc5ebb6122?w=1920&q=80"
-            alt="Industrial"
-            fill
-            className="object-cover opacity-15"
-          />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 via-zinc-950/90 to-zinc-950" />
-        
-        <div className="max-w-3xl mx-auto text-center relative z-10">
-          <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-6">
-            Ready To Transform
-            <br />
-            <span className="text-blue-500">Your Onboarding?</span>
-          </h2>
-          <p className="text-lg text-zinc-400 mb-10">
-            Join leading companies using Sidekick to train teams faster and smarter.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <a 
-              href={calLink} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 px-8 py-4 rounded-md font-bold uppercase tracking-wider transition-colors"
-            >
-              Book a Demo <ArrowRight className="w-5 h-5" />
-            </a>
-            <Link 
-              href="/contact" 
-              className="flex items-center gap-2 px-8 py-4 rounded-md font-bold uppercase tracking-wider border-2 border-zinc-700 hover:border-blue-600 hover:text-blue-400 transition-colors"
-            >
-              Talk to Sales
-            </Link>
-          </div>
+      <section className="py-16 px-6 bg-zinc-900">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-2xl font-bold text-white mb-3">Ready to transform your onboarding?</h2>
+          <p className="text-zinc-400 mb-8">Join leading companies using Sidekick to train teams faster.</p>
+          <a
+            href={calLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-white hover:bg-zinc-100 text-zinc-900 px-6 py-3 rounded-lg font-medium transition-colors"
+          >
+            Book a Demo <ArrowRight className="w-4 h-4" />
+          </a>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t-2 border-zinc-800 py-12 px-6 relative z-10">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-12 mb-12">
-            <div className="md:col-span-2">
-              <Link href="/" className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-blue-600 rounded-md flex items-center justify-center">
-                  <span className="font-black text-lg">S</span>
+      <footer className="py-12 px-6 bg-zinc-950">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col md:flex-row items-start justify-between gap-8">
+            <div>
+              <Link href="/" className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <span className="font-bold text-white text-sm">S</span>
                 </div>
-                <span className="font-bold text-lg tracking-tight">SIDEKICK</span>
+                <span className="font-semibold text-white">Sidekick</span>
               </Link>
-              <p className="text-zinc-500 max-w-sm">AI-powered onboarding for blue-collar teams.</p>
+              <p className="text-zinc-500 text-sm max-w-xs">AI-powered onboarding assistant for blue-collar teams.</p>
             </div>
-            <div>
-              <h4 className="font-bold text-white mb-4 uppercase tracking-wider text-sm">Product</h4>
-              <ul className="space-y-3">
-                <li><a href={calLink} target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-blue-400 transition-colors">Book Demo</a></li>
-                <li><Link href="/about" className="text-zinc-500 hover:text-blue-400 transition-colors">About</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold text-white mb-4 uppercase tracking-wider text-sm">Legal</h4>
-              <ul className="space-y-3">
-                <li><Link href="/privacy" className="text-zinc-500 hover:text-blue-400 transition-colors">Privacy</Link></li>
-                <li><Link href="/terms" className="text-zinc-500 hover:text-blue-400 transition-colors">Terms</Link></li>
-              </ul>
+            
+            <div className="flex gap-16">
+              <div>
+                <h4 className="text-zinc-400 text-xs font-medium uppercase tracking-wider mb-3">Company</h4>
+                <ul className="space-y-2">
+                  <li><Link href="/about" className="text-zinc-500 text-sm hover:text-white transition-colors">About</Link></li>
+                  <li><Link href="/contact" className="text-zinc-500 text-sm hover:text-white transition-colors">Contact</Link></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-zinc-400 text-xs font-medium uppercase tracking-wider mb-3">Resources</h4>
+                <ul className="space-y-2">
+                  <li><Link href="/privacy" className="text-zinc-500 text-sm hover:text-white transition-colors">Privacy</Link></li>
+                  <li><Link href="/terms" className="text-zinc-500 text-sm hover:text-white transition-colors">Terms</Link></li>
+                </ul>
+              </div>
             </div>
           </div>
-          <div className="border-t-2 border-zinc-800 pt-8 text-center">
-            <p className="text-zinc-600 text-sm">© 2025 Sidekick AI. All rights reserved.</p>
+          
+          <div className="border-t border-zinc-800 mt-12 pt-8">
+            <p className="text-zinc-600 text-xs text-center">© 2025 Sidekick AI. All rights reserved.</p>
           </div>
         </div>
       </footer>
