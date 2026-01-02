@@ -21,7 +21,8 @@ export default function About() {
     {
       name: "Justin So",
       role: "Co-Founder & CEO",
-      bio: "Strategic Analyst at Arm. Passionate about bringing technology to underserved workforces.",
+      job: "Strategic Analyst at Arm.",
+      bio: "Passionate about bringing technology to underserved workforces.",
       school: "University of Pennsylvania",
       image: "/team/justin.jpg",
       linkedin: "https://www.linkedin.com/in/justinso1/",
@@ -29,7 +30,8 @@ export default function About() {
     {
       name: "Aadip Khanal",
       role: "Co-Founder & CTO",
-      bio: "Software Engineer at Amazon. Expert in scalable systems and AI infrastructure.",
+      job: "Software Engineer at Amazon.",
+      bio: "Expert in scalable systems and AI infrastructure.",
       school: "University of California, Berkeley",
       image: "/team/aadip.jpg",
       linkedin: "#",
@@ -37,7 +39,8 @@ export default function About() {
     {
       name: "Aayush Bandopadhyay",
       role: "Co-Founder & CPO",
-      bio: "Associate PM at Google. Focused on building products that solve real problems.",
+      job: "Associate PM at Google.",
+      bio: "Focused on building products that solve real problems.",
       school: "University of Illinois Urbana-Champaign",
       image: "/team/aayush.jpg",
       linkedin: "#",
@@ -183,7 +186,8 @@ export default function About() {
                       <Linkedin className="w-5 h-5" />
                     </a>
                   </div>
-                  <p className="text-blue-600 text-sm font-medium mb-4">{member.role}</p>
+                  <p className="text-blue-600 text-sm font-medium mb-3">{member.role}</p>
+                  <p className="text-zinc-700 text-sm font-medium mb-1">{member.job}</p>
                   <p className="text-zinc-500 text-sm leading-relaxed mb-4">{member.bio}</p>
                   <p className="text-zinc-400 text-xs mt-auto pt-2 border-t border-zinc-200">{member.school}</p>
                 </div>
