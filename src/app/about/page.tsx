@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { ArrowRight, Target, Zap, Globe, Users, Linkedin, Twitter } from "lucide-react";
+import { ArrowRight, Target, Zap, Globe } from "lucide-react";
 
 export default function About() {
   const calLink = "https://cal.com/justin-so-xnr0oc/sidekick-demo";
@@ -17,35 +17,6 @@ export default function About() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const team = [
-    {
-      name: "Justin So",
-      role: "Co-Founder & CEO",
-      job: "Strategic Analyst at Arm.",
-      bio: "Passionate about bringing technology to underserved workforces.",
-      school: "University of Pennsylvania",
-      image: "/team/justin.jpg",
-      linkedin: "https://www.linkedin.com/in/justinso1/",
-    },
-    {
-      name: "Aadip Khanal",
-      role: "Co-Founder & CTO",
-      job: "Software Engineer at Amazon.",
-      bio: "Expert in scalable systems and AI infrastructure.",
-      school: "University of California, Berkeley",
-      image: "/team/aadip.jpg",
-      linkedin: "#",
-    },
-    {
-      name: "Aayush Bandopadhyay",
-      role: "Co-Founder & CPO",
-      job: "Associate PM at Google.",
-      bio: "Focused on building products that solve real problems.",
-      school: "University of Illinois Urbana-Champaign",
-      image: "/team/aayush.jpg",
-      linkedin: "#",
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-[#fafafa] text-zinc-900 overflow-x-hidden">
@@ -156,43 +127,6 @@ export default function About() {
                 <p className="text-zinc-500 text-sm">Co-founder & CEO</p>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Team */}
-      <section className="py-20 px-6 bg-white">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14">
-            <p className="text-blue-600 text-sm font-semibold mb-2">Our Team</p>
-            <h2 className="text-3xl md:text-4xl font-bold">Meet the founders</h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {team.map((member, index) => (
-              <div key={index} className="bg-[#fafafa] border border-zinc-200 rounded-2xl overflow-hidden hover:shadow-lg transition-all flex flex-col">
-                <div className="aspect-square bg-zinc-200 relative">
-                  <Image
-                    src={member.image}
-                    alt={member.name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="p-6 flex flex-col flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <h3 className="text-lg font-bold text-zinc-900">{member.name}</h3>
-                    <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-blue-600 transition-colors">
-                      <Linkedin className="w-5 h-5" />
-                    </a>
-                  </div>
-                  <p className="text-blue-600 text-sm font-medium mb-3">{member.role}</p>
-                  <p className="text-zinc-700 text-sm font-medium mb-1">{member.job}</p>
-                  <p className="text-zinc-500 text-sm leading-relaxed mb-4">{member.bio}</p>
-                  <p className="text-zinc-400 text-xs mt-auto pt-2 border-t border-zinc-200">{member.school}</p>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
