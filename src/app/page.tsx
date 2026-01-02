@@ -180,7 +180,7 @@ export default function Home() {
             {/* Proof of reality */}
             <p className="text-sm text-zinc-500">
               <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse" />
-              Live with 4 customers across 4 states
+              Live with 3 customers across 3 states and 2 countries
             </p>
           </div>
         </div>
@@ -326,6 +326,84 @@ export default function Home() {
                 <p className="text-sm text-zinc-500">{item.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================ */}
+      {/* EASY SETUP FOR MANAGERS */}
+      {/* ============================================ */}
+      <section className="py-20 px-6 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <p className="text-violet-600 text-sm font-semibold mb-2">For Managers</p>
+              <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-6">Set up in minutes, not weeks</h2>
+              <p className="text-zinc-500 mb-8">
+                Getting started is simple. Upload your existing documents and Sidekick&apos;s AI does the rest—no manual tagging, no complex configuration.
+              </p>
+              
+              <div className="space-y-4">
+                {[
+                  { step: '1', title: 'Upload your documents', desc: 'Drag and drop employee handbooks, SOPs, safety manuals, policy docs—any format works.' },
+                  { step: '2', title: 'AI processes automatically', desc: 'Sidekick reads, understands, and indexes your content. No manual tagging required.' },
+                  { step: '3', title: 'Share with your team', desc: 'Give workers a phone number to text. That\'s it—they can start asking questions immediately.' },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-4">
+                    <div className="w-8 h-8 bg-violet-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span className="text-violet-600 font-bold text-sm">{item.step}</span>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-zinc-900 mb-1">{item.title}</p>
+                      <p className="text-sm text-zinc-500">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Upload Mockup */}
+            <div className="bg-[#fafafa] border border-zinc-200 rounded-2xl p-6">
+              <div className="bg-white border border-zinc-200 rounded-xl p-5 mb-4">
+                <div className="border-2 border-dashed border-zinc-300 rounded-lg p-8 text-center hover:border-violet-400 transition-colors cursor-pointer">
+                  <div className="w-12 h-12 bg-violet-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <FileText className="w-6 h-6 text-violet-600" />
+                  </div>
+                  <p className="text-sm font-medium text-zinc-700 mb-1">Drop files here or click to upload</p>
+                  <p className="text-xs text-zinc-400">PDF, DOCX, TXT, or images up to 50MB</p>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="bg-white border border-zinc-200 rounded-lg p-3 flex items-center gap-3">
+                  <div className="w-8 h-8 bg-green-100 rounded flex items-center justify-center">
+                    <Check className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-zinc-700 truncate">Employee_Handbook_2024.pdf</p>
+                    <p className="text-xs text-green-600">Processed • 847 sections indexed</p>
+                  </div>
+                </div>
+                <div className="bg-white border border-zinc-200 rounded-lg p-3 flex items-center gap-3">
+                  <div className="w-8 h-8 bg-green-100 rounded flex items-center justify-center">
+                    <Check className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-zinc-700 truncate">Safety_Procedures.docx</p>
+                    <p className="text-xs text-green-600">Processed • 234 sections indexed</p>
+                  </div>
+                </div>
+                <div className="bg-white border border-zinc-200 rounded-lg p-3 flex items-center gap-3">
+                  <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
+                    <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-zinc-700 truncate">PTO_Policy.pdf</p>
+                    <p className="text-xs text-blue-600">Processing...</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -643,12 +721,12 @@ export default function Home() {
             <p className="text-blue-600 text-sm font-semibold mb-6 text-center">Early traction</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 mb-6">
               <div className="text-center">
-                <p className="text-3xl md:text-4xl font-bold text-zinc-900">4</p>
+                <p className="text-3xl md:text-4xl font-bold text-zinc-900">3</p>
                 <p className="text-sm text-zinc-500">Customers</p>
               </div>
               <div className="text-center">
-                <p className="text-3xl md:text-4xl font-bold text-zinc-900">4</p>
-                <p className="text-sm text-zinc-500">States</p>
+                <p className="text-3xl md:text-4xl font-bold text-zinc-900">2</p>
+                <p className="text-sm text-zinc-500">Countries</p>
               </div>
               <div className="text-center">
                 <p className="text-3xl md:text-4xl font-bold text-zinc-900">15+</p>
@@ -660,7 +738,7 @@ export default function Home() {
               </div>
             </div>
             <p className="text-zinc-500 text-sm text-center">
-              Piloting with manufacturing, retail, and automotive operators across the US
+              Piloting with manufacturing, retail, and automotive operators across the US and India
             </p>
           </div>
         </div>
