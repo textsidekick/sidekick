@@ -136,7 +136,7 @@ export default function About() {
           <div className="bg-white rounded-2xl p-8 md:p-10 border border-zinc-200">
             <p className="text-blue-600 text-sm font-semibold mb-4">Why We Started</p>
             <p className="text-xl md:text-2xl text-zinc-700 leading-relaxed mb-8 italic">
-              &quot;My dad runs a manufacturing plant with 100+ workers. Every new hire has the same questions—where to park, what to wear, how to clock in. Managers spend hours answering them. We built Sidekick so workers get instant answers and managers get their time back.&quot;
+              &quot;We interviewed dozens of manufacturing and retail operators to understand their biggest challenges. The same problem kept coming up: new hires ask the same questions over and over, and managers lose hours answering them. We built Sidekick so workers get instant answers and managers get their time back.&quot;
             </p>
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 bg-zinc-200 rounded-full overflow-hidden">
