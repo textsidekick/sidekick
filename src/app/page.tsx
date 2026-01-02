@@ -29,7 +29,8 @@ import {
   Timer,
   UserMinus,
   UserCheck,
-  Sparkles
+  Sparkles,
+  AlertCircle
 } from "lucide-react";
 
 export default function Home() {
@@ -349,68 +350,100 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Two views. One platform.</h2>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid lg:grid-cols-3 gap-6">
             {/* Worker View */}
             <div className="bg-white rounded-2xl overflow-hidden shadow-2xl">
               <div className="bg-zinc-100 px-4 py-3 border-b border-zinc-200">
                 <span className="text-xs font-medium text-zinc-500">Worker View — SMS</span>
               </div>
-              <div className="p-6 space-y-4 min-h-[320px]">
+              <div className="p-5 space-y-3">
                 <div className="flex justify-end">
-                  <div className="bg-blue-600 text-white px-4 py-2.5 rounded-2xl rounded-br-md max-w-[80%]">
+                  <div className="bg-blue-600 text-white px-4 py-2.5 rounded-2xl rounded-br-md max-w-[85%]">
                     <p className="text-sm">Where do I park on my first day?</p>
                   </div>
                 </div>
                 <div className="flex justify-start">
-                  <div className="bg-zinc-100 px-4 py-2.5 rounded-2xl rounded-bl-md max-w-[80%]">
-                    <p className="text-sm text-zinc-700">Park in Lot B behind the main building. Your badge will activate at 8am. See Section 3.2 of the Employee Handbook for full parking policies.</p>
-                    <p className="text-xs text-zinc-400 mt-2">Answered in 2 seconds</p>
+                  <div className="bg-zinc-100 px-4 py-2.5 rounded-2xl rounded-bl-md max-w-[85%]">
+                    <p className="text-sm text-zinc-700">Park in Lot B behind the main building. Your badge will activate at 8am.</p>
+                    <p className="text-xs text-zinc-400 mt-1.5">Answered in 2 seconds</p>
                   </div>
                 </div>
                 <div className="flex justify-end">
-                  <div className="bg-blue-600 text-white px-4 py-2.5 rounded-2xl rounded-br-md max-w-[80%]">
+                  <div className="bg-blue-600 text-white px-4 py-2.5 rounded-2xl rounded-br-md max-w-[85%]">
                     <p className="text-sm">What&apos;s the dress code?</p>
                   </div>
                 </div>
                 <div className="flex justify-start">
-                  <div className="bg-zinc-100 px-4 py-2.5 rounded-2xl rounded-bl-md max-w-[80%]">
-                    <p className="text-sm text-zinc-700">Steel-toed boots required on the floor. No loose clothing near machinery. Hard hats in Zone C.</p>
+                  <div className="bg-zinc-100 px-4 py-2.5 rounded-2xl rounded-bl-md max-w-[85%]">
+                    <p className="text-sm text-zinc-700">Steel-toed boots required. No loose clothing near machinery.</p>
                   </div>
                 </div>
               </div>
             </div>
             
-            {/* Manager View */}
+            {/* Manager View - Analytics */}
             <div className="bg-white rounded-2xl overflow-hidden shadow-2xl">
               <div className="bg-zinc-100 px-4 py-3 border-b border-zinc-200">
-                <span className="text-xs font-medium text-zinc-500">Manager View — Dashboard</span>
+                <span className="text-xs font-medium text-zinc-500">Manager View — Analytics</span>
               </div>
-              <div className="p-6 min-h-[320px]">
-                <div className="mb-6">
-                  <h4 className="text-sm font-semibold text-zinc-900 mb-4">Top Questions This Week</h4>
-                  <div className="space-y-2">
-                    {[
-                      { q: 'Where do I park?', count: 23 },
-                      { q: 'What\'s the dress code?', count: 18 },
-                      { q: 'How do I clock in?', count: 15 },
-                      { q: 'Who is my supervisor?', count: 12 },
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center justify-between py-2.5 border-b border-zinc-100">
-                        <span className="text-sm text-zinc-600">{item.q}</span>
-                        <span className="text-xs font-medium text-zinc-400 bg-zinc-100 px-2 py-1 rounded">{item.count}x</span>
-                      </div>
-                    ))}
+              <div className="p-5">
+                <h4 className="text-sm font-semibold text-zinc-900 mb-3">Top Questions This Week</h4>
+                <div className="space-y-1.5 mb-5">
+                  {[
+                    { q: 'Where do I park?', count: 23 },
+                    { q: 'What\'s the dress code?', count: 18 },
+                    { q: 'How do I clock in?', count: 15 },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center justify-between py-2 border-b border-zinc-100">
+                      <span className="text-sm text-zinc-600">{item.q}</span>
+                      <span className="text-xs font-medium text-zinc-400 bg-zinc-100 px-2 py-1 rounded">{item.count}x</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-green-50 rounded-xl p-3 text-center">
+                    <p className="text-2xl font-bold text-green-600">94%</p>
+                    <p className="text-xs text-green-700">Answered</p>
+                  </div>
+                  <div className="bg-blue-50 rounded-xl p-3 text-center">
+                    <p className="text-2xl font-bold text-blue-600">2.3s</p>
+                    <p className="text-xs text-blue-700">Avg time</p>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-green-50 rounded-xl p-4 text-center">
-                    <p className="text-3xl font-bold text-green-600">94%</p>
-                    <p className="text-xs text-green-700">Questions answered</p>
+              </div>
+            </div>
+
+            {/* AI Insights */}
+            <div className="bg-white rounded-2xl overflow-hidden shadow-2xl">
+              <div className="bg-amber-50 px-4 py-3 border-b border-amber-100">
+                <span className="text-xs font-medium text-amber-700 flex items-center gap-1.5">
+                  <Zap className="w-3 h-3" />
+                  AI Insights
+                </span>
+              </div>
+              <div className="p-5">
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <AlertCircle className="w-4 h-4 text-amber-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-amber-900 mb-1">Training Gap Detected</p>
+                      <p className="text-xs text-amber-700 leading-relaxed">
+                        Maria G. has asked 8 questions about forklift safety this week. This may indicate a gap in initial training.
+                      </p>
+                    </div>
                   </div>
-                  <div className="bg-blue-50 rounded-xl p-4 text-center">
-                    <p className="text-3xl font-bold text-blue-600">2.3s</p>
-                    <p className="text-xs text-blue-700">Avg response time</p>
-                  </div>
+                </div>
+                <div className="space-y-2">
+                  <button className="w-full text-left text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2.5 rounded-lg transition-colors flex items-center justify-between">
+                    <span>Schedule check-in with Maria</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
+                  <button className="w-full text-left text-sm bg-zinc-50 hover:bg-zinc-100 text-zinc-600 px-4 py-2.5 rounded-lg transition-colors flex items-center justify-between">
+                    <span>Review forklift training docs</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
                 </div>
               </div>
             </div>
