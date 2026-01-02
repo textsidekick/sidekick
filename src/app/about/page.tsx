@@ -183,9 +183,9 @@ export default function About() {
                       <Linkedin className="w-5 h-5" />
                     </a>
                   </div>
-                  <p className="text-blue-600 text-sm font-medium mb-3">{member.role}</p>
-                  <p className="text-zinc-500 text-sm mb-4">{member.bio}</p>
-                  <p className="text-zinc-400 text-xs mt-auto">{member.school}</p>
+                  <p className="text-blue-600 text-sm font-medium mb-4">{member.role}</p>
+                  <p className="text-zinc-500 text-sm leading-relaxed mb-4">{member.bio}</p>
+                  <p className="text-zinc-400 text-xs mt-auto pt-2 border-t border-zinc-200">{member.school}</p>
                 </div>
               </div>
             ))}
