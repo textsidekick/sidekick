@@ -738,7 +738,7 @@ export default function Home() {
               </div>
             </div>
             <p className="text-zinc-500 text-sm text-center">
-              Piloting with manufacturing, retail, and automotive operators across the US and India
+              Piloting with manufacturing, retail, and automotive operators across the US and South Korea
             </p>
           </div>
         </div>
