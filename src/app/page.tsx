@@ -262,9 +262,9 @@ export default function Home() {
                   { value: "23%", label: "leave due to poor training & support" },
                   { value: "40 hrs", label: "of manager time lost monthly to repeat questions" },
                 ].map((stat, i) => (
-                  <div key={i} className="flex items-center gap-4 py-3 border-b border-zinc-200 last:border-0">
-                    <p className="text-3xl font-bold text-zinc-400 w-24 flex-shrink-0">{stat.value}</p>
-                    <p className="text-sm text-zinc-600">{stat.label}</p>
+                  <div key={i} className="flex items-center gap-6 py-3 border-b border-zinc-200 last:border-0">
+                    <p className="text-3xl font-bold text-zinc-400 w-28 flex-shrink-0">{stat.value}</p>
+                    <p className="text-sm text-zinc-600 text-right flex-1">{stat.label}</p>
                   </div>
                 ))}
               </div>
@@ -286,9 +286,9 @@ export default function Home() {
                   { value: "15 hrs", label: "saved per manager per month" },
                   { value: "$18K", label: "annual savings per 50 employees" },
                 ].map((stat, i) => (
-                  <div key={i} className="flex items-center gap-4 py-3 border-b border-green-200 last:border-0">
-                    <p className="text-3xl font-bold text-green-600 w-24 flex-shrink-0">{stat.value}</p>
-                    <p className="text-sm text-green-800">{stat.label}</p>
+                  <div key={i} className="flex items-center gap-6 py-3 border-b border-green-200 last:border-0">
+                    <p className="text-3xl font-bold text-green-600 w-28 flex-shrink-0">{stat.value}</p>
+                    <p className="text-sm text-green-800 text-right flex-1">{stat.label}</p>
                   </div>
                 ))}
               </div>
@@ -350,99 +350,160 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Two views. One platform.</h2>
           </div>
           
-          <div className="grid lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 gap-8">
             {/* Worker View */}
             <div className="bg-white rounded-2xl overflow-hidden shadow-2xl">
               <div className="bg-zinc-100 px-4 py-3 border-b border-zinc-200">
                 <span className="text-xs font-medium text-zinc-500">Worker View — SMS</span>
               </div>
-              <div className="p-5 space-y-3">
+              <div className="p-6 space-y-4 min-h-[320px]">
                 <div className="flex justify-end">
-                  <div className="bg-blue-600 text-white px-4 py-2.5 rounded-2xl rounded-br-md max-w-[85%]">
+                  <div className="bg-blue-600 text-white px-4 py-2.5 rounded-2xl rounded-br-md max-w-[80%]">
                     <p className="text-sm">Where do I park on my first day?</p>
                   </div>
                 </div>
                 <div className="flex justify-start">
-                  <div className="bg-zinc-100 px-4 py-2.5 rounded-2xl rounded-bl-md max-w-[85%]">
-                    <p className="text-sm text-zinc-700">Park in Lot B behind the main building. Your badge will activate at 8am.</p>
-                    <p className="text-xs text-zinc-400 mt-1.5">Answered in 2 seconds</p>
+                  <div className="bg-zinc-100 px-4 py-2.5 rounded-2xl rounded-bl-md max-w-[80%]">
+                    <p className="text-sm text-zinc-700">Park in Lot B behind the main building. Your badge will activate at 8am. See Section 3.2 of the Employee Handbook for full parking policies.</p>
+                    <p className="text-xs text-zinc-400 mt-2">Answered in 2 seconds</p>
                   </div>
                 </div>
                 <div className="flex justify-end">
-                  <div className="bg-blue-600 text-white px-4 py-2.5 rounded-2xl rounded-br-md max-w-[85%]">
+                  <div className="bg-blue-600 text-white px-4 py-2.5 rounded-2xl rounded-br-md max-w-[80%]">
                     <p className="text-sm">What&apos;s the dress code?</p>
                   </div>
                 </div>
                 <div className="flex justify-start">
-                  <div className="bg-zinc-100 px-4 py-2.5 rounded-2xl rounded-bl-md max-w-[85%]">
-                    <p className="text-sm text-zinc-700">Steel-toed boots required. No loose clothing near machinery.</p>
+                  <div className="bg-zinc-100 px-4 py-2.5 rounded-2xl rounded-bl-md max-w-[80%]">
+                    <p className="text-sm text-zinc-700">Steel-toed boots required on the floor. No loose clothing near machinery. Hard hats in Zone C.</p>
                   </div>
                 </div>
               </div>
             </div>
             
-            {/* Manager View - Analytics */}
+            {/* Manager View */}
             <div className="bg-white rounded-2xl overflow-hidden shadow-2xl">
               <div className="bg-zinc-100 px-4 py-3 border-b border-zinc-200">
-                <span className="text-xs font-medium text-zinc-500">Manager View — Analytics</span>
+                <span className="text-xs font-medium text-zinc-500">Manager View — Dashboard</span>
               </div>
-              <div className="p-5">
-                <h4 className="text-sm font-semibold text-zinc-900 mb-3">Top Questions This Week</h4>
-                <div className="space-y-1.5 mb-5">
-                  {[
-                    { q: 'Where do I park?', count: 23 },
-                    { q: 'What\'s the dress code?', count: 18 },
-                    { q: 'How do I clock in?', count: 15 },
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center justify-between py-2 border-b border-zinc-100">
-                      <span className="text-sm text-zinc-600">{item.q}</span>
-                      <span className="text-xs font-medium text-zinc-400 bg-zinc-100 px-2 py-1 rounded">{item.count}x</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-green-50 rounded-xl p-3 text-center">
-                    <p className="text-2xl font-bold text-green-600">94%</p>
-                    <p className="text-xs text-green-700">Answered</p>
+              <div className="p-6 min-h-[320px]">
+                <div className="mb-6">
+                  <h4 className="text-sm font-semibold text-zinc-900 mb-4">Top Questions This Week</h4>
+                  <div className="space-y-2">
+                    {[
+                      { q: 'Where do I park?', count: 23 },
+                      { q: 'What\'s the dress code?', count: 18 },
+                      { q: 'How do I clock in?', count: 15 },
+                      { q: 'Who is my supervisor?', count: 12 },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center justify-between py-2.5 border-b border-zinc-100">
+                        <span className="text-sm text-zinc-600">{item.q}</span>
+                        <span className="text-xs font-medium text-zinc-400 bg-zinc-100 px-2 py-1 rounded">{item.count}x</span>
+                      </div>
+                    ))}
                   </div>
-                  <div className="bg-blue-50 rounded-xl p-3 text-center">
-                    <p className="text-2xl font-bold text-blue-600">2.3s</p>
-                    <p className="text-xs text-blue-700">Avg time</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-green-50 rounded-xl p-4 text-center">
+                    <p className="text-3xl font-bold text-green-600">94%</p>
+                    <p className="text-xs text-green-700">Questions answered</p>
+                  </div>
+                  <div className="bg-blue-50 rounded-xl p-4 text-center">
+                    <p className="text-3xl font-bold text-blue-600">2.3s</p>
+                    <p className="text-xs text-blue-700">Avg response time</p>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
 
-            {/* AI Insights */}
-            <div className="bg-white rounded-2xl overflow-hidden shadow-2xl">
-              <div className="bg-amber-50 px-4 py-3 border-b border-amber-100">
-                <span className="text-xs font-medium text-amber-700 flex items-center gap-1.5">
-                  <Zap className="w-3 h-3" />
+      {/* ============================================ */}
+      {/* AI INSIGHTS - Dedicated Section */}
+      {/* ============================================ */}
+      <section className="py-20 px-6 bg-[#fafafa]">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <p className="text-amber-600 text-sm font-semibold mb-2">AI-Powered Insights</p>
+              <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-6">More than just Q&A</h2>
+              <p className="text-zinc-500 mb-6">
+                Sidekick doesn&apos;t just answer questions—it learns from them. Our AI identifies patterns, detects training gaps, and helps managers take action before small issues become big problems.
+              </p>
+              
+              <div className="space-y-4">
+                {[
+                  { title: 'Pattern Detection', desc: 'Spots repeat questions that signal confusion or missing info' },
+                  { title: 'Training Gap Alerts', desc: 'Flags employees who may need additional support' },
+                  { title: 'Actionable Recommendations', desc: 'Suggests next steps like scheduling check-ins or updating docs' },
+                  { title: 'Continuous Learning', desc: 'Gets smarter with every question asked' },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <div className="w-5 h-5 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3 h-3 text-amber-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-zinc-900">{item.title}</p>
+                      <p className="text-sm text-zinc-500">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* AI Insights Card */}
+            <div className="bg-white rounded-2xl border border-zinc-200 shadow-xl overflow-hidden">
+              <div className="bg-amber-50 px-5 py-3 border-b border-amber-100">
+                <span className="text-sm font-medium text-amber-700 flex items-center gap-2">
+                  <Zap className="w-4 h-4" />
                   AI Insights
                 </span>
               </div>
               <div className="p-5">
+                {/* Alert Card */}
                 <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <AlertCircle className="w-4 h-4 text-amber-600" />
+                    <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <AlertCircle className="w-5 h-5 text-amber-600" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-amber-900 mb-1">Training Gap Detected</p>
-                      <p className="text-xs text-amber-700 leading-relaxed">
+                      <p className="text-sm font-semibold text-amber-900 mb-1">Training Gap Detected</p>
+                      <p className="text-sm text-amber-700 leading-relaxed">
                         Maria G. has asked 8 questions about forklift safety this week. This may indicate a gap in initial training.
                       </p>
                     </div>
                   </div>
                 </div>
+                
+                {/* Trend Card */}
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <TrendingUp className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-blue-900 mb-1">Trending Topic</p>
+                      <p className="text-sm text-blue-700 leading-relaxed">
+                        Questions about PTO policy increased 340% this week. Consider sending a team-wide reminder.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
                 <div className="space-y-2">
-                  <button className="w-full text-left text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2.5 rounded-lg transition-colors flex items-center justify-between">
+                  <button className="w-full text-left text-sm bg-amber-50 hover:bg-amber-100 text-amber-700 px-4 py-3 rounded-lg transition-colors flex items-center justify-between font-medium">
                     <span>Schedule check-in with Maria</span>
-                    <ArrowRight className="w-3 h-3" />
+                    <ArrowRight className="w-4 h-4" />
                   </button>
-                  <button className="w-full text-left text-sm bg-zinc-50 hover:bg-zinc-100 text-zinc-600 px-4 py-2.5 rounded-lg transition-colors flex items-center justify-between">
+                  <button className="w-full text-left text-sm bg-zinc-50 hover:bg-zinc-100 text-zinc-600 px-4 py-3 rounded-lg transition-colors flex items-center justify-between">
                     <span>Review forklift training docs</span>
-                    <ArrowRight className="w-3 h-3" />
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                  <button className="w-full text-left text-sm bg-zinc-50 hover:bg-zinc-100 text-zinc-600 px-4 py-3 rounded-lg transition-colors flex items-center justify-between">
+                    <span>Send PTO policy reminder</span>
+                    <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
