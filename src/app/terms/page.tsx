@@ -49,7 +49,7 @@ export default function Terms() {
       <section className="pt-28 pb-12 px-6 bg-white border-b border-zinc-100">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-4xl font-bold mb-4">Terms of Service</h1>
-          <p className="text-zinc-500">Last updated: January 1, 2025</p>
+          <p className="text-zinc-500">Last updated: January 1, 2026</p>
         </div>
       </section>
 
@@ -202,7 +202,7 @@ export default function Terms() {
           </div>
           
           <div className="border-t border-zinc-800 pt-8">
-            <p className="text-zinc-600 text-xs text-center">© 2025 Sidekick AI Inc. All rights reserved.</p>
+            <p className="text-zinc-600 text-xs text-center">© 2026 Sidekick AI Inc. All rights reserved.</p>
           </div>
         </div>
       </footer>
