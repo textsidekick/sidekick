@@ -848,7 +848,7 @@ export default function Home() {
           </div>
           
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-zinc-600 text-xs">© 2025 Sidekick AI Inc. All rights reserved.</p>
+            <p className="text-zinc-600 text-xs">© 2026 Sidekick AI Inc. All rights reserved.</p>
             <p className="text-zinc-700 text-xs">Santa Clara, CA</p>
           </div>
         </div>
