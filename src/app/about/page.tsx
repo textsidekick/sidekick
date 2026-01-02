@@ -182,7 +182,7 @@ export default function About() {
                       <h3 className="text-lg font-bold text-zinc-900">{member.name}</h3>
                       <p className="text-blue-600 text-sm font-medium">{member.role}</p>
                     </div>
-                    <a href={member.linkedin} className="text-zinc-400 hover:text-blue-600 transition-colors">
+                    <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-blue-600 transition-colors">
                       <Linkedin className="w-5 h-5" />
                     </a>
                   </div>
