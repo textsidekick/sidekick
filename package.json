@@ -13,6 +13,7 @@
     "@vercel/blob": "^2.0.0",
     "@vercel/kv": "^3.0.0",
     "anthropic": "^0.0.0",
+    "lucide-react": "^0.562.0",
     "nanoid": "^5.1.6",
     "next": "16.1.1",
     "openai": "^6.15.0",
