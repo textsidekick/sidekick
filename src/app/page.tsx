@@ -24,7 +24,8 @@ import {
   AlertCircle,
   CheckCircle,
   Mail,
-  Phone
+  Phone,
+  Quote
 } from "lucide-react";
 
 export default function Home() {
@@ -174,7 +175,7 @@ export default function Home() {
             {/* Proof of reality */}
             <p className="text-sm text-zinc-500">
               <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse" />
-              Live with 4 customers across 15+ locations
+              Live with 4 customers across 4 states
             </p>
           </div>
         </div>
@@ -442,16 +443,80 @@ export default function Home() {
       </section>
 
       {/* ============================================ */}
+      {/* TESTIMONIALS */}
+      {/* ============================================ */}
+      <section className="py-20 px-6 bg-[#fafafa]">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-blue-600 text-sm font-semibold mb-2">Testimonials</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-4">What our customers say</h2>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                quote: "Sidekick cut our onboarding time in half. New hires used to interrupt managers constantly with basic questions—now they just text and get instant answers. It's been a game-changer for our floor operations.",
+                name: "Chris Kim",
+                title: "Owner",
+                company: "EDS Manufacturing",
+                logo: "/logos/eds.png"
+              },
+              {
+                quote: "Our stores are spread across multiple states, so consistent training was always a challenge. With Sidekick, every employee gets the same accurate answers whether they're in Texas or California.",
+                name: "Kishore Muvva",
+                title: "Owner",
+                company: "Trinethra Supermarket",
+                logo: "/logos/trinethra.png"
+              },
+              {
+                quote: "In automotive, there's a lot of compliance and safety info that new techs need to know. Sidekick makes sure they get the right answers instantly instead of guessing or waiting for a manager.",
+                name: "Jim Falk",
+                title: "Owner",
+                company: "Jim Falk Motors",
+                logo: "/logos/jfm.png"
+              },
+            ].map((item, i) => (
+              <div key={i} className="bg-white border border-zinc-200 rounded-2xl p-6 hover:shadow-lg transition-all">
+                <div className="mb-4">
+                  <Quote className="w-8 h-8 text-blue-100" />
+                </div>
+                <p className="text-zinc-600 text-sm leading-relaxed mb-6">
+                  &quot;{item.quote}&quot;
+                </p>
+                <div className="flex items-center gap-3 pt-4 border-t border-zinc-100">
+                  <Image 
+                    src={item.logo} 
+                    alt={item.company} 
+                    width={40} 
+                    height={40} 
+                    className="rounded-lg object-contain"
+                  />
+                  <div>
+                    <p className="font-semibold text-zinc-900 text-sm">{item.name}</p>
+                    <p className="text-zinc-500 text-xs">{item.title}, {item.company}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================ */}
       {/* PROOF / TRACTION */}
       {/* ============================================ */}
-      <section className="py-16 px-6 bg-[#fafafa]">
+      <section className="py-16 px-6 bg-white">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white border border-zinc-200 rounded-2xl p-8 md:p-10">
+          <div className="bg-[#fafafa] border border-zinc-200 rounded-2xl p-8 md:p-10">
             <p className="text-blue-600 text-sm font-semibold mb-6 text-center">Early traction</p>
-            <div className="grid grid-cols-3 gap-6 md:gap-8 mb-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 mb-6">
               <div className="text-center">
                 <p className="text-3xl md:text-4xl font-bold text-zinc-900">4</p>
-                <p className="text-sm text-zinc-500">Pilot customers</p>
+                <p className="text-sm text-zinc-500">Customers</p>
+              </div>
+              <div className="text-center">
+                <p className="text-3xl md:text-4xl font-bold text-zinc-900">4</p>
+                <p className="text-sm text-zinc-500">States</p>
               </div>
               <div className="text-center">
                 <p className="text-3xl md:text-4xl font-bold text-zinc-900">15+</p>
@@ -459,88 +524,12 @@ export default function Home() {
               </div>
               <div className="text-center">
                 <p className="text-3xl md:text-4xl font-bold text-zinc-900">500+</p>
-                <p className="text-sm text-zinc-500">Workers using Sidekick</p>
+                <p className="text-sm text-zinc-500">Workers</p>
               </div>
             </div>
             <p className="text-zinc-500 text-sm text-center">
-              Piloting with manufacturing and retail operators in California
+              Piloting with manufacturing, retail, and automotive operators across the US
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ============================================ */}
-      {/* FOUNDERS - Why Us */}
-      {/* ============================================ */}
-      <section className="py-20 px-6 bg-white">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-blue-600 text-sm font-semibold mb-2">The Team</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-4">Why we&apos;re building this</h2>
-          </div>
-          
-          {/* Founder note */}
-          <div className="bg-[#fafafa] rounded-2xl p-8 mb-12">
-            <p className="text-zinc-600 leading-relaxed mb-6 text-lg italic">
-              &quot;My dad runs a manufacturing plant with 100+ workers. Every new hire has the same questions—where to park, what to wear, how to clock in. Managers spend hours answering them. We built Sidekick so workers get instant answers and managers get their time back.&quot;
-            </p>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-zinc-300 rounded-full overflow-hidden">
-                <Image 
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" 
-                  alt="Justin So"
-                  width={48}
-                  height={48}
-                  className="object-cover"
-                />
-              </div>
-              <div>
-                <p className="font-semibold text-zinc-900">Justin So</p>
-                <p className="text-zinc-500 text-sm">Co-founder & CEO • Penn &apos;25</p>
-              </div>
-            </div>
-          </div>
-          
-          {/* Team grid */}
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { 
-                name: 'Justin So', 
-                role: 'CEO', 
-                prev: 'Arm', 
-                school: 'Penn',
-                image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face'
-              },
-              { 
-                name: 'Aadip Khanal', 
-                role: 'CTO', 
-                prev: 'Amazon', 
-                school: 'Berkeley',
-                image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face'
-              },
-              { 
-                name: 'Aayush B.', 
-                role: 'CPO', 
-                prev: 'Google', 
-                school: 'UIUC',
-                image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face'
-              },
-            ].map((member, i) => (
-              <div key={i} className="text-center">
-                <div className="w-24 h-24 bg-zinc-200 rounded-full mx-auto mb-4 overflow-hidden">
-                  <Image 
-                    src={member.image} 
-                    alt={member.name}
-                    width={96}
-                    height={96}
-                    className="object-cover"
-                  />
-                </div>
-                <p className="font-semibold text-zinc-900">{member.name}</p>
-                <p className="text-sm text-blue-600 mb-1">{member.role}</p>
-                <p className="text-xs text-zinc-500">Previously {member.prev} • {member.school}</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>
