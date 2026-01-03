@@ -1,367 +1,406 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { 
+  FileText, 
+  MessageSquare, 
+  TrendingUp, 
+  Upload, 
+  Users, 
+  Clock,
+  CheckCircle,
+  AlertTriangle,
+  ChevronRight,
+  Sparkles,
+  Globe,
+  BarChart3,
+  Settings,
+  LogOut
+} from "lucide-react";
 
-function Logo({ size = 48 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M4 8 Q4 4 8 4 L40 4 Q44 4 44 8 L44 32 Q44 36 40 36 L16 36 L8 44 L8 36 Q4 36 4 32 Z" fill="#0ea5e9"/>
-      <rect x="20" y="16" width="8" height="3" rx="1.5" fill="white"/>
-      <circle cx="15" cy="17" r="7" stroke="white" strokeWidth="3" fill="none"/>
-      <circle cx="33" cy="17" r="7" stroke="white" strokeWidth="3" fill="none"/>
-      <circle cx="15" cy="16" r="2.5" fill="#1e293b"/>
-      <circle cx="33" cy="16" r="2.5" fill="#1e293b"/>
-      <path d="M19 28 Q24 31 29 28" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
-    </svg>
-  );
-}
-
-interface Analytics {
-  summary: {
-    totalQuestions: number;
-    answeredQuestions: number;
-    answerRate: number;
-    avgConfidence: number;
-    timeSaved: number;
-    costSaved: number;
-  };
-  dailyData: Array<{ date: string; questions: number }>;
-  topics: Array<{ topic: string; count: number; percent: number }>;
-  gaps: Array<{ topic: string; count: number; avgConfidence: number }>;
-  recentQuestions: Array<{
-    id: string;
-    question: string;
+interface Document {
+  id: string;
+  name: string;
+  type: string;
+  uploadedAt: string;
+  chunks?: string[];
+  classification?: {
+    type: string;
+    title: string;
     confidence: number;
-    topic: string;
-    worker: string;
-    timestamp: string;
-    answered: boolean;
-  }>;
+  };
 }
 
-const topicColors: Record<string, string> = {
-  "Safety": "bg-red-500",
-  "Schedule": "bg-blue-500",
-  "HR & Benefits": "bg-green-500",
-  "Equipment": "bg-yellow-500",
-  "Reporting": "bg-purple-500",
-  "Contacts": "bg-pink-500",
-  "General": "bg-gray-400",
-};
+interface Question {
+  question: string;
+  answer: string;
+  language: string;
+  confidence: number;
+  timestamp: string;
+}
+
+interface Stats {
+  totalQuestions: number;
+  todayCount: number;
+  avgConfidence: number;
+  byLanguage: Record<string, number>;
+  recent: Question[];
+  lowConfidence: Question[];
+}
 
 export default function ManagerDashboard() {
-  const [analytics, setAnalytics] = useState<Analytics | null>(null);
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"overview" | "questions" | "gaps">("overview");
-  const [range, setRange] = useState("7d");
 
   useEffect(() => {
-    fetchAnalytics();
-  }, [range]);
+    Promise.all([
+      fetch("/api/documents").then(r => r.json()),
+      fetch("/api/analytics/stats").then(r => r.json()).catch(() => null)
+    ]).then(([docsData, statsData]) => {
+      setDocuments(docsData.documents || []);
+      setStats(statsData);
+      setLoading(false);
+    });
+  }, []);
 
-  const fetchAnalytics = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/analytics?range=${range}`);
-      const data = await res.json();
-      setAnalytics(data);
-    } catch (e) {
-      console.error("Failed to fetch analytics", e);
-    }
-    setLoading(false);
+  const typeIcons: Record<string, string> = {
+    handbook: "📘",
+    safety_manual: "🦺",
+    shift_schedule: "📅",
+    payroll_info: "💰",
+    training_material: "🎓",
+    equipment_manual: "⚙️",
+    emergency_procedures: "🚨",
+    other: "📄",
   };
 
-  const formatTime = (timestamp: string) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    
-    if (diffMins < 1) return "just now";
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`;
-    return `${Math.floor(diffMins / 1440)}d ago`;
+  const langNames: Record<string, string> = {
+    en: "English",
+    es: "Spanish",
+    zh: "Chinese",
+    ko: "Korean",
+    vi: "Vietnamese",
+    tl: "Tagalog",
   };
-
-  if (loading || !analytics) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
-  const maxQuestions = Math.max(...analytics.dailyData.map(d => d.questions), 1);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <Logo size={32} />
-            <span className="text-gray-900 text-xl font-bold">Sidekick</span>
-            <span className="text-gray-400 text-sm ml-2">Analytics</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/qa" className="text-gray-600 hover:text-gray-900 text-sm">Q&A Demo</Link>
-            <Link href="/worker" className="text-gray-600 hover:text-gray-900 text-sm">Worker View</Link>
-            <div className="w-8 h-8 bg-sky-500 rounded-full flex items-center justify-center text-white text-sm font-medium">JD</div>
+    <div className="min-h-screen bg-[#fafafa] text-zinc-900">
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+      `}</style>
+
+      {/* Navigation */}
+      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-zinc-200">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-8">
+              <Link href="/" className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">S</span>
+                </div>
+                <span className="font-semibold text-zinc-900">Sidekick</span>
+              </Link>
+              
+              <div className="hidden md:flex items-center gap-1">
+                <Link 
+                  href="/manager" 
+                  className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg"
+                >
+                  Dashboard
+                </Link>
+                <Link 
+                  href="/manager/upload" 
+                  className="px-4 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors"
+                >
+                  Documents
+                </Link>
+                <Link 
+                  href="/manager/analytics" 
+                  className="px-4 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors"
+                >
+                  Analytics
+                </Link>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <button className="p-2 text-zinc-500 hover:text-zinc-900 transition-colors">
+                <Settings className="w-5 h-5" />
+              </button>
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <span className="text-blue-600 font-medium text-sm">M</span>
+              </div>
+            </div>
           </div>
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h1>
-            <p className="text-gray-600">Real-time insights from worker questions</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <select
-              value={range}
-              onChange={(e) => setRange(e.target.value)}
-              className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 bg-white"
-            >
-              <option value="7d">Last 7 days</option>
-              <option value="30d">Last 30 days</option>
-            </select>
-            <button
-              onClick={fetchAnalytics}
-              className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-sm font-medium transition-colors"
-            >
-              Refresh
-            </button>
-          </div>
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-zinc-900 mb-2">Welcome back</h1>
+          <p className="text-zinc-500">Here's what's happening with your team today.</p>
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-1 mb-8 bg-gray-100 p-1 rounded-lg w-fit">
-          {[
-            { id: "overview", label: "Overview" },
-            { id: "questions", label: "Questions" },
-            { id: "gaps", label: "Training Gaps" },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as typeof activeTab)}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                activeTab === tab.id ? "bg-white text-gray-900 shadow-sm" : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {activeTab === "overview" && (
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : (
           <>
-            {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-2xl">💬</span>
-                  <span className="text-sm font-medium text-green-600">Live</span>
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              <div className="bg-white border border-zinc-200 rounded-xl p-5">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <MessageSquare className="w-5 h-5 text-blue-600" />
+                  </div>
                 </div>
-                <div className="text-3xl font-bold text-gray-900 mb-1">{analytics.summary.totalQuestions}</div>
-                <div className="text-sm text-gray-600">Questions Asked</div>
+                <p className="text-2xl font-bold text-zinc-900">{stats?.totalQuestions || 0}</p>
+                <p className="text-sm text-zinc-500">Total Questions</p>
               </div>
-              <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-2xl">✅</span>
-                  <span className="text-sm font-medium text-green-600">{analytics.summary.answerRate}%</span>
+
+              <div className="bg-white border border-zinc-200 rounded-xl p-5">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <Clock className="w-5 h-5 text-green-600" />
+                  </div>
                 </div>
-                <div className="text-3xl font-bold text-gray-900 mb-1">{analytics.summary.answeredQuestions}</div>
-                <div className="text-sm text-gray-600">Successfully Answered</div>
+                <p className="text-2xl font-bold text-zinc-900">{stats?.todayCount || 0}</p>
+                <p className="text-sm text-zinc-500">Today</p>
               </div>
-              <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-2xl">⏱️</span>
+
+              <div className="bg-white border border-zinc-200 rounded-xl p-5">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <FileText className="w-5 h-5 text-purple-600" />
+                  </div>
                 </div>
-                <div className="text-3xl font-bold text-gray-900 mb-1">{analytics.summary.timeSaved} min</div>
-                <div className="text-sm text-gray-600">Supervisor Time Saved</div>
+                <p className="text-2xl font-bold text-zinc-900">{documents.length}</p>
+                <p className="text-sm text-zinc-500">Documents</p>
               </div>
-              <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-2xl">💰</span>
+
+              <div className="bg-white border border-zinc-200 rounded-xl p-5">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-amber-600" />
+                  </div>
                 </div>
-                <div className="text-3xl font-bold text-green-600 mb-1">${analytics.summary.costSaved}</div>
-                <div className="text-sm text-gray-600">Estimated Savings</div>
+                <p className="text-2xl font-bold text-zinc-900">{stats?.avgConfidence || 0}%</p>
+                <p className="text-sm text-zinc-500">Avg Confidence</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-              {/* Chart */}
-              <div className="lg:col-span-2 bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                <h3 className="text-lg font-semibold text-gray-900 mb-6">Questions This Week</h3>
-                <div className="flex items-end justify-between h-48 gap-2">
-                  {analytics.dailyData.map((day) => (
-                    <div key={day.date} className="flex-1 flex flex-col items-center gap-2">
-                      <div className="w-full bg-gray-100 rounded-t-lg relative" style={{ height: "160px" }}>
-                        <div
-                          className="absolute bottom-0 w-full bg-sky-500 rounded-t-lg transition-all hover:bg-sky-600"
-                          style={{ height: `${(day.questions / maxQuestions) * 100}%` }}
-                        />
-                      </div>
-                      <span className="text-xs text-gray-600">{day.date}</span>
-                      <span className="text-xs text-gray-400">{day.questions}</span>
+            {/* Main Grid */}
+            <div className="grid lg:grid-cols-3 gap-6">
+              {/* Recent Questions - Takes 2 columns */}
+              <div className="lg:col-span-2 bg-white border border-zinc-200 rounded-xl">
+                <div className="p-5 border-b border-zinc-200 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <MessageSquare className="w-4 h-4 text-blue-600" />
                     </div>
-                  ))}
+                    <h2 className="font-semibold text-zinc-900">Recent Questions</h2>
+                  </div>
+                  <Link 
+                    href="/manager/analytics" 
+                    className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                  >
+                    View all <ChevronRight className="w-4 h-4" />
+                  </Link>
+                </div>
+                
+                <div className="divide-y divide-zinc-100">
+                  {stats?.recent && stats.recent.length > 0 ? (
+                    stats.recent.slice(0, 5).map((q, i) => (
+                      <div key={i} className="p-4 hover:bg-zinc-50 transition-colors">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-zinc-900 font-medium truncate">{q.question}</p>
+                            <p className="text-xs text-zinc-500 mt-1 line-clamp-2">{q.answer.slice(0, 100)}...</p>
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <span className={`text-xs px-2 py-1 rounded-full ${
+                              q.confidence >= 80 
+                                ? "bg-green-100 text-green-700" 
+                                : q.confidence >= 50 
+                                  ? "bg-yellow-100 text-yellow-700" 
+                                  : "bg-red-100 text-red-700"
+                            }`}>
+                              {q.confidence}%
+                            </span>
+                            <span className="text-xs text-zinc-400 flex items-center gap-1">
+                              <Globe className="w-3 h-3" />
+                              {langNames[q.language] || q.language}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-8 text-center">
+                      <div className="w-12 h-12 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <MessageSquare className="w-6 h-6 text-zinc-400" />
+                      </div>
+                      <p className="text-zinc-500 text-sm">No questions yet</p>
+                      <p className="text-zinc-400 text-xs mt-1">Questions will appear here when workers ask via SMS</p>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* Topics */}
-              <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                <h3 className="text-lg font-semibold text-gray-900 mb-6">Top Topics</h3>
-                <div className="space-y-4">
-                  {analytics.topics.slice(0, 6).map((topic) => (
-                    <div key={topic.topic}>
-                      <div className="flex items-center justify-between text-sm mb-1">
-                        <span className="text-gray-700">{topic.topic}</span>
-                        <span className="text-gray-500">{topic.count}</span>
+              {/* Right Column */}
+              <div className="space-y-6">
+                {/* Documents */}
+                <div className="bg-white border border-zinc-200 rounded-xl">
+                  <div className="p-5 border-b border-zinc-200 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <FileText className="w-4 h-4 text-purple-600" />
                       </div>
-                      <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full ${topicColors[topic.topic] || "bg-gray-400"} rounded-full`}
-                          style={{ width: `${topic.percent}%` }}
-                        />
-                      </div>
+                      <h2 className="font-semibold text-zinc-900">Documents</h2>
                     </div>
-                  ))}
+                    <Link 
+                      href="/manager/upload" 
+                      className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                    >
+                      <Upload className="w-4 h-4" /> Upload
+                    </Link>
+                  </div>
+                  
+                  <div className="divide-y divide-zinc-100">
+                    {documents.length > 0 ? (
+                      documents.slice(0, 4).map((doc) => (
+                        <div key={doc.id} className="p-4 hover:bg-zinc-50 transition-colors">
+                          <div className="flex items-center gap-3">
+                            <span className="text-xl">
+                              {typeIcons[doc.classification?.type || "other"]}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-zinc-900 truncate">{doc.name}</p>
+                              <p className="text-xs text-zinc-400">
+                                {doc.classification?.title || "Processing..."}
+                              </p>
+                            </div>
+                            {doc.classification && (
+                              <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-6 text-center">
+                        <p className="text-zinc-500 text-sm">No documents yet</p>
+                        <Link 
+                          href="/manager/upload"
+                          className="inline-flex items-center gap-2 mt-3 text-sm text-blue-600 hover:text-blue-700"
+                        >
+                          <Upload className="w-4 h-4" /> Upload your first document
+                        </Link>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Recent */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">Recent Questions</h3>
-                <button
-                  onClick={() => setActiveTab("questions")}
-                  className="text-sky-500 hover:text-sky-600 text-sm font-medium"
-                >
-                  View All →
-                </button>
-              </div>
-              <div className="divide-y divide-gray-100">
-                {analytics.recentQuestions.slice(0, 5).map((q) => (
-                  <div key={q.id} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50">
-                    <div className="flex-1">
-                      <p className="text-gray-900 font-medium">{q.question}</p>
-                      <p className="text-sm text-gray-500 mt-1">{q.worker} • {formatTime(q.timestamp)}</p>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className={`px-2 py-1 text-xs rounded-full ${topicColors[q.topic] || "bg-gray-400"} text-white`}>
-                        {q.topic}
-                      </span>
-                      <span className={`text-sm font-medium ${q.confidence >= 80 ? "text-green-600" : q.confidence >= 60 ? "text-yellow-600" : "text-red-600"}`}>
-                        {q.confidence}%
-                      </span>
+                {/* AI Insights */}
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl">
+                  <div className="p-5 border-b border-blue-200">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <Sparkles className="w-4 h-4 text-white" />
+                      </div>
+                      <h2 className="font-semibold text-blue-900">AI Insights</h2>
                     </div>
                   </div>
-                ))}
+                  
+                  <div className="p-5 space-y-4">
+                    {stats?.lowConfidence && stats.lowConfidence.length > 0 ? (
+                      <>
+                        <div className="flex items-start gap-3 p-3 bg-white/60 rounded-lg">
+                          <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-sm font-medium text-blue-900">Training Gap Detected</p>
+                            <p className="text-xs text-blue-700 mt-1">
+                              {stats.lowConfidence.length} question{stats.lowConfidence.length > 1 ? 's' : ''} had low confidence. Consider adding more documentation.
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {Object.keys(stats.byLanguage || {}).length > 1 && (
+                          <div className="flex items-start gap-3 p-3 bg-white/60 rounded-lg">
+                            <Globe className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                            <div>
+                              <p className="text-sm font-medium text-blue-900">Multilingual Team</p>
+                              <p className="text-xs text-blue-700 mt-1">
+                                Questions received in {Object.keys(stats.byLanguage).length} languages
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div className="text-center py-4">
+                        <p className="text-sm text-blue-700">Insights will appear as your team uses Sidekick</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="bg-white border border-zinc-200 rounded-xl p-5">
+                  <h3 className="font-semibold text-zinc-900 mb-4">Quick Actions</h3>
+                  <div className="space-y-2">
+                    <Link
+                      href="/manager/upload"
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-zinc-50 transition-colors group"
+                    >
+                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                        <Upload className="w-4 h-4 text-blue-600" />
+                      </div>
+                      <span className="text-sm text-zinc-700">Upload Documents</span>
+                    </Link>
+                    <Link
+                      href="/manager/analytics"
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-zinc-50 transition-colors group"
+                    >
+                      <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                        <BarChart3 className="w-4 h-4 text-purple-600" />
+                      </div>
+                      <span className="text-sm text-zinc-700">View Analytics</span>
+                    </Link>
+                    <Link
+                      href="/qa"
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-zinc-50 transition-colors group"
+                    >
+                      <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                        <MessageSquare className="w-4 h-4 text-green-600" />
+                      </div>
+                      <span className="text-sm text-zinc-700">Test Q&A</span>
+                    </Link>
+                  </div>
+                </div>
               </div>
             </div>
           </>
         )}
+      </main>
 
-        {activeTab === "questions" && (
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">All Questions</h3>
-            </div>
-            <div className="divide-y divide-gray-100">
-              {analytics.recentQuestions.map((q) => (
-                <div key={q.id} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50">
-                  <div className="flex-1">
-                    <p className="text-gray-900 font-medium">{q.question}</p>
-                    <p className="text-sm text-gray-500 mt-1">{q.worker} • {formatTime(q.timestamp)}</p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <span className={`px-2 py-1 text-xs rounded-full ${topicColors[q.topic] || "bg-gray-400"} text-white`}>
-                      {q.topic}
-                    </span>
-                    <span className={`text-sm font-medium ${q.confidence >= 80 ? "text-green-600" : q.confidence >= 60 ? "text-yellow-600" : "text-red-600"}`}>
-                      {q.confidence}%
-                    </span>
-                  </div>
-                </div>
-              ))}
+      {/* Footer */}
+      <footer className="border-t border-zinc-200 mt-12">
+        <div className="max-w-7xl mx-auto px-6 py-6">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-zinc-400">© 2026 Sidekick AI</p>
+            <div className="flex items-center gap-6">
+              <Link href="/privacy" className="text-sm text-zinc-400 hover:text-zinc-600">Privacy</Link>
+              <Link href="/terms" className="text-sm text-zinc-400 hover:text-zinc-600">Terms</Link>
             </div>
           </div>
-        )}
-
-        {activeTab === "gaps" && (
-          <div className="space-y-6">
-            {analytics.gaps.length > 0 ? (
-              <>
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="text-2xl">⚠️</div>
-                    <div>
-                      <h3 className="font-semibold text-amber-900">Training Gaps Detected</h3>
-                      <p className="text-amber-800 text-sm mt-1">
-                        These topics have low confidence scores, indicating missing or incomplete documentation.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                  <div className="divide-y divide-gray-100">
-                    {analytics.gaps.map((gap, i) => (
-                      <div key={i} className="px-6 py-4 flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3">
-                            <span className="w-2 h-2 rounded-full bg-red-500" />
-                            <p className="text-gray-900 font-medium">{gap.topic}</p>
-                          </div>
-                          <p className="text-sm text-gray-500 mt-1 ml-5">
-                            {gap.count} low-confidence questions
-                          </p>
-                        </div>
-                        <Link
-                          href="/qa"
-                          className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-sm font-medium transition-colors"
-                        >
-                          Upload Docs
-                        </Link>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
-                <div className="text-4xl mb-4">🎉</div>
-                <h3 className="font-semibold text-green-900">No Training Gaps</h3>
-                <p className="text-green-800 text-sm mt-1">
-                  All questions are being answered with high confidence!
-                </p>
-              </div>
-            )}
-
-            {/* ROI Summary */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">ROI Summary</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center p-4 bg-green-50 rounded-xl">
-                  <div className="text-3xl font-bold text-green-600">{analytics.summary.timeSaved} min</div>
-                  <div className="text-sm text-green-700 mt-1">Supervisor time saved</div>
-                </div>
-                <div className="text-center p-4 bg-blue-50 rounded-xl">
-                  <div className="text-3xl font-bold text-blue-600">${analytics.summary.costSaved}</div>
-                  <div className="text-sm text-blue-700 mt-1">Estimated cost savings</div>
-                </div>
-                <div className="text-center p-4 bg-purple-50 rounded-xl">
-                  <div className="text-3xl font-bold text-purple-600">{analytics.summary.avgConfidence}%</div>
-                  <div className="text-sm text-purple-700 mt-1">Average confidence</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+        </div>
+      </footer>
     </div>
   );
 }
