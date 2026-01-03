@@ -4,199 +4,114 @@ import { getDocuments } from "../documents/store";
 import { getEmbeddings, cosineSimilarity } from "@/lib/embeddings";
 
 const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
+  apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-const SUPPORTED_LANGUAGES: Record<string, string> = {
-  en: "English",
-  es: "Spanish",
-  zh: "Chinese",
-  vi: "Vietnamese",
-  tl: "Tagalog",
-  ko: "Korean",
-  pt: "Portuguese",
-  fr: "French",
-};
+// Step 1: Detect language and translate to English
+async function detectAndTranslate(query: string): Promise<{
+  originalLanguage: string;
+  isEnglish: boolean;
+  englishQuery: string;
+}> {
+  const response = await anthropic.messages.create({
+    model: "claude-sonnet-4-20250514",
+    max_tokens: 300,
+    messages: [{
+      role: "user",
+      content: `Analyze this text and respond with ONLY a JSON object (no markdown):
+Text: "${query}"
+{"language":"detected language name","isEnglish":true/false,"englishQuery":"English translation or original if already English"}`
+    }]
+  });
 
-// Detect if question is non-English and translate for search
-async function translateForSearch(question: string): Promise<{ translated: string; originalLang: string }> {
-  const isEnglish = /^[a-zA-Z0-9\s.,!?'"()-]+$/.test(question);
-  
-  if (isEnglish && !/[¿¡áéíóúñü]/i.test(question)) {
-    return { translated: question, originalLang: "en" };
-  }
-
+  const text = response.content[0].type === "text" ? response.content[0].text : "{}";
   try {
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 200,
-      system: "Translate the following question to English. Return ONLY the English translation, nothing else.",
-      messages: [{ role: "user", content: question }]
-    });
-    
-    const text = response.content[0];
-    if (text.type === "text") {
-      // Detect original language
-      let lang = "en";
-      if (/[¿¡áéíóúñü]/i.test(question) || /\b(donde|como|que|cuando)\b/i.test(question)) lang = "es";
-      else if (/[\u4e00-\u9fff]/.test(question)) lang = "zh";
-      else if (/[\uac00-\ud7af]/.test(question)) lang = "ko";
-      else if (/[\u0600-\u06ff]/.test(question)) lang = "ar";
-      
-      return { translated: text.text.trim(), originalLang: lang };
-    }
-  } catch (e) {
-    console.error("Translation error:", e);
+    const cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+    const result = JSON.parse(cleaned);
+    return {
+      originalLanguage: result.language || "English",
+      isEnglish: result.isEnglish !== false,
+      englishQuery: result.englishQuery || query
+    };
+  } catch {
+    return { originalLanguage: "English", isEnglish: true, englishQuery: query };
   }
-  
-  return { translated: question, originalLang: "en" };
+}
+
+// Step 4: Translate response back to original language
+async function translateResponse(answer: string, targetLanguage: string): Promise<string> {
+  const response = await anthropic.messages.create({
+    model: "claude-sonnet-4-20250514",
+    max_tokens: 1000,
+    messages: [{
+      role: "user",
+      content: `Translate to ${targetLanguage}. Output ONLY the translation:\n\n${answer}`
+    }]
+  });
+  return response.content[0].type === "text" ? response.content[0].text : answer;
 }
 
 export async function POST(request: NextRequest) {
   const { question } = await request.json();
-
   if (!question) {
-    return NextResponse.json({ error: "No question provided" }, { status: 400 });
+    return NextResponse.json({ error: "No question" }, { status: 400 });
   }
 
-  // Translate question for search if needed
-  const { translated: searchQuery, originalLang } = await translateForSearch(question);
-  console.log("Original:", question, "| Search query:", searchQuery, "| Lang:", originalLang);
+  console.log("[Ask] Original question:", question);
 
-  const documents = getDocuments();
-  console.log("Got", documents.length, "documents");
+  // STEP 1 & 2: Detect language and translate to English
+  const { originalLanguage, isEnglish, englishQuery } = await detectAndTranslate(question);
+  console.log("[Ask] Language:", originalLanguage, "| English query:", englishQuery);
 
+  // STEP 3: Search documents using ENGLISH query
+  const docs = getDocuments();
   let relevantChunks: { text: string; score: number }[] = [];
+  const searchWords = englishQuery.toLowerCase().split(/\s+/).filter(w => w.length > 2);
 
-  // Try semantic search first
-  const hasEmbeddings = documents.some(doc => doc.embeddings && doc.embeddings.length > 0);
-  
-  if (hasEmbeddings && process.env.OPENAI_API_KEY) {
-    try {
-      const [questionEmbedding] = await getEmbeddings([searchQuery]);
-      
-      for (const doc of documents) {
-        if (doc.embeddings && doc.chunks) {
-          for (let i = 0; i < doc.chunks.length; i++) {
-            if (doc.embeddings[i]) {
-              const score = cosineSimilarity(questionEmbedding, doc.embeddings[i]);
-              if (score > 0.3) {
-                relevantChunks.push({ text: doc.chunks[i], score });
-              }
-            }
-          }
-        }
+  for (const doc of docs) {
+    for (const chunk of doc.chunks || []) {
+      const chunkLower = chunk.toLowerCase();
+      let score = 0;
+      for (const word of searchWords) {
+        if (chunkLower.includes(word)) score++;
       }
-      
-      relevantChunks.sort((a, b) => b.score - a.score);
-      relevantChunks = relevantChunks.slice(0, 5);
-      console.log("Semantic search found", relevantChunks.length, "chunks");
-    } catch (err) {
-      console.error("Semantic search error:", err);
+      if (score > 0) {
+        relevantChunks.push({ text: chunk, score });
+      }
     }
   }
 
-  // Fallback to keyword search using translated query
-  if (relevantChunks.length === 0) {
-    const questionWords = searchQuery.toLowerCase()
-      .replace(/[?.,!]/g, "")
-      .split(" ")
-      .filter((w: string) => w.length > 3);
+  relevantChunks.sort((a, b) => b.score - a.score);
+  relevantChunks = relevantChunks.slice(0, 5);
+  console.log("[Ask] Found", relevantChunks.length, "relevant chunks");
 
-    console.log("Keyword search with:", questionWords);
-
-    for (const doc of documents) {
-      for (const chunk of doc.chunks || []) {
-        const chunkLower = chunk.toLowerCase();
-        let score = 0;
-        for (const word of questionWords) {
-          if (chunkLower.includes(word)) score++;
-        }
-        if (score > 0) {
-          relevantChunks.push({ text: chunk, score });
-        }
-      }
-    }
-
-    relevantChunks.sort((a, b) => b.score - a.score);
-    relevantChunks = relevantChunks.slice(0, 5);
-    console.log("Keyword search found", relevantChunks.length, "chunks");
-  }
-
-  let answer = "";
+  let answer: string;
   let confidence = 0;
-  let sources = 0;
-  let needsDocuments = false;
-  let detectedLanguage = originalLang;
+  let sources = relevantChunks.length;
 
   if (relevantChunks.length > 0 && process.env.ANTHROPIC_API_KEY) {
     const context = relevantChunks.map(c => c.text).join("\n\n---\n\n");
-
-    try {
-      const message = await anthropic.messages.create({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1024,
-        system: `You are a helpful workplace assistant for blue-collar workers.
-
-CRITICAL: The worker asked their question in ${SUPPORTED_LANGUAGES[originalLang] || originalLang}. 
-You MUST respond in ${SUPPORTED_LANGUAGES[originalLang] || originalLang}.
-
-Your role:
-- Answer based ONLY on the provided documents
-- Be concise and direct
-- Use simple language
-- If the answer is not in the documents, say so`,
-        messages: [
-          {
-            role: "user",
-            content: `Documents (English):
-
-${context}
-
----
-
-Worker's original question (in ${SUPPORTED_LANGUAGES[originalLang] || originalLang}): ${question}
-
-Respond in ${SUPPORTED_LANGUAGES[originalLang] || originalLang}.`
-          }
-        ]
-      });
-
-      const textContent = message.content.find(block => block.type === "text");
-      if (textContent && textContent.type === "text") {
-        answer = textContent.text;
-        confidence = Math.min(95, 70 + relevantChunks.length * 5);
-        sources = relevantChunks.length;
-      }
-    } catch (error) {
-      console.error("Claude API error:", error);
-      answer = relevantChunks[0].text;
-      confidence = 70;
-      sources = relevantChunks.length;
-    }
-  } else if (relevantChunks.length > 0) {
-    answer = relevantChunks[0].text;
-    confidence = 70;
-    sources = relevantChunks.length;
+    const response = await anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 500,
+      system: "You are a helpful workplace assistant. Answer based on the documents. Be concise for SMS.",
+      messages: [{
+        role: "user",
+        content: `Documents:\n${context}\n\nQuestion: ${englishQuery}\n\nAnswer concisely:`
+      }]
+    });
+    answer = response.content[0].type === "text" ? response.content[0].text : "Sorry, I couldn't generate a response.";
+    confidence = 85;
   } else {
-    if (originalLang === "es") {
-      answer = "No tengo suficiente información para responder eso todavía.\n\nPor favor, pida a su gerente que suba los documentos relevantes.";
-    } else if (originalLang === "zh") {
-      answer = "我目前没有足够的信息来回答这个问题。\n\n请让您的经理上传相关文件。";
-    } else {
-      answer = "I don't have enough information to answer that yet.\n\nPlease ask your manager to upload relevant documents.";
-    }
+    answer = "I don't have information about that. Please ask your manager to upload relevant documents.";
     confidence = 0;
-    needsDocuments = true;
-    sources = 0;
   }
 
-  return NextResponse.json({ 
-    answer, 
-    sources, 
-    confidence, 
-    needsDocuments,
-    language: detectedLanguage,
-    languageName: SUPPORTED_LANGUAGES[detectedLanguage] || "English"
-  });
+  // STEP 4: Translate answer back if needed
+  if (!isEnglish) {
+    console.log("[Ask] Translating response to", originalLanguage);
+    answer = await translateResponse(answer, originalLanguage);
+  }
+
+  return NextResponse.json({ answer, sources, confidence, language: originalLanguage });
 }
