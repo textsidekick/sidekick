@@ -1,4 +1,4 @@
-import { kv } from "@vercel/kv";
+import { put, list, del } from "@vercel/blob";
 
 export interface Document {
   id: string;
@@ -16,22 +16,44 @@ export interface Document {
   };
 }
 
-const DOCS_KEY = "documents";
+const DOCS_KEY = "documents.json";
 
 export async function getDocuments(): Promise<Document[]> {
   try {
-    const docs = await kv.get<Document[]>(DOCS_KEY);
+    const { blobs } = await list({ prefix: DOCS_KEY });
+    if (blobs.length === 0) return [];
+    
+    const response = await fetch(blobs[0].url);
+    const docs = await response.json();
     return docs || [];
   } catch (e) {
-    console.error("KV get error:", e);
+    console.error("Blob get error:", e);
     return [];
   }
+}
+
+export async function saveDocuments(docs: Document[]): Promise<void> {
+  // Delete old blob first
+  try {
+    const { blobs } = await list({ prefix: DOCS_KEY });
+    for (const blob of blobs) {
+      await del(blob.url);
+    }
+  } catch (e) {
+    // Ignore delete errors
+  }
+  
+  // Save new blob
+  await put(DOCS_KEY, JSON.stringify(docs), {
+    access: "public",
+    addRandomSuffix: false,
+  });
 }
 
 export async function addDocument(doc: Document): Promise<void> {
   const docs = await getDocuments();
   docs.push(doc);
-  await kv.set(DOCS_KEY, docs);
+  await saveDocuments(docs);
 }
 
 export async function updateDocumentEmbeddings(id: string, embeddings: number[][]): Promise<void> {
@@ -39,7 +61,7 @@ export async function updateDocumentEmbeddings(id: string, embeddings: number[][
   const doc = docs.find(d => d.id === id);
   if (doc) {
     doc.embeddings = embeddings;
-    await kv.set(DOCS_KEY, docs);
+    await saveDocuments(docs);
   }
 }
 
@@ -48,12 +70,12 @@ export async function updateDocumentClassification(id: string, classification: D
   const doc = docs.find(d => d.id === id);
   if (doc) {
     doc.classification = classification;
-    await kv.set(DOCS_KEY, docs);
+    await saveDocuments(docs);
   }
 }
 
 export async function deleteDocument(id: string): Promise<void> {
   const docs = await getDocuments();
   const filtered = docs.filter(d => d.id !== id);
-  await kv.set(DOCS_KEY, filtered);
+  await saveDocuments(filtered);
 }
