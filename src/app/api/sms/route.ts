@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import twilio from "twilio";
 import { getDocuments } from "../documents/store";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-// Translate query to English for searching
 async function translateToEnglish(query: string): Promise<{ language: string; englishQuery: string }> {
   const response = await anthropic.messages.create({
     model: "claude-sonnet-4-20250514",
@@ -27,7 +25,6 @@ async function translateToEnglish(query: string): Promise<{ language: string; en
   }
 }
 
-// Translate response back to original language
 async function translateResponse(answer: string, targetLanguage: string): Promise<string> {
   if (targetLanguage.toLowerCase() === "english") return answer;
   const response = await anthropic.messages.create({
@@ -48,12 +45,11 @@ export async function POST(request: NextRequest) {
 
   console.log("[SMS] From:", from, "| Message:", body);
 
-  // Step 1: Translate query to English
   const { language, englishQuery } = await translateToEnglish(body);
   console.log("[SMS] Language:", language, "| English query:", englishQuery);
 
-  // Step 2: Search documents with ENGLISH query
-  const docs = getDocuments();
+  // Now async!
+  const docs = await getDocuments();
   const searchWords = englishQuery.toLowerCase().split(/\s+/).filter(w => w.length > 2);
   let relevantChunks: { text: string; score: number }[] = [];
 
@@ -70,7 +66,7 @@ export async function POST(request: NextRequest) {
 
   relevantChunks.sort((a, b) => b.score - a.score);
   relevantChunks = relevantChunks.slice(0, 5);
-  console.log("[SMS] Found", relevantChunks.length, "chunks for English query");
+  console.log("[SMS] Found", relevantChunks.length, "chunks");
 
   let answer: string;
 
@@ -90,11 +86,8 @@ export async function POST(request: NextRequest) {
     answer = "I don't have information about that yet. Please ask your supervisor or HR.";
   }
 
-  // Step 3: Translate answer back to original language
   answer = await translateResponse(answer, language);
-  console.log("[SMS] Final answer:", answer.substring(0, 100) + "...");
 
-  // Send via Twilio
   const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response><Message>${answer}</Message></Response>`;
   return new NextResponse(twiml, { headers: { "Content-Type": "text/xml" } });
 }

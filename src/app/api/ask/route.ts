@@ -1,48 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { getDocuments } from "../documents/store";
-import { getEmbeddings, cosineSimilarity } from "@/lib/embeddings";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-// Step 1: Detect language and translate to English
-async function detectAndTranslate(query: string): Promise<{
-  originalLanguage: string;
-  isEnglish: boolean;
-  englishQuery: string;
-}> {
+async function detectAndTranslate(query: string): Promise<{ language: string; englishQuery: string; isEnglish: boolean }> {
   const response = await anthropic.messages.create({
     model: "claude-sonnet-4-20250514",
     max_tokens: 300,
     messages: [{
       role: "user",
-      content: `Analyze this text and respond with ONLY a JSON object (no markdown):
-Text: "${query}"
-{"language":"detected language name","isEnglish":true/false,"englishQuery":"English translation or original if already English"}`
+      content: `Detect language and translate to English. Return ONLY JSON, no markdown:
+"${query}"
+{"language":"detected language","englishQuery":"English translation","isEnglish":true/false}`
     }]
   });
-
   const text = response.content[0].type === "text" ? response.content[0].text : "{}";
   try {
     const cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
     const result = JSON.parse(cleaned);
     return {
-      originalLanguage: result.language || "English",
-      isEnglish: result.isEnglish !== false,
-      englishQuery: result.englishQuery || query
+      language: result.language || "English",
+      englishQuery: result.englishQuery || query,
+      isEnglish: result.isEnglish !== false
     };
   } catch {
-    return { originalLanguage: "English", isEnglish: true, englishQuery: query };
+    return { language: "English", englishQuery: query, isEnglish: true };
   }
 }
 
-// Step 4: Translate response back to original language
 async function translateResponse(answer: string, targetLanguage: string): Promise<string> {
+  if (targetLanguage.toLowerCase() === "english") return answer;
   const response = await anthropic.messages.create({
     model: "claude-sonnet-4-20250514",
-    max_tokens: 1000,
+    max_tokens: 500,
     messages: [{
       role: "user",
       content: `Translate to ${targetLanguage}. Output ONLY the translation:\n\n${answer}`
@@ -53,20 +44,16 @@ async function translateResponse(answer: string, targetLanguage: string): Promis
 
 export async function POST(request: NextRequest) {
   const { question } = await request.json();
-  if (!question) {
-    return NextResponse.json({ error: "No question" }, { status: 400 });
-  }
+  console.log("[Ask] Question:", question);
 
-  console.log("[Ask] Original question:", question);
+  // Step 1: Detect language and translate to English
+  const { language, englishQuery, isEnglish } = await detectAndTranslate(question);
+  console.log("[Ask] Language:", language, "| English query:", englishQuery);
 
-  // STEP 1 & 2: Detect language and translate to English
-  const { originalLanguage, isEnglish, englishQuery } = await detectAndTranslate(question);
-  console.log("[Ask] Language:", originalLanguage, "| English query:", englishQuery);
-
-  // STEP 3: Search documents using ENGLISH query
-  const docs = getDocuments();
-  let relevantChunks: { text: string; score: number }[] = [];
+  // Step 2: Search documents with ENGLISH query
+  const docs = await getDocuments();  // NOW ASYNC!
   const searchWords = englishQuery.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+  let relevantChunks: { text: string; score: number }[] = [];
 
   for (const doc of docs) {
     for (const chunk of doc.chunks || []) {
@@ -75,9 +62,7 @@ export async function POST(request: NextRequest) {
       for (const word of searchWords) {
         if (chunkLower.includes(word)) score++;
       }
-      if (score > 0) {
-        relevantChunks.push({ text: chunk, score });
-      }
+      if (score > 0) relevantChunks.push({ text: chunk, score });
     }
   }
 
@@ -87,14 +72,15 @@ export async function POST(request: NextRequest) {
 
   let answer: string;
   let confidence = 0;
-  let sources = relevantChunks.length;
+  const sources = relevantChunks.length;
 
+  // Step 3: Generate answer in English
   if (relevantChunks.length > 0 && process.env.ANTHROPIC_API_KEY) {
     const context = relevantChunks.map(c => c.text).join("\n\n---\n\n");
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
       max_tokens: 500,
-      system: "You are a helpful workplace assistant. Answer based on the documents. Be concise for SMS.",
+      system: "You're a helpful workplace assistant. Answer based on the documents provided. Be concise and direct.",
       messages: [{
         role: "user",
         content: `Documents:\n${context}\n\nQuestion: ${englishQuery}\n\nAnswer concisely:`
@@ -107,11 +93,11 @@ export async function POST(request: NextRequest) {
     confidence = 0;
   }
 
-  // STEP 4: Translate answer back if needed
+  // Step 4: Translate answer back if needed
   if (!isEnglish) {
-    console.log("[Ask] Translating response to", originalLanguage);
-    answer = await translateResponse(answer, originalLanguage);
+    console.log("[Ask] Translating response to", language);
+    answer = await translateResponse(answer, language);
   }
 
-  return NextResponse.json({ answer, sources, confidence, language: originalLanguage });
+  return NextResponse.json({ answer, sources, confidence, language });
 }
