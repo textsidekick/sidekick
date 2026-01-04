@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCompanies, saveCompanies, assignPhoneToCompany } from "./store";
+import { getCompanies, saveCompanies, registerWorker, getWorkers } from "./store";
 
 export async function GET() {
   const companies = await getCompanies();
-  return NextResponse.json({ companies });
+  const workers = await getWorkers();
+  return NextResponse.json({ companies, workers });
 }
 
 export async function POST(request: NextRequest) {
-  const { action, phone, companyId, company } = await request.json();
+  const { action, phone, companyId, locationId, company } = await request.json();
   
-  if (action === "assignPhone") {
-    await assignPhoneToCompany(phone, companyId);
+  if (action === "assignPhone" && phone && companyId) {
+    await registerWorker(phone, companyId, locationId || companyId);
     return NextResponse.json({ success: true });
   }
   
@@ -19,10 +20,20 @@ export async function POST(request: NextRequest) {
     companies.push({
       id: company.id,
       name: company.name,
-      phoneNumbers: [],
+      locations: company.locations || [],
       createdAt: new Date().toISOString(),
     });
     await saveCompanies(companies);
+    return NextResponse.json({ success: true });
+  }
+  
+  if (action === "addLocation" && companyId) {
+    const companies = await getCompanies();
+    const comp = companies.find(c => c.id === companyId);
+    if (comp && company?.location) {
+      comp.locations.push(company.location);
+      await saveCompanies(companies);
+    }
     return NextResponse.json({ success: true });
   }
   
