@@ -10,6 +10,8 @@ export interface QuestionLog {
   timestamp: string;
   companyId?: string;
   topic?: string;
+  responseTime?: number;
+  answered?: boolean;
 }
 
 const ANALYTICS_KEY = "analytics-data.json";
@@ -30,81 +32,77 @@ async function saveAnalyticsData(logs: QuestionLog[]): Promise<void> {
     const { blobs } = await list({ prefix: ANALYTICS_KEY });
     for (const blob of blobs) await del(blob.url);
   } catch {}
-  // Keep last 500 entries
   const trimmed = logs.slice(-500);
   await put(ANALYTICS_KEY, JSON.stringify(trimmed), { access: "public", addRandomSuffix: false });
 }
 
 export async function logQuestion(log: Omit<QuestionLog, "id">): Promise<void> {
   const logs = await getAnalyticsData();
-  logs.push({
-    ...log,
-    id: Date.now().toString(),
-  });
+  logs.push({ ...log, id: Date.now().toString() });
   await saveAnalyticsData(logs);
+}
+
+function classifyTopic(question: string): string {
+  const q = question.toLowerCase();
+  if (q.includes("park") || q.includes("lot")) return "parking";
+  if (q.includes("safety") || q.includes("ppe")) return "safety";
+  if (q.includes("break") || q.includes("lunch")) return "breaks";
+  if (q.includes("pay") || q.includes("wage")) return "compensation";
+  if (q.includes("schedule") || q.includes("shift")) return "schedule";
+  if (q.includes("dress") || q.includes("wear") || q.includes("uniform")) return "dress_code";
+  if (q.includes("benefit") || q.includes("insurance")) return "benefits";
+  if (q.includes("bathroom") || q.includes("restroom") || q.includes("bano")) return "facilities";
+  return "general";
 }
 
 export async function getStats(companyId?: string) {
   let logs = await getAnalyticsData();
-  
-  if (companyId) {
-    logs = logs.filter(l => l.companyId === companyId || !l.companyId);
-  }
+  if (companyId) logs = logs.filter(l => l.companyId === companyId || !l.companyId);
 
   const byLanguage: Record<string, number> = {};
-  logs.forEach(l => {
-    byLanguage[l.language] = (byLanguage[l.language] || 0) + 1;
-  });
-
   const byTopic: Record<string, number> = {};
+  
   logs.forEach(l => {
-    const q = l.question.toLowerCase();
-    let topic = l.topic || "general";
-    if (q.includes("park") || q.includes("estacion")) topic = "parking";
-    else if (q.includes("ppe") || q.includes("safety") || q.includes("seguridad")) topic = "safety";
-    else if (q.includes("break") || q.includes("lunch") || q.includes("almuerzo")) topic = "breaks";
-    else if (q.includes("pay") || q.includes("salary") || q.includes("pago")) topic = "compensation";
-    else if (q.includes("schedule") || q.includes("shift") || q.includes("horario")) topic = "schedule";
-    else if (q.includes("dress") || q.includes("wear") || q.includes("uniform")) topic = "dress_code";
-    else if (q.includes("benefit") || q.includes("insurance") || q.includes("health")) topic = "benefits";
-    else if (q.includes("contact") || q.includes("phone") || q.includes("email")) topic = "contacts";
-    else if (q.includes("train") || q.includes("orientation")) topic = "training";
+    byLanguage[l.language || "English"] = (byLanguage[l.language || "English"] || 0) + 1;
+    const topic = l.topic || classifyTopic(l.question);
     byTopic[topic] = (byTopic[topic] || 0) + 1;
   });
 
-  const recent = logs.slice(-20).reverse();
   const avgConfidence = logs.length > 0 
-    ? Math.round(logs.reduce((sum, l) => sum + l.confidence, 0) / logs.length)
+    ? Math.round((logs.reduce((sum, l) => sum + (l.confidence || 0), 0) / logs.length) * 100)
     : 0;
-  
+
+  const logsWithTime = logs.filter(l => l.responseTime && l.responseTime > 0);
+  const avgResponseTime = logsWithTime.length > 0
+    ? Math.round(logsWithTime.reduce((sum, l) => sum + (l.responseTime || 0), 0) / logsWithTime.length)
+    : 0;
+
   const today = new Date().toDateString();
-  const todayCount = logs.filter(l => new Date(l.timestamp).toDateString() === today).length;
-  
-  const weekAgo = new Date();
-  weekAgo.setDate(weekAgo.getDate() - 7);
-  const weekCount = logs.filter(l => new Date(l.timestamp) >= weekAgo).length;
+  const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
 
   const knowledgeGaps = logs
-    .filter(l => l.confidence < 0.5)
+    .filter(l => l.answered === false || l.confidence < 0.5)
     .reduce((acc, l) => {
       const existing = acc.find(g => g.question.toLowerCase() === l.question.toLowerCase());
       if (existing) existing.count++;
-      else acc.push({ question: l.question, count: 1 });
+      else acc.push({ question: l.question, count: 1, topic: classifyTopic(l.question) });
       return acc;
-    }, [] as { question: string; count: number }[])
+    }, [] as { question: string; count: number; topic: string }[])
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
 
+  const answeredCount = logs.filter(l => l.answered !== false && l.confidence >= 0.5).length;
+
   return {
     totalQuestions: logs.length,
-    todayCount,
-    weekCount,
+    todayCount: logs.filter(l => new Date(l.timestamp).toDateString() === today).length,
+    weekCount: logs.filter(l => new Date(l.timestamp) >= weekAgo).length,
     byLanguage,
     byTopic,
-    recentQuestions: recent,
+    recentQuestions: logs.slice(-20).reverse(),
     avgConfidence,
-    avgResponseTime: 0,
-    answeredRate: logs.length > 0 ? Math.round((logs.filter(l => l.confidence > 0.5).length / logs.length) * 100) : 0,
+    avgResponseTime,
+    answeredRate: logs.length > 0 ? Math.round((answeredCount / logs.length) * 100) : 0,
     knowledgeGaps,
   };
 }
