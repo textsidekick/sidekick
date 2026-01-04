@@ -218,6 +218,28 @@ export async function POST(request: NextRequest) {
 
   answer = await translateResponse(answer, language);
 
+  // Log to analytics
+  const wasAnswered = relevantChunks.length > 0;
+  try {
+    const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
+    await fetch(`${baseUrl}/api/analytics`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        question: body,
+        answer: answer,
+        companyId: worker.companyId,
+        locationId: worker.locationId,
+        language: language,
+        confidence: wasAnswered ? 0.85 : 0,
+        answered: wasAnswered,
+        topic: 'general'
+      })
+    });
+  } catch (e) {
+    console.log('[SMS] Analytics log failed:', e);
+  }
+
   const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response><Message>${answer}</Message></Response>`;
   return new NextResponse(twiml, { headers: { "Content-Type": "text/xml" } });
 }
