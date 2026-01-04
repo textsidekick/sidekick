@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface Message {
   id: number;
@@ -24,6 +24,11 @@ export default function SMSDemo() {
   const [visibleMessages, setVisibleMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [currentConvo] = useState(0);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [visibleMessages, isTyping]);
 
   useEffect(() => {
     const convo = conversations[currentConvo];
@@ -64,29 +69,12 @@ export default function SMSDemo() {
       {/* iPhone Frame */}
       <div className="relative bg-black rounded-[3rem] p-2 shadow-2xl border-[3px] border-gray-800">
         {/* Dynamic Island */}
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 w-28 h-8 bg-black rounded-full z-20" />
+        <div className="absolute top-3 left-1/2 -translate-x-1/2 w-28 h-7 bg-black rounded-full z-20" />
         
         {/* Screen */}
-        <div className="bg-black rounded-[2.5rem] overflow-hidden">
-          {/* Status Bar */}
-          <div className="px-8 pt-4 pb-1 flex justify-between items-center text-sm font-semibold text-white">
-            <span>9:41</span>
-            <div className="flex items-center gap-1">
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12.01 21.49L23.64 7c-.45-.34-4.93-4-11.64-4C5.28 3 .81 6.66.36 7l11.63 14.49.01.01.01-.01z"/>
-              </svg>
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M2 22h20V2z"/>
-              </svg>
-              <div className="w-7 h-3 border-2 border-white rounded-sm relative ml-1">
-                <div className="absolute top-0.5 left-0.5 bottom-0.5 bg-white rounded-sm" style={{width: "75%"}}/>
-                <div className="absolute -right-1 top-1/2 -translate-y-1/2 w-0.5 h-1.5 bg-white rounded-r"/>
-              </div>
-            </div>
-          </div>
-
+        <div className="bg-black rounded-[2.5rem] overflow-hidden pt-8">
           {/* iMessage Header */}
-          <div className="px-4 pb-2 pt-1">
+          <div className="px-4 pb-3 pt-2 border-b border-gray-800">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1 text-blue-500">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
@@ -104,13 +92,14 @@ export default function SMSDemo() {
             </div>
           </div>
 
-          {/* Messages Area */}
-          <div className="h-[420px] px-3 py-2 overflow-hidden flex flex-col gap-2">
+          {/* Messages Area - Scrollable */}
+          <div 
+            className="h-[420px] px-3 py-3 overflow-y-auto flex flex-col gap-2 scroll-smooth messages-container"
+          >
             {visibleMessages.map((msg) => (
               <div
                 key={msg.id}
-                className={`flex ${msg.sender === "worker" ? "justify-end" : "justify-start"}`}
-                style={{animation: "slideIn 0.25s ease-out"}}
+                className={`flex ${msg.sender === "worker" ? "justify-end" : "justify-start"} msg-animate`}
               >
                 <div
                   className={`max-w-[80%] px-3 py-2 text-[15px] leading-snug text-left ${
@@ -126,7 +115,7 @@ export default function SMSDemo() {
             
             {/* Typing Indicator */}
             {isTyping && (
-              <div className="flex justify-start" style={{animation: "slideIn 0.25s ease-out"}}>
+              <div className="flex justify-start msg-animate">
                 <div className="bg-[#3A3A3C] px-4 py-3 rounded-[18px] rounded-bl-[4px]">
                   <div className="flex gap-1 items-center">
                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: "0ms", animationDuration: "0.6s"}}/>
@@ -136,6 +125,8 @@ export default function SMSDemo() {
                 </div>
               </div>
             )}
+            
+            <div ref={messagesEndRef} />
           </div>
 
           {/* iMessage Input */}
@@ -165,7 +156,17 @@ export default function SMSDemo() {
       {/* Decorative glow */}
       <div className="absolute -inset-8 bg-green-500/10 rounded-[5rem] blur-3xl -z-10" />
 
-      <style jsx global>{`
+      <style jsx>{`
+        .messages-container::-webkit-scrollbar {
+          display: none;
+        }
+        .messages-container {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .msg-animate {
+          animation: slideIn 0.25s ease-out;
+        }
         @keyframes slideIn {
           from { opacity: 0; transform: translateY(8px) scale(0.95); }
           to { opacity: 1; transform: translateY(0) scale(1); }
