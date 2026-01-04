@@ -172,6 +172,8 @@ export async function POST(request: NextRequest) {
 
   console.log("[SMS] Worker:", company.name, "-", location?.city);
 
+  const startTime = Date.now();
+
   // Translate query
   const { language, englishQuery } = await translateToEnglish(body);
   console.log("[SMS] Language:", language, "| English query:", englishQuery);
@@ -219,7 +221,8 @@ export async function POST(request: NextRequest) {
   answer = await translateResponse(answer, language);
 
   // Log to analytics
-  const wasAnswered = relevantChunks.length > 0;
+  const responseTime = Date.now() - startTime;
+  const wasAnswered = relevantChunks.length > 0 && !answer.includes("don't have info");
   try {
     const baseUrl = 'https://sidekick-phi.vercel.app';
     await fetch(`${baseUrl}/api/analytics`, {
@@ -233,7 +236,8 @@ export async function POST(request: NextRequest) {
         language: language,
         confidence: wasAnswered ? 0.85 : 0,
         answered: wasAnswered,
-        topic: 'general'
+        topic: 'general',
+        responseTime: responseTime
       })
     });
   } catch (e) {
