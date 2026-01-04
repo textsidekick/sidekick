@@ -19,8 +19,8 @@ const conversations: Message[][] = [
     { id: 6, text: "El almuerzo es a las 11:30 AM para el primer turno. Es un descanso de 30 minutos. 🍽️", sender: "sidekick", delay: 10000 },
     { id: 7, text: "안전 장비는 어디서 받나요?", sender: "worker", delay: 13000 },
     { id: 8, text: "안전 장비는 도구 보관소에서 받을 수 있습니다. 노란색 구역에서는 안전모가 필수입니다. 🦺", sender: "sidekick", delay: 15000 },
-    { id: 9, text: "Who do I contact in an emergency?", sender: "worker", delay: 18000 },
-    { id: 10, text: "Call 911 for emergencies. Your floor supervisor is Mike Chen (ext. 2847). Assembly point is Parking Lot B. 🚨", sender: "sidekick", delay: 20000 },
+    { id: 9, text: "When is payday?", sender: "worker", delay: 18000 },
+    { id: 10, text: "Payday is every other Friday. Direct deposit hits by 8am. Paper checks available at HR after 10am. 💰", sender: "sidekick", delay: 20000 },
   ],
 ];
 
@@ -69,7 +69,7 @@ export default function SMSDemo() {
   }, [currentConvo]);
 
   return (
-    <div className="relative mx-auto" style={{ width: "300px" }}>
+    <div className="relative mx-auto" style={{ width: "340px" }}>
       {/* iPhone Frame */}
       <div className="relative bg-black rounded-[3rem] p-2 shadow-2xl border-[3px] border-gray-800">
         {/* Dynamic Island */}
@@ -77,7 +77,7 @@ export default function SMSDemo() {
         
         {/* Screen */}
         <div className="bg-black rounded-[2.5rem] overflow-hidden pt-8">
-          {/* iMessage Header - Truly Centered */}
+          {/* iMessage Header */}
           <div className="px-4 pb-3 pt-2 border-b border-gray-800">
             <div className="text-center">
               <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-0.5">
@@ -90,7 +90,7 @@ export default function SMSDemo() {
 
           {/* Messages Area - Scrollable */}
           <div 
-            className="h-[420px] px-3 py-3 overflow-y-auto flex flex-col gap-2 scroll-smooth messages-container"
+            className="h-[460px] px-3 py-3 overflow-y-auto flex flex-col gap-2 scroll-smooth messages-container"
           >
             {visibleMessages.map((msg) => (
               <div
