@@ -28,10 +28,13 @@ export default function SMSDemo() {
   const [visibleMessages, setVisibleMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [currentConvo] = useState(0);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
+  // Auto-scroll only within the container, not the page
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
   }, [visibleMessages, isTyping]);
 
   useEffect(() => {
@@ -88,9 +91,10 @@ export default function SMSDemo() {
             </div>
           </div>
 
-          {/* Messages Area - Scrollable */}
+          {/* Messages Area - Scrollable within container only */}
           <div 
-            className="h-[460px] px-3 py-3 overflow-y-auto flex flex-col gap-2 scroll-smooth messages-container"
+            ref={containerRef}
+            className="h-[460px] px-3 py-3 overflow-y-auto flex flex-col gap-2 messages-container"
           >
             {visibleMessages.map((msg) => (
               <div
@@ -121,8 +125,6 @@ export default function SMSDemo() {
                 </div>
               </div>
             )}
-            
-            <div ref={messagesEndRef} />
           </div>
 
           {/* iMessage Input */}
