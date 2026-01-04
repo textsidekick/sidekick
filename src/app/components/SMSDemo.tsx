@@ -30,7 +30,6 @@ export default function SMSDemo() {
   const [currentConvo] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll only within the container, not the page
   useEffect(() => {
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
@@ -74,27 +73,27 @@ export default function SMSDemo() {
   return (
     <div className="relative mx-auto" style={{ width: "340px" }}>
       {/* iPhone Frame */}
-      <div className="relative bg-black rounded-[3rem] p-2 shadow-2xl border-[3px] border-gray-800">
+      <div className="relative bg-gray-900 rounded-[3rem] p-2 shadow-2xl border-[3px] border-gray-800">
         {/* Dynamic Island */}
         <div className="absolute top-3 left-1/2 -translate-x-1/2 w-28 h-7 bg-black rounded-full z-20" />
         
         {/* Screen */}
-        <div className="bg-black rounded-[2.5rem] overflow-hidden pt-8">
+        <div className="bg-[#F2F2F7] rounded-[2.5rem] overflow-hidden pt-8">
           {/* iMessage Header */}
-          <div className="px-4 pb-3 pt-2 border-b border-gray-800">
+          <div className="px-4 pb-3 pt-2 border-b border-gray-300 bg-[#F2F2F7]">
             <div className="text-center">
-              <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-0.5">
+              <div className="w-10 h-10 bg-gray-400 rounded-full flex items-center justify-center mx-auto mb-0.5">
                 <span className="text-white font-semibold text-sm">S</span>
               </div>
-              <p className="font-semibold text-white text-[15px]">Sidekick</p>
-              <p className="text-[11px] text-gray-400">+1 (888) 707-4659</p>
+              <p className="font-semibold text-black text-[15px]">Sidekick</p>
+              <p className="text-[11px] text-gray-500">+1 (888) 707-4659</p>
             </div>
           </div>
 
-          {/* Messages Area - Scrollable within container only */}
+          {/* Messages Area */}
           <div 
             ref={containerRef}
-            className="h-[460px] px-3 py-3 overflow-y-auto flex flex-col gap-2 messages-container"
+            className="h-[460px] px-3 py-3 overflow-y-auto flex flex-col gap-2 messages-container bg-white"
           >
             {visibleMessages.map((msg) => (
               <div
@@ -104,8 +103,8 @@ export default function SMSDemo() {
                 <div
                   className={`max-w-[80%] px-3 py-2 text-[15px] leading-snug text-left ${
                     msg.sender === "worker"
-                      ? "bg-[#34C759] text-white rounded-[18px] rounded-br-[4px]"
-                      : "bg-[#3A3A3C] text-white rounded-[18px] rounded-bl-[4px]"
+                      ? "bg-[#0B93F6] text-white rounded-[18px] rounded-br-[4px]"
+                      : "bg-[#E9E9EB] text-black rounded-[18px] rounded-bl-[4px]"
                   }`}
                 >
                   {msg.text}
@@ -116,7 +115,7 @@ export default function SMSDemo() {
             {/* Typing Indicator */}
             {isTyping && (
               <div className="flex justify-start msg-animate">
-                <div className="bg-[#3A3A3C] px-4 py-3 rounded-[18px] rounded-bl-[4px]">
+                <div className="bg-[#E9E9EB] px-4 py-3 rounded-[18px] rounded-bl-[4px]">
                   <div className="flex gap-1 items-center">
                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: "0ms", animationDuration: "0.6s"}}/>
                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: "150ms", animationDuration: "0.6s"}}/>
@@ -128,16 +127,16 @@ export default function SMSDemo() {
           </div>
 
           {/* iMessage Input */}
-          <div className="px-3 py-2 border-t border-gray-800">
+          <div className="px-3 py-2 border-t border-gray-200 bg-[#F2F2F7]">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
               </div>
-              <div className="flex-1 bg-[#1C1C1E] rounded-full px-4 py-2 border border-gray-700 flex items-center justify-between">
-                <span className="text-gray-500 text-[15px]">Text Message</span>
-                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <div className="flex-1 bg-white rounded-full px-4 py-2 border border-gray-300 flex items-center justify-between">
+                <span className="text-gray-400 text-[15px]">iMessage</span>
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
                 </svg>
               </div>
@@ -145,14 +144,14 @@ export default function SMSDemo() {
           </div>
           
           {/* Home Indicator */}
-          <div className="pb-2 pt-1 flex justify-center">
-            <div className="w-32 h-1 bg-white rounded-full" />
+          <div className="pb-2 pt-1 flex justify-center bg-[#F2F2F7]">
+            <div className="w-32 h-1 bg-black rounded-full" />
           </div>
         </div>
       </div>
 
       {/* Decorative glow */}
-      <div className="absolute -inset-8 bg-green-500/10 rounded-[5rem] blur-3xl -z-10" />
+      <div className="absolute -inset-8 bg-blue-500/10 rounded-[5rem] blur-3xl -z-10" />
 
       <style jsx>{`
         .messages-container::-webkit-scrollbar {
