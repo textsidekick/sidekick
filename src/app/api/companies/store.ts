@@ -32,6 +32,7 @@ function getDefaultCompanies(): Company[] {
       locations: [
         { id: "eds-santaclara", name: "EDS Santa Clara", city: "Santa Clara", state: "CA" },
         { id: "eds-sanjose", name: "EDS San Jose", city: "San Jose", state: "CA" },
+        { id: "eds-seoul", name: "EDS Seoul", city: "Seoul", state: "South Korea" },
       ],
       createdAt: new Date().toISOString() 
     },
@@ -48,9 +49,8 @@ function getDefaultCompanies(): Company[] {
       id: "jfm", 
       name: "Jim Falk Motors", 
       locations: [
-        { id: "jfm-beverlyhills", name: "Jim Falk Motors Beverly Hills", city: "Beverly Hills", state: "CA" },
-        { id: "jfm-santamonica", name: "Jim Falk Motors Santa Monica", city: "Santa Monica", state: "CA" },
-        { id: "jfm-losangeles", name: "Jim Falk Motors Los Angeles", city: "Los Angeles", state: "CA" },
+        { id: "jfm-kahului", name: "Jim Falk Motors Kahului", city: "Kahului", state: "HI" },
+        { id: "jfm-clinton", name: "Jim Falk Motors Clinton", city: "Clinton", state: "MO" },
       ],
       createdAt: new Date().toISOString() 
     },
