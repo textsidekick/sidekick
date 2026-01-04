@@ -17,6 +17,8 @@ const conversations: Message[][] = [
     { id: 4, text: "Employee parking is in Lot B behind the main building. Visitor parking is in front. 🅿️", sender: "sidekick", delay: 6000 },
     { id: 5, text: "¿A qué hora es el almuerzo?", sender: "worker", delay: 8500 },
     { id: 6, text: "El almuerzo es a las 11:30 AM para el primer turno. Es un descanso de 30 minutos. 🍽️", sender: "sidekick", delay: 10000 },
+    { id: 7, text: "안전 장비는 어디서 받나요?", sender: "worker", delay: 13000 },
+    { id: 8, text: "안전 장비는 도구 보관소에서 받을 수 있습니다. 노란색 구역에서는 안전모가 필수입니다. 🦺", sender: "sidekick", delay: 15000 },
   ],
 ];
 
@@ -55,7 +57,7 @@ export default function SMSDemo() {
 
       const restartTimeout = setTimeout(() => {
         runAnimation();
-      }, 15000);
+      }, 20000);
       timeouts.push(restartTimeout);
     };
 
@@ -73,22 +75,14 @@ export default function SMSDemo() {
         
         {/* Screen */}
         <div className="bg-black rounded-[2.5rem] overflow-hidden pt-8">
-          {/* iMessage Header */}
+          {/* iMessage Header - Truly Centered */}
           <div className="px-4 pb-3 pt-2 border-b border-gray-800">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1 text-blue-500">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                </svg>
+            <div className="text-center">
+              <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-0.5">
+                <span className="text-white font-semibold text-sm">S</span>
               </div>
-              <div className="text-center">
-                <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-0.5">
-                  <span className="text-white font-semibold text-sm">S</span>
-                </div>
-                <p className="font-semibold text-white text-[15px]">Sidekick</p>
-                <p className="text-[11px] text-gray-400">+1 (888) 707-4659</p>
-              </div>
-              <div className="w-8" />
+              <p className="font-semibold text-white text-[15px]">Sidekick</p>
+              <p className="text-[11px] text-gray-400">+1 (888) 707-4659</p>
             </div>
           </div>
 
