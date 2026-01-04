@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDocuments, addDocument, deleteDocument, updateDocumentEmbeddings } from "./store";
 import { getEmbeddings } from "@/lib/embeddings";
-import { classifyDocument, extractStructuredData, DocumentType } from "@/lib/documentClassifier";
+import { classifyDocument } from "@/lib/documentClassifier";
 
 async function extractPdfText(buffer: Buffer): Promise<string> {
   try {
@@ -14,14 +14,18 @@ async function extractPdfText(buffer: Buffer): Promise<string> {
   }
 }
 
-export async function GET() {
-  const documents = await getDocuments();
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const companyId = searchParams.get("companyId") || "eds";
+  
+  const documents = await getDocuments(companyId);
   return NextResponse.json({ documents });
 }
 
 export async function POST(request: NextRequest) {
   const formData = await request.formData();
   const file = formData.get("file") as File;
+  const companyId = formData.get("companyId")?.toString() || "eds";
 
   if (!file) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -33,7 +37,6 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     content = await extractPdfText(buffer);
-    console.log("Extracted PDF text length:", content.length);
   } else {
     content = await file.text();
   }
@@ -48,8 +51,6 @@ export async function POST(request: NextRequest) {
     .filter(chunk => chunk.length > 30)
     .map(chunk => chunk.replace(/\s+/g, " "));
 
-  console.log("Created", chunks.length, "chunks from", file.name);
-
   const doc = {
     id: Date.now().toString(),
     name: file.name,
@@ -60,14 +61,13 @@ export async function POST(request: NextRequest) {
     chunks,
   };
 
-  await addDocument(doc);
+  await addDocument(doc, companyId);
 
   // Classification
   let classification = null;
   if (process.env.ANTHROPIC_API_KEY) {
     try {
       classification = await classifyDocument(content);
-      console.log("Classification:", classification);
     } catch (err) {
       console.error("Classification error:", err);
     }
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
   // Embeddings in background
   if (process.env.OPENAI_API_KEY && chunks.length > 0) {
     getEmbeddings(chunks)
-      .then(embeddings => updateDocumentEmbeddings(doc.id, embeddings))
+      .then(embeddings => updateDocumentEmbeddings(doc.id, embeddings, companyId))
       .catch(err => console.error("Embedding error:", err));
   }
 
@@ -86,11 +86,12 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
+  const companyId = searchParams.get("companyId") || "eds";
 
   if (!id) {
     return NextResponse.json({ error: "No ID provided" }, { status: 400 });
   }
 
-  await deleteDocument(id);
+  await deleteDocument(id, companyId);
   return NextResponse.json({ success: true });
 }

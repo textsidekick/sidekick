@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { getDocuments } from "../documents/store";
+import { getCompanyByPhone } from "../companies/store";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -45,11 +46,17 @@ export async function POST(request: NextRequest) {
 
   console.log("[SMS] From:", from, "| Message:", body);
 
+  // STEP 1: Look up which company this phone belongs to
+  const company = await getCompanyByPhone(from);
+  const companyId = company?.id || "eds"; // Default to EDS if not found
+  console.log("[SMS] Company:", company?.name || "Unknown (defaulting to EDS)");
+
+  // STEP 2: Translate query to English
   const { language, englishQuery } = await translateToEnglish(body);
   console.log("[SMS] Language:", language, "| English query:", englishQuery);
 
-  // Now async!
-  const docs = await getDocuments();
+  // STEP 3: Search ONLY this company's documents
+  const docs = await getDocuments(companyId);
   const searchWords = englishQuery.toLowerCase().split(/\s+/).filter(w => w.length > 2);
   let relevantChunks: { text: string; score: number }[] = [];
 
@@ -66,7 +73,7 @@ export async function POST(request: NextRequest) {
 
   relevantChunks.sort((a, b) => b.score - a.score);
   relevantChunks = relevantChunks.slice(0, 5);
-  console.log("[SMS] Found", relevantChunks.length, "chunks");
+  console.log("[SMS] Found", relevantChunks.length, "chunks from", companyId);
 
   let answer: string;
 
@@ -75,7 +82,7 @@ export async function POST(request: NextRequest) {
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
       max_tokens: 400,
-      system: "You're a helpful workplace assistant. Answer based on the documents. Be concise for SMS (under 300 chars). Add a relevant emoji at the end.",
+      system: `You're a helpful workplace assistant for ${company?.name || "the company"}. Answer based on the documents. Be concise for SMS (under 300 chars). Add a relevant emoji at the end.`,
       messages: [{
         role: "user",
         content: `Documents:\n${context}\n\nQuestion: ${englishQuery}\n\nAnswer concisely:`

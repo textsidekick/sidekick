@@ -16,66 +16,60 @@ export interface Document {
   };
 }
 
-const DOCS_KEY = "documents.json";
+function getDocsKey(companyId: string): string {
+  return `documents-${companyId}.json`;
+}
 
-export async function getDocuments(): Promise<Document[]> {
+export async function getDocuments(companyId: string = "eds"): Promise<Document[]> {
   try {
-    const { blobs } = await list({ prefix: DOCS_KEY });
+    const key = getDocsKey(companyId);
+    const { blobs } = await list({ prefix: key });
     if (blobs.length === 0) return [];
     
     const response = await fetch(blobs[0].url);
-    const docs = await response.json();
-    return docs || [];
+    return await response.json();
   } catch (e) {
     console.error("Blob get error:", e);
     return [];
   }
 }
 
-export async function saveDocuments(docs: Document[]): Promise<void> {
-  // Delete old blob first
+async function saveDocuments(companyId: string, docs: Document[]): Promise<void> {
+  const key = getDocsKey(companyId);
   try {
-    const { blobs } = await list({ prefix: DOCS_KEY });
-    for (const blob of blobs) {
-      await del(blob.url);
-    }
-  } catch (e) {
-    // Ignore delete errors
-  }
+    const { blobs } = await list({ prefix: key });
+    for (const blob of blobs) await del(blob.url);
+  } catch (e) {}
   
-  // Save new blob
-  await put(DOCS_KEY, JSON.stringify(docs), {
-    access: "public",
-    addRandomSuffix: false,
-  });
+  await put(key, JSON.stringify(docs), { access: "public", addRandomSuffix: false });
 }
 
-export async function addDocument(doc: Document): Promise<void> {
-  const docs = await getDocuments();
+export async function addDocument(doc: Document, companyId: string = "eds"): Promise<void> {
+  const docs = await getDocuments(companyId);
   docs.push(doc);
-  await saveDocuments(docs);
+  await saveDocuments(companyId, docs);
 }
 
-export async function updateDocumentEmbeddings(id: string, embeddings: number[][]): Promise<void> {
-  const docs = await getDocuments();
+export async function updateDocumentEmbeddings(id: string, embeddings: number[][], companyId: string = "eds"): Promise<void> {
+  const docs = await getDocuments(companyId);
   const doc = docs.find(d => d.id === id);
   if (doc) {
     doc.embeddings = embeddings;
-    await saveDocuments(docs);
+    await saveDocuments(companyId, docs);
   }
 }
 
-export async function updateDocumentClassification(id: string, classification: Document["classification"]): Promise<void> {
-  const docs = await getDocuments();
+export async function updateDocumentClassification(id: string, classification: Document["classification"], companyId: string = "eds"): Promise<void> {
+  const docs = await getDocuments(companyId);
   const doc = docs.find(d => d.id === id);
   if (doc) {
     doc.classification = classification;
-    await saveDocuments(docs);
+    await saveDocuments(companyId, docs);
   }
 }
 
-export async function deleteDocument(id: string): Promise<void> {
-  const docs = await getDocuments();
+export async function deleteDocument(id: string, companyId: string = "eds"): Promise<void> {
+  const docs = await getDocuments(companyId);
   const filtered = docs.filter(d => d.id !== id);
-  await saveDocuments(filtered);
+  await saveDocuments(companyId, filtered);
 }
