@@ -221,7 +221,7 @@ export async function POST(request: NextRequest) {
   // Log to analytics
   const wasAnswered = relevantChunks.length > 0;
   try {
-    const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
+    const baseUrl = 'https://sidekick-phi.vercel.app';
     await fetch(`${baseUrl}/api/analytics`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
