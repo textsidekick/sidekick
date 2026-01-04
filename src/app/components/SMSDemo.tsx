@@ -19,6 +19,8 @@ const conversations: Message[][] = [
     { id: 6, text: "El almuerzo es a las 11:30 AM para el primer turno. Es un descanso de 30 minutos. 🍽️", sender: "sidekick", delay: 10000 },
     { id: 7, text: "안전 장비는 어디서 받나요?", sender: "worker", delay: 13000 },
     { id: 8, text: "안전 장비는 도구 보관소에서 받을 수 있습니다. 노란색 구역에서는 안전모가 필수입니다. 🦺", sender: "sidekick", delay: 15000 },
+    { id: 9, text: "Who do I contact in an emergency?", sender: "worker", delay: 18000 },
+    { id: 10, text: "Call 911 for emergencies. Your floor supervisor is Mike Chen (ext. 2847). Assembly point is Parking Lot B. 🚨", sender: "sidekick", delay: 20000 },
   ],
 ];
 
@@ -57,7 +59,7 @@ export default function SMSDemo() {
 
       const restartTimeout = setTimeout(() => {
         runAnimation();
-      }, 20000);
+      }, 25000);
       timeouts.push(restartTimeout);
     };
 
