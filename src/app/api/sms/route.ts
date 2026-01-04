@@ -3,6 +3,22 @@ import Anthropic from "@anthropic-ai/sdk";
 import { getDocuments } from "../documents/store";
 import { getCompanies, getWorkerByPhone, registerWorker, Company, Location } from "../companies/store";
 
+
+function classifyTopic(question: string): string {
+  const q = question.toLowerCase();
+  if (q.includes("park") || q.includes("lot") || q.includes("estacion")) return "parking";
+  if (q.includes("safety") || q.includes("ppe") || q.includes("helmet")) return "safety";
+  if (q.includes("break") || q.includes("lunch") || q.includes("almuerzo")) return "breaks";
+  if (q.includes("pay") || q.includes("wage") || q.includes("salary")) return "compensation";
+  if (q.includes("schedule") || q.includes("shift") || q.includes("hours")) return "schedule";
+  if (q.includes("dress") || q.includes("wear") || q.includes("uniform")) return "dress_code";
+  if (q.includes("benefit") || q.includes("insurance") || q.includes("401k")) return "benefits";
+  if (q.includes("bathroom") || q.includes("restroom") || q.includes("bano")) return "facilities";
+  if (q.includes("wifi") || q.includes("password") || q.includes("internet")) return "it_support";
+  if (q.includes("contact") || q.includes("phone") || q.includes("email")) return "contacts";
+  return "general";
+}
+
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 async function translateToEnglish(query: string): Promise<{ language: string; englishQuery: string }> {
@@ -222,7 +238,7 @@ export async function POST(request: NextRequest) {
 
   // Log to analytics
   const responseTime = Date.now() - startTime;
-  const wasAnswered = relevantChunks.length > 0 && !answer.includes("don't have info");
+  const wasAnswered = relevantChunks.length > 0 && !answer.includes("don't have info") && !answer.includes("don't see") && !answer.includes("no incluyen") && !answer.includes("Please contact") && !answer.includes("check with");
   try {
     const baseUrl = 'https://sidekick-phi.vercel.app';
     await fetch(`${baseUrl}/api/analytics`, {
@@ -236,7 +252,7 @@ export async function POST(request: NextRequest) {
         language: language,
         confidence: wasAnswered ? 0.85 : 0,
         answered: wasAnswered,
-        topic: 'general',
+        topic: classifyTopic(body),
         responseTime: responseTime
       })
     });
