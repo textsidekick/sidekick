@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import SMSDemo from "./components/SMSDemo";
 import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import { 
@@ -145,43 +146,47 @@ export default function Home() {
           <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-violet-200/15 rounded-full blur-[80px]" />
         </div>
 
-        <div className="relative z-10 max-w-5xl mx-auto px-6">
-          <div className={`text-center max-w-3xl mx-auto mb-10 ${isLoaded ? 'fade-up' : 'opacity-0'}`}>
-            {/* Clear one-sentence value prop */}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-5 leading-[1.1]">
-              AI onboarding assistant for
-              <br />
-              <span className="text-blue-600">deskless workers.</span>
-            </h1>
-            
-            {/* Sub-headline: Who + Benefit */}
-            <p className="text-xl text-zinc-600 mb-8 leading-relaxed max-w-2xl mx-auto">
-              For manufacturing, retail, and logistics teams. Reduce early turnover and free up your managers from answering the same questions over and over.
-            </p>
-            
-            {/* Soft CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-              <a 
-                href={calLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3.5 rounded-xl font-medium transition-all shadow-lg shadow-blue-600/20 w-full sm:w-auto justify-center"
-              >
-                Request a Demo <ArrowRight className="w-4 h-4" />
-              </a>
-              <Link 
-                href="/contact"
-                className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-medium bg-white border border-zinc-200 hover:border-zinc-300 transition-all shadow-sm w-full sm:w-auto justify-center"
-              >
-                Talk to Us
-              </Link>
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
+          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+            {/* Left side - Text content */}
+            <div className={`flex-1 text-center lg:text-left ${isLoaded ? 'fade-up' : 'opacity-0'}`}>
+              <h1 className="text-4xl md:text-5xl lg:text-5xl font-bold tracking-tight mb-5 leading-[1.1]">
+                AI onboarding assistant for
+                <br />
+                <span className="text-blue-600">deskless workers.</span>
+              </h1>
+              
+              <p className="text-xl text-zinc-600 mb-8 leading-relaxed max-w-xl">
+                For manufacturing, retail, and logistics teams. Reduce early turnover and free up your managers from answering the same questions over and over.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-4 mb-8">
+                <a 
+                  href={calLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3.5 rounded-xl font-medium transition-all shadow-lg shadow-blue-600/20 w-full sm:w-auto justify-center"
+                >
+                  Request a Demo <ArrowRight className="w-4 h-4" />
+                </a>
+                <Link 
+                  href="/contact"
+                  className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-medium bg-white border border-zinc-200 hover:border-zinc-300 transition-all shadow-sm w-full sm:w-auto justify-center"
+                >
+                  Talk to Us
+                </Link>
+              </div>
+
+              <p className="text-sm text-zinc-500">
+                <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse" />
+                Live with 3 customers across 3 states and 2 countries
+              </p>
             </div>
 
-            {/* Proof of reality */}
-            <p className="text-sm text-zinc-500">
-              <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse" />
-              Live with 3 customers across 3 states and 2 countries
-            </p>
+            {/* Right side - SMS Demo */}
+            <div className={`flex-shrink-0 ${isLoaded ? 'fade-up delay-200' : 'opacity-0'}`}>
+              <SMSDemo />
+            </div>
           </div>
         </div>
       </section>
