@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
+    "@studio-freight/lenis": "^1.0.42",
     "@vercel/blob": "^2.0.0",
     "@vercel/kv": "^3.0.0",
     "anthropic": "^0.0.0",
