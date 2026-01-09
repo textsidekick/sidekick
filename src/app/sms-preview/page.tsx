@@ -255,8 +255,8 @@ const SMSDemo = () => {
         <div className="bg-[#f2f2f7] rounded-[2.8rem] overflow-hidden h-[680px] relative">
           {/* Contact Header - compact */}
           <div className="bg-[#f2f2f7] pt-12 pb-2 px-4 text-center">
-            <div className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center mx-auto mb-1 text-white font-semibold text-base">
-              S
+            <div className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center mx-auto mb-1">
+              <img src="/sidekicklogo-white.png" alt="S" className="w-10 h-10" />
             </div>
             <p className="font-semibold text-zinc-900 text-[15px]">Sidekick</p>
             <p className="text-xs text-zinc-500">+1 (888) 707-4659</p>
@@ -347,9 +347,9 @@ export default function PreviewPage() {
   
   // Rotating text for hero subtitle
   const rotatingPhrases = [
-    "answers worker questions instantly.",
+    "identifies what's missing in your training.",
     "reduces manager interruptions.",
-    "onboards new hires faster.",
+    "requires no app download.",
     "speaks 10+ languages.",
     "works 24/7.",
   ];
@@ -358,22 +358,29 @@ export default function PreviewPage() {
 
   // Static star positions for consistent rendering - positioned on edges to avoid text
   const starPositions = [
-    // Left side stars
-    { left: 3, top: 15, opacity: 0.3 }, { left: 8, top: 35, opacity: 0.4 }, { left: 5, top: 55, opacity: 0.2 },
-    { left: 12, top: 8, opacity: 0.5 }, { left: 10, top: 45, opacity: 0.3 }, { left: 6, top: 68, opacity: 0.4 },
-    { left: 15, top: 25, opacity: 0.3 }, { left: 18, top: 60, opacity: 0.5 }, { left: 4, top: 42, opacity: 0.2 },
-    { left: 14, top: 72, opacity: 0.4 }, { left: 9, top: 18, opacity: 0.3 }, { left: 7, top: 78, opacity: 0.5 },
+    // Scattered across sky - keeping top < 45% to stay above buildings
+    // Varied sizes: 1 = small, 2 = medium, 3 = large
+    { left: 3, top: 8, opacity: 0.6, size: 1 }, { left: 8, top: 22, opacity: 0.8, size: 2 }, { left: 5, top: 38, opacity: 0.5, size: 1 },
+    { left: 12, top: 5, opacity: 0.9, size: 3 }, { left: 10, top: 30, opacity: 0.4, size: 1 }, { left: 6, top: 42, opacity: 0.6, size: 2 },
+    { left: 15, top: 15, opacity: 0.7, size: 1 }, { left: 18, top: 35, opacity: 0.5, size: 2 }, { left: 4, top: 28, opacity: 0.4, size: 1 },
+    { left: 14, top: 44, opacity: 0.6, size: 1 }, { left: 9, top: 12, opacity: 0.8, size: 2 }, { left: 7, top: 20, opacity: 0.5, size: 1 },
+    { left: 2, top: 33, opacity: 0.7, size: 1 }, { left: 11, top: 40, opacity: 0.4, size: 1 }, { left: 16, top: 25, opacity: 0.6, size: 2 },
     // Right side stars
-    { left: 85, top: 12, opacity: 0.4 }, { left: 92, top: 32, opacity: 0.3 }, { left: 88, top: 52, opacity: 0.5 },
-    { left: 95, top: 22, opacity: 0.2 }, { left: 90, top: 65, opacity: 0.4 }, { left: 83, top: 8, opacity: 0.3 },
-    { left: 97, top: 45, opacity: 0.5 }, { left: 86, top: 75, opacity: 0.2 }, { left: 93, top: 58, opacity: 0.4 },
-    { left: 89, top: 38, opacity: 0.3 }, { left: 96, top: 70, opacity: 0.5 }, { left: 84, top: 48, opacity: 0.2 },
-    // Top edge stars (above text)
-    { left: 25, top: 5, opacity: 0.3 }, { left: 40, top: 8, opacity: 0.4 }, { left: 55, top: 4, opacity: 0.2 },
-    { left: 70, top: 7, opacity: 0.5 }, { left: 35, top: 3, opacity: 0.3 }, { left: 60, top: 6, opacity: 0.4 },
-    // Bottom edge stars (below text, but above city)
-    { left: 22, top: 58, opacity: 0.3 }, { left: 78, top: 55, opacity: 0.4 }, { left: 20, top: 62, opacity: 0.2 },
-    { left: 80, top: 60, opacity: 0.5 }, { left: 25, top: 65, opacity: 0.3 }, { left: 75, top: 63, opacity: 0.4 },
+    { left: 85, top: 10, opacity: 0.7, size: 2 }, { left: 92, top: 25, opacity: 0.5, size: 1 }, { left: 88, top: 38, opacity: 0.8, size: 3 },
+    { left: 95, top: 18, opacity: 0.4, size: 1 }, { left: 90, top: 42, opacity: 0.6, size: 1 }, { left: 83, top: 6, opacity: 0.9, size: 2 },
+    { left: 97, top: 32, opacity: 0.5, size: 1 }, { left: 86, top: 44, opacity: 0.4, size: 1 }, { left: 93, top: 40, opacity: 0.7, size: 2 },
+    { left: 89, top: 28, opacity: 0.6, size: 1 }, { left: 96, top: 15, opacity: 0.8, size: 1 }, { left: 84, top: 35, opacity: 0.5, size: 2 },
+    { left: 98, top: 8, opacity: 0.6, size: 1 }, { left: 82, top: 22, opacity: 0.7, size: 1 }, { left: 91, top: 12, opacity: 0.5, size: 1 },
+    // Center-left area (above text)
+    { left: 22, top: 4, opacity: 0.6, size: 1 }, { left: 28, top: 12, opacity: 0.8, size: 2 }, { left: 25, top: 25, opacity: 0.5, size: 1 },
+    { left: 32, top: 8, opacity: 0.7, size: 1 }, { left: 20, top: 18, opacity: 0.4, size: 1 }, { left: 35, top: 20, opacity: 0.6, size: 2 },
+    // Center-right area (above text)
+    { left: 65, top: 6, opacity: 0.7, size: 1 }, { left: 72, top: 15, opacity: 0.5, size: 2 }, { left: 68, top: 28, opacity: 0.8, size: 1 },
+    { left: 78, top: 10, opacity: 0.6, size: 1 }, { left: 62, top: 22, opacity: 0.4, size: 1 }, { left: 75, top: 18, opacity: 0.9, size: 3 },
+    // Top edge - more density
+    { left: 40, top: 3, opacity: 0.5, size: 1 }, { left: 50, top: 6, opacity: 0.7, size: 2 }, { left: 45, top: 10, opacity: 0.4, size: 1 },
+    { left: 55, top: 4, opacity: 0.6, size: 1 }, { left: 38, top: 8, opacity: 0.8, size: 1 }, { left: 58, top: 12, opacity: 0.5, size: 2 },
+    { left: 42, top: 15, opacity: 0.6, size: 1 }, { left: 52, top: 20, opacity: 0.4, size: 1 }, { left: 48, top: 2, opacity: 0.9, size: 2 },
   ];
 
   // Rotate through phrases
@@ -562,9 +569,9 @@ export default function PreviewPage() {
       {/* ============================================ */}
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrollY > 50 ? 'bg-white/90 backdrop-blur-md shadow-sm' : 'bg-transparent'}`}>
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 transition-transform duration-300 hover:scale-105">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="font-bold text-white text-sm">S</span>
+          <Link href="/" className="flex items-center gap-1.5 transition-transform duration-300 hover:scale-105">
+            <div className="w-8 h-8 flex items-center justify-center">
+              <img src={scrollY > 50 ? "/sidekicklogo-blue.png" : "/sidekicklogo-white.png"} alt="Sidekick" className="w-8 h-8" />
             </div>
             <span className={`font-semibold transition-colors duration-300 ${scrollY > 50 ? 'text-zinc-900' : 'text-white'}`}>Sidekick</span>
           </Link>
@@ -589,9 +596,9 @@ export default function PreviewPage() {
       {/* ============================================ */}
       <section 
         ref={heroRef}
-        className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
+        className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden hero-bg"
         style={{
-          backgroundImage: 'url(/hero-background.jpg)', backgroundSize: 'cover', backgroundPosition: 'center bottom',
+          backgroundSize: 'cover', backgroundPosition: 'center bottom',
         }}
       >
         {/* Dark overlay for better text contrast at top */}
@@ -602,19 +609,12 @@ export default function PreviewPage() {
           }}
         />
         
-        {/* Grain texture overlay */}
-        <div 
-          className="absolute inset-0 opacity-20 pointer-events-none"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-          }}
-        />
         {/* Star dots overlay - hidden on mobile */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           {starPositions.map((star, i) => (
             <div
               key={i}
-              className="absolute w-1 h-1 bg-white rounded-full"
+              className={`absolute rounded-full bg-white ${star.size === 3 ? "w-1.5 h-1.5" : star.size === 2 ? "w-1 h-1" : "w-0.5 h-0.5"}`}
               style={{
                 left: `${star.left}%`,
                 top: `${star.top}%`,
@@ -645,7 +645,7 @@ export default function PreviewPage() {
           {/* Subtitle with rotating text */}
           <div className={`${isLoaded ? 'fade-up delay-200' : 'opacity-0'} mb-6`}>
             <p className="text-base md:text-lg text-white/70 max-w-2xl mx-auto leading-relaxed">
-              The AI assistant for manufacturing, retail, and logistics teams that
+              The AI onboarding assistant for deskless teams that:
               <br />
               <span 
                 className={`inline-block font-medium text-white transition-all duration-300 ${
@@ -835,7 +835,7 @@ export default function PreviewPage() {
           {starPositions.slice(0, 30).map((star, i) => (
             <div
               key={i}
-              className="absolute w-1 h-1 bg-white rounded-full"
+              className={`absolute rounded-full bg-white ${star.size === 3 ? "w-1.5 h-1.5" : star.size === 2 ? "w-1 h-1" : "w-0.5 h-0.5"}`}
               style={{
                 left: `${star.left}%`,
                 top: `${star.top}%`,
@@ -1097,7 +1097,7 @@ export default function PreviewPage() {
             {starPositions.slice(10, 35).map((star, i) => (
               <div
                 key={i}
-                className="absolute w-1 h-1 bg-white rounded-full"
+                className={`absolute rounded-full bg-white ${star.size === 3 ? "w-1.5 h-1.5" : star.size === 2 ? "w-1 h-1" : "w-0.5 h-0.5"}`}
                 style={{
                   left: `${star.left}%`,
                   top: `${star.top}%`,
@@ -1139,8 +1139,8 @@ export default function PreviewPage() {
           <div className="grid md:grid-cols-4 gap-8 mb-12">
             <div className="md:col-span-2">
               <Link href="/" className="flex items-center gap-2 mb-4 transition-transform duration-300 hover:scale-105 w-fit">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <span className="font-bold text-white text-sm">S</span>
+                <div className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors duration-300 ${scrollY > 50 ? "" : "bg-white"}`}>
+                  <img src="/sidekicklogo.png" alt="Sidekick" className="w-8 h-8" />
                 </div>
                 <span className="font-semibold text-white">Sidekick</span>
               </Link>
