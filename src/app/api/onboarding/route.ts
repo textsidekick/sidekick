@@ -1,9 +1,85 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCompanies, saveCompanies, Company } from "../companies/store";
-import { put, list, del } from "@vercel/blob";
+import { supabase } from "@/lib/supabase";
+import { createEmbedding } from "@/lib/embeddings";
 import Anthropic from "@anthropic-ai/sdk";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+// Generate a random 6-character access code
+function generateAccessCode(): string {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let result = "";
+  for (let i = 0; i < 6; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
+// Scrape website content
+async function scrapeWebsite(url: string): Promise<string[]> {
+  const chunks: string[] = [];
+  
+  try {
+    // Normalize URL
+    let normalizedUrl = url.trim();
+    if (!normalizedUrl.startsWith("http")) {
+      normalizedUrl = "https://" + normalizedUrl;
+    }
+    
+    // Fetch the main page
+    const response = await fetch(normalizedUrl, {
+      headers: { "User-Agent": "Sidekick-Bot/1.0" },
+    });
+    
+    if (!response.ok) {
+      console.log("[Onboarding] Failed to fetch website:", response.status);
+      return [];
+    }
+    
+    const html = await response.text();
+    
+    // Extract text content (simple extraction)
+    const textContent = html
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+      .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, "")
+      .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, "")
+      .replace(/<header[^>]*>[\s\S]*?<\/header>/gi, "")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/\s+/g, " ")
+      .trim();
+    
+    // Split into chunks of ~500 chars
+    const words = textContent.split(" ");
+    let currentChunk = "";
+    
+    for (const word of words) {
+      if ((currentChunk + " " + word).length > 500) {
+        if (currentChunk.trim().length > 50) {
+          chunks.push("From company website: " + currentChunk.trim());
+        }
+        currentChunk = word;
+      } else {
+        currentChunk += " " + word;
+      }
+    }
+    
+    if (currentChunk.trim().length > 50) {
+      chunks.push("From company website: " + currentChunk.trim());
+    }
+    
+    console.log("[Onboarding] Scraped", chunks.length, "chunks from website");
+    
+  } catch (error) {
+    console.error("[Onboarding] Website scrape error:", error);
+  }
+  
+  return chunks.slice(0, 20); // Limit to 20 chunks
+}
 
 export async function POST(request: NextRequest) {
   console.log("[Onboarding] === API HIT ===");
@@ -11,12 +87,7 @@ export async function POST(request: NextRequest) {
   let data: any;
   try {
     data = await request.json();
-    console.log("[Onboarding] Parsed JSON successfully");
     console.log("[Onboarding] Company:", data.companyName);
-    console.log("[Onboarding] Audio count:", data.audioRecordings?.length || 0);
-    if (data.audioRecordings?.length > 0) {
-      console.log("[Onboarding] First audio base64 length:", data.audioRecordings[0]?.base64?.length || 0);
-    }
   } catch (e) {
     console.error("[Onboarding] JSON parse error:", e);
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
@@ -31,163 +102,174 @@ export async function POST(request: NextRequest) {
     const locationParts = (data.location || "").split(",").map((s: string) => s.trim());
     const city = locationParts[0] || data.companyName;
     const state = locationParts[1] || "";
-    const locationId = `${companyId}-${city.toLowerCase().replace(/\s+/g, "")}`;
+    const locationId = companyId + "-" + city.toLowerCase().replace(/\s+/g, "");
     
-    console.log("[Onboarding] Creating company:", companyId);
-    
-    const newCompany: Company = {
-      id: companyId,
-      name: data.companyName,
-      locations: [{ id: locationId, name: `${data.companyName} ${city}`, city, state }],
-      createdAt: new Date().toISOString(),
-    };
-    
-    const companies = await getCompanies();
-    const existingIndex = companies.findIndex(c => c.id === companyId);
-    if (existingIndex >= 0) {
-      const existing = companies[existingIndex];
-      if (!existing.locations.find(l => l.id === locationId)) {
-        existing.locations.push(newCompany.locations[0]);
-      }
-      companies[existingIndex] = existing;
-    } else {
-      companies.push(newCompany);
+    // Generate unique access code
+    let accessCode = generateAccessCode();
+    let attempts = 0;
+    while (attempts < 10) {
+      const { data: existing } = await supabase
+        .from("companies")
+        .select("id")
+        .eq("access_code", accessCode)
+        .single();
+      
+      if (!existing) break;
+      accessCode = generateAccessCode();
+      attempts++;
     }
-    await saveCompanies(companies);
-    console.log("[Onboarding] Company saved");
+    
+    console.log("[Onboarding] Creating company:", companyId, "with access code:", accessCode);
+    
+    // Upsert company with access code and website
+    const { error: companyError } = await supabase
+      .from("companies")
+      .upsert({ 
+        id: companyId, 
+        name: data.companyName,
+        access_code: accessCode,
+        website_url: data.websiteUrl || null,
+        manager_name: data.managerName || null,
+        manager_phone: data.managerPhone || null,
+      }, { onConflict: "id" });
+    
+    if (companyError) {
+      console.error("[Onboarding] Company error:", companyError);
+    }
     
     const allChunks: string[] = [];
-    const knowledgeSummary = { seedAnswers: 0, documents: 0, audioNotes: 0, total: 0 };
+    const knowledgeSummary = { seedAnswers: 0, documents: 0, audioNotes: 0, websitePages: 0, total: 0 };
+    
+    // Scrape website if provided
+    if (data.websiteUrl) {
+      const websiteChunks = await scrapeWebsite(data.websiteUrl);
+      allChunks.push(...websiteChunks);
+      knowledgeSummary.websitePages = websiteChunks.length;
+    }
     
     // Seed answers
     const seedAnswers = data.seedAnswers || {};
-    const questionMap: Record<number, string> = { 1: "Where should employees park?", 2: "Which entrance should workers use?", 3: "How do workers clock in?", 4: "What PPE is required?", 5: "How long are breaks?", 6: "What is the phone policy?" };
+    const questionMap: Record<number, string> = { 
+      1: "Where should employees park?", 
+      2: "Which entrance should workers use?", 
+      3: "How do workers clock in?", 
+      4: "What PPE is required?", 
+      5: "How long are breaks?", 
+      6: "What is the phone policy?" 
+    };
+    
     for (const [id, answer] of Object.entries(seedAnswers)) {
       const question = questionMap[parseInt(id)];
       if (question && answer) {
         const answerText = Array.isArray(answer) ? answer.join(", ") : String(answer);
-        allChunks.push(`Q: ${question}\nA: ${answerText}`);
+        allChunks.push("Q: " + question + "\nA: " + answerText);
         knowledgeSummary.seedAnswers++;
       }
     }
-    console.log("[Onboarding] Seed answers:", knowledgeSummary.seedAnswers);
     
     if (data.managerName && data.managerPhone) {
-      allChunks.push(`Q: Who is my manager?\nA: Your manager is ${data.managerName} at ${data.managerPhone}.`);
+      allChunks.push("Q: Who is my manager?\nA: Your manager is " + data.managerName + " at " + data.managerPhone + ".");
       knowledgeSummary.seedAnswers++;
     }
     
     if (data.location) {
-      allChunks.push(`Q: Where is the workplace located?\nA: ${data.companyName} is located in ${data.location}.`);
+      allChunks.push("Q: Where is the workplace located?\nA: " + data.companyName + " is located in " + data.location + ".");
       knowledgeSummary.seedAnswers++;
     }
     
-    // Process audio
+    // Process audio recordings if present
     if (data.audioRecordings && Array.isArray(data.audioRecordings) && data.audioRecordings.length > 0) {
       console.log("[Onboarding] Processing audio recordings:", data.audioRecordings.length);
       
       for (let i = 0; i < data.audioRecordings.length; i++) {
         const recording = data.audioRecordings[i];
         const base64Length = recording.base64?.length || 0;
-        console.log(`[Onboarding] Recording ${i}: base64 length = ${base64Length}`);
         
         if (base64Length > 100 && process.env.OPENAI_API_KEY) {
-          console.log("[Onboarding] Attempting Whisper transcription...");
           try {
             const audioBuffer = Buffer.from(recording.base64, "base64");
-            console.log("[Onboarding] Buffer created, size:", audioBuffer.length);
-            
             const file = new File([audioBuffer], "recording.webm", { type: "audio/webm" });
             const formData = new FormData();
             formData.append("file", file);
             formData.append("model", "whisper-1");
             
-            console.log("[Onboarding] Calling Whisper API...");
             const whisperRes = await fetch("https://api.openai.com/v1/audio/transcriptions", {
               method: "POST",
-              headers: { "Authorization": `Bearer ${process.env.OPENAI_API_KEY}` },
+              headers: { "Authorization": "Bearer " + process.env.OPENAI_API_KEY },
               body: formData,
             });
-            
-            console.log("[Onboarding] Whisper status:", whisperRes.status);
             
             if (whisperRes.ok) {
               const whisperData = await whisperRes.json();
               const transcription = whisperData.text || "";
-              console.log("[Onboarding] Transcription:", transcription.slice(0, 100));
               
               if (transcription) {
-                console.log("[Onboarding] Calling Claude to extract Q&A...");
                 const claudeRes = await anthropic.messages.create({
                   model: "claude-sonnet-4-20250514",
                   max_tokens: 1500,
-                  messages: [{ role: "user", content: `Extract Q&A pairs from this voice note about workplace policies:\n\n"${transcription}"\n\nReturn ONLY a JSON array like: [{"question":"...","answer":"..."}]` }]
+                  messages: [{ role: "user", content: 'Extract Q&A pairs from this voice note about workplace policies:\n\n"' + transcription + '"\n\nReturn ONLY a JSON array like: [{"question":"...","answer":"..."}]' }]
                 });
                 
                 const claudeText = claudeRes.content[0].type === "text" ? claudeRes.content[0].text : "[]";
                 const cleaned = claudeText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-                console.log("[Onboarding] Claude response:", cleaned.slice(0, 100));
                 
                 try {
                   const qaPairs = JSON.parse(cleaned);
                   for (const qa of qaPairs) {
-                    allChunks.push(`Q: ${qa.question}\nA: ${qa.answer}`);
+                    allChunks.push("Q: " + qa.question + "\nA: " + qa.answer);
                     knowledgeSummary.audioNotes++;
                   }
-                  console.log("[Onboarding] Added", qaPairs.length, "Q&A from audio");
                 } catch (parseErr) {
-                  console.log("[Onboarding] JSON parse failed, using raw transcription");
-                  allChunks.push(`Q: What did the manager say?\nA: ${transcription}`);
+                  allChunks.push("Q: What did the manager say?\nA: " + transcription);
                   knowledgeSummary.audioNotes++;
                 }
               }
-            } else {
-              const errText = await whisperRes.text();
-              console.error("[Onboarding] Whisper error:", errText);
             }
           } catch (audioErr) {
             console.error("[Onboarding] Audio processing error:", audioErr);
           }
-        } else {
-          console.log("[Onboarding] Skipping audio - too short or no API key");
         }
       }
-    } else {
-      console.log("[Onboarding] No audio recordings in request");
     }
     
     knowledgeSummary.total = allChunks.length;
     console.log("[Onboarding] Total chunks:", allChunks.length);
     
-    // Save to blob
+    // Save chunks to Supabase with embeddings
     if (allChunks.length > 0) {
-      const seedDoc = {
-        id: `seed-${companyId}-${Date.now()}`,
-        name: "Onboarding Knowledge",
-        chunks: allChunks,
-        uploadedAt: new Date().toISOString(),
-        classification: { type: "policy", title: "Onboarding Q&A", confidence: 1 }
-      };
+      const { data: doc, error: docError } = await supabase
+        .from("documents")
+        .insert({
+          company_id: companyId,
+          name: "Onboarding Knowledge",
+          content: allChunks.join("\n\n"),
+        })
+        .select()
+        .single();
       
-      const docsKey = `documents-${companyId}.json`;
-      let existingDocs: any[] = [];
-      try {
-        const { blobs } = await list({ prefix: docsKey });
-        if (blobs.length > 0) {
-          const response = await fetch(blobs[0].url);
-          existingDocs = await response.json();
-          for (const blob of blobs) await del(blob.url);
+      if (docError) {
+        console.error("[Onboarding] Doc error:", docError);
+      } else if (doc) {
+        for (const chunk of allChunks) {
+          try {
+            const embedding = await createEmbedding(chunk);
+            await supabase.from("document_chunks").insert({
+              document_id: doc.id,
+              company_id: companyId,
+              content: chunk,
+              embedding: embedding,
+            });
+          } catch (embErr) {
+            console.error("[Onboarding] Embedding error:", embErr);
+          }
         }
-      } catch (e) {}
-      
-      existingDocs.push(seedDoc);
-      await put(docsKey, JSON.stringify(existingDocs), { access: "public", addRandomSuffix: false });
-      console.log("[Onboarding] Saved to blob");
+      }
+      console.log("[Onboarding] Saved to Supabase");
     }
-
-    const twilioNumber = process.env.TWILIO_PHONE_NUMBER || "+1 (XXX) XXX-XXXX";
+    
+    const twilioNumber = process.env.TWILIO_PHONE_NUMBER || "+1 (888) 707-4659";
+    
     console.log("[Onboarding] DONE - returning success");
-
     return NextResponse.json({ 
       success: true, 
       companyId,
@@ -196,10 +278,9 @@ export async function POST(request: NextRequest) {
       location: { city, state },
       knowledgeSummary,
       twilioNumber,
-      joinCommand: `JOIN ${data.companyName} ${city}`,
-      company: newCompany,
+      accessCode,
+      joinCommand: "JOIN " + accessCode,
     });
-
   } catch (error) {
     console.error("[Onboarding] Error:", error);
     return NextResponse.json({ 
@@ -210,6 +291,14 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
-  const companies = await getCompanies();
+  const { data: companies, error } = await supabase
+    .from("companies")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return NextResponse.json({ companies: [] });
+  }
+
   return NextResponse.json({ companies });
 }

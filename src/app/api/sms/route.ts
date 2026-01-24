@@ -1,531 +1,695 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import { put, list, del } from "@vercel/blob";
+import OpenAI from "openai";
+import twilio from "twilio";
+import { supabase } from "@/lib/supabase";
+import { createEmbedding } from "@/lib/embeddings";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
-interface Worker {
-  phone: string;
-  company: string;
-  location: string;
-  language: string;
-  joinedAt: string;
+const LOW_CONFIDENCE_PHRASES = [
+  "don't have information",
+  "do not have information",
+  "couldn't find",
+  "could not find",
+  "no information",
+  "check with your manager",
+  "not sure",
+  "don't know",
+  "do not know",
+  "unable to find",
+  "not mentioned",
+  "doesn't appear",
+  "does not appear",
+  "no details",
+  "not specified",
+  "consult the employee handbook",
+  "consult your manager"
+];
+
+// Safety keywords that should always surface warnings
+const SAFETY_KEYWORDS = [
+  "lockout", "tagout", "loto", "ppe", "hazard", "chemical", "msds", "sds",
+  "forklift", "crane", "lift", "hot work", "confined space", "fall protection",
+  "electrical", "arc flash", "pressure", "hydraulic", "pneumatic"
+];
+
+function isLowConfidenceAnswer(answer: string): boolean {
+  const lowerAnswer = answer.toLowerCase();
+  return LOW_CONFIDENCE_PHRASES.some(phrase => lowerAnswer.includes(phrase));
 }
 
-interface Manager {
-  phone: string;
-  company: string;
-  name: string;
-  registeredAt: string;
+function containsSafetyTopic(text: string): boolean {
+  const lower = text.toLowerCase();
+  return SAFETY_KEYWORDS.some(keyword => lower.includes(keyword));
 }
 
-async function getWorkers(): Promise<Worker[]> {
-  try {
-    const { blobs } = await list({ prefix: 'workers.json' });
-    if (blobs.length === 0) return [];
-    const response = await fetch(blobs[0].url);
-    return await response.json();
-  } catch (e) {
-    console.error("[SMS] getWorkers error:", e);
+async function searchDocuments(question: string, companyId: string) {
+  const embedding = await createEmbedding(question);
+  
+  const { data, error } = await supabase.rpc("match_documents", {
+    query_embedding: embedding,
+    match_company_id: companyId,
+    match_count: 5,
+  });
+
+  if (error) {
+    console.error("Vector search error:", error);
     return [];
   }
+
+  return data || [];
 }
 
-async function saveWorkers(workers: Worker[]): Promise<void> {
-  const { blobs } = await list({ prefix: 'workers.json' });
-  for (const blob of blobs) await del(blob.url);
-  await put('workers.json', JSON.stringify(workers), { access: 'public', addRandomSuffix: false });
+// ============================================
+// NEW: Image Analysis Functions
+// ============================================
+
+interface ImageAnalysis {
+  description: string;
+  searchQueries: string[];
+  isSafetyRelated: boolean;
+  identifiedItems: string[];
 }
 
-async function getManagers(): Promise<Manager[]> {
+async function fetchImageAsBase64(mediaUrl: string): Promise<{ base64: string; mediaType: string } | null> {
   try {
-    const { blobs } = await list({ prefix: 'managers.json' });
-    if (blobs.length === 0) return [];
-    const response = await fetch(blobs[0].url);
-    return await response.json();
-  } catch (e) {
-    console.error("[SMS] getManagers error:", e);
-    return [];
-  }
-}
-
-async function saveManagers(managers: Manager[]): Promise<void> {
-  const { blobs } = await list({ prefix: 'managers.json' });
-  for (const blob of blobs) await del(blob.url);
-  await put('managers.json', JSON.stringify(managers), { access: 'public', addRandomSuffix: false });
-}
-
-async function getDocuments(companyId: string): Promise<any[]> {
-  try {
-    const { blobs } = await list({ prefix: `documents-${companyId}.json` });
-    if (blobs.length === 0) return [];
-    const response = await fetch(blobs[0].url);
-    return await response.json();
-  } catch (e) {
-    console.error("[SMS] getDocuments error:", e);
-    return [];
-  }
-}
-
-async function saveDocuments(companyId: string, documents: any[]): Promise<void> {
-  const { blobs } = await list({ prefix: `documents-${companyId}.json` });
-  for (const blob of blobs) await del(blob.url);
-  await put(`documents-${companyId}.json`, JSON.stringify(documents), { access: 'public', addRandomSuffix: false });
-}
-
-async function getCompanies(): Promise<any[]> {
-  try {
-    const { blobs } = await list({ prefix: 'companies.json' });
-    if (blobs.length === 0) return [];
-    const response = await fetch(blobs[0].url);
-    return await response.json();
-  } catch (e) {
-    console.error("[SMS] getCompanies error:", e);
-    return [];
-  }
-}
-
-async function processImageWithVision(imageUrl: string, companyName: string): Promise<{ success: boolean; chunks: string[]; summary: string }> {
-  try {
-    console.log("[SMS] Processing image with Claude Vision:", imageUrl);
-    
-    // Twilio media URLs require authentication
-    const accountSid = process.env.TWILIO_ACCOUNT_SID;
-    const authToken = process.env.TWILIO_AUTH_TOKEN;
-    const auth = Buffer.from(`${accountSid}:${authToken}`).toString("base64");
-    
-    const imageResponse = await fetch(imageUrl, {
+    // Twilio requires authentication to fetch media
+    const response = await fetch(mediaUrl, {
       headers: {
-        "Authorization": `Basic ${auth}`
-      }
-    });
-    
-    const imageBuffer = await imageResponse.arrayBuffer();
-    const contentType = imageResponse.headers.get('content-type') || 'image/jpeg';
-    
-    // Make sure we got an actual image, not an error page
-    if (!contentType.startsWith('image/')) {
-      console.error("[SMS] Got non-image response:", contentType);
-      return { success: false, chunks: [], summary: "Failed to fetch image from Twilio" };
-    }
-    
-    const base64Image = Buffer.from(imageBuffer).toString('base64');
-    
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 2000,
-      messages: [{
-        role: "user",
-        content: [
-          {
-            type: "image",
-            source: {
-              type: "base64",
-              media_type: contentType as "image/jpeg" | "image/png" | "image/gif" | "image/webp",
-              data: base64Image,
-            },
-          },
-          {
-            type: "text",
-            text: `This is a workplace photo from ${companyName}. Extract useful information workers might need - schedules, rules, policies, contact info, etc.
-
-Return ONLY JSON:
-{
-  "summary": "Brief description",
-  "qa_pairs": [{"question": "...", "answer": "..."}]
-}
-
-If no useful info: {"summary": "No relevant workplace information found", "qa_pairs": []}`
-          }
-        ]
-      }]
-    });
-
-    const responseText = response.content[0].type === "text" ? response.content[0].text : "{}";
-    const cleaned = responseText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-    const parsed = JSON.parse(cleaned);
-    const chunks = parsed.qa_pairs?.map((qa: any) => `Q: ${qa.question}\nA: ${qa.answer}`) || [];
-    
-    return { success: true, chunks, summary: parsed.summary || "Image processed" };
-  } catch (e) {
-    console.error("[SMS] Vision processing error:", e);
-    return { success: false, chunks: [], summary: "Failed to process image" };
-  }
-}
-
-async function transcribeAudio(audioUrl: string): Promise<string | null> {
-  try {
-    console.log("[SMS] Transcribing audio with Deepgram:", audioUrl);
-    
-    // Fetch audio with Twilio auth
-    const accountSid = process.env.TWILIO_ACCOUNT_SID;
-    const authToken = process.env.TWILIO_AUTH_TOKEN;
-    const auth = Buffer.from(`${accountSid}:${authToken}`).toString("base64");
-    
-    const audioResponse = await fetch(audioUrl, {
-      headers: { "Authorization": `Basic ${auth}` }
-    });
-    
-    const audioBuffer = await audioResponse.arrayBuffer();
-    const contentType = audioResponse.headers.get('content-type') || 'audio/amr';
-    console.log("[SMS] Audio fetched, size:", audioBuffer.byteLength, "type:", contentType);
-    
-    // Send to Deepgram (supports AMR natively + auto language detection!)
-    const deepgramResponse = await fetch('https://api.deepgram.com/v1/listen?model=nova-2&smart_format=true&detect_language=true', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Token ${process.env.DEEPGRAM_API_KEY}`,
-        'Content-Type': contentType,
+        "Authorization": `Basic ${Buffer.from(
+          `${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_TOKEN}`
+        ).toString("base64")}`,
       },
-      body: audioBuffer,
     });
     
-    console.log("[SMS] Deepgram status:", deepgramResponse.status);
-    
-    if (!deepgramResponse.ok) {
-      const errorText = await deepgramResponse.text();
-      console.error("[SMS] Deepgram error:", errorText);
+    if (!response.ok) {
+      console.error("[SMS] Failed to fetch image:", response.status);
       return null;
     }
     
-    const result = await deepgramResponse.json();
-    const transcript = result.results?.channels?.[0]?.alternatives?.[0]?.transcript || null;
-    console.log("[SMS] Transcription:", transcript);
-    return transcript;
-  } catch (e) {
-    console.error("[SMS] Audio transcription error:", e);
+    const contentType = response.headers.get("content-type") || "image/jpeg";
+    const arrayBuffer = await response.arrayBuffer();
+    const base64 = Buffer.from(arrayBuffer).toString("base64");
+    
+    return { base64, mediaType: contentType };
+  } catch (error) {
+    console.error("[SMS] Error fetching image:", error);
     return null;
   }
 }
 
-function detectLanguage(text: string): string {
-  if (/[\u4e00-\u9fff]/.test(text)) return "zh";
-  if (/[\uac00-\ud7af]/.test(text)) return "ko";
-  if (/[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i.test(text)) return "vi";
-  if (/\b(hola|donde|cuando|como|que|por favor|gracias|trabajo)\b/i.test(text)) return "es";
-  return "en";
-}
+async function analyzeImage(base64: string, mediaType: string, workerQuestion?: string): Promise<ImageAnalysis> {
+  const analysisPrompt = `You are an expert manufacturing and industrial assistant. Analyze this image from a factory floor worker.
 
-async function sendSMS(to: string, body: string): Promise<void> {
-  const accountSid = process.env.TWILIO_ACCOUNT_SID;
-  const authToken = process.env.TWILIO_AUTH_TOKEN;
-  const fromNumber = process.env.TWILIO_PHONE_NUMBER;
+${workerQuestion ? `The worker asked: "${workerQuestion}"` : "The worker sent this image without a question."}
 
-  console.log("[SMS] sendSMS called, to:", to, "hasCredentials:", !!accountSid && !!authToken && !!fromNumber);
+Provide a JSON response with:
+1. "description": Brief description of what you see (equipment, parts, conditions, any visible text/labels)
+2. "searchQueries": Array of 2-4 search queries to find relevant SOPs, manuals, or safety procedures (e.g., "forklift safety procedure", "hydraulic press maintenance", "part number 12345")
+3. "isSafetyRelated": Boolean - true if this involves safety equipment, hazards, PPE, lockout/tagout, or dangerous conditions
+4. "identifiedItems": Array of specific items identified (part numbers, equipment names, tool types, PPE items)
 
-  if (!accountSid || !authToken || !fromNumber) {
-    console.error("[SMS] Missing Twilio credentials");
-    return;
-  }
+Focus on manufacturing context: machines, parts, tools, safety equipment, work conditions.
+If you see warning labels, part numbers, or equipment names, include them.
+
+Respond ONLY with valid JSON, no markdown or explanation.`;
 
   try {
-    const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
-    const auth = Buffer.from(`${accountSid}:${authToken}`).toString("base64");
-    
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": `Basic ${auth}`,
-      },
-      body: new URLSearchParams({ To: to, From: fromNumber, Body: body }),
+    const response = await anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 500,
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "image",
+              source: {
+                type: "base64",
+                media_type: mediaType as "image/jpeg" | "image/png" | "image/gif" | "image/webp",
+                data: base64,
+              },
+            },
+            {
+              type: "text",
+              text: analysisPrompt,
+            },
+          ],
+        },
+      ],
     });
+
+    const text = response.content[0].type === "text" ? response.content[0].text : "";
     
-    console.log("[SMS] Twilio response status:", res.status);
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error("[SMS] Twilio error:", errorText);
+    // Parse JSON response
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0]);
     }
-  } catch (e) {
-    console.error("[SMS] sendSMS error:", e);
+    
+    // Fallback if JSON parsing fails
+    return {
+      description: text,
+      searchQueries: [workerQuestion || "equipment identification"],
+      isSafetyRelated: false,
+      identifiedItems: [],
+    };
+  } catch (error) {
+    console.error("[SMS] Image analysis error:", error);
+    return {
+      description: "Unable to analyze image",
+      searchQueries: [workerQuestion || "general inquiry"],
+      isSafetyRelated: false,
+      identifiedItems: [],
+    };
   }
 }
 
-function normalizePhone(phone: string): string {
-  return phone.replace(/\D/g, '').slice(-10);
+async function generateImageResponse(
+  imageAnalysis: ImageAnalysis,
+  relevantChunks: any[],
+  workerName: string,
+  companyName: string,
+  workerQuestion?: string
+): Promise<string> {
+  const context = relevantChunks.map((c: any) => c.content).join("\n\n");
+  
+  // Build a direct, confident response based on what we identified
+  const identifiedItems = imageAnalysis.identifiedItems.length > 0 
+    ? imageAnalysis.identifiedItems.join(", ")
+    : null;
+
+  const systemPrompt = `You are Sidekick, a helpful manufacturing assistant. Give a SHORT, DIRECT answer (under 250 chars).
+
+You analyzed a worker's photo and found:
+- What you see: ${imageAnalysis.description}
+- Specific items: ${identifiedItems || "not specifically identified"}
+- Safety concern: ${imageAnalysis.isSafetyRelated ? "YES" : "no"}
+
+${workerQuestion ? `Worker asked: "${workerQuestion}"` : "Worker wants to know about this item."}
+
+RESPOND DIRECTLY. Examples of GOOD responses:
+- "Those are Phillips head screws. You'll need a #2 Phillips screwdriver."
+- "That's a 3/8" hex bolt. Use a 9/16" wrench or socket."
+- "⚠️ That's a hydraulic line. Depressurize before disconnecting. Need 2 wrenches."
+
+DO NOT say "I don't have information" - you DO have information from the image analysis above.
+DO NOT ask clarifying questions - just answer based on what you see.
+${context ? `\nCompany docs that might help:\n${context}` : ""}`;
+
+  try {
+    const response = await anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 300,
+      messages: [{ role: "user", content: systemPrompt }],
+    });
+
+    if (response.content[0].type === "text") {
+      let answer = response.content[0].text;
+      // If Claude still hedges, use our fallback
+      if (answer.toLowerCase().includes("don't have") || answer.toLowerCase().includes("cannot identify")) {
+        return buildDirectResponse(imageAnalysis, workerQuestion);
+      }
+      return answer;
+    }
+  } catch (error) {
+    console.error("[SMS] Claude error for image response:", error);
+  }
+
+  return buildDirectResponse(imageAnalysis, workerQuestion);
+}
+
+function buildDirectResponse(imageAnalysis: ImageAnalysis, workerQuestion?: string): string {
+  const { description, identifiedItems, isSafetyRelated } = imageAnalysis;
+  
+  // Build the most helpful response we can from the analysis
+  const items = identifiedItems.length > 0 ? identifiedItems.join(", ") : description;
+  
+  if (isSafetyRelated) {
+    return `⚠️ I see: ${items}. Check safety procedures before proceeding.`;
+  }
+  
+  // Try to give tool suggestions based on common items
+  const lowerDesc = description.toLowerCase();
+  if (lowerDesc.includes("screw") && lowerDesc.includes("phillips")) {
+    return `Those are Phillips head screws. You'll need a #2 Phillips screwdriver.`;
+  }
+  if (lowerDesc.includes("screw") && lowerDesc.includes("flat")) {
+    return `Those are flathead screws. You'll need a flathead/slotted screwdriver.`;
+  }
+  if (lowerDesc.includes("bolt") || lowerDesc.includes("hex")) {
+    return `I see hex bolts. You'll need a socket wrench or combination wrench in the matching size.`;
+  }
+  if (lowerDesc.includes("screw")) {
+    return `I see screws - looks like Phillips head. You'll need a Phillips screwdriver (#1 or #2 depending on size).`;
+  }
+  
+  return `I see: ${items}. What specifically would you like to know?`;
+}
+
+// ============================================
+// END: Image Analysis Functions
+// ============================================
+
+async function getAIResponse(systemPrompt: string, userMessage: string): Promise<string> {
+  try {
+    const response = await anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 300,
+      system: systemPrompt,
+      messages: [{ role: "user", content: userMessage }],
+    });
+    
+    if (response.content[0].type === "text") {
+      return response.content[0].text;
+    }
+  } catch (error) {
+    console.error("[SMS] Claude error, falling back to GPT:", error);
+  }
+  
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      max_tokens: 300,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userMessage }
+      ],
+    });
+    
+    return response.choices[0]?.message?.content || "Sorry, I couldn't generate a response.";
+  } catch (error) {
+    console.error("[SMS] GPT error:", error);
+    return "Sorry, I'm having trouble right now. Please try again in a moment.";
+  }
+}
+
+async function sendSMS(to: string, body: string) {
+  try {
+    await twilioClient.messages.create({
+      body,
+      from: process.env.TWILIO_PHONE_NUMBER,
+      to,
+    });
+    return true;
+  } catch (error) {
+    console.error("[SMS] Failed to send:", error);
+    return false;
+  }
+}
+
+async function saveToKnowledgeBase(companyId: string, question: string, answer: string) {
+  try {
+    const chunk = `Q: ${question}\nA: ${answer}`;
+    const embedding = await createEmbedding(chunk);
+    
+    let { data: doc } = await supabase
+      .from("documents")
+      .select("id")
+      .eq("company_id", companyId)
+      .eq("name", "Manager Answers")
+      .single();
+    
+    if (!doc) {
+      const { data: newDoc } = await supabase
+        .from("documents")
+        .insert({
+          company_id: companyId,
+          name: "Manager Answers",
+          content: chunk,
+        })
+        .select()
+        .single();
+      doc = newDoc;
+    }
+    
+    if (doc) {
+      await supabase.from("document_chunks").insert({
+        document_id: doc.id,
+        company_id: companyId,
+        content: chunk,
+        embedding: embedding,
+      });
+    }
+    
+    console.log("[SMS] Saved manager answer to knowledge base");
+    return true;
+  } catch (error) {
+    console.error("[SMS] Failed to save to knowledge base:", error);
+    return false;
+  }
+}
+
+function twimlResponse(message: string): NextResponse {
+  const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response><Message>${message}</Message></Response>`;
+  return new NextResponse(twiml, { headers: { "Content-Type": "text/xml" } });
 }
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
   
   try {
-    let body: string;
-    let from: string;
-    let mediaUrl: string | null = null;
-    let mediaType: string | null = null;
-    let numMedia = 0;
+    const formData = await request.formData();
+    const body = formData.get("Body")?.toString()?.trim() || "";
+    const from = formData.get("From")?.toString() || "";
     
-    const contentType = request.headers.get("content-type") || "";
+    // NEW: Check for media attachments (images)
+    const numMedia = parseInt(formData.get("NumMedia")?.toString() || "0", 10);
+    const mediaUrl = formData.get("MediaUrl0")?.toString();
+    const mediaType = formData.get("MediaContentType0")?.toString();
     
-    if (contentType.includes("application/x-www-form-urlencoded")) {
-      const formData = await request.formData();
-      body = formData.get("Body")?.toString() || "";
-      from = formData.get("From")?.toString() || "";
-      numMedia = parseInt(formData.get("NumMedia")?.toString() || "0");
-      if (numMedia > 0) {
-        mediaUrl = formData.get("MediaUrl0")?.toString() || null;
-        mediaType = formData.get("MediaContentType0")?.toString() || null;
-      }
-    } else {
-      const json = await request.json();
-      body = json.Body || json.message || "";
-      from = json.From || json.from || "";
-      mediaUrl = json.MediaUrl0 || null;
-      mediaType = json.MediaContentType0 || null;
-      numMedia = json.NumMedia || 0;
-    }
+    console.log("[SMS] From:", from, "Body:", body, "NumMedia:", numMedia);
 
-    console.log(`[SMS] From: ${from} | Message: ${body} | Media: ${numMedia} | Type: ${mediaType}`);
-
-    console.log("[SMS] Loading data...");
-    const workers = await getWorkers();
-    const managers = await getManagers();
-    const companies = await getCompanies();
-    console.log("[SMS] Loaded:", workers.length, "workers,", managers.length, "managers,", companies.length, "companies");
+    // Check if this is a manager responding to a question
+    const { data: pendingQuestion } = await supabase
+      .from("questions")
+      .select("*, companies(name)")
+      .eq("pending_manager_response_phone", from)
+      .is("manager_response", null)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single();
     
-    const normalizedFrom = normalizePhone(from);
-    const manager = managers.find(m => normalizePhone(m.phone) === normalizedFrom);
-    const worker = workers.find(w => w.phone === from);
-    
-    console.log("[SMS] Is manager:", !!manager, "Is worker:", !!worker);
-    
-    // Handle MANAGE command
-    const manageMatch = body.match(/^manage\s+(.+)/i);
-    if (manageMatch) {
-      console.log("[SMS] MANAGE command detected");
-      const companySearch = manageMatch[1].trim().toLowerCase();
-      const company = companies.find(c => c.name.toLowerCase().includes(companySearch) || c.id.includes(companySearch));
-      
-      if (company) {
-        console.log("[SMS] Found company:", company.name);
-        const existingIndex = managers.findIndex(m => normalizePhone(m.phone) === normalizedFrom);
-        const newManager: Manager = {
-          phone: from,
-          company: company.id,
-          name: "",
-          registeredAt: new Date().toISOString(),
-        };
+    if (pendingQuestion) {
+      if (body.toUpperCase() === "SKIP") {
+        await supabase
+          .from("questions")
+          .update({ pending_manager_response_phone: null })
+          .eq("id", pendingQuestion.id);
         
-        if (existingIndex >= 0) {
-          managers[existingIndex] = newManager;
-        } else {
-          managers.push(newManager);
-        }
-        
-        console.log("[SMS] Saving manager...");
-        await saveManagers(managers);
-        console.log("[SMS] Manager saved, sending response...");
-        
-        await sendSMS(from, `✅ You're now registered as a manager for ${company.name}!\n\n📸 Text me photos of schedules or signs\n🎤 Send voice messages\n📝 Or text facts like "Parking is in Lot B"`);
-        console.log("[SMS] Response sent");
-      } else {
-        console.log("[SMS] Company not found");
-        await sendSMS(from, `Company not found. Available:\n${companies.map(c => c.name).join(", ")}`);
+        return twimlResponse("Got it, skipped. The worker will figure it out another way.");
       }
       
-      return new NextResponse(
-        `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`,
-        { headers: { "Content-Type": "text/xml" } }
+      const managerAnswer = body;
+      
+      await supabase
+        .from("questions")
+        .update({ 
+          manager_response: managerAnswer,
+          pending_manager_response_phone: null,
+          manager_notified: true
+        })
+        .eq("id", pendingQuestion.id);
+      
+      const companyName = (pendingQuestion.companies as any)?.name || "Your manager";
+      await sendSMS(
+        pendingQuestion.worker_phone,
+        `💬 ${companyName} replied to your question:\n\n"${pendingQuestion.question}"\n\n➡️ ${managerAnswer}`
       );
+      
+      await saveToKnowledgeBase(
+        pendingQuestion.company_id,
+        pendingQuestion.question,
+        managerAnswer
+      );
+      
+      return twimlResponse(`Thanks! I've sent your answer to ${pendingQuestion.worker_name || "the worker"} and saved it for future questions. 👍`);
     }
 
-    // Handle manager sending image
-    if (manager && mediaUrl && mediaType?.startsWith("image/")) {
-      console.log("[SMS] Manager sending image");
-      const company = companies.find(c => c.id === manager.company);
-      const result = await processImageWithVision(mediaUrl, company?.name || "");
-      
-      if (result.success && result.chunks.length > 0) {
-        const documents = await getDocuments(manager.company);
-        documents.push({
-          id: `photo-${Date.now()}`,
-          name: "Photo Upload via SMS",
-          chunks: result.chunks,
-          uploadedAt: new Date().toISOString(),
-        });
-        await saveDocuments(manager.company, documents);
-        await sendSMS(from, `📸 Got it! I learned ${result.chunks.length} thing(s):\n\n${result.summary}`);
-      } else {
-        await sendSMS(from, `📸 Couldn't extract info from that image. Try a clearer photo.`);
-      }
-      
-      return new NextResponse(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`, { headers: { "Content-Type": "text/xml" } });
-    }
+    // Check if worker exists
+    const { data: worker } = await supabase
+      .from("workers")
+      .select("*")
+      .eq("phone", from)
+      .single();
 
-    // Handle manager sending audio
-    if (manager && mediaUrl && mediaType?.startsWith("audio/")) {
-      console.log("[SMS] Manager sending audio");
-      const transcription = await transcribeAudio(mediaUrl);
+    // CASE 0: Check if this is a Y/N response to escalation prompt
+    if (worker && worker.pending_escalation_question_id) {
+      const response = body.toUpperCase().trim();
       
-      if (transcription && transcription.length > 5) {
-        const company = companies.find(c => c.id === manager.company);
+      if (response === "Y" || response === "YES") {
+        const { data: question } = await supabase
+          .from("questions")
+          .select("id, question, company_id")
+          .eq("id", worker.pending_escalation_question_id)
+          .single();
         
-        try {
-          const response = await anthropic.messages.create({
-            model: "claude-sonnet-4-20250514",
-            max_tokens: 1000,
-            messages: [{ role: "user", content: `Convert to Q&A for ${company?.name || "workplace"}:\n\n"${transcription}"\n\nReturn ONLY: [{"question":"...","answer":"..."}]` }]
-          });
-          const text = response.content[0].type === "text" ? response.content[0].text : "[]";
-          const cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-          const qaPairs = JSON.parse(cleaned);
-          const chunks = qaPairs.map((qa: any) => `Q: ${qa.question}\nA: ${qa.answer}`);
+        if (question) {
+          const { data: company } = await supabase
+            .from("companies")
+            .select("name, manager_phone, manager_name")
+            .eq("id", question.company_id)
+            .single();
           
-          if (chunks.length > 0) {
-            const documents = await getDocuments(manager.company);
-            documents.push({
-              id: `voice-${Date.now()}`,
-              name: "Voice Message via SMS",
-              chunks,
-              uploadedAt: new Date().toISOString(),
-            });
-            await saveDocuments(manager.company, documents);
-            await sendSMS(from, `🎤 Got it! I learned ${chunks.length} thing(s) from your voice message:\n\n"${transcription.slice(0, 100)}${transcription.length > 100 ? '...' : ''}"`);
-          } else {
-            await sendSMS(from, `🎤 I heard you but couldn't extract workplace info. Try again?`);
+          if (company?.manager_phone) {
+            await supabase
+              .from("questions")
+              .update({ 
+                manager_notified: true,
+                pending_manager_response_phone: company.manager_phone
+              })
+              .eq("id", question.id);
+            
+            await sendSMS(
+              company.manager_phone,
+              `📋 Sidekick Alert for ${company.name}\n\n${worker.name || "A worker"} asked:\n"${question.question}"\n\n💬 Reply with your answer and I'll send it to them & remember it for next time.\n\nOr reply SKIP to ignore.`
+            );
           }
-        } catch (e) {
-          console.error("[SMS] Error processing voice:", e);
-          await sendSMS(from, `🎤 Couldn't process that voice message. Try again?`);
+          
+          await supabase
+            .from("workers")
+            .update({ pending_escalation_question_id: null })
+            .eq("phone", from);
+          
+          return twimlResponse(`Got it! I've asked ${company?.manager_name || "your manager"}. They can reply directly and I'll forward their answer to you. 👍`);
         }
-      } else {
-        await sendSMS(from, `🎤 I couldn't transcribe that audio. Try speaking more clearly or send a text instead.`);
+      } else if (response === "N" || response === "NO") {
+        await supabase
+          .from("workers")
+          .update({ pending_escalation_question_id: null })
+          .eq("phone", from);
+        
+        return twimlResponse("No problem! Let me know if you have other questions. 👍");
       }
       
-      return new NextResponse(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`, { headers: { "Content-Type": "text/xml" } });
+      await supabase
+        .from("workers")
+        .update({ pending_escalation_question_id: null })
+        .eq("phone", from);
     }
 
-    // Handle manager sending text
-    if (manager && body && !body.toLowerCase().startsWith("join") && !body.toLowerCase().startsWith("manage")) {
-      const isQuestion = body.trim().endsWith("?") || /^(what|where|when|how|who|why)\b/i.test(body);
+    // CASE 1: New user trying to join with access code
+    if (!worker && body.toUpperCase().startsWith("JOIN ")) {
+      const accessCode = body.substring(5).trim().toUpperCase();
       
-      if (!isQuestion && body.length > 10) {
-        console.log("[SMS] Manager adding knowledge via text");
-        const company = companies.find(c => c.id === manager.company);
+      const { data: company } = await supabase
+        .from("companies")
+        .select("id, name, access_code")
+        .eq("access_code", accessCode)
+        .single();
+      
+      if (!company) {
+        const companyName = body.substring(5).trim();
+        const companyId = companyName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
         
-        try {
-          const response = await anthropic.messages.create({
-            model: "claude-sonnet-4-20250514",
-            max_tokens: 1000,
-            messages: [{ role: "user", content: `Convert to Q&A for ${company?.name || "workplace"}:\n\n"${body}"\n\nReturn ONLY: [{"question":"...","answer":"..."}]` }]
-          });
-          const text = response.content[0].type === "text" ? response.content[0].text : "[]";
-          const cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-          const qaPairs = JSON.parse(cleaned);
-          const chunks = qaPairs.map((qa: any) => `Q: ${qa.question}\nA: ${qa.answer}`);
-          
-          if (chunks.length > 0) {
-            const documents = await getDocuments(manager.company);
-            documents.push({
-              id: `text-${Date.now()}`,
-              name: "SMS Knowledge",
-              chunks,
-              uploadedAt: new Date().toISOString(),
-            });
-            await saveDocuments(manager.company, documents);
-            await sendSMS(from, `📝 Got it! Added to knowledge base.`);
-          }
-        } catch (e) {
-          console.error("[SMS] Error processing text:", e);
-          await sendSMS(from, `Couldn't process that. Try again.`);
+        const { data: legacyCompany } = await supabase
+          .from("companies")
+          .select("id, name")
+          .eq("id", companyId)
+          .single();
+        
+        if (!legacyCompany) {
+          return twimlResponse("Sorry, that access code wasn't recognized. Please check with your manager for the correct code.");
         }
         
-        return new NextResponse(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`, { headers: { "Content-Type": "text/xml" } });
-      }
-    }
-    
-    // Handle JOIN command
-    const joinMatch = body.match(/^join\s+(.+)/i);
-    if (joinMatch) {
-      console.log("[SMS] JOIN command");
-      const joinText = joinMatch[1].trim().toLowerCase();
-      
-      let matchedCompany = null;
-      let matchedLocation = null;
-      
-      for (const company of companies) {
-        for (const location of company.locations || []) {
-          const searchStr = `${company.name} ${location.city}`.toLowerCase();
-          if (searchStr.includes(joinText) || joinText.includes(company.name.toLowerCase())) {
-            matchedCompany = company;
-            matchedLocation = location;
-            break;
-          }
-        }
-        if (matchedCompany) break;
-      }
-      
-      if (matchedCompany && matchedLocation) {
-        const newWorker: Worker = {
+        await supabase.from("workers").insert({
           phone: from,
-          company: matchedCompany.id,
-          location: matchedLocation.id,
-          language: "en",
-          joinedAt: new Date().toISOString(),
-        };
+          company_id: legacyCompany.id,
+          name: null,
+          verified: false,
+        });
         
-        const idx = workers.findIndex(w => w.phone === from);
-        if (idx >= 0) workers[idx] = newWorker;
-        else workers.push(newWorker);
-        
-        await saveWorkers(workers);
-        await sendSMS(from, `✅ Welcome to ${matchedCompany.name} - ${matchedLocation.city}!\n\nJust text me any question! 🎉`);
-      } else {
-        await sendSMS(from, `Company not found. Check spelling or ask your manager.`);
+        return twimlResponse(`Welcome to ${legacyCompany.name}! What's your first name?`);
       }
       
-      return new NextResponse(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`, { headers: { "Content-Type": "text/xml" } });
+      await supabase.from("workers").insert({
+        phone: from,
+        company_id: company.id,
+        name: null,
+        verified: false,
+      });
+      
+      return twimlResponse(`Welcome to ${company.name}! 🎉 What's your first name?`);
     }
 
-    // Not registered
-    if (!worker && !manager) {
-      console.log("[SMS] Unregistered user");
-      await sendSMS(from, `👋 Welcome to Sidekick!\n\n📱 Workers: JOIN [company]\n👔 Managers: MANAGE [company]`);
-      return new NextResponse(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`, { headers: { "Content-Type": "text/xml" } });
+    // CASE 2: New user without JOIN command
+    if (!worker) {
+      return twimlResponse("Welcome to Sidekick! 👋 Text JOIN followed by your company's 6-letter code to get started.\n\nExample: JOIN ABC123");
     }
 
-    // Worker question
-    console.log("[SMS] Worker question");
-    const companyId = worker?.company || manager?.company || "";
-    const documents = await getDocuments(companyId);
-    const language = detectLanguage(body);
-
-    const allChunks: string[] = [];
-    for (const doc of documents) {
-      if (doc.chunks) allChunks.push(...doc.chunks);
-    }
-
-    let response: string;
-
-    if (allChunks.length === 0) {
-      response = "I don't have any info set up yet. Please contact your manager.";
-    } else {
-      try {
-        const company = companies.find(c => c.id === companyId);
-        const claudeResponse = await anthropic.messages.create({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 300,
-          system: `You're Sidekick, SMS assistant for ${company?.name || "this company"}. Be concise. Use knowledge base only. Add emoji.`,
-          messages: [{ role: "user", content: `Knowledge:\n${allChunks.join("\n\n")}\n\nQuestion: ${body}` }]
-        });
-        response = claudeResponse.content[0].type === "text" ? claudeResponse.content[0].text : "Please try again.";
-      } catch (e) {
-        console.error("[SMS] Claude error:", e);
-        response = "Sorry, error occurred. Try again.";
+    // CASE 3: Worker exists but hasn't provided name yet
+    if (worker && !worker.name) {
+      const name = body.trim().split(" ")[0];
+      
+      if (name.length < 2 || name.length > 30) {
+        return twimlResponse("Please reply with your first name to get started.");
       }
+      
+      await supabase
+        .from("workers")
+        .update({ name: name, verified: true })
+        .eq("phone", from);
+      
+      const { data: company } = await supabase
+        .from("companies")
+        .select("name")
+        .eq("id", worker.company_id)
+        .single();
+      
+      return twimlResponse(`Thanks ${name}! 🙌 You're all set. Ask me anything about ${company?.name || "your workplace"} - policies, procedures, schedules, and more. You can also send photos of equipment or parts!`);
     }
 
-    await sendSMS(from, response);
-    console.log(`[SMS] Done in ${Date.now() - startTime}ms`);
+    // CASE 4: Registered worker - now with IMAGE SUPPORT
+    const { data: company } = await supabase
+      .from("companies")
+      .select("name, manager_phone, manager_name")
+      .eq("id", worker.company_id)
+      .single();
 
-    return new NextResponse(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`, { headers: { "Content-Type": "text/xml" } });
+    // ============================================
+    // NEW: Handle image messages
+    // ============================================
+    if (numMedia > 0 && mediaUrl) {
+      console.log("[SMS] Processing image from", worker.name, "MediaType:", mediaType);
+      
+      // Fetch and analyze the image
+      const imageData = await fetchImageAsBase64(mediaUrl);
+      
+      if (!imageData) {
+        return twimlResponse("Sorry, I couldn't load that image. Please try sending it again.");
+      }
+      
+      // Analyze the image with Claude Vision
+      const imageAnalysis = await analyzeImage(imageData.base64, imageData.mediaType, body || undefined);
+      
+      console.log("[SMS] Image analysis:", JSON.stringify(imageAnalysis, null, 2));
+      
+      // Search documents using the generated queries
+      let allRelevantChunks: any[] = [];
+      for (const query of imageAnalysis.searchQueries) {
+        const chunks = await searchDocuments(query, worker.company_id);
+        allRelevantChunks = [...allRelevantChunks, ...chunks];
+      }
+      
+      // Also search with any identified items
+      for (const item of imageAnalysis.identifiedItems) {
+        const chunks = await searchDocuments(item, worker.company_id);
+        allRelevantChunks = [...allRelevantChunks, ...chunks];
+      }
+      
+      // Deduplicate chunks by content
+      const uniqueChunks = allRelevantChunks.filter((chunk, index, self) =>
+        index === self.findIndex(c => c.content === chunk.content)
+      ).slice(0, 5); // Keep top 5
+      
+      const bestSimilarity = uniqueChunks.length > 0 
+        ? Math.round(Math.max(...uniqueChunks.map(c => c.similarity)) * 100)
+        : 0;
+      
+      // Generate response
+      const answer = await generateImageResponse(
+        imageAnalysis,
+        uniqueChunks,
+        worker.name || "Worker",
+        company?.name || "your company",
+        body || undefined
+      );
+      
+      const responseTime = Date.now() - startTime;
+      const lowConfidence = isLowConfidenceAnswer(answer) || bestSimilarity < 40;
+      
+      // Log the question (include image info)
+      const questionText = body 
+        ? `[IMAGE] ${body}` 
+        : `[IMAGE] ${imageAnalysis.description}`;
+      
+      const { data: questionRecord } = await supabase.from("questions").insert({
+        company_id: worker.company_id,
+        worker_phone: from,
+        worker_name: worker.name,
+        question: questionText,
+        answer: answer,
+        confidence: bestSimilarity,
+        response_time_ms: responseTime,
+        manager_notified: false,
+        // You could add: image_url: mediaUrl (if you want to store it)
+      }).select().single();
+
+      // For safety-related images with low confidence, always offer escalation
+      if ((imageAnalysis.isSafetyRelated || lowConfidence) && company?.manager_phone && questionRecord) {
+        await supabase
+          .from("workers")
+          .update({ pending_escalation_question_id: questionRecord.id })
+          .eq("phone", from);
+        
+        const safetyPrefix = imageAnalysis.isSafetyRelated ? "⚠️ SAFETY: " : "";
+        return twimlResponse(`${safetyPrefix}${answer}\n\n---\nWant me to ask ${company.manager_name || "your manager"} about this?\n\nReply Y/N`);
+      }
+
+      return twimlResponse(answer);
+    }
+    // ============================================
+    // END: Handle image messages
+    // ============================================
     
-  } catch (error) {
-    console.error("[SMS] FATAL ERROR:", error);
-    return new NextResponse(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`, { headers: { "Content-Type": "text/xml" } });
-  }
-}
+    // CASE 5: Regular text question (existing logic)
+    const relevantChunks = await searchDocuments(body, worker.company_id);
+    const context = relevantChunks.map((c: any) => c.content).join("\n\n");
+    
+    const similarityScore = relevantChunks.length > 0 
+      ? Math.round(relevantChunks[0].similarity * 100) 
+      : 0;
 
-export async function GET() {
-  return NextResponse.json({ status: "SMS endpoint active" });
+    // Enhanced system prompt for manufacturing context
+    const isSafetyQuestion = containsSafetyTopic(body);
+    const systemPrompt = `You are Sidekick, a helpful workplace assistant for ${worker.name || "a worker"} at ${company?.name || "their company"}.
+
+${isSafetyQuestion ? `⚠️ SAFETY QUESTION DETECTED - Always:
+1. Lead with any safety warnings or required PPE
+2. Reference specific SOPs when available (e.g., "According to SOP-12...")
+3. If unsure about any safety procedure, say so and recommend checking with supervisor
+4. Never guess on lockout/tagout, chemical handling, or equipment procedures` : ""}
+
+Answer questions based on the provided context. Be concise, friendly, and helpful. Keep responses under 300 characters for SMS.
+If you reference a specific document or SOP, mention it.
+If you don't have enough information to answer, say so honestly and mention they should check with their manager.`;
+    
+    const userMessage = context
+      ? `Context from company documents:\n${context}\n\nQuestion: ${body}`
+      : `Question: ${body}\n\nNote: No relevant documents found. Provide a helpful general response and mention they should check with their manager for specific policies.`;
+
+    const answer = await getAIResponse(systemPrompt, userMessage);
+    
+    const responseTime = Date.now() - startTime;
+    const lowConfidence = isLowConfidenceAnswer(answer);
+
+    const { data: questionRecord } = await supabase.from("questions").insert({
+      company_id: worker.company_id,
+      worker_phone: from,
+      worker_name: worker.name,
+      question: body,
+      answer: answer,
+      confidence: similarityScore,
+      response_time_ms: responseTime,
+      manager_notified: false,
+    }).select().single();
+
+    if (lowConfidence && company?.manager_phone && questionRecord) {
+      await supabase
+        .from("workers")
+        .update({ pending_escalation_question_id: questionRecord.id })
+        .eq("phone", from);
+      
+      return twimlResponse(`${answer}\n\n---\n⚠️ Want me to notify ${company.manager_name || "your manager"} about this question?\n\nReply Y for Yes, N for No`);
+    }
+
+    return twimlResponse(answer);
+
+  } catch (error) {
+    console.error("[SMS] Error:", error);
+    return twimlResponse("Sorry, I encountered an error. Please try again in a moment.");
+  }
 }

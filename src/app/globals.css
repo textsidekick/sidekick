@@ -111,18 +111,3 @@ body {
 }
 
 /* Responsive hero background */
-.hero-bg {
-  background-image: url(/hero-sidekick.jpg);
-  background-size: cover;
-  background-position: center bottom;
-  background-repeat: no-repeat;
-  background-color: #070d18;
-}
-
-
-@media (max-width: 768px) {
-  .hero-bg {
-    background-size: 100% auto;
-    background-position: 75% bottom !important;
-  }
-}

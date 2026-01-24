@@ -1,4 +1,4 @@
-import { put, list, del } from "@vercel/blob";
+import { supabase } from "@/lib/supabase";
 
 export interface Location {
   id: string;
@@ -11,114 +11,96 @@ export interface Company {
   id: string;
   name: string;
   locations: Location[];
-  createdAt: string;
+  createdAt?: string;
 }
 
-export interface WorkerRegistration {
+export interface Worker {
   phone: string;
   companyId: string;
   locationId: string;
   registeredAt: string;
 }
 
-const COMPANIES_KEY = "companies.json";
-const WORKERS_KEY = "workers.json";
-
-function getDefaultCompanies(): Company[] {
-  return [
-    { 
-      id: "eds", 
-      name: "EDS Manufacturing", 
-      locations: [
-        { id: "eds-santaclara", name: "EDS Santa Clara", city: "Santa Clara", state: "CA" },
-        { id: "eds-sanjose", name: "EDS San Jose", city: "San Jose", state: "CA" },
-        { id: "eds-seoul", name: "EDS Seoul", city: "Seoul", state: "South Korea" },
-      ],
-      createdAt: new Date().toISOString() 
-    },
-    { 
-      id: "trinethra", 
-      name: "Trinethra Supermarket", 
-      locations: [
-        { id: "trinethra-fremont", name: "Trinethra Fremont", city: "Fremont", state: "CA" },
-        { id: "trinethra-sunnyvale", name: "Trinethra Sunnyvale", city: "Sunnyvale", state: "CA" },
-      ],
-      createdAt: new Date().toISOString() 
-    },
-    { 
-      id: "jfm", 
-      name: "Jim Falk Motors", 
-      locations: [
-        { id: "jfm-kahului", name: "Jim Falk Motors Kahului", city: "Kahului", state: "HI" },
-        { id: "jfm-clinton", name: "Jim Falk Motors Clinton", city: "Clinton", state: "MO" },
-      ],
-      createdAt: new Date().toISOString() 
-    },
-  ];
-}
-
-async function fetchBlob(key: string): Promise<unknown | null> {
-  try {
-    const { blobs } = await list({ prefix: key });
-    if (blobs.length === 0) return null;
-    const response = await fetch(blobs[0].url);
-    return await response.json();
-  } catch (e) {
-    console.error("Blob fetch error:", e);
-    return null;
-  }
-}
-
-async function saveBlob(key: string, data: unknown): Promise<void> {
-  try {
-    const { blobs } = await list({ prefix: key });
-    for (const blob of blobs) await del(blob.url);
-  } catch (e) {}
-  await put(key, JSON.stringify(data), { access: "public", addRandomSuffix: false });
-}
-
 export async function getCompanies(): Promise<Company[]> {
-  const data = await fetchBlob(COMPANIES_KEY);
-  return (data as Company[]) || getDefaultCompanies();
+  const { data, error } = await supabase
+    .from("companies")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching companies:", error);
+    return [];
+  }
+
+  return (data || []).map((c: any) => ({
+    id: c.id,
+    name: c.name,
+    locations: c.locations || [],
+    createdAt: c.created_at,
+  }));
 }
 
 export async function saveCompanies(companies: Company[]): Promise<void> {
-  await saveBlob(COMPANIES_KEY, companies);
+  for (const company of companies) {
+    const { error } = await supabase
+      .from("companies")
+      .upsert({
+        id: company.id,
+        name: company.name,
+        created_at: company.createdAt || new Date().toISOString(),
+      }, { onConflict: "id" });
+
+    if (error) {
+      console.error("Error saving company:", error);
+    }
+  }
 }
 
-export async function getWorkers(): Promise<WorkerRegistration[]> {
-  const data = await fetchBlob(WORKERS_KEY);
-  return (data as WorkerRegistration[]) || [];
-}
+export async function getCompany(id: string): Promise<Company | null> {
+  const { data, error } = await supabase
+    .from("companies")
+    .select("*")
+    .eq("id", id)
+    .single();
 
-export async function saveWorkers(workers: WorkerRegistration[]): Promise<void> {
-  await saveBlob(WORKERS_KEY, workers);
-}
+  if (error) {
+    console.error("Error fetching company:", error);
+    return null;
+  }
 
-export async function getWorkerByPhone(phone: string): Promise<WorkerRegistration | null> {
-  const workers = await getWorkers();
-  const normalized = phone.replace(/\D/g, "").slice(-10);
-  return workers.find(w => w.phone.replace(/\D/g, "").slice(-10) === normalized) || null;
+  return data;
 }
 
 export async function registerWorker(phone: string, companyId: string, locationId: string): Promise<void> {
-  const workers = await getWorkers();
-  const normalized = phone.replace(/\D/g, "").slice(-10);
-  const filtered = workers.filter(w => w.phone.replace(/\D/g, "").slice(-10) !== normalized);
-  filtered.push({ phone, companyId, locationId, registeredAt: new Date().toISOString() });
-  await saveWorkers(filtered);
+  const { error } = await supabase
+    .from("workers")
+    .upsert({
+      phone,
+      company_id: companyId,
+      location_id: locationId,
+      verified: false,
+    }, { onConflict: "phone" });
+
+  if (error) {
+    console.error("Error registering worker:", error);
+  }
 }
 
-export async function getCompanyByPhone(phone: string): Promise<Company | null> {
-  const worker = await getWorkerByPhone(phone);
-  if (!worker) return null;
-  const companies = await getCompanies();
-  return companies.find(c => c.id === worker.companyId) || null;
-}
+export async function getWorkers(): Promise<Worker[]> {
+  const { data, error } = await supabase
+    .from("workers")
+    .select("*")
+    .order("created_at", { ascending: false });
 
-export async function assignPhoneToCompany(phone: string, companyId: string): Promise<void> {
-  const companies = await getCompanies();
-  const company = companies.find(c => c.id === companyId);
-  const defaultLocation = company?.locations[0]?.id || companyId;
-  await registerWorker(phone, companyId, defaultLocation);
+  if (error) {
+    console.error("Error fetching workers:", error);
+    return [];
+  }
+
+  return (data || []).map((w: any) => ({
+    phone: w.phone,
+    companyId: w.company_id,
+    locationId: w.location_id,
+    registeredAt: w.created_at,
+  }));
 }

@@ -1,75 +1,69 @@
-import { put, list, del } from "@vercel/blob";
+import { supabase } from "@/lib/supabase";
 
 export interface Document {
   id: string;
   name: string;
-  type: string;
-  size: number;
-  content: string;
-  uploadedAt: string;
-  chunks: string[];
-  embeddings?: number[][];
-  classification?: {
-    type: string;
-    title: string;
-    confidence: number;
+  content?: string;
+  companyId: string;
+  createdAt?: string;
+}
+
+export async function getDocuments(companyId: string): Promise<Document[]> {
+  const { data, error } = await supabase
+    .from("documents")
+    .select("*")
+    .eq("company_id", companyId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching documents:", error);
+    return [];
+  }
+
+  return (data || []).map((d: any) => ({
+    id: d.id,
+    name: d.name,
+    content: d.content,
+    companyId: d.company_id,
+    createdAt: d.created_at,
+  }));
+}
+
+export async function saveDocument(doc: Omit<Document, "id">): Promise<Document | null> {
+  const { data, error } = await supabase
+    .from("documents")
+    .insert({
+      name: doc.name,
+      content: doc.content,
+      company_id: doc.companyId,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error saving document:", error);
+    return null;
+  }
+
+  return {
+    id: data.id,
+    name: data.name,
+    content: data.content,
+    companyId: data.company_id,
+    createdAt: data.created_at,
   };
 }
 
-function getDocsKey(companyId: string): string {
-  return `documents-${companyId}.json`;
-}
+export async function deleteDocument(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from("documents")
+    .delete()
+    .eq("id", id);
 
-export async function getDocuments(companyId: string = "eds"): Promise<Document[]> {
-  try {
-    const key = getDocsKey(companyId);
-    const { blobs } = await list({ prefix: key });
-    if (blobs.length === 0) return [];
-    
-    const response = await fetch(blobs[0].url);
-    return await response.json();
-  } catch (e) {
-    console.error("Blob get error:", e);
-    return [];
+  if (error) {
+    console.error("Error deleting document:", error);
+    return false;
   }
-}
 
-async function saveDocuments(companyId: string, docs: Document[]): Promise<void> {
-  const key = getDocsKey(companyId);
-  try {
-    const { blobs } = await list({ prefix: key });
-    for (const blob of blobs) await del(blob.url);
-  } catch (e) {}
-  
-  await put(key, JSON.stringify(docs), { access: "public", addRandomSuffix: false });
-}
-
-export async function addDocument(doc: Document, companyId: string = "eds"): Promise<void> {
-  const docs = await getDocuments(companyId);
-  docs.push(doc);
-  await saveDocuments(companyId, docs);
-}
-
-export async function updateDocumentEmbeddings(id: string, embeddings: number[][], companyId: string = "eds"): Promise<void> {
-  const docs = await getDocuments(companyId);
-  const doc = docs.find(d => d.id === id);
-  if (doc) {
-    doc.embeddings = embeddings;
-    await saveDocuments(companyId, docs);
-  }
-}
-
-export async function updateDocumentClassification(id: string, classification: Document["classification"], companyId: string = "eds"): Promise<void> {
-  const docs = await getDocuments(companyId);
-  const doc = docs.find(d => d.id === id);
-  if (doc) {
-    doc.classification = classification;
-    await saveDocuments(companyId, docs);
-  }
-}
-
-export async function deleteDocument(id: string, companyId: string = "eds"): Promise<void> {
-  const docs = await getDocuments(companyId);
-  const filtered = docs.filter(d => d.id !== id);
-  await saveDocuments(companyId, filtered);
+  return true;
 }

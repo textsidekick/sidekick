@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "step": "01",
+    "title": "Build Your Knowledge Base",
+    "titleLarge": "Upload everything your workers need to know",
+    "img": "/images/project/project-1.webp",
+    "category": "Setup",
+    "shortDesc": "Upload employee handbooks, SOPs, training docs, and even audio recordings. Sidekick learns it all instantly.",
+    "dataFilter": "setup"
+  },
+  {
+    "id": 2,
+    "step": "02",
+    "title": "Get Your Location Code",
+    "titleLarge": "One simple code connects your entire team",
+    "img": "/images/project/project-2.webp",
+    "category": "Setup",
+    "shortDesc": "Each location gets a unique code. Share it with workers—that's all they need to get started.",
+    "dataFilter": "setup"
+  },
+  {
+    "id": 3,
+    "step": "03",
+    "title": "Workers Text & Ask",
+    "titleLarge": "No app, no training, no friction",
+    "img": "/images/project/project-3.webp",
+    "category": "Worker",
+    "shortDesc": "Workers text the code to join, then ask questions in any language via text or voice memo. Instant answers 24/7.",
+    "dataFilter": "worker"
+  },
+  {
+    "id": 4,
+    "step": "04",
+    "title": "Track & Improve",
+    "titleLarge": "See what's working and what's missing",
+    "img": "/images/project/project-4.webp",
+    "category": "Manager",
+    "shortDesc": "Your dashboard shows trending questions, knowledge gaps, and AI-suggested improvements to your training materials.",
+    "dataFilter": "manager"
+  }
+]
