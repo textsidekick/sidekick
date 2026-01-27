@@ -929,14 +929,6 @@ export default function ManagerDashboard() {
       companyId={selectedCompany}
       darkMode={darkMode}
     />
-
-    {/* QuickBooks Integration */}
-      companyId={selectedCompany}
-      darkMode={darkMode}
-      onEmployeesImported={(count) => {
-        console.log(`Imported ${count} employees from QuickBooks`);
-      }}
-    />
             <div className={`${darkMode ? "bg-gray-800 border-gray-600" : "bg-white border-gray-200"} rounded-xl border-2 border-dashed p-8 text-center hover:border-blue-400 transition-colors`}><input type="file" id="upload" className="hidden" accept=".pdf,.txt,.doc,.docx,.xlsx,.csv" onChange={handleUpload} disabled={uploading} /><label htmlFor="upload" className="cursor-pointer"><Upload className={`w-10 h-10 mx-auto mb-3 ${darkMode ? "text-gray-500" : "text-gray-400"}`} /><p className={`font-medium mb-1 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>{uploading ? "Uploading..." : "Drop files here or click to upload"}</p><p className={`text-sm ${darkMode ? "text-gray-500" : "text-gray-400"}`}>PDF, Word, Excel, or text files</p></label></div>
             <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border`}><div className={`px-4 py-3 border-b flex items-center justify-between ${darkMode ? "border-gray-700" : "border-gray-100"}`}><h3 className={`font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>{documents.length} Documents</h3><button onClick={() => fetch(`/api/documents?companyId=${selectedCompany}`).then(r => r.json()).then(d => setDocuments(d.documents || []))} className={darkMode ? "text-gray-500" : "text-gray-400"}><RefreshCw className="w-4 h-4" /></button></div><div className={`divide-y ${darkMode ? "divide-gray-700" : "divide-gray-100"}`}>{documents.length === 0 ? <div className={`p-8 text-center ${darkMode ? "text-gray-500" : "text-gray-500"}`}><FileText className="w-10 h-10 mx-auto mb-2 opacity-30" /><p>No documents uploaded yet</p></div> : documents.map(doc => (<div key={doc.id} className={`p-4 flex items-center justify-between ${darkMode ? "hover:bg-gray-700" : "hover:bg-gray-50"}`}><div className="flex items-center gap-3"><div className={`w-10 h-10 rounded-lg flex items-center justify-center ${darkMode ? "bg-blue-900" : "bg-blue-50"}`}><FileText className="w-5 h-5 text-blue-500" /></div><div><p className={`font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>{doc.name}</p><p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>{doc.classification?.title || "Processing..."}</p></div></div><button onClick={() => handleDelete(doc.id)} className={`p-2 rounded-lg ${darkMode ? "text-gray-500 hover:text-red-400" : "text-gray-400 hover:text-red-500"}`}><Trash2 className="w-5 h-5" /></button></div>))}</div></div>
           </div>
