@@ -46,6 +46,119 @@ function containsSafetyTopic(text: string): boolean {
   return SAFETY_KEYWORDS.some(keyword => lower.includes(keyword));
 }
 
+// ============================================
+// Issue/Problem Detection
+// ============================================
+interface IssueAnalysis {
+  isIssue: boolean;
+  equipment: string | null;
+  severity: "low" | "medium" | "high";
+}
+
+const ISSUE_PATTERNS = [
+  /\b(broken|broke|down|not working|stopped|failed|failure|malfunction|stuck|jammed|jam|leaking|leak|overheating|overheat|smoking|smoke|sparking|spark|noise|loud|grinding|vibrating|vibration|error|alarm|warning|damaged|damage|cracked|crack)\b/i,
+  /\b(won't start|won't turn on|won't run|doesn't work|isn't working|stopped working|quit working)\b/i,
+  /\b(needs repair|needs fix|needs maintenance|out of order|oo[o]?)\b/i,
+  /\b(problem with|issue with|trouble with|something wrong)\b/i,
+];
+
+const EQUIPMENT_PATTERNS = [
+  /\b(machine|line|press|conveyor|belt|pump|motor|compressor|valve|tank|forklift|crane|hoist|drill|saw|grinder|welder|robot|arm|station|cell)\s*#?\s*(\d+|[a-z])\b/i,
+  /\b(machine|line|press|conveyor|belt|pump|motor|compressor|valve|tank|forklift|crane|hoist|drill|saw|grinder|welder|robot|arm|station|cell)\b/i,
+];
+
+const HIGH_SEVERITY_KEYWORDS = [
+  "fire", "smoke", "smoking", "spark", "sparking", "explosion", "injury", "injured", "hurt",
+  "emergency", "dangerous", "hazard", "leak", "leaking", "gas", "chemical", "spill"
+];
+
+// ============================================
+// Safety Checklist Configuration
+// ============================================
+const CHECKLIST_ITEMS = [
+  { id: "ppe", label: "PPE on", emoji: "🥽" },
+  { id: "loto", label: "LOTO performed", emoji: "🔒" },
+  { id: "equipment", label: "Equipment inspected", emoji: "🔧" },
+];
+
+function parseChecklistResponse(response: string): { ppe: boolean | null; loto: boolean | null; equipment: boolean | null } {
+  const normalized = response.toUpperCase().replace(/[^YN]/g, " ").trim().split(/\s+/);
+  
+  return {
+    ppe: normalized[0] === "Y" ? true : normalized[0] === "N" ? false : null,
+    loto: normalized[1] === "Y" ? true : normalized[1] === "N" ? false : null,
+    equipment: normalized[2] === "Y" ? true : normalized[2] === "N" ? false : null,
+  };
+}
+
+function formatChecklistResult(results: { ppe: boolean | null; loto: boolean | null; equipment: boolean | null }): { message: string; hasFailures: boolean; failures: string[] } {
+  const failures: string[] = [];
+  let message = "";
+  
+  // PPE
+  if (results.ppe === true) {
+    message += "✅ PPE: Good\n";
+  } else if (results.ppe === false) {
+    message += "❌ PPE: NOT WORN\n";
+    failures.push("PPE not worn");
+  } else {
+    message += "⚠️ PPE: No response\n";
+  }
+  
+  // LOTO
+  if (results.loto === true) {
+    message += "✅ LOTO: Good\n";
+  } else if (results.loto === false) {
+    message += "❌ LOTO: NOT PERFORMED\n";
+    failures.push("LOTO not performed");
+  } else {
+    message += "⚠️ LOTO: No response\n";
+  }
+  
+  // Equipment
+  if (results.equipment === true) {
+    message += "✅ Equipment: Good";
+  } else if (results.equipment === false) {
+    message += "❌ Equipment: NOT INSPECTED";
+    failures.push("Equipment not inspected");
+  } else {
+    message += "⚠️ Equipment: No response";
+  }
+  
+  return { message, hasFailures: failures.length > 0, failures };
+}
+
+function detectIssueReport(text: string): IssueAnalysis {
+  const lower = text.toLowerCase();
+  
+  // Check if this looks like an issue report
+  const isIssue = ISSUE_PATTERNS.some(pattern => pattern.test(text));
+  
+  if (!isIssue) {
+    return { isIssue: false, equipment: null, severity: "low" };
+  }
+  
+  // Try to extract equipment reference
+  let equipment: string | null = null;
+  for (const pattern of EQUIPMENT_PATTERNS) {
+    const match = text.match(pattern);
+    if (match) {
+      equipment = match[0];
+      break;
+    }
+  }
+  
+  // Determine severity
+  let severity: "low" | "medium" | "high" = "medium";
+  if (HIGH_SEVERITY_KEYWORDS.some(keyword => lower.includes(keyword))) {
+    severity = "high";
+  } else if (lower.includes("minor") || lower.includes("small") || lower.includes("little")) {
+    severity = "low";
+  }
+  
+  return { isIssue, equipment, severity };
+}
+
 async function searchDocuments(question: string, companyId: string) {
   const embedding = await createEmbedding(question);
   
@@ -58,6 +171,22 @@ async function searchDocuments(question: string, companyId: string) {
   if (error) {
     console.error("Vector search error:", error);
     return [];
+  }
+
+  // Enrich with document names for source attribution
+  if (data && data.length > 0) {
+    const documentIds = [...new Set(data.map((d: any) => d.document_id))];
+    const { data: docs } = await supabase
+      .from("documents")
+      .select("id, name")
+      .in("id", documentIds);
+    
+    const docNameMap = new Map(docs?.map((d: any) => [d.id, d.name]) || []);
+    
+    return data.map((chunk: any) => ({
+      ...chunk,
+      document_name: docNameMap.get(chunk.document_id) || null,
+    }));
   }
 
   return data || [];
@@ -177,6 +306,15 @@ async function generateImageResponse(
 ): Promise<string> {
   const context = relevantChunks.map((c: any) => c.content).join("\n\n");
   
+  // Get unique source documents for attribution
+  const sourceDocuments = [...new Set(relevantChunks
+    .map((c: any) => c.document_name)
+    .filter(Boolean)
+  )];
+  const sourcesHint = sourceDocuments.length > 0 
+    ? `\nIf using company docs, cite the source: ${sourceDocuments.join(", ")}`
+    : "";
+  
   // Build a direct, confident response based on what we identified
   const identifiedItems = imageAnalysis.identifiedItems.length > 0 
     ? imageAnalysis.identifiedItems.join(", ")
@@ -194,10 +332,10 @@ ${workerQuestion ? `Worker asked: "${workerQuestion}"` : "Worker wants to know a
 RESPOND DIRECTLY. Examples of GOOD responses:
 - "Those are Phillips head screws. You'll need a #2 Phillips screwdriver."
 - "That's a 3/8" hex bolt. Use a 9/16" wrench or socket."
-- "⚠️ That's a hydraulic line. Depressurize before disconnecting. Need 2 wrenches."
+- "Per Safety Manual: ⚠️ Hydraulic line - depressurize before disconnecting."
 
 DO NOT say "I don't have information" - you DO have information from the image analysis above.
-DO NOT ask clarifying questions - just answer based on what you see.
+DO NOT ask clarifying questions - just answer based on what you see.${sourcesHint}
 ${context ? `\nCompany docs that might help:\n${context}` : ""}`;
 
   try {
@@ -542,12 +680,126 @@ export async function POST(request: NextRequest) {
       return twimlResponse(`Thanks ${name}! 🙌 You're all set. Ask me anything about ${company?.name || "your workplace"} - policies, procedures, schedules, and more. You can also send photos of equipment or parts!`);
     }
 
-    // CASE 4: Registered worker - now with IMAGE SUPPORT
+    // CASE 4: Registered worker - get company info
     const { data: company } = await supabase
       .from("companies")
       .select("name, manager_phone, manager_name")
       .eq("id", worker.company_id)
       .single();
+
+    // ============================================
+    // CHECKLIST: Start checklist
+    // ============================================
+    if (body.toUpperCase() === "CHECKLIST" || body.toUpperCase() === "CHECK" || body.toUpperCase() === "SAFETY") {
+      // Mark worker as having pending checklist
+      await supabase
+        .from("workers")
+        .update({ pending_checklist: true })
+        .eq("phone", from);
+      
+      return twimlResponse(`🔒 Shift Safety Check\n\n1. PPE on? (Y/N)\n2. LOTO performed? (Y/N)\n3. Equipment inspected? (Y/N)\n\nReply like: Y Y Y`);
+    }
+
+    // ============================================
+    // CHECKLIST: Process checklist response
+    // ============================================
+    if (worker.pending_checklist) {
+      const results = parseChecklistResponse(body);
+      
+      // Check if this looks like a valid checklist response
+      const validResponse = results.ppe !== null || results.loto !== null || results.equipment !== null;
+      
+      if (validResponse) {
+        // Clear pending checklist
+        await supabase
+          .from("workers")
+          .update({ pending_checklist: false })
+          .eq("phone", from);
+        
+        // Log the checklist
+        await supabase.from("checklists").insert({
+          company_id: worker.company_id,
+          worker_phone: from,
+          worker_name: worker.name,
+          ppe_ok: results.ppe,
+          loto_ok: results.loto,
+          equipment_ok: results.equipment,
+          shift_date: new Date().toISOString().split('T')[0],
+        });
+        
+        const { message, hasFailures, failures } = formatChecklistResult(results);
+        
+        // Notify manager if there are failures
+        if (hasFailures && company?.manager_phone) {
+          await sendSMS(
+            company.manager_phone,
+            `⚠️ Safety Checklist Alert\n\nWorker: ${worker.name}\nIssues: ${failures.join(", ")}\n\nPlease follow up.`
+          );
+        }
+        
+        let response = message;
+        if (hasFailures) {
+          response += `\n\n⚠️ ${company?.manager_name || "Manager"} has been notified. Please address issues before starting work.`;
+        } else {
+          response += `\n\n✅ All clear! Have a safe shift.`;
+        }
+        
+        return twimlResponse(response);
+      }
+      // If not a valid checklist response, clear the flag and process normally
+      await supabase
+        .from("workers")
+        .update({ pending_checklist: false })
+        .eq("phone", from);
+    }
+
+    // ============================================
+    // CERTIFICATIONS: View my certs
+    // ============================================
+    if (body.toUpperCase() === "MY CERTS" || body.toUpperCase() === "CERTS" || body.toUpperCase() === "CERTIFICATIONS") {
+      const { data: certs } = await supabase
+        .from("certifications")
+        .select("*")
+        .eq("worker_phone", from)
+        .order("expiry_date", { ascending: true });
+
+      if (!certs || certs.length === 0) {
+        return twimlResponse("📋 You don't have any certifications on file yet.\n\nAsk your manager to add your certifications to Sidekick.");
+      }
+
+      const today = new Date();
+      let response = "📋 Your Certifications:\n\n";
+      
+      certs.forEach(cert => {
+        const expiry = new Date(cert.expiry_date);
+        const daysUntil = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        
+        let status = "✅";
+        if (daysUntil < 0) status = "❌ EXPIRED";
+        else if (daysUntil <= 30) status = "⚠️ Expiring soon";
+        
+        response += `${status} ${cert.cert_name}\n`;
+        if (daysUntil < 0) {
+          response += `   Expired ${Math.abs(daysUntil)} days ago\n`;
+        } else if (daysUntil <= 30) {
+          response += `   Expires in ${daysUntil} days\n`;
+        } else {
+          response += `   Expires: ${expiry.toLocaleDateString()}\n`;
+        }
+        response += "\n";
+      });
+
+      const expiringSoon = certs.filter(c => {
+        const daysUntil = Math.ceil((new Date(c.expiry_date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        return daysUntil >= 0 && daysUntil <= 30;
+      });
+
+      if (expiringSoon.length > 0) {
+        response += `⚠️ ${expiringSoon.length} cert(s) need renewal soon. Contact your manager.`;
+      }
+
+      return twimlResponse(response);
+    }
 
     // ============================================
     // NEW: Handle image messages
@@ -634,10 +886,65 @@ export async function POST(request: NextRequest) {
     // ============================================
     // END: Handle image messages
     // ============================================
+
+    // ============================================
+    // NEW: Issue/Problem Detection and Logging
+    // ============================================
+    const issueAnalysis = detectIssueReport(body);
+    
+    if (issueAnalysis.isIssue) {
+      console.log("[SMS] Issue detected:", issueAnalysis);
+      
+      // Log the issue to the database
+      const { data: issueRecord, error: issueError } = await supabase
+        .from("issues")
+        .insert({
+          company_id: worker.company_id,
+          worker_phone: from,
+          worker_name: worker.name,
+          description: body,
+          equipment: issueAnalysis.equipment,
+          severity: issueAnalysis.severity,
+          status: "open",
+        })
+        .select()
+        .single();
+      
+      if (issueError) {
+        console.error("[SMS] Failed to log issue:", issueError);
+        return twimlResponse("Sorry, I couldn't log that issue. Please try again or contact your manager directly.");
+      }
+      
+      // Notify manager
+      if (company?.manager_phone) {
+        const severityEmoji = issueAnalysis.severity === "high" ? "🚨" : issueAnalysis.severity === "medium" ? "⚠️" : "📋";
+        await sendSMS(
+          company.manager_phone,
+          `${severityEmoji} Issue Report #${issueRecord.id.slice(0, 8)}\n\nFrom: ${worker.name || "Worker"}\n${issueAnalysis.equipment ? `Equipment: ${issueAnalysis.equipment}\n` : ""}Issue: ${body}\n\nReply to this thread or check dashboard.`
+        );
+      }
+      
+      // Confirm to worker
+      const issueId = issueRecord.id.slice(0, 8).toUpperCase();
+      const equipmentAck = issueAnalysis.equipment ? ` for ${issueAnalysis.equipment}` : "";
+      return twimlResponse(`✅ Logged issue #${issueId}${equipmentAck}. ${company?.manager_name || "Your manager"} has been notified. We'll follow up soon.`);
+    }
+    // ============================================
+    // END: Issue Detection
+    // ============================================
     
     // CASE 5: Regular text question (existing logic)
     const relevantChunks = await searchDocuments(body, worker.company_id);
     const context = relevantChunks.map((c: any) => c.content).join("\n\n");
+    
+    // Get unique source documents for attribution
+    const sourceDocuments = [...new Set(relevantChunks
+      .map((c: any) => c.document_name)
+      .filter(Boolean)
+    )];
+    const sourcesText = sourceDocuments.length > 0 
+      ? `\n\nSOURCE DOCUMENTS: ${sourceDocuments.join(", ")}\nWhen answering, reference the source like "Per [document name]:" or "According to [document name]:"`
+      : "";
     
     const similarityScore = relevantChunks.length > 0 
       ? Math.round(relevantChunks[0].similarity * 100) 
@@ -649,13 +956,13 @@ export async function POST(request: NextRequest) {
 
 ${isSafetyQuestion ? `⚠️ SAFETY QUESTION DETECTED - Always:
 1. Lead with any safety warnings or required PPE
-2. Reference specific SOPs when available (e.g., "According to SOP-12...")
+2. Reference specific SOPs when available (e.g., "Per Safety Manual:" or "According to SOP-12:")
 3. If unsure about any safety procedure, say so and recommend checking with supervisor
 4. Never guess on lockout/tagout, chemical handling, or equipment procedures` : ""}
 
 Answer questions based on the provided context. Be concise, friendly, and helpful. Keep responses under 300 characters for SMS.
-If you reference a specific document or SOP, mention it.
-If you don't have enough information to answer, say so honestly and mention they should check with their manager.`;
+IMPORTANT: When you use information from the documents, cite the source naturally (e.g., "Per the Employee Handbook:" or "According to Safety Manual:").
+If you don't have enough information to answer, say so honestly and mention they should check with their manager.${sourcesText}`;
     
     const userMessage = context
       ? `Context from company documents:\n${context}\n\nQuestion: ${body}`
