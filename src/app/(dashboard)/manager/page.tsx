@@ -1,5 +1,8 @@
 "use client";
 import GoogleDriveIntegration from "@/components/GoogleDriveIntegration";
+import DropboxIntegration from "@/components/DropboxIntegration";
+import GustoIntegration from "@/components/GustoIntegration";
+import MicrosoftTeamsIntegration from "@/components/MicrosoftTeamsIntegration";
 import React from "react";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
@@ -900,6 +903,38 @@ export default function ManagerDashboard() {
       darkMode={darkMode}
       onDocumentImported={(doc) => {
         setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title } }]);
+      }}
+    />
+
+    {/* Dropbox Integration */}
+    <DropboxIntegration 
+      companyId={selectedCompany}
+      darkMode={darkMode}
+      onDocumentImported={(doc) => {
+        setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title } }]);
+      }}
+    />
+
+    {/* Gusto Integration */}
+    <GustoIntegration 
+      companyId={selectedCompany}
+      darkMode={darkMode}
+      onEmployeesImported={(count) => {
+        console.log(`Imported ${count} employees from Gusto`);
+      }}
+    />
+
+    {/* Microsoft Teams Integration */}
+    <MicrosoftTeamsIntegration 
+      companyId={selectedCompany}
+      darkMode={darkMode}
+    />
+
+    {/* QuickBooks Integration */}
+      companyId={selectedCompany}
+      darkMode={darkMode}
+      onEmployeesImported={(count) => {
+        console.log(`Imported ${count} employees from QuickBooks`);
       }}
     />
             <div className={`${darkMode ? "bg-gray-800 border-gray-600" : "bg-white border-gray-200"} rounded-xl border-2 border-dashed p-8 text-center hover:border-blue-400 transition-colors`}><input type="file" id="upload" className="hidden" accept=".pdf,.txt,.doc,.docx,.xlsx,.csv" onChange={handleUpload} disabled={uploading} /><label htmlFor="upload" className="cursor-pointer"><Upload className={`w-10 h-10 mx-auto mb-3 ${darkMode ? "text-gray-500" : "text-gray-400"}`} /><p className={`font-medium mb-1 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>{uploading ? "Uploading..." : "Drop files here or click to upload"}</p><p className={`text-sm ${darkMode ? "text-gray-500" : "text-gray-400"}`}>PDF, Word, Excel, or text files</p></label></div>
