@@ -1,4 +1,5 @@
 "use client";
+import WalkthroughUpload from "@/components/WalkthroughUpload";
 import GoogleDriveIntegration from "@/components/GoogleDriveIntegration";
 import DropboxIntegration from "@/components/DropboxIntegration";
 import GustoIntegration from "@/components/GustoIntegration";
@@ -165,7 +166,7 @@ function AnimatedNumber({ value, duration = 1000 }: { value: number; duration?: 
 }
 
 export default function ManagerDashboard() {
-  const [activeTab, setActiveTab] = useState<"analytics" | "issues" | "checklists" | "certs" | "gaps" | "documents" | "workers">("analytics");
+  const [activeTab, setActiveTab] = useState<"analytics" | "issues" | "documents" | "create" | "workers">("analytics");
   const [companies, setCompanies] = useState<Company[]>([]);
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [selectedCompany, setSelectedCompany] = useState<string>("");
@@ -366,10 +367,10 @@ export default function ManagerDashboard() {
 
   useEffect(() => {
     if (selectedCompany) {
-      if (activeTab === "analytics" || activeTab === "gaps") { loadStats(); loadGaps(); }
+      if (activeTab === "analytics") { loadStats(); loadGaps(); }
       if (activeTab === "issues" || activeTab === "analytics") { loadIssues(); }
-      if (activeTab === "checklists" || activeTab === "analytics") { loadChecklists(); }
-      if (activeTab === "certs") { loadCertifications(); }
+      if (activeTab === "workers" || activeTab === "analytics") { loadChecklists(); }
+      if (activeTab === "workers") { loadCertifications(); }
     }
   }, [activeTab, selectedCompany, timeRange]);
 
@@ -578,11 +579,9 @@ export default function ManagerDashboard() {
           <div className={`flex gap-1 p-1 rounded-xl ${darkMode ? "bg-gray-800" : "bg-gray-100"}`}>
             {[
               { id: "analytics", label: "Analytics", icon: BarChart3 },
-              { id: "issues", label: "Issues", icon: AlertTriangle, badge: openIssuesCount, badgeColor: openHighPriorityCount > 0 ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700" },
-              { id: "checklists", label: "Checklists", icon: ClipboardList, badge: checklistStats?.failedToday || 0, badgeColor: (checklistStats?.failedToday || 0) > 0 ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700" },
-              { id: "gaps", label: "AI Suggestions", icon: Lightbulb, badge: gaps.length, badgeColor: "bg-amber-100 text-amber-700" },
-              { id: "certs", label: "Certifications", icon: Award, badge: certStats?.expiringSoon || 0, badgeColor: (certStats?.expired || 0) > 0 ? "bg-red-100 text-red-700" : (certStats?.expiringSoon || 0) > 0 ? "bg-amber-100 text-amber-700" : "bg-green-100 text-green-700" },
+              { id: "issues", label: "Alerts", icon: AlertTriangle, badge: openIssuesCount, badgeColor: openHighPriorityCount > 0 ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700" },
               { id: "documents", label: "Documents", icon: FileText },
+              { id: "create", label: "AI Studio", icon: Sparkles },
               { id: "workers", label: "Workers", icon: Users, badge: companyWorkers.length, badgeColor: "bg-blue-100 text-blue-700" }
             ].map(tab => (
               <button key={tab.id} onClick={() => setActiveTab(tab.id as typeof activeTab)} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id ? (darkMode ? "bg-gray-700 text-white shadow-sm" : "bg-white text-gray-900 shadow-sm") : (darkMode ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900")}`}>
@@ -630,315 +629,227 @@ export default function ManagerDashboard() {
         )}
 
         {/* CHECKLISTS TAB */}
-        {activeTab === "checklists" && (
-          <div className="space-y-6">
-            {/* Checklist Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl border p-6`}>
-                <div className="flex items-center justify-between mb-1"><span className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Completed Today</span><ClipboardList className="w-4 h-4 text-blue-500" /></div>
-                <span className={`text-4xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}><AnimatedNumber value={checklistStats?.totalToday || 0} /></span>
-              </div>
-              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl border p-6`}>
-                <div className="flex items-center justify-between mb-1"><span className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Passed</span><CheckCircle2 className="w-4 h-4 text-green-500" /></div>
-                <span className="text-4xl font-bold text-green-500"><AnimatedNumber value={checklistStats?.passedToday || 0} /></span>
-              </div>
-              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl border p-6`}>
-                <div className="flex items-center justify-between mb-1"><span className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Failed</span><XCircle className="w-4 h-4 text-red-500" /></div>
-                <span className="text-4xl font-bold text-red-500"><AnimatedNumber value={checklistStats?.failedToday || 0} /></span>
-              </div>
-              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl border p-6`}>
-                <div className="flex items-center justify-between mb-1"><span className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Compliance Rate</span><Shield className="w-4 h-4 text-blue-500" /></div>
-                <span className={`text-4xl font-bold ${(checklistStats?.complianceRate || 100) >= 90 ? "text-green-500" : (checklistStats?.complianceRate || 100) >= 70 ? "text-amber-500" : "text-red-500"}`}><AnimatedNumber value={checklistStats?.complianceRate || 100} />%</span>
-              </div>
-            </div>
-
-            {/* Failure Breakdown */}
-            {(checklistStats?.ppeFailures || checklistStats?.lotoFailures || checklistStats?.equipmentFailures) ? (
-              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border p-6`}>
-                <h3 className={`font-semibold mb-4 ${darkMode ? "text-white" : "text-gray-900"}`}>Failure Breakdown (All Time)</h3>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className={`${darkMode ? "bg-gray-700" : "bg-gray-50"} rounded-lg p-4 text-center`}>
-                    <p className="text-3xl font-bold text-red-500">{checklistStats?.ppeFailures || 0}</p>
-                    <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>🥽 PPE Failures</p>
-                  </div>
-                  <div className={`${darkMode ? "bg-gray-700" : "bg-gray-50"} rounded-lg p-4 text-center`}>
-                    <p className="text-3xl font-bold text-red-500">{checklistStats?.lotoFailures || 0}</p>
-                    <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>🔒 LOTO Failures</p>
-                  </div>
-                  <div className={`${darkMode ? "bg-gray-700" : "bg-gray-50"} rounded-lg p-4 text-center`}>
-                    <p className="text-3xl font-bold text-red-500">{checklistStats?.equipmentFailures || 0}</p>
-                    <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>🔧 Equipment Failures</p>
-                  </div>
-                </div>
-              </div>
-            ) : null}
-
-            {/* Worker Compliance */}
-            {checklistStats?.workerCompliance && checklistStats.workerCompliance.length > 0 && (
-              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border p-6`}>
-                <h3 className={`font-semibold mb-4 ${darkMode ? "text-white" : "text-gray-900"}`}>Worker Compliance (Last 7 Days)</h3>
-                <div className="space-y-3">
-                  {checklistStats.workerCompliance.map((w, i) => {
-                    const rate = w.total > 0 ? Math.round((w.passed / w.total) * 100) : 100;
-                    return (
-                      <div key={i} className="flex items-center gap-4">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-medium ${getAvatarColor(w.name)}`}>{getInitials(w.name)}</div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className={`font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>{w.name}</span>
-                            <span className={`text-sm font-medium ${rate >= 90 ? "text-green-600" : rate >= 70 ? "text-amber-600" : "text-red-600"}`}>{rate}%</span>
-                          </div>
-                          <div className={`h-2 ${darkMode ? "bg-gray-700" : "bg-gray-100"} rounded-full overflow-hidden`}>
-                            <div className={`h-full rounded-full ${rate >= 90 ? "bg-green-500" : rate >= 70 ? "bg-amber-500" : "bg-red-500"}`} style={{ width: `${rate}%` }} />
-                          </div>
-                          <p className={`text-xs mt-1 ${darkMode ? "text-gray-500" : "text-gray-400"}`}>{w.passed}/{w.total} passed</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Recent Checklists */}
-            <div className="flex items-center justify-between">
-              <h3 className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>Recent Checklists</h3>
-              <button onClick={loadChecklists} className={darkMode ? "text-gray-500" : "text-gray-400"}><RefreshCw className={`w-5 h-5 ${loadingChecklists ? "animate-spin" : ""}`} /></button>
-            </div>
-            <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border`}>
-              {checklists.length === 0 ? (
-                <div className={`p-12 text-center ${darkMode ? "text-gray-500" : "text-gray-400"}`}>
-                  <ClipboardList className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                  <p className="font-medium">No checklists yet</p>
-                  <p className="text-sm mt-1">Workers can text CHECKLIST to complete their shift safety check</p>
-                </div>
-              ) : (
-                <div className={`divide-y ${darkMode ? "divide-gray-700" : "divide-gray-100"}`}>
-                  {checklists.slice(0, 20).map(checklist => {
-                    const allPassed = checklist.ppe_ok && checklist.loto_ok && checklist.equipment_ok;
-                    return (
-                      <div key={checklist.id} className={`p-4 flex items-center gap-4 ${darkMode ? "hover:bg-gray-700" : "hover:bg-gray-50"}`}>
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${allPassed ? "bg-green-100" : "bg-red-100"}`}>
-                          {allPassed ? <CheckCircle2 className="w-5 h-5 text-green-600" /> : <XCircle className="w-5 h-5 text-red-600" />}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className={`font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>{checklist.worker_name || "Unknown Worker"}</span>
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${allPassed ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>{allPassed ? "Passed" : "Failed"}</span>
-                          </div>
-                          <div className="flex items-center gap-3 text-sm">
-                            <span className={checklist.ppe_ok ? "text-green-600" : "text-red-600"}>{checklist.ppe_ok ? "✓" : "✗"} PPE</span>
-                            <span className={checklist.loto_ok ? "text-green-600" : "text-red-600"}>{checklist.loto_ok ? "✓" : "✗"} LOTO</span>
-                            <span className={checklist.equipment_ok ? "text-green-600" : "text-red-600"}>{checklist.equipment_ok ? "✓" : "✗"} Equipment</span>
-                          </div>
-                          <p className={`text-xs mt-1 ${darkMode ? "text-gray-500" : "text-gray-400"}`}>{formatTimeAgo(checklist.created_at)}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* CERTS TAB */}
-        {activeTab === "certs" && (
-          <div className="space-y-6">
-            {/* Add Cert Modal */}
-            {showAddCertModal && (
-              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                <div className={`${darkMode ? "bg-gray-800" : "bg-white"} rounded-2xl max-w-md w-full p-6 shadow-xl`}>
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className={`font-semibold text-lg ${darkMode ? "text-white" : "text-gray-900"}`}>Add Certification</h3>
-                    <button onClick={() => setShowAddCertModal(false)} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-400" /></button>
-                  </div>
-                  <div className="space-y-4">
-                    <div>
-                      <label className={`block text-sm font-medium mb-1 ${darkMode ? "text-gray-300" : "text-gray-700"}`}>Worker</label>
-                      <select value={newCert.workerPhone} onChange={(e) => setNewCert({...newCert, workerPhone: e.target.value})} className={`w-full px-3 py-2 rounded-lg border ${darkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-200"}`}>
-                        <option value="">Select worker...</option>
-                        {companyWorkers.map(w => <option key={w.phone} value={w.phone}>{w.name || w.phone}</option>)}
-                      </select>
-                    </div>
-                    <div>
-                      <label className={`block text-sm font-medium mb-1 ${darkMode ? "text-gray-300" : "text-gray-700"}`}>Certification Type</label>
-                      <select value={newCert.certType} onChange={(e) => setNewCert({...newCert, certType: e.target.value})} className={`w-full px-3 py-2 rounded-lg border ${darkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-200"}`}>
-                        <option value="">Select type...</option>
-                        <option value="forklift">🚜 Forklift Operator</option>
-                        <option value="crane">🏗️ Crane Operator</option>
-                        <option value="electrical">⚡ Electrical Safety</option>
-                        <option value="confined_space">🚧 Confined Space</option>
-                        <option value="hazmat">☣️ Hazmat Handling</option>
-                        <option value="first_aid">🩹 First Aid/CPR</option>
-                        <option value="loto">🔒 Lockout/Tagout</option>
-                        <option value="fall_protection">🪢 Fall Protection</option>
-                        <option value="welding">🔥 Welding</option>
-                        <option value="osha_10">📋 OSHA 10-Hour</option>
-                        <option value="osha_30">📋 OSHA 30-Hour</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className={`block text-sm font-medium mb-1 ${darkMode ? "text-gray-300" : "text-gray-700"}`}>Expiry Date</label>
-                      <input type="date" value={newCert.expiryDate} onChange={(e) => setNewCert({...newCert, expiryDate: e.target.value})} className={`w-full px-3 py-2 rounded-lg border ${darkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-200"}`} />
-                    </div>
-                    <button onClick={addCertification} disabled={!newCert.workerPhone || !newCert.certType || !newCert.expiryDate} className="w-full py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50">Add Certification</button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl border p-6`}>
-                <div className="flex items-center justify-between mb-1"><span className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Total Certs</span><Award className="w-4 h-4 text-blue-500" /></div>
-                <span className={`text-4xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}><AnimatedNumber value={certStats?.total || 0} /></span>
-              </div>
-              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl border p-6`}>
-                <div className="flex items-center justify-between mb-1"><span className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Expired</span><XCircle className="w-4 h-4 text-red-500" /></div>
-                <span className="text-4xl font-bold text-red-500"><AnimatedNumber value={certStats?.expired || 0} /></span>
-              </div>
-              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl border p-6`}>
-                <div className="flex items-center justify-between mb-1"><span className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Expiring Soon</span><AlertTriangle className="w-4 h-4 text-amber-500" /></div>
-                <span className="text-4xl font-bold text-amber-500"><AnimatedNumber value={(certStats?.expiringThisWeek || 0) + (certStats?.expiringThisMonth || 0)} /></span>
-              </div>
-              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl border p-6`}>
-                <div className="flex items-center justify-between mb-1"><span className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Valid</span><CheckCircle2 className="w-4 h-4 text-green-500" /></div>
-                <span className="text-4xl font-bold text-green-500"><AnimatedNumber value={certStats?.valid || 0} /></span>
-              </div>
-            </div>
-
-            {/* Action Bar */}
-            <div className="flex items-center justify-between">
-              <h3 className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>All Certifications</h3>
-              <div className="flex items-center gap-2">
-                <button onClick={loadCertifications} className={darkMode ? "text-gray-500" : "text-gray-400"}><RefreshCw className={`w-5 h-5 ${loadingCerts ? "animate-spin" : ""}`} /></button>
-                <button onClick={() => setShowAddCertModal(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"><Plus className="w-4 h-4" /> Add Cert</button>
-              </div>
-            </div>
-
-            {/* Certifications List */}
-            <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border`}>
-              {certifications.length === 0 ? (
-                <div className={`p-12 text-center ${darkMode ? "text-gray-500" : "text-gray-400"}`}>
-                  <Award className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                  <p className="font-medium">No certifications yet</p>
-                  <p className="text-sm mt-1">Add worker certifications to track expiry dates and get reminders</p>
-                </div>
-              ) : (
-                <div className={`divide-y ${darkMode ? "divide-gray-700" : "divide-gray-100"}`}>
-                  {certifications.map(cert => {
-                    const expiry = new Date(cert.expiry_date);
-                    const now = new Date();
-                    const daysUntil = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-                    const isExpired = daysUntil < 0;
-                    const isExpiringSoon = daysUntil >= 0 && daysUntil <= 30;
-                    const certIcons: Record<string, string> = {
-                      forklift: "🚜", crane: "🏗️", electrical: "⚡", confined_space: "🚧",
-                      hazmat: "☣️", first_aid: "🩹", loto: "🔒", fall_protection: "🪢",
-                      welding: "🔥", osha_10: "📋", osha_30: "📋"
-                    };
-                    return (
-                      <div key={cert.id} className={`p-4 flex items-center gap-4 ${darkMode ? "hover:bg-gray-700" : "hover:bg-gray-50"}`}>
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${isExpired ? "bg-red-100" : isExpiringSoon ? "bg-amber-100" : "bg-green-100"}`}>
-                          {certIcons[cert.cert_type] || "📜"}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className={`font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>{cert.cert_name || cert.cert_type}</span>
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${isExpired ? "bg-red-100 text-red-700" : isExpiringSoon ? "bg-amber-100 text-amber-700" : "bg-green-100 text-green-700"}`}>
-                              {isExpired ? "Expired" : isExpiringSoon ? `${daysUntil}d left` : "Valid"}
-                            </span>
-                          </div>
-                          <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}>{cert.worker_name || "Unknown Worker"}</p>
-                          <p className={`text-xs ${darkMode ? "text-gray-500" : "text-gray-400"}`}>Expires: {expiry.toLocaleDateString()}</p>
-                        </div>
-                        <button onClick={() => deleteCertification(cert.id)} className={`p-2 rounded-lg ${darkMode ? "text-gray-500 hover:text-red-400" : "text-gray-400 hover:text-red-500"}`}><Trash2 className="w-4 h-4" /></button>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
         {/* ANALYTICS TAB */}
         {activeTab === "analytics" && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl border p-6`}><div className="flex items-center justify-between mb-1"><span className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Questions Today</span><MessageSquare className={`w-4 h-4 ${darkMode ? "text-gray-600" : "text-gray-300"}`} /></div><div className="flex items-baseline gap-3"><span className={`text-4xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}><AnimatedNumber value={stats?.todayCount || 0} /></span>{weekTrend !== 0 && <span className={`flex items-center gap-1 text-sm font-medium px-2 py-0.5 rounded-full ${weekTrend > 0 ? "text-green-600 bg-green-50" : "text-red-600 bg-red-50"}`}>{weekTrend > 0 ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}{Math.abs(weekTrend)}%</span>}</div><p className={`text-xs ${darkMode ? "text-gray-500" : "text-gray-400"} mt-1`}>{stats?.weekCount || 0} this week</p></div>
-              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl border p-6`}><div className="flex items-center justify-between mb-1"><span className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Answer Accuracy</span><Target className={`w-4 h-4 ${darkMode ? "text-gray-600" : "text-gray-300"}`} /></div><span className={`text-4xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}><AnimatedNumber value={stats?.avgConfidence || 0} />%</span><p className={`text-xs ${darkMode ? "text-gray-500" : "text-gray-400"} mt-1`}>{stats?.answeredRate || 0}% answered</p></div>
-              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl border p-6`}><div className="flex items-center justify-between mb-1"><span className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Open Issues</span><AlertTriangle className={`w-4 h-4 ${openHighPriorityCount > 0 ? "text-red-500" : "text-amber-500"}`} /></div><div className="flex items-baseline gap-3"><span className={`text-4xl font-bold ${openHighPriorityCount > 0 ? "text-red-500" : darkMode ? "text-white" : "text-gray-900"}`}><AnimatedNumber value={openIssuesCount} /></span>{openHighPriorityCount > 0 && <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">{openHighPriorityCount} urgent</span>}</div><button onClick={() => setActiveTab("issues")} className="text-xs text-blue-600 mt-1">View all →</button></div>
-              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl border p-6`}><div className="flex items-center justify-between mb-1"><span className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Health Score</span><Award className={`w-4 h-4 ${darkMode ? "text-gray-600" : "text-gray-300"}`} /></div><span className={`text-4xl font-bold ${healthScore >= 70 ? "text-green-500" : healthScore >= 40 ? "text-amber-500" : "text-red-500"}`}><AnimatedNumber value={healthScore} /></span><div className="w-full h-2 bg-gray-200 rounded-full mt-2 overflow-hidden"><div className={`h-full rounded-full transition-all duration-1000 ${healthScore >= 70 ? "bg-green-500" : healthScore >= 40 ? "bg-amber-500" : "bg-red-500"}`} style={{ width: `${healthScore}%` }} /></div></div>
+          <div className="space-y-4">
+            {/* Stats Row */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border p-4`}><div className="flex items-center justify-between mb-1"><span className={`text-xs ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Questions Today</span><MessageSquare className={`w-4 h-4 ${darkMode ? "text-gray-600" : "text-gray-300"}`} /></div><div className="flex items-baseline gap-2"><span className={`text-2xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}><AnimatedNumber value={stats?.todayCount || 0} /></span>{weekTrend !== 0 && <span className={`flex items-center gap-1 text-xs font-medium px-1.5 py-0.5 rounded-full ${weekTrend > 0 ? "text-green-600 bg-green-50" : "text-red-600 bg-red-50"}`}>{weekTrend > 0 ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}{Math.abs(weekTrend)}%</span>}</div><p className={`text-xs ${darkMode ? "text-gray-500" : "text-gray-400"}`}>{stats?.weekCount || 0} this week</p></div>
+              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border p-4`}><div className="flex items-center justify-between mb-1"><span className={`text-xs ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Answer Accuracy</span><Target className={`w-4 h-4 ${darkMode ? "text-gray-600" : "text-gray-300"}`} /></div><span className={`text-2xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}><AnimatedNumber value={stats?.avgConfidence || 0} />%</span><p className={`text-xs ${darkMode ? "text-gray-500" : "text-gray-400"}`}>{stats?.answeredRate || 0}% answered</p></div>
+              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border p-4`}><div className="flex items-center justify-between mb-1"><span className={`text-xs ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Open Issues</span><AlertTriangle className={`w-4 h-4 ${openHighPriorityCount > 0 ? "text-red-500" : "text-amber-500"}`} /></div><div className="flex items-baseline gap-2"><span className={`text-2xl font-bold ${openHighPriorityCount > 0 ? "text-red-500" : darkMode ? "text-white" : "text-gray-900"}`}><AnimatedNumber value={openIssuesCount} /></span>{openHighPriorityCount > 0 && <span className="text-xs px-1.5 py-0.5 rounded-full bg-red-100 text-red-700">{openHighPriorityCount} urgent</span>}</div><button onClick={() => setActiveTab("issues")} className="text-xs text-blue-600">View all →</button></div>
+              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border p-4`}><div className="flex items-center justify-between mb-1"><span className={`text-xs ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Health Score</span><Award className={`w-4 h-4 ${darkMode ? "text-gray-600" : "text-gray-300"}`} /></div><span className={`text-2xl font-bold ${healthScore >= 70 ? "text-green-500" : healthScore >= 40 ? "text-amber-500" : "text-red-500"}`}><AnimatedNumber value={healthScore} /></span><div className="w-full h-1.5 bg-gray-200 rounded-full mt-1 overflow-hidden"><div className={`h-full rounded-full ${healthScore >= 70 ? "bg-green-500" : healthScore >= 40 ? "bg-amber-500" : "bg-red-500"}`} style={{ width: `${healthScore}%` }} /></div></div>
             </div>
-            <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl border p-6`}>
-              <div className="flex items-center justify-between mb-2"><div><h3 className={`font-semibold text-lg ${darkMode ? "text-white" : "text-gray-900"}`}>Questions per Hour</h3><p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>{peakHourLabel ? `Peak time: ${peakHourLabel}` : "Track question volume throughout the day"}</p></div><button onClick={loadStats} className={darkMode ? "text-gray-500" : "text-gray-400"}><RefreshCw className={`w-5 h-5 ${loadingStats ? "animate-spin" : ""}`} /></button></div>
-              <div className="h-52 flex items-end gap-1 mt-6 mb-4 px-2">{hours.map(hour => { const count = byHour[hour] || 0; const heightPercent = maxHourCount > 0 ? (count / maxHourCount) * 100 : 0; const isHighlighted = count === maxHourCount && count > 0; return (<div key={hour} className="flex-1 flex flex-col items-center gap-1 group"><div className="relative w-full flex justify-center h-36"><div className={`absolute -top-8 ${darkMode ? "bg-white text-gray-900" : "bg-gray-900 text-white"} text-xs px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity z-10`}>{count}</div><div className={`w-full max-w-[24px] rounded-t-lg transition-all duration-500 ${isHighlighted ? "bg-blue-600" : count > 0 ? (darkMode ? "bg-blue-500" : "bg-blue-400") : (darkMode ? "bg-gray-700" : "bg-blue-100")}`} style={{ height: `${Math.max(heightPercent, count > 0 ? 8 : 3)}%`, position: "absolute", bottom: 0 }} /></div><span className={`text-xs ${darkMode ? "text-gray-500" : "text-gray-400"}`}>{hour === 0 ? "12A" : hour < 12 ? `${hour}A` : hour === 12 ? "12P" : `${hour - 12}P`}</span></div>); })}</div>
-              <div className={`flex gap-1 p-1 rounded-lg ${darkMode ? "bg-gray-700" : "bg-gray-100"}`}>{(["1day", "1week", "1month", "1year", "all"] as const).map(range => <button key={range} onClick={() => setTimeRange(range)} className={`px-3 py-1.5 text-sm font-medium rounded-md ${timeRange === range ? (darkMode ? "bg-gray-600 text-white" : "bg-white text-gray-900 shadow-sm") : (darkMode ? "text-gray-400" : "text-gray-500")}`}>{timeRangeLabels[range]}</button>)}</div>
+            {/* Chart - Full Width */}
+            <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border p-4`}>
+              <div className="flex items-center justify-between mb-2"><div><h3 className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>Questions per Hour</h3><p className={`text-xs ${darkMode ? "text-gray-400" : "text-gray-500"}`}>{peakHourLabel ? `Peak: ${peakHourLabel}` : "Question volume"}</p></div><button onClick={loadStats} className={darkMode ? "text-gray-500" : "text-gray-400"}><RefreshCw className={`w-4 h-4 ${loadingStats ? "animate-spin" : ""}`} /></button></div>
+              <div className="h-32 flex items-end gap-0.5 mb-2">{hours.map(hour => { const count = byHour[hour] || 0; const heightPercent = maxHourCount > 0 ? (count / maxHourCount) * 100 : 0; const isHighlighted = count === maxHourCount && count > 0; return (<div key={hour} className="flex-1 flex flex-col items-center group"><div className="relative w-full flex justify-center h-28"><div className={`w-full max-w-[20px] rounded-t transition-all ${isHighlighted ? "bg-blue-600" : count > 0 ? (darkMode ? "bg-blue-500" : "bg-blue-400") : (darkMode ? "bg-gray-700" : "bg-blue-100")}`} style={{ height: `${Math.max(heightPercent, count > 0 ? 8 : 3)}%`, position: "absolute", bottom: 0 }} /></div><span className={`text-[10px] ${darkMode ? "text-gray-500" : "text-gray-400"}`}>{hour === 0 ? "12a" : hour < 12 ? `${hour}a` : hour === 12 ? "12p" : `${hour - 12}p`}</span></div>); })}</div>
+              <div className={`flex gap-1 p-0.5 rounded-lg ${darkMode ? "bg-gray-700" : "bg-gray-100"}`}>{(["1day", "1week", "1month", "1year", "all"] as const).map(range => <button key={range} onClick={() => setTimeRange(range)} className={`px-2 py-1 text-xs font-medium rounded ${timeRange === range ? (darkMode ? "bg-gray-600 text-white" : "bg-white text-gray-900 shadow-sm") : (darkMode ? "text-gray-400" : "text-gray-500")}`}>{timeRangeLabels[range]}</button>)}</div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl border p-6`}><div className="flex items-center gap-2 mb-4"><Zap className="w-5 h-5 text-amber-500" /><h3 className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>Topics</h3></div><div className="space-y-3">{sortedTopics.length === 0 ? <p className={`text-center py-4 text-sm ${darkMode ? "text-gray-500" : "text-gray-400"}`}>No data yet</p> : sortedTopics.slice(0, 5).map(([topic, count]) => { const info = TOPIC_LABELS[topic] || TOPIC_LABELS.general; const percentage = Math.round((count / maxTopicCount) * 100); return (<div key={topic}><div className="flex items-center justify-between mb-1"><span className={`text-xs px-2 py-0.5 rounded-full ${info.bgColor} ${info.color}`}>{ICON_MAP[info.icon] && React.createElement(ICON_MAP[info.icon], { className: "w-3 h-3 inline mr-1" })}{info.label}</span><span className={`text-xs ${darkMode ? "text-gray-400" : "text-gray-500"}`}>{count}</span></div><div className={`h-1.5 ${darkMode ? "bg-gray-700" : "bg-gray-100"} rounded-full overflow-hidden`}><div className="h-full bg-blue-500 rounded-full transition-all duration-500" style={{ width: `${percentage}%` }} /></div></div>); })}</div></div>
-              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl border p-6`}><div className="flex items-center gap-2 mb-4"><Globe className="w-5 h-5 text-blue-500" /><h3 className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>Languages</h3></div><div className="space-y-2">{Object.entries(stats?.byLanguage || {}).length === 0 ? <p className={`text-center py-4 text-sm ${darkMode ? "text-gray-500" : "text-gray-400"}`}>No data yet</p> : Object.entries(stats?.byLanguage || {}).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([lang, count]) => { const langInfo = LANG_FLAGS[lang] || { flag: "globe", name: lang }; return (<div key={lang} className={`flex items-center justify-between px-3 py-2 rounded-lg ${darkMode ? "bg-gray-700" : "bg-gray-50"}`}><div className="flex items-center gap-2">{langInfo.flag === "globe" ? <Globe className="w-5 h-5 text-gray-400" /> : <img src={`https://flagcdn.com/w80/${langInfo.flag}.png`} alt={langInfo.name} className="w-5 h-5 rounded-full object-cover" />}<span className={`text-sm ${darkMode ? "text-gray-300" : "text-gray-700"}`}>{langInfo.name}</span></div><span className={`text-xs px-2 py-0.5 rounded-full ${darkMode ? "bg-gray-600 text-gray-300" : "bg-gray-200 text-gray-600"}`}>{count}</span></div>); })}</div></div>
-              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl border p-6`}><div className="flex items-center justify-between mb-4"><h3 className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>Questions</h3><button onClick={() => setShowAllQuestions(true)} className="text-blue-600 text-xs font-medium flex items-center gap-1">See All <ChevronRight className="w-3 h-3" /></button></div><div className="space-y-3">{(stats?.recentQuestions || []).slice(0, 4).map((q, i) => (<div key={i} className="flex items-start gap-2"><div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-xs flex-shrink-0 ${getAvatarColor(q.worker_name || "")}`}>{q.worker_name ? getInitials(q.worker_name) : <User className="w-4 h-4" />}</div><div className="flex-1 min-w-0"><p className={`font-medium text-xs ${darkMode ? "text-white" : "text-gray-900"}`}>{q.worker_name || "Unknown"}</p><p className={`text-xs truncate ${darkMode ? "text-gray-400" : "text-gray-500"}`}>{q.question}</p></div></div>))}{(!stats?.recentQuestions || stats.recentQuestions.length === 0) && <div className={`text-center py-4 ${darkMode ? "text-gray-500" : "text-gray-400"}`}><MessageSquare className="w-6 h-6 mx-auto mb-1 opacity-50" /><p className="text-xs">No questions yet</p></div>}</div></div>
-              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl border p-6`}><div className="flex items-center justify-between mb-4"><h3 className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>Activity</h3><Activity className={`w-4 h-4 ${darkMode ? "text-gray-500" : "text-gray-400"}`} /></div><div className="space-y-3">{activityFeed.length === 0 ? <div className={`text-center py-4 ${darkMode ? "text-gray-500" : "text-gray-400"}`}><Bell className="w-6 h-6 mx-auto mb-1 opacity-50" /><p className="text-xs">No recent activity</p></div> : activityFeed.slice(0, 4).map(item => (<div key={item.id} className="flex items-start gap-2"><div className={`w-7 h-7 rounded-full flex items-center justify-center ${darkMode ? "bg-gray-700" : "bg-gray-100"}`}><item.icon className={`w-3 h-3 ${item.color}`} /></div><div className="flex-1 min-w-0"><p className={`text-xs ${darkMode ? "text-gray-300" : "text-gray-700"}`}>{item.message}</p><p className={`text-xs ${darkMode ? "text-gray-500" : "text-gray-400"}`}>{formatTimeAgo(item.time)}</p></div></div>))}</div></div>
+            {/* Questions + Activity Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border p-4`}><div className="flex items-center justify-between mb-3"><h3 className={`font-semibold text-sm ${darkMode ? "text-white" : "text-gray-900"}`}>Recent Questions</h3><button onClick={() => setShowAllQuestions(true)} className="text-blue-600 text-xs font-medium flex items-center gap-1">See All <ChevronRight className="w-3 h-3" /></button></div><div className="space-y-2">{(stats?.recentQuestions || []).slice(0, 4).map((q, i) => (<div key={i} className="flex items-start gap-2"><div className={`w-7 h-7 rounded-full flex items-center justify-center text-white font-medium text-xs flex-shrink-0 ${getAvatarColor(q.worker_name || "")}`}>{q.worker_name ? getInitials(q.worker_name) : <User className="w-3 h-3" />}</div><div className="flex-1 min-w-0"><p className={`font-medium text-xs ${darkMode ? "text-white" : "text-gray-900"}`}>{q.worker_name || "Unknown"}</p><p className={`text-xs truncate ${darkMode ? "text-gray-400" : "text-gray-500"}`}>{q.question}</p></div></div>))}{(!stats?.recentQuestions || stats.recentQuestions.length === 0) && <div className={`text-center py-3 ${darkMode ? "text-gray-500" : "text-gray-400"}`}><MessageSquare className="w-5 h-5 mx-auto mb-1 opacity-50" /><p className="text-xs">No questions yet</p></div>}</div></div>
+              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border p-4`}><div className="flex items-center justify-between mb-3"><h3 className={`font-semibold text-sm ${darkMode ? "text-white" : "text-gray-900"}`}>Activity</h3><Activity className={`w-4 h-4 ${darkMode ? "text-gray-500" : "text-gray-400"}`} /></div><div className="space-y-2">{activityFeed.length === 0 ? <div className={`text-center py-3 ${darkMode ? "text-gray-500" : "text-gray-400"}`}><Bell className="w-5 h-5 mx-auto mb-1 opacity-50" /><p className="text-xs">No recent activity</p></div> : activityFeed.slice(0, 4).map(item => (<div key={item.id} className="flex items-start gap-2"><div className={`w-6 h-6 rounded-full flex items-center justify-center ${darkMode ? "bg-gray-700" : "bg-gray-100"}`}><item.icon className={`w-3 h-3 ${item.color}`} /></div><div className="flex-1 min-w-0"><p className={`text-xs ${darkMode ? "text-gray-300" : "text-gray-700"}`}>{item.message}</p><p className={`text-xs ${darkMode ? "text-gray-500" : "text-gray-400"}`}>{formatTimeAgo(item.time)}</p></div></div>))}</div></div>
             </div>
           </div>
         )}
 
         {/* GAPS TAB */}
-        {activeTab === "gaps" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between"><div><h2 className={`text-xl font-bold flex items-center gap-2 ${darkMode ? "text-white" : "text-gray-900"}`}><Lightbulb className="w-6 h-6 text-amber-500" />Document Gap Detection</h2><p className={`mt-1 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>AI-identified knowledge gaps with policy suggestions</p></div><button onClick={analyzeGaps} disabled={analyzingGaps || !stats?.knowledgeGaps?.length} className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 disabled:opacity-50"><Sparkles className={`w-4 h-4 ${analyzingGaps ? "animate-spin" : ""}`} />{analyzingGaps ? "Analyzing..." : "Analyze Gaps"}</button></div>
-            {gaps.length === 0 ? <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border p-12 text-center`}><Lightbulb className={`w-12 h-12 mx-auto mb-4 ${darkMode ? "text-gray-600" : "text-gray-300"}`} /><h3 className={`text-lg font-medium mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>No gaps detected yet</h3><p className={darkMode ? "text-gray-400" : "text-gray-500"}>{stats?.knowledgeGaps?.length ? `You have ${stats.knowledgeGaps.length} unanswered questions. Click "Analyze Gaps" to identify patterns.` : "Once workers start asking questions, we'll identify knowledge gaps automatically."}</p></div> : <div className="grid gap-4">{gaps.map(gap => (<div key={gap.id} className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border p-6 hover:shadow-lg transition-shadow`}><div className="flex items-start justify-between"><div className="flex-1"><div className="flex items-center gap-3 mb-3"><span className={`px-3 py-1 rounded-full text-sm font-medium ${TOPIC_LABELS[gap.topic]?.bgColor || "bg-gray-100"} ${TOPIC_LABELS[gap.topic]?.color || "text-gray-700"}`}>{TOPIC_LABELS[gap.topic]?.label || gap.topic}</span><span className={`px-2 py-0.5 rounded text-xs font-medium ${gap.priority >= 80 ? "bg-red-100 text-red-700" : gap.priority >= 50 ? "bg-amber-100 text-amber-700" : "bg-green-100 text-green-700"}`}>Priority: {gap.priority}</span>{gap.trend === "rising" && <span className="flex items-center gap-1 text-xs text-red-600"><ArrowUp className="w-3 h-3" /> Rising</span>}</div><h3 className={`font-semibold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>Questions workers are asking:</h3><ul className="space-y-1 mb-4">{gap.cluster.slice(0, 3).map((q, i) => <li key={i} className={`text-sm flex items-start gap-2 ${darkMode ? "text-gray-400" : "text-gray-600"}`}><MessageSquare className={`w-4 h-4 mt-0.5 flex-shrink-0 ${darkMode ? "text-gray-500" : "text-gray-400"}`} />&ldquo;{q}&rdquo;</li>)}</ul><div className="bg-amber-50 border border-amber-200 rounded-lg p-4"><div className="flex items-start gap-2"><Sparkles className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" /><div><p className="font-medium text-amber-900 mb-1">AI Suggestion</p><p className="text-amber-800 text-sm">{gap.suggestedPolicy}</p></div></div></div><div className={`flex items-center gap-4 mt-4 text-sm ${darkMode ? "text-gray-500" : "text-gray-500"}`}><span>Asked {gap.frequency} times</span><span>•</span><span>{gap.uniqueWorkers} workers</span></div></div><button onClick={() => generateDraft(gap)} disabled={generatingDraft === gap.id} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 ml-4"><FileCheck className={`w-4 h-4 ${generatingDraft === gap.id ? "animate-spin" : ""}`} />{generatingDraft === gap.id ? "..." : "Generate Draft"}</button></div></div>))}</div>}
-          </div>
-        )}
-
         {/* DOCUMENTS TAB */}
         {activeTab === "documents" && (
           <div className="space-y-6">
-    {/* Google Drive Integration */}
-    <GoogleDriveIntegration 
-      companyId={selectedCompany}
-      darkMode={darkMode}
-      onDocumentImported={(doc) => {
-        setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title } }]);
-      }}
-    />
+            {/* Manual Upload */}
+            <div className={`${darkMode ? "bg-gray-800 border-gray-600" : "bg-white border-gray-200"} rounded-xl border-2 border-dashed p-8 text-center hover:border-blue-400 transition-colors`}>
+              <input type="file" id="upload" className="hidden" accept=".pdf,.txt,.doc,.docx,.xlsx,.csv" onChange={handleUpload} disabled={uploading} />
+              <label htmlFor="upload" className="cursor-pointer">
+                <Upload className={`w-10 h-10 mx-auto mb-3 ${darkMode ? "text-gray-500" : "text-gray-400"}`} />
+                <p className={`font-medium mb-1 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>{uploading ? "Uploading..." : "Drop files here or click to upload"}</p>
+                <p className={`text-sm ${darkMode ? "text-gray-500" : "text-gray-400"}`}>PDF, Word, Excel, or text files</p>
+              </label>
+            </div>
 
-    {/* Dropbox Integration */}
-    <DropboxIntegration 
-      companyId={selectedCompany}
-      darkMode={darkMode}
-      onDocumentImported={(doc) => {
-        setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title } }]);
-      }}
-    />
+            {/* Integrations Section */}
+            <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border p-4`}>
+              <h3 className={`font-medium mb-4 ${darkMode ? "text-white" : "text-gray-900"}`}>Import from Integrations</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <GoogleDriveIntegration companyId={selectedCompany} darkMode={darkMode} onDocumentImported={(doc) => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title } }])} />
+                <DropboxIntegration companyId={selectedCompany} darkMode={darkMode} onDocumentImported={(doc) => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title } }])} />
+                <GustoIntegration companyId={selectedCompany} darkMode={darkMode} onEmployeesImported={(count) => console.log("Imported employees:", count)} />
+                <MicrosoftTeamsIntegration companyId={selectedCompany} darkMode={darkMode} />
+              </div>
+            </div>
 
-    {/* Gusto Integration */}
-    <GustoIntegration 
-      companyId={selectedCompany}
-      darkMode={darkMode}
-      onEmployeesImported={(count) => {
-        console.log(`Imported ${count} employees from Gusto`);
-      }}
-    />
+            {/* Document List */}
+            <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border`}>
+              <div className={`px-4 py-3 border-b flex items-center justify-between ${darkMode ? "border-gray-700" : "border-gray-100"}`}>
+                <h3 className={`font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>{documents.length} Documents</h3>
+                <button onClick={() => fetch(`/api/documents?companyId=${selectedCompany}`).then(r => r.json()).then(d => setDocuments(d.documents || []))} className={darkMode ? "text-gray-500" : "text-gray-400"}><RefreshCw className="w-4 h-4" /></button>
+              </div>
+              <div className={`divide-y ${darkMode ? "divide-gray-700" : "divide-gray-100"}`}>
+                {documents.length === 0 ? (
+                  <div className={`p-8 text-center ${darkMode ? "text-gray-500" : "text-gray-500"}`}>
+                    <FileText className="w-10 h-10 mx-auto mb-2 opacity-30" />
+                    <p>No documents uploaded yet</p>
+                  </div>
+                ) : documents.map(doc => (
+                  <div key={doc.id} className={`p-4 flex items-center justify-between ${darkMode ? "hover:bg-gray-700" : "hover:bg-gray-50"}`}>
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${darkMode ? "bg-blue-900" : "bg-blue-50"}`}>
+                        <FileText className="w-5 h-5 text-blue-500" />
+                      </div>
+                      <div>
+                        <p className={`font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>{doc.name}</p>
+                        <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>{doc.classification?.title || "Processing..."}</p>
+                      </div>
+                    </div>
+                    <button onClick={() => handleDelete(doc.id)} className={`p-2 rounded-lg ${darkMode ? "text-gray-500 hover:text-red-400" : "text-gray-400 hover:text-red-500"}`}>
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
-    {/* Microsoft Teams Integration */}
-    <MicrosoftTeamsIntegration 
-      companyId={selectedCompany}
-      darkMode={darkMode}
-    />
-            <div className={`${darkMode ? "bg-gray-800 border-gray-600" : "bg-white border-gray-200"} rounded-xl border-2 border-dashed p-8 text-center hover:border-blue-400 transition-colors`}><input type="file" id="upload" className="hidden" accept=".pdf,.txt,.doc,.docx,.xlsx,.csv" onChange={handleUpload} disabled={uploading} /><label htmlFor="upload" className="cursor-pointer"><Upload className={`w-10 h-10 mx-auto mb-3 ${darkMode ? "text-gray-500" : "text-gray-400"}`} /><p className={`font-medium mb-1 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>{uploading ? "Uploading..." : "Drop files here or click to upload"}</p><p className={`text-sm ${darkMode ? "text-gray-500" : "text-gray-400"}`}>PDF, Word, Excel, or text files</p></label></div>
-            <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border`}><div className={`px-4 py-3 border-b flex items-center justify-between ${darkMode ? "border-gray-700" : "border-gray-100"}`}><h3 className={`font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>{documents.length} Documents</h3><button onClick={() => fetch(`/api/documents?companyId=${selectedCompany}`).then(r => r.json()).then(d => setDocuments(d.documents || []))} className={darkMode ? "text-gray-500" : "text-gray-400"}><RefreshCw className="w-4 h-4" /></button></div><div className={`divide-y ${darkMode ? "divide-gray-700" : "divide-gray-100"}`}>{documents.length === 0 ? <div className={`p-8 text-center ${darkMode ? "text-gray-500" : "text-gray-500"}`}><FileText className="w-10 h-10 mx-auto mb-2 opacity-30" /><p>No documents uploaded yet</p></div> : documents.map(doc => (<div key={doc.id} className={`p-4 flex items-center justify-between ${darkMode ? "hover:bg-gray-700" : "hover:bg-gray-50"}`}><div className="flex items-center gap-3"><div className={`w-10 h-10 rounded-lg flex items-center justify-center ${darkMode ? "bg-blue-900" : "bg-blue-50"}`}><FileText className="w-5 h-5 text-blue-500" /></div><div><p className={`font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>{doc.name}</p><p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>{doc.classification?.title || "Processing..."}</p></div></div><button onClick={() => handleDelete(doc.id)} className={`p-2 rounded-lg ${darkMode ? "text-gray-500 hover:text-red-400" : "text-gray-400 hover:text-red-500"}`}><Trash2 className="w-5 h-5" /></button></div>))}</div></div>
+        {/* CREATE TAB */}
+        {activeTab === "create" && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className={`text-xl font-bold flex items-center gap-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                  <Sparkles className="w-6 h-6 text-purple-500" />
+                  Create Content
+                </h2>
+                <p className={`mt-1 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+                  Generate training materials, policies, and guides from your facility knowledge
+                </p>
+              </div>
+            </div>
+
+            {/* Video Walkthrough Upload */}
+            <WalkthroughUpload 
+              companyId={selectedCompany}
+              darkMode={darkMode}
+              onComplete={(result) => {
+                console.log("Walkthrough processed:", result.locations, "locations,", result.faqs, "FAQs");
+              }}
+            />
+
+            {/* Knowledge Gaps Section */}
+            <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border p-6`}>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${darkMode ? "bg-amber-900" : "bg-amber-100"}`}>
+                    <Lightbulb className="w-5 h-5 text-amber-500" />
+                  </div>
+                  <div>
+                    <h3 className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>Generate from Knowledge Gaps</h3>
+                    <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Create policies based on unanswered worker questions</p>
+                  </div>
+                </div>
+                <button onClick={analyzeGaps} disabled={analyzingGaps || !stats?.knowledgeGaps?.length} className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 disabled:opacity-50">
+                  <Sparkles className={`w-4 h-4 ${analyzingGaps ? "animate-spin" : ""}`} />
+                  {analyzingGaps ? "Analyzing..." : "Analyze Gaps"}
+                </button>
+              </div>
+
+              {gaps.length === 0 ? (
+                <div className={`p-8 text-center ${darkMode ? "text-gray-500" : "text-gray-400"}`}>
+                  <Lightbulb className="w-10 h-10 mx-auto mb-2 opacity-30" />
+                  <p>{stats?.knowledgeGaps?.length ? "Click 'Analyze Gaps' to identify patterns" : "No knowledge gaps detected yet"}</p>
+                </div>
+              ) : (
+                <div className="space-y-3 mt-4">
+                  {gaps.slice(0, 3).map(gap => (
+                    <div key={gap.id} className={`${darkMode ? "bg-gray-700" : "bg-gray-50"} rounded-lg p-4`}>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${TOPIC_LABELS[gap.topic]?.bgColor || "bg-gray-100"} ${TOPIC_LABELS[gap.topic]?.color || "text-gray-700"}`}>
+                              {TOPIC_LABELS[gap.topic]?.label || gap.topic}
+                            </span>
+                            <span className={`text-xs ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Asked {gap.frequency} times</span>
+                          </div>
+                          <p className={`text-sm ${darkMode ? "text-gray-300" : "text-gray-700"}`}>{gap.suggestedPolicy}</p>
+                        </div>
+                        <button onClick={() => generateDraft(gap)} disabled={generatingDraft === gap.id} className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 ml-4">
+                          <FileCheck className={`w-4 h-4 ${generatingDraft === gap.id ? "animate-spin" : ""}`} />
+                          {generatingDraft === gap.id ? "..." : "Generate"}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  {gaps.length > 3 && (
+                    <button onClick={() => setActiveTab("create")} className="text-blue-600 text-sm font-medium">
+                      View all {gaps.length} suggestions →
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         )}
 
         {/* WORKERS TAB */}
         {activeTab === "workers" && (
           <div className="space-y-6">
-            <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border p-6`}><div className="flex items-center justify-between mb-6"><div><h3 className={`font-semibold text-lg ${darkMode ? "text-white" : "text-gray-900"}`}>Worker Registration</h3><p className={`text-sm mt-1 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Share this code with your workers to join Sidekick</p></div><button onClick={() => setShowQrModal(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"><QrCode className="w-4 h-4" /> Show QR Code</button></div><div className={`${darkMode ? "bg-gray-700" : "bg-gray-50"} rounded-lg p-4`}><div className="flex items-center justify-between"><div><p className={`text-sm mb-2 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>Workers text this to join:</p><code className={`text-2xl font-bold font-mono ${darkMode ? "text-blue-400" : "text-blue-600"}`}>JOIN {currentCompany?.access_code || "XXXXXX"}</code></div><button onClick={copyAccessCode} className={`p-3 rounded-lg ${darkMode ? "bg-gray-600" : "bg-white"} border ${darkMode ? "border-gray-500" : "border-gray-200"}`}>{copiedCode ? <Check className="w-5 h-5 text-green-500" /> : <Copy className={`w-5 h-5 ${darkMode ? "text-gray-400" : "text-gray-500"}`} />}</button></div><p className={`text-xs mt-3 ${darkMode ? "text-gray-500" : "text-gray-400"}`}>Send to: +1 (888) 707-4659</p></div></div>
-            <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border`}><div className={`px-4 py-3 border-b flex items-center justify-between ${darkMode ? "border-gray-700" : "border-gray-100"}`}><h3 className={`font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>{companyWorkers.length} Workers</h3><span className={`text-xs px-2 py-1 rounded-full ${darkMode ? "bg-green-900 text-green-400" : "bg-green-50 text-green-600"}`}>{companyWorkers.filter(w => w.name).length} verified</span></div><div className={`divide-y ${darkMode ? "divide-gray-700" : "divide-gray-100"}`}>{companyWorkers.length === 0 ? <div className={`p-8 text-center ${darkMode ? "text-gray-500" : "text-gray-500"}`}><Users className="w-10 h-10 mx-auto mb-2 opacity-30" /><p>No workers registered yet</p></div> : companyWorkers.map((worker, i) => (<div key={i} onClick={() => setSelectedWorker(worker)} className={`p-4 flex items-center gap-4 cursor-pointer ${darkMode ? "hover:bg-gray-700" : "hover:bg-gray-50"}`}><div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-medium ${getAvatarColor(worker.name || "")}`}>{worker.name ? getInitials(worker.name) : <User className="w-5 h-5" />}</div><div className="flex-1"><p className={`font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>{worker.name || "Unnamed Worker"}</p><p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>{worker.phone}</p></div><div className="flex items-center gap-3"><span className={`text-xs ${darkMode ? "text-gray-500" : "text-gray-400"}`}>{(stats?.recentQuestions || []).filter(q => q.worker_phone === worker.phone).length} questions</span>{worker.name ? <span className="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full"><CheckCircle className="w-3 h-3" /> Verified</span> : <span className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-full">Pending</span>}<ChevronRight className={`w-4 h-4 ${darkMode ? "text-gray-600" : "text-gray-300"}`} /></div></div>))}</div></div>
+            <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border p-6`}>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className={`font-semibold text-lg ${darkMode ? "text-white" : "text-gray-900"}`}>Worker Registration</h3>
+                  <p className={`text-sm mt-1 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Share this code with your workers to join Sidekick</p>
+                </div>
+                <button onClick={() => setShowQrModal(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700">
+                  <QrCode className="w-4 h-4" /> Show QR Code
+                </button>
+              </div>
+              <div className={`${darkMode ? "bg-gray-700" : "bg-gray-50"} rounded-lg p-4`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className={`text-sm mb-2 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>Workers text this to join:</p>
+                    <code className={`text-2xl font-bold font-mono ${darkMode ? "text-blue-400" : "text-blue-600"}`}>JOIN {currentCompany?.access_code || "XXXXXX"}</code>
+                  </div>
+                  <button onClick={copyAccessCode} className={`p-3 rounded-lg ${darkMode ? "bg-gray-600" : "bg-white"} border ${darkMode ? "border-gray-500" : "border-gray-200"}`}>
+                    {copiedCode ? <Check className="w-5 h-5 text-green-500" /> : <Copy className={`w-5 h-5 ${darkMode ? "text-gray-400" : "text-gray-500"}`} />}
+                  </button>
+                </div>
+                <p className={`text-xs mt-3 ${darkMode ? "text-gray-500" : "text-gray-400"}`}>Send to: +1 (888) 707-4659</p>
+              </div>
+            </div>
+
+            <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border`}>
+              <div className={`px-4 py-3 border-b flex items-center justify-between ${darkMode ? "border-gray-700" : "border-gray-100"}`}>
+                <h3 className={`font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>{companyWorkers.length} Workers</h3>
+                <span className={`text-xs px-2 py-1 rounded-full ${darkMode ? "bg-green-900 text-green-400" : "bg-green-50 text-green-600"}`}>{companyWorkers.filter(w => w.name).length} verified</span>
+              </div>
+              <div className={`divide-y ${darkMode ? "divide-gray-700" : "divide-gray-100"}`}>
+                {companyWorkers.length === 0 ? (
+                  <div className={`p-8 text-center ${darkMode ? "text-gray-500" : "text-gray-500"}`}>
+                    <Users className="w-10 h-10 mx-auto mb-2 opacity-30" />
+                    <p>No workers registered yet</p>
+                  </div>
+                ) : companyWorkers.map((worker, i) => (
+                  <div key={i} onClick={() => setSelectedWorker(worker)} className={`p-4 flex items-center gap-4 cursor-pointer ${darkMode ? "hover:bg-gray-700" : "hover:bg-gray-50"}`}>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-medium ${getAvatarColor(worker.name || "")}`}>
+                      {worker.name ? getInitials(worker.name) : <User className="w-5 h-5" />}
+                    </div>
+                    <div className="flex-1">
+                      <p className={`font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>{worker.name || "Unnamed Worker"}</p>
+                      <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>{worker.phone}</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className={`text-xs ${darkMode ? "text-gray-500" : "text-gray-400"}`}>{(stats?.recentQuestions || []).filter(q => q.worker_phone === worker.phone).length} questions</span>
+                      {worker.name ? (
+                        <span className="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full"><CheckCircle className="w-3 h-3" /> Verified</span>
+                      ) : (
+                        <span className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-full">Pending</span>
+                      )}
+                      <ChevronRight className={`w-4 h-4 ${darkMode ? "text-gray-600" : "text-gray-300"}`} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
       </div>
