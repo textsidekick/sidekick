@@ -2,7 +2,7 @@
 import React from "react";
 import { useState, useRef, useCallback } from "react";
 import Link from "next/link";
-import { Upload, Mic, ChevronLeft, Check, Building2, Users, Globe, FileText, Phone, Sparkles, Mail, AlertCircle, CheckCircle2, Loader2, Link as LinkIcon, Factory, ShoppingCart, Package, Car, Hotel, HeartPulse, Truck, Hammer, Home } from "lucide-react";
+import { Upload, Mic, Moon, Sun, ChevronLeft, Check, Building2, Users, Globe, FileText, Phone, Sparkles, Mail, AlertCircle, CheckCircle2, Loader2, Link as LinkIcon, Factory, ShoppingCart, Package, Car, Hotel, HeartPulse, Truck, Hammer, Home } from "lucide-react";
 
 const industries = [
   { id: "manufacturing", label: "Manufacturing", icon: Factory },
@@ -107,6 +107,12 @@ export default function OnboardingWizard() {
   
   // State for "Other" text inputs
   const [otherRole, setOtherRole] = useState("");
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("sidekickDarkMode");
+    if (saved) setDarkMode(JSON.parse(saved));
+  }, []);
   const [otherLanguage, setOtherLanguage] = useState("");
   const [otherAnswers, setOtherAnswers] = useState<Record<number, string>>({});
   
@@ -142,6 +148,12 @@ export default function OnboardingWizard() {
   ];
 
   const updateForm = (field: string, value: any) => setForm(prev => ({ ...prev, [field]: value }));
+  const toggleDarkMode = () => {
+    const newMode = !darkMode;
+    setDarkMode(newMode);
+    localStorage.setItem("sidekickDarkMode", JSON.stringify(newMode));
+  };
+
   const toggleRole = (role: string) => setForm(prev => ({ ...prev, roles: prev.roles.includes(role) ? prev.roles.filter(r => r !== role) : [...prev.roles, role] }));
   const toggleLanguage = (code: string) => setForm(prev => ({ ...prev, languages: prev.languages.includes(code) ? prev.languages.filter(l => l !== code) : [...prev.languages, code] }));
 

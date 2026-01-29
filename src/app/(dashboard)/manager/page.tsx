@@ -559,7 +559,7 @@ export default function ManagerDashboard() {
       {/* Header */}
       <header className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} border-b px-6 py-4`}>
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2"><img src="/images/logo/sidekick-logo-blue.png" alt="Sidekick" className="w-8 h-8" /><span className={`font-bold text-xl ${darkMode ? "text-white" : "text-gray-900"}`}>Sidekick</span><span className={`mx-3 ${darkMode ? "text-gray-600" : "text-gray-300"}`}>|</span><span className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Dashboard</span></Link>
+          <Link href="/" className="flex items-center gap-2"><img src={darkMode ? "/images/logo/sidekick-logo-white.png" : "/images/logo/sidekick-logo-blue.png"} alt="Sidekick" className="w-8 h-8" /><span className={`font-bold text-xl ${darkMode ? "text-white" : "text-gray-900"}`}>Sidekick</span><span className={`mx-3 ${darkMode ? "text-gray-600" : "text-gray-300"}`}>|</span><span className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Dashboard</span></Link>
           <div className="flex items-center gap-4">
             <button onClick={() => { const newMode = !darkMode; setDarkMode(newMode); localStorage.setItem("sidekickDarkMode", JSON.stringify(newMode)); }} className={`p-2 rounded-lg ${darkMode ? "bg-gray-700 text-yellow-400" : "bg-gray-100 text-gray-600"}`}>{darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}</button>
             <Link href="/" className={`p-2 rounded-lg ${darkMode ? "bg-gray-700 text-gray-300" : "bg-gray-100 text-gray-600"}`}><Home className="w-5 h-5" /></Link>
