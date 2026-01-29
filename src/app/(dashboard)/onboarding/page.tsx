@@ -274,7 +274,7 @@ export default function OnboardingWizard() {
             <span style={{ color: "#cbd5e1" }}>|</span>
             <span style={{ fontSize: "14px", color: "#64748b" }}>Onboarding</span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}><span style={{ fontSize: "14px", color: "#64748b" }}>Step {step + 1} of {steps.length}</span><button onClick={toggleDarkMode} style={{ padding: "8px", borderRadius: "8px", background: darkMode ? "#334155" : "#f1f5f9", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>{darkMode ? <Sun size={20} color="#fbbf24" /> : <Moon size={20} color="#64748b" />}</button><Link href="/" style={{ padding: "8px", borderRadius: "8px", background: darkMode ? "#334155" : "#f1f5f9", color: "#64748b", display: "flex", alignItems: "center", justifyContent: "center" }}><Home size={20} /></Link></div>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}><span style={{ fontSize: "14px", color: "#64748b" }}>Step {step + 1} of {steps.length}</span><Link href="/" style={{ padding: "8px", borderRadius: "8px", background: darkMode ? "#334155" : "#f1f5f9", color: "#64748b", display: "flex", alignItems: "center", justifyContent: "center" }}><Home size={20} /></Link></div>
         </div>
       </header>
 
