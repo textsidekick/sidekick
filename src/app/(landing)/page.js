@@ -1,18 +1,20 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { Moon, Sun } from "lucide-react";
 
 export default function Home() {
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("darkMode");
+    const saved = localStorage.getItem("sidekickDarkMode");
     if (saved) setDarkMode(JSON.parse(saved));
   }, []);
 
   const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    localStorage.setItem("darkMode", JSON.stringify(!darkMode));
+    const newMode = !darkMode;
+    setDarkMode(newMode);
+    localStorage.setItem("sidekickDarkMode", JSON.stringify(newMode));
   };
 
   return (
@@ -40,25 +42,25 @@ export default function Home() {
           borderRadius: "12px",
           border: "none",
           background: darkMode ? "#334155" : "#ffffff",
-          color: darkMode ? "#fbbf24" : "#64748b",
           cursor: "pointer",
           boxShadow: darkMode 
             ? "0 2px 8px rgba(0,0,0,0.3)" 
             : "0 2px 8px rgba(0,0,0,0.08)",
-          fontSize: "1.25rem",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           transition: "all 0.3s ease"
         }}
       >
-        {darkMode ? "☀️" : "🌙"}
+        {darkMode ? <Sun size={20} color="#fbbf24" /> : <Moon size={20} color="#64748b" />}
       </button>
 
       <img 
-        src="/images/logo/newsidekicklogo.png" 
+        src={darkMode ? "/images/logo/sidekick-logo-white.png" : "/images/logo/newsidekicklogo.png"}
         alt="Sidekick" 
         style={{ 
           width: "80px", 
-          marginBottom: "1.5rem",
-          filter: darkMode ? "brightness(1.1)" : "none"
+          marginBottom: "1.5rem"
         }}
       />
       <h1 style={{ 
