@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { Upload, Mic, Moon, Sun, ChevronLeft, Check, Building2, Users, Globe, FileText, Phone, Sparkles, Mail, AlertCircle, CheckCircle2, Loader2, Link as LinkIcon, Factory, ShoppingCart, Package, Car, Hotel, HeartPulse, Truck, Hammer, Home } from "lucide-react";
 
