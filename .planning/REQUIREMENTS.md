@@ -96,54 +96,52 @@
 
 ## Traceability
 
-*(Populated during roadmap creation)*
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | FOUND-01 | Phase 1 | Pending |
-| FOUND-02 | Phase 2 | Pending |
-| FOUND-03 | Phase 2 | Pending |
-| FOUND-04 | Phase 1 | Pending |
-| FOUND-05 | Phase 1 | Pending |
-| FOUND-06 | Phase 1 | Pending |
+| FOUND-02 | Phase 3 | Pending |
+| FOUND-03 | Phase 3 | Pending |
+| FOUND-04 | Phase 2 | Pending |
+| FOUND-05 | Phase 2 | Pending |
+| FOUND-06 | Phase 2 | Pending |
 | DARK-01 | Phase 9 | Pending |
 | DARK-02 | Phase 9 | Pending |
-| DARK-03 | Phase 2 | Pending |
+| DARK-03 | Phase 3 | Pending |
 | DARK-04 | Phase 9 | Pending |
-| ALRT-01 | Phase 3 | Pending |
-| ALRT-02 | Phase 3 | Pending |
-| ALRT-03 | Phase 3 | Pending |
-| ALRT-04 | Phase 3 | Pending |
-| ANLX-01 | Phase 4 | Pending |
-| ANLX-02 | Phase 4 | Pending |
-| ANLX-03 | Phase 4 | Pending |
-| ANLX-04 | Phase 4 | Pending |
-| ANLX-05 | Phase 4 | Pending |
-| ANLX-06 | Phase 4 | Pending |
-| WORK-01 | Phase 5 | Pending |
-| WORK-02 | Phase 5 | Pending |
-| WORK-03 | Phase 5 | Pending |
-| WORK-04 | Phase 5 | Pending |
-| WORK-05 | Phase 5 | Pending |
-| DOCS-01 | Phase 6 | Pending |
-| DOCS-02 | Phase 6 | Pending |
-| DOCS-03 | Phase 6 | Pending |
-| DOCS-04 | Phase 6 | Pending |
-| AIST-01 | Phase 7 | Pending |
-| AIST-02 | Phase 7 | Pending |
-| AIST-03 | Phase 7 | Pending |
-| DSN-01 | All phases | Pending |
-| DSN-02 | Phase 6 | Pending |
-| DSN-03 | All phases | Pending |
-| DSN-04 | Phases 6-7 | Pending |
-| DSN-05 | Phase 2 | Pending |
-| DSN-06 | All phases | Pending |
+| ALRT-01 | Phase 4 | Pending |
+| ALRT-02 | Phase 4 | Pending |
+| ALRT-03 | Phase 4 | Pending |
+| ALRT-04 | Phase 4 | Pending |
+| ANLX-01 | Phase 5 | Pending |
+| ANLX-02 | Phase 5 | Pending |
+| ANLX-03 | Phase 5 | Pending |
+| ANLX-04 | Phase 5 | Pending |
+| ANLX-05 | Phase 5 | Pending |
+| ANLX-06 | Phase 5 | Pending |
+| WORK-01 | Phase 6 | Pending |
+| WORK-02 | Phase 6 | Pending |
+| WORK-03 | Phase 6 | Pending |
+| WORK-04 | Phase 6 | Pending |
+| WORK-05 | Phase 6 | Pending |
+| DOCS-01 | Phase 7 | Pending |
+| DOCS-02 | Phase 7 | Pending |
+| DOCS-03 | Phase 7 | Pending |
+| DOCS-04 | Phase 7 | Pending |
+| AIST-01 | Phase 8 | Pending |
+| AIST-02 | Phase 8 | Pending |
+| AIST-03 | Phase 8 | Pending |
+| DSN-01 | Phase 2 (cross-cutting) | Pending |
+| DSN-02 | Phase 7 (cross-cutting) | Pending |
+| DSN-03 | Phase 9 (cross-cutting) | Pending |
+| DSN-04 | Phase 7 (cross-cutting) | Pending |
+| DSN-05 | Phase 3 | Pending |
+| DSN-06 | Phase 2 (cross-cutting) | Pending |
 
 **Coverage:**
-- v1 requirements: 37 total
-- Mapped to phases: 37
-- Unmapped: 0 ✓
+- v1 requirements: 38 total
+- Mapped to phases: 38
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-13*
-*Last updated: 2026-03-13 after initial definition*
+*Last updated: 2026-03-13 after roadmap creation*
