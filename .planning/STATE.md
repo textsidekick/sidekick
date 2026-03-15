@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Phase 1 context gathered
-last_updated: "2026-03-13T21:35:15.272Z"
+stopped_at: "Checkpoint: Task 3 human-verify — awaiting browser verification of depth system and dark mode"
+last_updated: "2026-03-15T02:41:09.725Z"
 last_activity: 2026-03-13 -- Roadmap created (9 phases, 38 requirements mapped)
 progress:
   total_phases: 9
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  completed_phases: 1
+  total_plans: 1
+  completed_plans: 1
   percent: 0
 ---
 
@@ -50,6 +50,7 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: -
 
 *Updated after each plan completion*
+| Phase 01-foundation-verification P01 | 5 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -61,6 +62,9 @@ Recent decisions affecting current work:
 - [Roadmap]: Alerts tab is Phase 4 (first tab built) -- highest business priority
 - [Roadmap]: DSN-* requirements are cross-cutting; assigned to specific phases for traceability but enforced continuously
 - [Roadmap]: Phases 4-8 (tabs) depend on Phase 3 but are independent of each other; ordered by business priority
+- [Phase 01-foundation-verification]: app/page.tsx kept as server component (no use client) so redirect() from next/navigation works correctly
+- [Phase 01-foundation-verification]: mounted guard pattern (useState + useEffect) is mandatory for useTheme() to avoid hydration mismatch — applies to all dashboard components
+- [Phase 01-foundation-verification]: Dashboard page uses bg-[var(--page-bg)] CSS variable arbitrary-value syntax, not bg-gray-50, to exercise and prove the CSS variable path
 
 ### Pending Todos
 
@@ -73,6 +77,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-13T21:35:15.264Z
-Stopped at: Phase 1 context gathered
-Resume file: .planning/phases/01-foundation-verification/01-CONTEXT.md
+Last session: 2026-03-15T02:41:09.722Z
+Stopped at: Checkpoint: Task 3 human-verify — awaiting browser verification of depth system and dark mode
+Resume file: None
