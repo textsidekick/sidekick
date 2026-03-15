@@ -141,13 +141,13 @@ Apply this class string to every card. No exceptions.
 ```
 rounded-xl border border-gray-200 dark:border-gray-800
 bg-white dark:bg-[var(--card-bg)]
-shadow-[var(--card-shadow)]
+[box-shadow:var(--card-shadow)]
 p-5
 ```
 
 Hover-interactive cards additionally get:
 ```
-hover:shadow-[var(--card-shadow-hover)] transition-shadow duration-150 cursor-pointer
+hover:[box-shadow:var(--card-shadow-hover)] transition-shadow duration-150 cursor-pointer
 ```
 
 ### Button Rules
@@ -303,7 +303,7 @@ If a design decision isn't covered by this file and you're not sure what to do �
 - **Never use `<form>` HTML tags** — onClick/onChange handlers only
 - **Never use `any` in TypeScript** — define the type or use unknown and narrow
 - **Never hardcode hex values in JSX classNames** — use Tailwind classes or CSS variables
-- **Never use shadow-lg or shadow-xl on cards** — always `shadow-[var(--card-shadow)]`
+- **Never use shadow-lg or shadow-xl on cards** — always `[box-shadow:var(--card-shadow)]` (Tailwind v4 arbitrary CSS property syntax — `shadow-[var(...)]` breaks with multi-value shadows)
 - **Never mix icon libraries** — Lucide React only, always
 - **Never build a bare empty state** — always use the EmptyState component
 - **Never let single-column upload zones go full width** — max-w-2xl

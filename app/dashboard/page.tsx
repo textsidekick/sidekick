@@ -32,7 +32,7 @@ export default function DashboardPage() {
             </Button>
           )}
         </div>
-        <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)] shadow-[var(--card-shadow)] p-5">
+        <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)] [box-shadow:var(--card-shadow)] p-5">
           <h1 className="text-base font-semibold text-gray-900 dark:text-white">
             Sidekick Dashboard
           </h1>
