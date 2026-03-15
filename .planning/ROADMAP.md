@@ -32,10 +32,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. `app/dashboard/page.tsx` renders without errors and displays a visible page with the depth system background color (#f9fafb light, #0f1117 dark)
   2. CSS variables from globals.css (--page-bg, --card-bg, --card-shadow) are applied and inspectable in the browser
   3. A test div using the CLAUDE.md card anatomy class string (`rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)] shadow-[var(--card-shadow)] p-5`) renders with visible depth separation from the page background in both light and dark mode
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 01-01: TBD
+- [ ] 01-01-PLAN.md — Replace root redirect and create dashboard depth-system verification stub
 
 ### Phase 2: Shared Components
 **Goal**: The three shared building-block components (EmptyState, MetricCard, SectionHeader) are built, verified in both modes, and ready for use by all 5 tabs
