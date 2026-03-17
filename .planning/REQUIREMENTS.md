@@ -8,7 +8,7 @@
 ### Foundation
 
 - [x] **FOUND-01**: Design tokens and CSS variables are defined in globals.css — depth system (--page-bg, --card-bg, --card-shadow), dark mode tokens, and shadcn primary color override to blue *(already complete in workflow 00)*
-- [ ] **FOUND-02**: Layout shell renders with TopBar (logo, theme toggle, avatar dropdown), SubHeader (company selector), and TabNav (5 tabs + Invite Workers button)
+- [x] **FOUND-02**: Layout shell renders with TopBar (logo, theme toggle, avatar dropdown), SubHeader (company selector), and TabNav (5 tabs + Invite Workers button)
 - [ ] **FOUND-03**: Tab navigation switches between Analytics, Alerts, Documents, AI Studio, and Workers tabs via useState (no URL routing)
 - [ ] **FOUND-04**: Shared EmptyState component renders icon container + title + description + optional action button — used across all tabs
 - [ ] **FOUND-05**: Shared MetricCard component renders KPI value + label + icon + optional subtext
@@ -18,7 +18,7 @@
 
 - [ ] **DARK-01**: Every component renders correctly in light mode (page bg #f9fafb, card bg #ffffff)
 - [ ] **DARK-02**: Every component renders correctly in dark mode (page bg #0f1117, card bg #1a1d27)
-- [ ] **DARK-03**: Theme toggle in TopBar switches between light, dark, and system modes
+- [x] **DARK-03**: Theme toggle in TopBar switches between light, dark, and system modes
 - [ ] **DARK-04**: No text element is unreadable or invisible in either mode
 
 ### Alerts Tab
@@ -99,14 +99,14 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | FOUND-01 | Phase 1 | Complete |
-| FOUND-02 | Phase 3 | Pending |
+| FOUND-02 | Phase 3 | Complete |
 | FOUND-03 | Phase 3 | Pending |
 | FOUND-04 | Phase 2 | Pending |
 | FOUND-05 | Phase 2 | Pending |
 | FOUND-06 | Phase 2 | Pending |
 | DARK-01 | Phase 9 | Pending |
 | DARK-02 | Phase 9 | Pending |
-| DARK-03 | Phase 3 | Pending |
+| DARK-03 | Phase 3 | Complete |
 | DARK-04 | Phase 9 | Pending |
 | ALRT-01 | Phase 4 | Pending |
 | ALRT-02 | Phase 4 | Pending |
