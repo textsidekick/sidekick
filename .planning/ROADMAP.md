@@ -12,7 +12,7 @@ This roadmap delivers a demo-ready manager dashboard for Sidekick -- a greenfiel
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation Verification** - Confirm scaffold wiring, design tokens, and dashboard page shell render correctly
+- [x] **Phase 1: Foundation Verification** - Confirm scaffold wiring, design tokens, and dashboard page shell render correctly
 - [ ] **Phase 2: Shared Components** - Build EmptyState, MetricCard, and SectionHeader -- the building blocks every tab depends on
 - [ ] **Phase 3: Layout Shell** - Build TopBar, SubHeader, and TabNav with working dark mode toggle and tab switching
 - [ ] **Phase 4: Alerts Tab** - Build the highest-priority tab: 4 KPI cards, filtered issues table, segmented status control
@@ -35,7 +35,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 1 plan
 
 Plans:
-- [ ] 01-01-PLAN.md — Replace root redirect and create dashboard depth-system verification stub
+- [x] 01-01-PLAN.md — Replace root redirect and create dashboard depth-system verification stub (COMPLETE 2026-03-16)
 
 ### Phase 2: Shared Components
 **Goal**: The three shared building-block components (EmptyState, MetricCard, SectionHeader) are built, verified in both modes, and ready for use by all 5 tabs
@@ -47,12 +47,10 @@ Plans:
   3. SectionHeader component renders a card heading with optional action button using the correct typography scale -- visually correct in both modes
   4. All three components use only Lucide React icons (no other icon library)
   5. All cards use raw divs with the exact CLAUDE.md class string -- the shadcn Card component is not imported anywhere in `components/dashboard/shared/`
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
-- [ ] 02-03: TBD
+- [ ] 02-01-PLAN.md — Build EmptyState, MetricCard, SectionHeader components and visual showcase page
 
 ### Phase 3: Layout Shell
 **Goal**: The dashboard has a fully navigable chrome -- TopBar with logo and dark mode toggle, SubHeader with company selector, and TabNav with 5 tabs -- and switching tabs works
@@ -189,8 +187,8 @@ Note: Phases 4-8 depend on Phase 3 but are independent of each other. The recomm
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation Verification | 0/1 | Not started | - |
-| 2. Shared Components | 0/3 | Not started | - |
+| 1. Foundation Verification | 1/1 | Complete | 2026-03-16 |
+| 2. Shared Components | 0/1 | Planned | - |
 | 3. Layout Shell | 0/3 | Not started | - |
 | 4. Alerts Tab | 0/3 | Not started | - |
 | 5. Analytics Tab | 0/3 | Not started | - |
