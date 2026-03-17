@@ -62,12 +62,11 @@ Plans:
   3. TabNav renders 5 tabs (Analytics, Alerts, Documents, AI Studio, Workers) plus an "Invite Workers" button -- active tab uses a border-bottom underline indicator (not a filled pill)
   4. Clicking a tab in TabNav switches the visible content area via useState -- all 5 tabs are switchable
   5. The full layout shell (TopBar + SubHeader + TabNav) renders correctly in both light and dark mode with no invisible or unreadable elements
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
-- [ ] 03-03: TBD
+- [ ] 03-01-PLAN.md — Build TopBar (logo, 3-state theme toggle, avatar dropdown) and SubHeader (tagline + company selector)
+- [ ] 03-02-PLAN.md — Build TabNav (5 tabs, underline indicator, Invite Workers CTA) and rewire dashboard page for full tab switching
 
 ### Phase 4: Alerts Tab
 **Goal**: A manager opening the dashboard sees the Alerts tab with 4 KPI summary cards and a filterable issues table -- the single highest-value view for morning check-ins
@@ -189,7 +188,7 @@ Note: Phases 4-8 depend on Phase 3 but are independent of each other. The recomm
 |-------|----------------|--------|-----------|
 | 1. Foundation Verification | 1/1 | Complete | 2026-03-16 |
 | 2. Shared Components | 0/1 | Planned | - |
-| 3. Layout Shell | 0/3 | Not started | - |
+| 3. Layout Shell | 0/2 | Not started | - |
 | 4. Alerts Tab | 0/3 | Not started | - |
 | 5. Analytics Tab | 0/3 | Not started | - |
 | 6. Workers Tab | 0/3 | Not started | - |
