@@ -48,8 +48,8 @@
 }
 
 :root {
-  /* Page background overridden to gray-50 for depth system */
-  --background: oklch(0.984 0 0);       /* #f9fafb */
+  /* Page background — warm cream for depth system */
+  --background: oklch(0.975 0.005 80);  /* ~#f7f5f0 warm cream */
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);                 /* #ffffff */
   --card-foreground: oklch(0.145 0 0);
@@ -84,7 +84,7 @@
   --sidebar-ring: oklch(0.546 0.245 262.881);
 
   /* ── Depth System ── */
-  --page-bg: #f9fafb;
+  --page-bg: #f7f5f0;
   --card-bg: #ffffff;
   --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.06);
   --card-shadow-hover: 0 4px 12px 0 rgb(0 0 0 / 0.1), 0 2px 4px -1px rgb(0 0 0 / 0.06);
