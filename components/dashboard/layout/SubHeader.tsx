@@ -34,7 +34,7 @@ function SubHeader({}: SubHeaderProps) {
         {/* Right: Company Selector */}
         <Select value={company} onValueChange={(value) => { if (value) setCompany(value) }}>
           <SelectTrigger className="w-[200px] border-gray-200 dark:border-gray-700 bg-transparent">
-            <Building className="h-4 w-4 text-gray-500 shrink-0" />
+            <Building className="h-4 w-4 text-gray-500 dark:text-gray-400 shrink-0" />
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
