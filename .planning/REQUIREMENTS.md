@@ -9,7 +9,7 @@
 
 - [x] **FOUND-01**: Design tokens and CSS variables are defined in globals.css — depth system (--page-bg, --card-bg, --card-shadow), dark mode tokens, and shadcn primary color override to blue *(already complete in workflow 00)*
 - [x] **FOUND-02**: Layout shell renders with TopBar (logo, theme toggle, avatar dropdown), SubHeader (company selector), and TabNav (5 tabs + Invite Workers button)
-- [ ] **FOUND-03**: Tab navigation switches between Analytics, Alerts, Documents, AI Studio, and Workers tabs via useState (no URL routing)
+- [x] **FOUND-03**: Tab navigation switches between Analytics, Alerts, Documents, AI Studio, and Workers tabs via useState (no URL routing)
 - [ ] **FOUND-04**: Shared EmptyState component renders icon container + title + description + optional action button — used across all tabs
 - [ ] **FOUND-05**: Shared MetricCard component renders KPI value + label + icon + optional subtext
 - [ ] **FOUND-06**: Shared SectionHeader component renders card heading + optional action button
@@ -64,7 +64,7 @@
 - [ ] **DSN-02**: All integration connect buttons use `variant="outline"` with neutral border — never brand colors
 - [ ] **DSN-03**: All empty states use the shared EmptyState component — never bare icon + text
 - [ ] **DSN-04**: Single-column upload zones are constrained with `max-w-2xl`
-- [ ] **DSN-05**: Active tab uses border-bottom underline indicator — never a filled pill
+- [x] **DSN-05**: Active tab uses border-bottom underline indicator — never a filled pill
 - [ ] **DSN-06**: All icons are from Lucide React — no other icon libraries
 
 ## v2 Requirements
@@ -100,7 +100,7 @@
 |-------------|-------|--------|
 | FOUND-01 | Phase 1 | Complete |
 | FOUND-02 | Phase 3 | Complete |
-| FOUND-03 | Phase 3 | Pending |
+| FOUND-03 | Phase 3 | Complete |
 | FOUND-04 | Phase 2 | Pending |
 | FOUND-05 | Phase 2 | Pending |
 | FOUND-06 | Phase 2 | Pending |
@@ -134,7 +134,7 @@
 | DSN-02 | Phase 7 (cross-cutting) | Pending |
 | DSN-03 | Phase 9 (cross-cutting) | Pending |
 | DSN-04 | Phase 7 (cross-cutting) | Pending |
-| DSN-05 | Phase 3 | Pending |
+| DSN-05 | Phase 3 | Complete |
 | DSN-06 | Phase 2 (cross-cutting) | Pending |
 
 **Coverage:**

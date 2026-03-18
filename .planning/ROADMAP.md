@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation Verification** - Confirm scaffold wiring, design tokens, and dashboard page shell render correctly
 - [ ] **Phase 2: Shared Components** - Build EmptyState, MetricCard, and SectionHeader -- the building blocks every tab depends on
-- [ ] **Phase 3: Layout Shell** - Build TopBar, SubHeader, and TabNav with working dark mode toggle and tab switching
+- [x] **Phase 3: Layout Shell** - Build TopBar, SubHeader, and TabNav with working dark mode toggle and tab switching (completed 2026-03-18)
 - [ ] **Phase 4: Alerts Tab** - Build the highest-priority tab: 4 KPI cards, filtered issues table, segmented status control
 - [ ] **Phase 5: Analytics Tab** - Build usage metrics, Recharts questions chart, recent questions feed, and activity feed
 - [ ] **Phase 6: Workers Tab** - Build JOIN code display, QR code modal, and worker roster with verified badges
@@ -188,7 +188,7 @@ Note: Phases 4-8 depend on Phase 3 but are independent of each other. The recomm
 |-------|----------------|--------|-----------|
 | 1. Foundation Verification | 1/1 | Complete | 2026-03-16 |
 | 2. Shared Components | 0/1 | Planned | - |
-| 3. Layout Shell | 1/2 | In Progress|  |
+| 3. Layout Shell | 2/2 | Complete   | 2026-03-18 |
 | 4. Alerts Tab | 0/3 | Not started | - |
 | 5. Analytics Tab | 0/3 | Not started | - |
 | 6. Workers Tab | 0/3 | Not started | - |
