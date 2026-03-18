@@ -68,6 +68,7 @@ function WorkersTable({ workers }: WorkersTableProps) {
           description="Workers will appear here once they text your JOIN code to register with Sidekick."
         />
       ) : (
+        <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow className="border-b border-gray-100 hover:bg-transparent dark:border-gray-800">
@@ -122,6 +123,7 @@ function WorkersTable({ workers }: WorkersTableProps) {
             ))}
           </TableBody>
         </Table>
+        </div>
       )}
     </div>
   )

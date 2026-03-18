@@ -70,6 +70,7 @@ function DocumentsTable({ documents }: DocumentsTableProps) {
           description="Upload training documents, safety manuals, or policies. They'll appear here once added."
         />
       ) : (
+        <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow className="border-b border-gray-100 hover:bg-transparent dark:border-gray-800">
@@ -114,6 +115,7 @@ function DocumentsTable({ documents }: DocumentsTableProps) {
             ))}
           </TableBody>
         </Table>
+        </div>
       )}
     </div>
   )

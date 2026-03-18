@@ -30,7 +30,7 @@ function TabNav({ activeTab, onTabChange }: TabNavProps) {
   return (
     <div className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)]">
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-        <div className="flex gap-0">
+        <div className="flex gap-0 overflow-x-auto">
           {TABS.map((tab) => (
             <button
               key={tab.id}

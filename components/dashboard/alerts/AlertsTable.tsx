@@ -135,6 +135,7 @@ function AlertsTable({ alerts }: AlertsTableProps) {
           </div>
 
           {/* Table */}
+          <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="border-b border-gray-100 hover:bg-transparent dark:border-gray-800">
@@ -225,6 +226,7 @@ function AlertsTable({ alerts }: AlertsTableProps) {
               ))}
             </TableBody>
           </Table>
+          </div>
         </>
       )}
     </div>
