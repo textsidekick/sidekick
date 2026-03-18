@@ -41,9 +41,9 @@
 
 - [x] **WORK-01**: RegistrationCard displays the team JOIN code in monospace font with a copy-to-clipboard button
 - [x] **WORK-02**: "Show QR Code" button opens a QRCodeModal dialog with a scannable QR code and download button
-- [ ] **WORK-03**: WorkersTable renders a list of workers with columns for name, phone number, join date, and status
-- [ ] **WORK-04**: Verified workers display a verified badge in the table
-- [ ] **WORK-05**: Workers tab accepts `showMockData?: boolean` prop — when true, table populates with realistic mock worker data
+- [x] **WORK-03**: WorkersTable renders a list of workers with columns for name, phone number, join date, and status
+- [x] **WORK-04**: Verified workers display a verified badge in the table
+- [x] **WORK-05**: Workers tab accepts `showMockData?: boolean` prop — when true, table populates with realistic mock worker data
 
 ### Documents Tab
 
@@ -120,9 +120,9 @@
 | ANLX-06 | Phase 5 | Complete |
 | WORK-01 | Phase 6 | Complete |
 | WORK-02 | Phase 6 | Complete |
-| WORK-03 | Phase 6 | Pending |
-| WORK-04 | Phase 6 | Pending |
-| WORK-05 | Phase 6 | Pending |
+| WORK-03 | Phase 6 | Complete |
+| WORK-04 | Phase 6 | Complete |
+| WORK-05 | Phase 6 | Complete |
 | DOCS-01 | Phase 7 | Pending |
 | DOCS-02 | Phase 7 | Pending |
 | DOCS-03 | Phase 7 | Pending |
