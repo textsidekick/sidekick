@@ -24,8 +24,8 @@
 ### Alerts Tab
 
 - [x] **ALRT-01**: Alerts tab renders 4 KPI cards (Total Issues, Open, In Progress, Resolved) using MetricCard
-- [ ] **ALRT-02**: Alerts table renders a list of safety issues with columns for issue, worker, severity, status, and date
-- [ ] **ALRT-03**: Segmented control above the table filters issues by status (All / Open / In Progress / Resolved)
+- [x] **ALRT-02**: Alerts table renders a list of safety issues with columns for issue, worker, severity, status, and date
+- [x] **ALRT-03**: Segmented control above the table filters issues by status (All / Open / In Progress / Resolved)
 - [x] **ALRT-04**: Alerts tab accepts `showMockData?: boolean` prop — when true, table populates with realistic mock safety issues
 
 ### Analytics Tab
@@ -109,8 +109,8 @@
 | DARK-03 | Phase 3 | Complete |
 | DARK-04 | Phase 9 | Pending |
 | ALRT-01 | Phase 4 | Complete |
-| ALRT-02 | Phase 4 | Pending |
-| ALRT-03 | Phase 4 | Pending |
+| ALRT-02 | Phase 4 | Complete |
+| ALRT-03 | Phase 4 | Complete |
 | ALRT-04 | Phase 4 | Complete |
 | ANLX-01 | Phase 5 | Pending |
 | ANLX-02 | Phase 5 | Pending |
