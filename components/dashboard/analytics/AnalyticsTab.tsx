@@ -15,8 +15,33 @@ import { QuestionsPerHourChart } from './QuestionsPerHourChart'
 import { QuestionsChart } from './QuestionsChart'
 import { ResolutionChart } from './ResolutionChart'
 import { FeedCard } from './FeedCard'
+import type { FeedItem } from './FeedCard'
 
-function AnalyticsTab() {
+const MOCK_RECENT_QUESTIONS: FeedItem[] = [
+  { id: 'q1', text: 'How do I report a safety hazard in the warehouse?', timestamp: '2 min ago', category: 'Safety' },
+  { id: 'q2', text: 'What is the overtime policy for weekends?', timestamp: '15 min ago', category: 'HR' },
+  { id: 'q3', text: 'Where are the fire extinguishers on the loading dock?', timestamp: '32 min ago', category: 'Safety' },
+  { id: 'q4', text: 'Can I swap my Tuesday shift with another worker?', timestamp: '1 hour ago', category: 'Scheduling' },
+  { id: 'q5', text: 'What PPE is required for the chemical storage area?', timestamp: '2 hours ago', category: 'Safety' },
+  { id: 'q6', text: 'How do I request time off for next week?', timestamp: '3 hours ago', category: 'HR' },
+  { id: 'q7', text: 'What is the maximum weight for manual lifting?', timestamp: '4 hours ago', category: 'Safety' },
+]
+
+const MOCK_ACTIVITY: FeedItem[] = [
+  { id: 'a1', text: 'Maria Garcia uploaded "Safety Training Manual"', timestamp: '10 min ago' },
+  { id: 'a2', text: 'New worker registered: James Wilson', timestamp: '1 hour ago' },
+  { id: 'a3', text: 'Alert #47 resolved by Team Lead', timestamp: '2 hours ago' },
+  { id: 'a4', text: 'Knowledge base updated: Forklift Safety Guide', timestamp: '3 hours ago' },
+  { id: 'a5', text: 'Carlos Rodriguez completed onboarding', timestamp: '5 hours ago' },
+  { id: 'a6', text: 'New document synced from Google Drive', timestamp: 'Yesterday' },
+  { id: 'a7', text: 'Weekly analytics report generated', timestamp: 'Yesterday' },
+]
+
+interface AnalyticsTabProps {
+  showMockData?: boolean
+}
+
+function AnalyticsTab({ showMockData = false }: AnalyticsTabProps) {
   return (
     <div className="space-y-6">
       {/* Row 1: 4 KPI metric cards */}
@@ -64,7 +89,7 @@ function AnalyticsTab() {
         <FeedCard
           title="Recent Questions"
           icon={MessageSquare}
-          items={[]}
+          items={showMockData ? MOCK_RECENT_QUESTIONS : []}
           emptyTitle="No questions yet"
           emptyDescription="Questions from your workers will appear here as they interact with Sidekick throughout the day."
           showSeeAll
@@ -73,7 +98,7 @@ function AnalyticsTab() {
         <FeedCard
           title="Activity"
           icon={Activity}
-          items={[]}
+          items={showMockData ? MOCK_ACTIVITY : []}
           emptyTitle="No recent activity"
           emptyDescription="Team activity like document uploads, worker registrations, and alert resolutions will show up here."
         />
