@@ -27,7 +27,7 @@ export default function DashboardPage() {
 
       {/* Tab content area */}
       <div className="max-w-7xl mx-auto px-6 py-6">
-        {activeTab === 'analytics' && <AnalyticsTab />}
+        {activeTab === 'analytics' && <AnalyticsTab showMockData={true} />}
         {activeTab === 'alerts' && <AlertsTab showMockData={true} />}
         {activeTab === 'documents' && (
           <EmptyState
