@@ -110,12 +110,11 @@ Plans:
   3. WorkersTable renders a list of workers with columns for name, phone number, join date, and status
   4. Workers with verified status display a visible verified badge in the table
   5. With `showMockData={true}`, the table populates with realistic worker data (mix of verified and unverified); with `showMockData={false}`, the EmptyState component is displayed
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 06-01: TBD
-- [ ] 06-02: TBD
-- [ ] 06-03: TBD
+- [ ] 06-01-PLAN.md — Install qrcode.react, build RegistrationCard (JOIN code + copy) and QRCodeModal (QR display + download)
+- [ ] 06-02-PLAN.md — Build WorkersTable (roster + verified badges), assemble WorkersTab, wire into dashboard page
 
 ### Phase 7: Documents Tab
 **Goal**: A manager can see the document upload area, browse integration connectors with calm neutral buttons, and view uploaded documents
@@ -188,7 +187,7 @@ Note: Phases 4-8 depend on Phase 3 but are independent of each other. The recomm
 | 3. Layout Shell | 2/2 | Complete   | 2026-03-18 |
 | 4. Alerts Tab | 1/2 | In Progress|  |
 | 5. Analytics Tab | 1/1 | Complete   | 2026-03-18 |
-| 6. Workers Tab | 0/3 | Not started | - |
+| 6. Workers Tab | 0/2 | Planned | - |
 | 7. Documents Tab | 0/3 | Not started | - |
 | 8. AI Studio Tab | 0/2 | Not started | - |
 | 9. Polish and Verification | 0/3 | Not started | - |
