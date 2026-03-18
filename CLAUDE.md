@@ -321,45 +321,45 @@ If a design decision isn't covered by this file and you're not sure what to do �
 | Component | Status | Notes |
 |---|---|---|
 | **Foundation** | | |
-| Next.js project created | 🔲 Not started | |
-| Design tokens (tailwind.config + globals.css) | 🔲 Not started | |
-| Dependencies installed | 🔲 Not started | shadcn, next-themes, lucide-react, recharts |
-| shadcn components added | 🔲 Not started | card, button, badge, table, tabs, dialog, avatar, dropdown-menu, select, separator, skeleton, tooltip, progress |
+| Next.js project created | Complete | Built Phase 1, verified Phase 9 |
+| Design tokens (tailwind.config + globals.css) | Complete | Built Phase 1 (Tailwind v4 @theme inline), audited Phase 9 |
+| Dependencies installed | Complete | Built Phase 1 -- shadcn base-nova, next-themes, lucide-react, recharts, qrcode.react |
+| shadcn components added | Complete | Built Phase 1 -- 12 components installed via base-nova style |
 | **Layout Shell** | | |
-| TopBar | 🔲 Not started | |
-| SubHeader + CompanySelector | 🔲 Not started | |
-| TabNav | 🔲 Not started | |
-| Dashboard page assembly | 🔲 Not started | |
+| TopBar | Complete | Built Phase 3, dark mode audited Phase 9 |
+| SubHeader + CompanySelector | Complete | Built Phase 3, dark mode fix Phase 9 (Building icon) |
+| TabNav | Complete | Built Phase 3, responsive overflow added Phase 9 |
+| Dashboard page assembly | Complete | Built Phase 3, all 5 tabs wired with showMockData Phase 8 |
 | **Shared Components** | | |
-| EmptyState | 🔲 Not started | |
-| MetricCard | 🔲 Not started | |
-| SectionHeader | 🔲 Not started | |
+| EmptyState | Complete | Built Phase 2, used across all tabs, audited Phase 9 |
+| MetricCard | Complete | Built Phase 2, accentColor prop added Phase 4, audited Phase 9 |
+| SectionHeader | Complete | Built Phase 2, audited Phase 9 |
 | **Analytics Tab** | | |
-| AnalyticsTab (assembly) | 🔲 Not started | |
-| QuestionsChart | 🔲 Not started | |
-| FeedCard | 🔲 Not started | |
+| AnalyticsTab (assembly) | Complete | Built Phase 5, responsive grid verified Phase 9 |
+| QuestionsChart | Complete | Built Phase 5, audited Phase 9 |
+| FeedCard | Complete | Built Phase 5, audited Phase 9 |
 | **Alerts Tab** | | |
-| AlertsTab (assembly) | 🔲 Not started | |
-| AlertMetrics | 🔲 Not started | |
-| AlertsTable | 🔲 Not started | |
+| AlertsTab (assembly) | Complete | Built Phase 4, audited Phase 9 |
+| AlertMetrics | Complete | Built Phase 4, responsive grid verified Phase 9 |
+| AlertsTable | Complete | Built Phase 4, overflow-x-auto added Phase 9 |
 | **Documents Tab** | | |
-| DocumentsTab (assembly) | 🔲 Not started | |
-| UploadZone | 🔲 Not started | |
-| IntegrationsRow | 🔲 Not started | |
-| DocumentsTable | 🔲 Not started | |
+| DocumentsTab (assembly) | Complete | Built Phase 7, audited Phase 9 |
+| UploadZone | Complete | Built Phase 7, audited Phase 9 |
+| IntegrationsRow | Complete | Built Phase 7, neutral outline buttons, audited Phase 9 |
+| DocumentsTable | Complete | Built Phase 7, overflow-x-auto added Phase 9 |
 | **AI Studio Tab** | | |
-| AIStudioTab (assembly) | 🔲 Not started | |
-| VideoUpload | 🔲 Not started | |
-| KnowledgeGaps | 🔲 Not started | |
+| AIStudioTab (assembly) | Complete | Built Phase 8, audited Phase 9 |
+| VideoUpload | Complete | Built Phase 8, max-w-2xl constraint, audited Phase 9 |
+| KnowledgeGaps | Complete | Built Phase 8, amber Analyze Gaps button, audited Phase 9 |
 | **Workers Tab** | | |
-| WorkersTab (assembly) | 🔲 Not started | |
-| RegistrationCard | 🔲 Not started | |
-| QRCodeModal | 🔲 Not started | |
-| WorkersTable | 🔲 Not started | |
+| WorkersTab (assembly) | Complete | Built Phase 6, audited Phase 9 |
+| RegistrationCard | Complete | Built Phase 6, audited Phase 9 |
+| QRCodeModal | Complete | Built Phase 6, QRCodeSVG + Canvas download, audited Phase 9 |
+| WorkersTable | Complete | Built Phase 6, overflow-x-auto added Phase 9 |
 | **Polish** | | |
-| Typography audit | 🔲 Not started | |
-| Dark mode sweep | 🔲 Not started | |
-| Responsive breakpoints | 🔲 Not started | |
+| Typography audit | Complete | Phase 9 Plan 1 -- all 32 components verified |
+| Dark mode sweep | Complete | Phase 9 Plan 1 -- all dark: variants confirmed |
+| Responsive breakpoints | Complete | Phase 9 Plan 2 -- tables, TabNav, ContentCards, metric grids |
 
 ---
 
