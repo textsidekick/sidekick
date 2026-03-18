@@ -54,8 +54,8 @@
 
 ### AI Studio Tab
 
-- [ ] **AIST-01**: VideoUpload renders a drag-and-drop video upload zone constrained to `max-w-2xl` (never full-width)
-- [ ] **AIST-02**: KnowledgeGaps section renders the gap analysis area with an "Analyze Gaps" CTA button using amber styling (`bg-amber-500`)
+- [x] **AIST-01**: VideoUpload renders a drag-and-drop video upload zone constrained to `max-w-2xl` (never full-width)
+- [x] **AIST-02**: KnowledgeGaps section renders the gap analysis area with an "Analyze Gaps" CTA button using amber styling (`bg-amber-500`)
 - [ ] **AIST-03**: AI Studio tab accepts `showMockData?: boolean` prop — when true, knowledge gaps section populates with mock gap data
 
 ### Design System Compliance
@@ -127,8 +127,8 @@
 | DOCS-02 | Phase 7 | Complete |
 | DOCS-03 | Phase 7 | Complete |
 | DOCS-04 | Phase 7 | Complete |
-| AIST-01 | Phase 8 | Pending |
-| AIST-02 | Phase 8 | Pending |
+| AIST-01 | Phase 8 | Complete |
+| AIST-02 | Phase 8 | Complete |
 | AIST-03 | Phase 8 | Pending |
 | DSN-01 | Phase 2 (cross-cutting) | Pending |
 | DSN-02 | Phase 7 (cross-cutting) | Complete |
