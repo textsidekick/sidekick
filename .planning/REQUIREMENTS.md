@@ -47,8 +47,8 @@
 
 ### Documents Tab
 
-- [ ] **DOCS-01**: UploadZone renders a drag-and-drop file upload area with dashed border, upload icon, helper text, and hover state
-- [ ] **DOCS-02**: IntegrationsRow renders 4 integration cards (Google Drive, Dropbox, Gusto, Microsoft 365) each with a neutral `variant="outline"` connect button — no brand colors
+- [x] **DOCS-01**: UploadZone renders a drag-and-drop file upload area with dashed border, upload icon, helper text, and hover state
+- [x] **DOCS-02**: IntegrationsRow renders 4 integration cards (Google Drive, Dropbox, Gusto, Microsoft 365) each with a neutral `variant="outline"` connect button — no brand colors
 - [ ] **DOCS-03**: DocumentsTable renders a list of uploaded documents with columns for name, type, size, and upload date
 - [ ] **DOCS-04**: Documents tab accepts `showMockData?: boolean` prop — when true, table populates with mock document data
 
@@ -61,9 +61,9 @@
 ### Design System Compliance
 
 - [ ] **DSN-01**: All cards use the exact card anatomy class string from CLAUDE.md (rounded-xl, border, bg-white dark:bg-[var(--card-bg)], shadow-[var(--card-shadow)], p-5) — never shadcn `<Card>` component
-- [ ] **DSN-02**: All integration connect buttons use `variant="outline"` with neutral border — never brand colors
+- [x] **DSN-02**: All integration connect buttons use `variant="outline"` with neutral border — never brand colors
 - [ ] **DSN-03**: All empty states use the shared EmptyState component — never bare icon + text
-- [ ] **DSN-04**: Single-column upload zones are constrained with `max-w-2xl`
+- [x] **DSN-04**: Single-column upload zones are constrained with `max-w-2xl`
 - [x] **DSN-05**: Active tab uses border-bottom underline indicator — never a filled pill
 - [ ] **DSN-06**: All icons are from Lucide React — no other icon libraries
 
@@ -123,17 +123,17 @@
 | WORK-03 | Phase 6 | Complete |
 | WORK-04 | Phase 6 | Complete |
 | WORK-05 | Phase 6 | Complete |
-| DOCS-01 | Phase 7 | Pending |
-| DOCS-02 | Phase 7 | Pending |
+| DOCS-01 | Phase 7 | Complete |
+| DOCS-02 | Phase 7 | Complete |
 | DOCS-03 | Phase 7 | Pending |
 | DOCS-04 | Phase 7 | Pending |
 | AIST-01 | Phase 8 | Pending |
 | AIST-02 | Phase 8 | Pending |
 | AIST-03 | Phase 8 | Pending |
 | DSN-01 | Phase 2 (cross-cutting) | Pending |
-| DSN-02 | Phase 7 (cross-cutting) | Pending |
+| DSN-02 | Phase 7 (cross-cutting) | Complete |
 | DSN-03 | Phase 9 (cross-cutting) | Pending |
-| DSN-04 | Phase 7 (cross-cutting) | Pending |
+| DSN-04 | Phase 7 (cross-cutting) | Complete |
 | DSN-05 | Phase 3 | Complete |
 | DSN-06 | Phase 2 (cross-cutting) | Pending |
 
