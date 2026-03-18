@@ -126,12 +126,11 @@ Plans:
   3. DocumentsTable renders a list of documents with columns for name, type, size, and upload date
   4. With `showMockData={true}`, the documents table populates with mock document data; with `showMockData={false}`, the EmptyState component is displayed
   5. Single-column upload zones in the Documents tab respect layout constraints and all integration buttons are visually neutral (outline only, no blue/orange/purple fills)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 07-01: TBD
-- [ ] 07-02: TBD
-- [ ] 07-03: TBD
+- [ ] 07-01-PLAN.md — Build UploadZone (drag-and-drop area) and IntegrationsRow (4 neutral connector cards)
+- [ ] 07-02-PLAN.md — Build DocumentsTable, assemble DocumentsTab, wire into dashboard page
 
 ### Phase 8: AI Studio Tab
 **Goal**: A manager can see the video walkthrough upload zone and knowledge gaps analysis section -- the flagship product differentiator
@@ -188,6 +187,6 @@ Note: Phases 4-8 depend on Phase 3 but are independent of each other. The recomm
 | 4. Alerts Tab | 1/2 | In Progress|  |
 | 5. Analytics Tab | 1/1 | Complete   | 2026-03-18 |
 | 6. Workers Tab | 2/2 | Complete   | 2026-03-18 |
-| 7. Documents Tab | 0/3 | Not started | - |
+| 7. Documents Tab | 0/2 | Not started | - |
 | 8. AI Studio Tab | 0/2 | Not started | - |
 | 9. Polish and Verification | 0/3 | Not started | - |
