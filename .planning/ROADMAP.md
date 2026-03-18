@@ -78,12 +78,11 @@ Plans:
   3. A segmented control above the table filters the visible rows by status (All / Open / In Progress / Resolved) -- clicking a segment immediately filters the table
   4. With `showMockData={true}`, the table populates with realistic mock safety issues (multiple severities, multiple statuses) and the KPI cards show corresponding counts; with `showMockData={false}`, the EmptyState component is displayed
   5. The entire Alerts tab (KPIs + table + filter) renders correctly in both light and dark mode
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
-- [ ] 04-03: TBD
+- [ ] 04-01-PLAN.md — Add valueClassName to MetricCard and build AlertMetrics with 4 computed KPI cards
+- [ ] 04-02-PLAN.md — Build AlertsTable with segmented control, wire AlertsTab assembly, and integrate into dashboard page
 
 ### Phase 5: Analytics Tab
 **Goal**: A manager can review team usage at a glance -- 4 KPI cards, a questions-over-time chart with time range selection, recent questions, and an activity feed
@@ -189,7 +188,7 @@ Note: Phases 4-8 depend on Phase 3 but are independent of each other. The recomm
 | 1. Foundation Verification | 1/1 | Complete | 2026-03-16 |
 | 2. Shared Components | 0/1 | Planned | - |
 | 3. Layout Shell | 2/2 | Complete   | 2026-03-18 |
-| 4. Alerts Tab | 0/3 | Not started | - |
+| 4. Alerts Tab | 0/2 | Planned | - |
 | 5. Analytics Tab | 0/3 | Not started | - |
 | 6. Workers Tab | 0/3 | Not started | - |
 | 7. Documents Tab | 0/3 | Not started | - |
