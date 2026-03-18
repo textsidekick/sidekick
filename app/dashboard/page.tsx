@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { FileText, Sparkles } from 'lucide-react'
+import { Sparkles } from 'lucide-react'
 import { TopBar } from '@/components/dashboard/layout/TopBar'
 import { SubHeader } from '@/components/dashboard/layout/SubHeader'
 import { TabNav, type TabId } from '@/components/dashboard/layout/TabNav'
 import { AnalyticsTab } from '@/components/dashboard/analytics/AnalyticsTab'
 import { AlertsTab } from '@/components/dashboard/alerts/AlertsTab'
 import { WorkersTab } from '@/components/dashboard/workers/WorkersTab'
+import { DocumentsTab } from '@/components/dashboard/documents/DocumentsTab'
 import { EmptyState } from '@/components/dashboard/shared/EmptyState'
 
 export default function DashboardPage() {
@@ -30,13 +31,7 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto px-6 py-6">
         {activeTab === 'analytics' && <AnalyticsTab showMockData={true} />}
         {activeTab === 'alerts' && <AlertsTab showMockData={true} />}
-        {activeTab === 'documents' && (
-          <EmptyState
-            icon={FileText}
-            title="Documents Coming Soon"
-            description="Upload and manage training documents and integrations here. This tab is under construction."
-          />
-        )}
+        {activeTab === 'documents' && <DocumentsTab showMockData={true} />}
         {activeTab === 'ai-studio' && (
           <EmptyState
             icon={Sparkles}
