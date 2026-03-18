@@ -16,10 +16,10 @@
 
 ### Dark / Light Mode
 
-- [ ] **DARK-01**: Every component renders correctly in light mode (page bg #f9fafb, card bg #ffffff)
-- [ ] **DARK-02**: Every component renders correctly in dark mode (page bg #0f1117, card bg #1a1d27)
+- [x] **DARK-01**: Every component renders correctly in light mode (page bg #f9fafb, card bg #ffffff)
+- [x] **DARK-02**: Every component renders correctly in dark mode (page bg #0f1117, card bg #1a1d27)
 - [x] **DARK-03**: Theme toggle in TopBar switches between light, dark, and system modes
-- [ ] **DARK-04**: No text element is unreadable or invisible in either mode
+- [x] **DARK-04**: No text element is unreadable or invisible in either mode
 
 ### Alerts Tab
 
@@ -62,7 +62,7 @@
 
 - [ ] **DSN-01**: All cards use the exact card anatomy class string from CLAUDE.md (rounded-xl, border, bg-white dark:bg-[var(--card-bg)], shadow-[var(--card-shadow)], p-5) — never shadcn `<Card>` component
 - [x] **DSN-02**: All integration connect buttons use `variant="outline"` with neutral border — never brand colors
-- [ ] **DSN-03**: All empty states use the shared EmptyState component — never bare icon + text
+- [x] **DSN-03**: All empty states use the shared EmptyState component — never bare icon + text
 - [x] **DSN-04**: Single-column upload zones are constrained with `max-w-2xl`
 - [x] **DSN-05**: Active tab uses border-bottom underline indicator — never a filled pill
 - [ ] **DSN-06**: All icons are from Lucide React — no other icon libraries
@@ -104,10 +104,10 @@
 | FOUND-04 | Phase 2 | Pending |
 | FOUND-05 | Phase 2 | Pending |
 | FOUND-06 | Phase 2 | Pending |
-| DARK-01 | Phase 9 | Pending |
-| DARK-02 | Phase 9 | Pending |
+| DARK-01 | Phase 9 | Complete |
+| DARK-02 | Phase 9 | Complete |
 | DARK-03 | Phase 3 | Complete |
-| DARK-04 | Phase 9 | Pending |
+| DARK-04 | Phase 9 | Complete |
 | ALRT-01 | Phase 4 | Complete |
 | ALRT-02 | Phase 4 | Complete |
 | ALRT-03 | Phase 4 | Complete |
@@ -132,7 +132,7 @@
 | AIST-03 | Phase 8 | Complete |
 | DSN-01 | Phase 2 (cross-cutting) | Pending |
 | DSN-02 | Phase 7 (cross-cutting) | Complete |
-| DSN-03 | Phase 9 (cross-cutting) | Pending |
+| DSN-03 | Phase 9 (cross-cutting) | Complete |
 | DSN-04 | Phase 7 (cross-cutting) | Complete |
 | DSN-05 | Phase 3 | Complete |
 | DSN-06 | Phase 2 (cross-cutting) | Pending |
