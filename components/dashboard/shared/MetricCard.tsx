@@ -14,6 +14,15 @@ interface MetricCardProps {
   dateRange?: string
   valueClassName?: string
   isHighlighted?: boolean
+  accentColor?: 'amber' | 'red' | 'emerald' | 'blue' | 'purple'
+}
+
+const ACCENT_BORDER: Record<string, string> = {
+  amber: 'border-l-amber-400 dark:border-l-amber-500',
+  red: 'border-l-red-400 dark:border-l-red-500',
+  emerald: 'border-l-emerald-400 dark:border-l-emerald-500',
+  blue: 'border-l-blue-400 dark:border-l-blue-500',
+  purple: 'border-l-purple-400 dark:border-l-purple-500',
 }
 
 function MetricCard({
@@ -27,6 +36,7 @@ function MetricCard({
   valueClassName,
   dateRange,
   isHighlighted = false,
+  accentColor,
 }: MetricCardProps) {
   const getTrendColor = (val: number) => {
     if (val > 0) return 'text-emerald-600 dark:text-emerald-400'
@@ -50,7 +60,7 @@ function MetricCard({
         isHighlighted
           ? 'border-blue-200 dark:border-blue-800 ring-1 ring-blue-100 dark:ring-blue-900/50'
           : 'border-gray-200 dark:border-gray-800'
-      }`}
+      } ${accentColor ? `border-l-[3px] ${ACCENT_BORDER[accentColor]}` : ''}`}
     >
       <div className="flex items-start justify-between">
         <div>

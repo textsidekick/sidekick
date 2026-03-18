@@ -5,6 +5,7 @@ import { MetricCard } from '@/components/dashboard/shared/MetricCard'
 
 type Severity = 'high' | 'medium' | 'low'
 type AlertStatus = 'open' | 'resolved'
+type AlertCategory = 'safety' | 'equipment' | 'compliance' | 'health'
 
 interface AlertItem {
   id: string
@@ -13,6 +14,7 @@ interface AlertItem {
   severity: Severity
   status: AlertStatus
   date: string
+  category: AlertCategory
 }
 
 const MOCK_ALERTS: AlertItem[] = [
@@ -23,6 +25,7 @@ const MOCK_ALERTS: AlertItem[] = [
     severity: 'high',
     status: 'open',
     date: '2026-03-17',
+    category: 'equipment',
   },
   {
     id: 'ALT-002',
@@ -31,6 +34,7 @@ const MOCK_ALERTS: AlertItem[] = [
     severity: 'medium',
     status: 'open',
     date: '2026-03-17',
+    category: 'safety',
   },
   {
     id: 'ALT-003',
@@ -39,6 +43,7 @@ const MOCK_ALERTS: AlertItem[] = [
     severity: 'low',
     status: 'open',
     date: '2026-03-16',
+    category: 'compliance',
   },
   {
     id: 'ALT-004',
@@ -47,6 +52,7 @@ const MOCK_ALERTS: AlertItem[] = [
     severity: 'high',
     status: 'open',
     date: '2026-03-16',
+    category: 'compliance',
   },
   {
     id: 'ALT-005',
@@ -55,6 +61,7 @@ const MOCK_ALERTS: AlertItem[] = [
     severity: 'high',
     status: 'resolved',
     date: '2026-03-15',
+    category: 'health',
   },
   {
     id: 'ALT-006',
@@ -63,6 +70,7 @@ const MOCK_ALERTS: AlertItem[] = [
     severity: 'medium',
     status: 'resolved',
     date: '2026-03-15',
+    category: 'equipment',
   },
   {
     id: 'ALT-007',
@@ -71,6 +79,7 @@ const MOCK_ALERTS: AlertItem[] = [
     severity: 'low',
     status: 'resolved',
     date: '2026-03-16',
+    category: 'compliance',
   },
   {
     id: 'ALT-008',
@@ -79,6 +88,43 @@ const MOCK_ALERTS: AlertItem[] = [
     severity: 'medium',
     status: 'resolved',
     date: '2026-03-15',
+    category: 'health',
+  },
+  {
+    id: 'ALT-009',
+    issue: 'Broken shelf bracket in walk-in freezer',
+    worker: 'Maria G.',
+    severity: 'medium',
+    status: 'open',
+    date: '2026-03-14',
+    category: 'equipment',
+  },
+  {
+    id: 'ALT-010',
+    issue: 'Worker reported slip near loading dock',
+    worker: 'James T.',
+    severity: 'high',
+    status: 'resolved',
+    date: '2026-03-13',
+    category: 'safety',
+  },
+  {
+    id: 'ALT-011',
+    issue: 'Fire extinguisher inspection overdue',
+    worker: 'Carlos R.',
+    severity: 'medium',
+    status: 'resolved',
+    date: '2026-03-12',
+    category: 'compliance',
+  },
+  {
+    id: 'ALT-012',
+    issue: 'Allergic reaction protocol not followed',
+    worker: 'Sarah K.',
+    severity: 'high',
+    status: 'resolved',
+    date: '2026-03-11',
+    category: 'health',
   },
 ]
 
@@ -101,7 +147,9 @@ function AlertMetrics({ alerts }: AlertMetricsProps) {
         value={openIssues}
         icon={Clock}
         iconClassName="h-5 w-5 text-amber-500"
-        subtext={`${openIssues} requiring attention`}
+        accentColor="amber"
+        change={15.0}
+        subtext="Reported in last 24 hours"
       />
       <MetricCard
         label="High Priority"
@@ -109,25 +157,30 @@ function AlertMetrics({ alerts }: AlertMetricsProps) {
         icon={AlertTriangle}
         iconClassName="h-5 w-5 text-red-500"
         valueClassName="text-red-500 dark:text-red-400"
-        subtext={`${highPriority} need immediate action`}
+        accentColor="red"
+        change={-8.0}
+        subtext="Need immediate action"
       />
       <MetricCard
         label="Resolved"
         value={resolved}
         icon={CheckCircle2}
         iconClassName="h-5 w-5 text-emerald-500"
-        subtext="This week"
+        accentColor="emerald"
+        change={20.0}
+        subtext="Resolved this week"
       />
       <MetricCard
         label="Total Reported"
         value={totalReported}
         icon={Wrench}
         iconClassName="h-5 w-5 text-blue-500"
-        subtext="All time"
+        accentColor="blue"
+        subtext="All time across team"
       />
     </div>
   )
 }
 
 export { AlertMetrics, MOCK_ALERTS }
-export type { AlertMetricsProps, AlertItem, Severity, AlertStatus }
+export type { AlertMetricsProps, AlertItem, Severity, AlertStatus, AlertCategory }

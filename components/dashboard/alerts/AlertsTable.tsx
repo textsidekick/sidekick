@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { RefreshCw, ShieldAlert } from 'lucide-react'
+import { RefreshCw, ShieldAlert, Search, CheckCircle2, Eye, BellOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -58,11 +58,24 @@ function capitalize(str: string): string {
 
 function AlertsTable({ alerts }: AlertsTableProps) {
   const [filter, setFilter] = useState<FilterStatus>('open')
+  const [search, setSearch] = useState('')
 
   const filteredAlerts = useMemo(() => {
-    if (filter === 'all') return alerts
-    return alerts.filter((a) => a.status === filter)
-  }, [alerts, filter])
+    let result = alerts
+    if (filter !== 'all') {
+      result = result.filter((a) => a.status === filter)
+    }
+    if (search.trim()) {
+      const q = search.toLowerCase()
+      result = result.filter(
+        (a) =>
+          a.issue.toLowerCase().includes(q) ||
+          a.worker.toLowerCase().includes(q) ||
+          a.id.toLowerCase().includes(q)
+      )
+    }
+    return result
+  }, [alerts, filter, search])
 
   const filterCounts = useMemo(() => {
     const open = alerts.filter((a) => a.status === 'open').length
@@ -86,27 +99,39 @@ function AlertsTable({ alerts }: AlertsTableProps) {
       {isEmpty ? (
         <EmptyState
           icon={ShieldAlert}
-          title="No issues reported"
-          description="Safety alerts and issues reported by workers will appear here."
+          title="No open issues"
+          description="Safety alerts and issues reported by workers will appear here. When your team reports concerns via Sidekick, they show up in this list."
         />
       ) : (
         <>
-          {/* Segmented control */}
-          <div className="mt-3 mb-4 inline-flex rounded-lg bg-gray-100 p-1 dark:bg-gray-800">
-            {FILTER_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => setFilter(opt.value)}
-                className={
-                  filter === opt.value
-                    ? 'rounded-md bg-white px-3 py-1.5 text-sm font-medium text-gray-900 transition-all dark:bg-gray-700 dark:text-white [box-shadow:var(--card-shadow)]'
-                    : 'rounded-md px-3 py-1.5 text-sm font-medium text-gray-500 transition-all hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-                }
-              >
-                {opt.label} ({filterCounts[opt.value]})
-              </button>
-            ))}
+          {/* Filter bar: segmented control + search */}
+          <div className="mt-3 mb-4 flex flex-wrap items-center gap-3">
+            <div className="inline-flex rounded-lg bg-gray-100 p-1 dark:bg-gray-800">
+              {FILTER_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setFilter(opt.value)}
+                  className={
+                    filter === opt.value
+                      ? 'rounded-md bg-white px-3 py-1.5 text-sm font-medium text-gray-900 transition-all dark:bg-gray-700 dark:text-white [box-shadow:var(--card-shadow)]'
+                      : 'rounded-md px-3 py-1.5 text-sm font-medium text-gray-500 transition-all hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                  }
+                >
+                  {opt.label} ({filterCounts[opt.value]})
+                </button>
+              ))}
+            </div>
+            <div className="relative ml-auto">
+              <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+              <input
+                type="text"
+                placeholder="Search issues..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="h-8 w-48 rounded-lg border border-gray-200 bg-transparent pl-8 pr-3 text-sm text-gray-900 placeholder-gray-400 outline-none transition-colors focus:border-blue-300 focus:ring-1 focus:ring-blue-200 dark:border-gray-700 dark:text-white dark:placeholder-gray-500 dark:focus:border-blue-700 dark:focus:ring-blue-900"
+              />
+            </div>
           </div>
 
           {/* Table */}
@@ -128,13 +153,16 @@ function AlertsTable({ alerts }: AlertsTableProps) {
                 <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
                   Date
                 </TableHead>
+                <TableHead className="text-right text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Actions
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredAlerts.map((alert) => (
                 <TableRow
                   key={alert.id}
-                  className="border-b border-gray-100 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800/50"
+                  className="group/row border-b border-gray-100 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800/50"
                 >
                   <TableCell className="text-sm font-medium text-gray-900 dark:text-white">
                     {alert.issue}
@@ -162,6 +190,36 @@ function AlertsTable({ alerts }: AlertsTableProps) {
                   </TableCell>
                   <TableCell className="text-sm text-gray-500 dark:text-gray-400">
                     {formatDate(alert.date)}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center justify-end gap-1 opacity-0 transition-opacity group-hover/row:opacity-100">
+                      {alert.status === 'open' && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 rounded-md text-gray-400 hover:text-emerald-600 dark:text-gray-500 dark:hover:text-emerald-400"
+                          title="Mark resolved"
+                        >
+                          <CheckCircle2 className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 rounded-md text-gray-400 hover:text-blue-600 dark:text-gray-500 dark:hover:text-blue-400"
+                        title="View details"
+                      >
+                        <Eye className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 rounded-md text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+                        title="Dismiss"
+                      >
+                        <BellOff className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

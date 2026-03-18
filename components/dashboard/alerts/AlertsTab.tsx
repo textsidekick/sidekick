@@ -1,6 +1,7 @@
 'use client'
 
 import { AlertMetrics, MOCK_ALERTS } from './AlertMetrics'
+import { AlertCharts } from './AlertCharts'
 import { AlertsTable } from './AlertsTable'
 
 interface AlertsTabProps {
@@ -13,6 +14,7 @@ function AlertsTab({ showMockData = false }: AlertsTabProps) {
   return (
     <div className="space-y-6">
       <AlertMetrics alerts={alerts} />
+      <AlertCharts alerts={alerts} />
       <AlertsTable alerts={alerts} />
     </div>
   )
