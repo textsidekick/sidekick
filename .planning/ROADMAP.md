@@ -157,12 +157,11 @@ Plans:
   3. Every empty state across all 5 tabs uses the shared EmptyState component (icon container + title + description + optional action) -- no bare icon + text patterns remain
   4. Metric card grids collapse from 4 columns to 2 to 1 at the defined breakpoints (lg -> md -> sm)
   5. Running all 5 tabs with `showMockData={true}` and `showMockData={false}` produces correct populated and empty states respectively, with no missing data or broken layouts
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 09-01: TBD
-- [ ] 09-02: TBD
-- [ ] 09-03: TBD
+- [ ] 09-01-PLAN.md — Dark mode sweep, typography audit, card anatomy check, and EmptyState compliance across all 32 files
+- [ ] 09-02-PLAN.md — Responsive fixes (table overflow, TabNav scroll, grid breakpoints), showMockData validation, CLAUDE.md Build State update
 
 ## Cross-Cutting Concerns
 
@@ -189,4 +188,4 @@ Note: Phases 4-8 depend on Phase 3 but are independent of each other. The recomm
 | 6. Workers Tab | 2/2 | Complete   | 2026-03-18 |
 | 7. Documents Tab | 2/2 | Complete   | 2026-03-18 |
 | 8. AI Studio Tab | 2/2 | Complete   | 2026-03-18 |
-| 9. Polish and Verification | 0/3 | Not started | - |
+| 9. Polish and Verification | 0/2 | Not started | - |
