@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { Sparkles } from 'lucide-react'
 import { TopBar } from '@/components/dashboard/layout/TopBar'
 import { SubHeader } from '@/components/dashboard/layout/SubHeader'
 import { TabNav, type TabId } from '@/components/dashboard/layout/TabNav'
@@ -9,7 +8,8 @@ import { AnalyticsTab } from '@/components/dashboard/analytics/AnalyticsTab'
 import { AlertsTab } from '@/components/dashboard/alerts/AlertsTab'
 import { WorkersTab } from '@/components/dashboard/workers/WorkersTab'
 import { DocumentsTab } from '@/components/dashboard/documents/DocumentsTab'
-import { EmptyState } from '@/components/dashboard/shared/EmptyState'
+import { AIStudioTab } from '@/components/dashboard/ai-studio/AIStudioTab'
+
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<TabId>('analytics')
@@ -32,13 +32,7 @@ export default function DashboardPage() {
         {activeTab === 'analytics' && <AnalyticsTab showMockData={true} />}
         {activeTab === 'alerts' && <AlertsTab showMockData={true} />}
         {activeTab === 'documents' && <DocumentsTab showMockData={true} />}
-        {activeTab === 'ai-studio' && (
-          <EmptyState
-            icon={Sparkles}
-            title="AI Studio Coming Soon"
-            description="Create training content and analyze knowledge gaps here. This tab is under construction."
-          />
-        )}
+        {activeTab === 'ai-studio' && <AIStudioTab showMockData={true} />}
         {activeTab === 'workers' && <WorkersTab showMockData={true} />}
       </div>
     </div>
