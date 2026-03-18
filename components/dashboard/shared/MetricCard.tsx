@@ -12,6 +12,7 @@ interface MetricCardProps {
   previousValue?: string | number
   change?: number
   dateRange?: string
+  valueClassName?: string
   isHighlighted?: boolean
 }
 
@@ -23,6 +24,7 @@ function MetricCard({
   iconClassName = 'h-5 w-5 text-gray-400 dark:text-gray-500',
   previousValue,
   change,
+  valueClassName,
   dateRange,
   isHighlighted = false,
 }: MetricCardProps) {
@@ -63,7 +65,7 @@ function MetricCard({
         </div>
         <Icon className={iconClassName} />
       </div>
-      <div className="mt-2 text-3xl font-bold leading-none text-gray-900 dark:text-white">
+      <div className={`mt-2 text-3xl font-bold leading-none ${valueClassName || 'text-gray-900 dark:text-white'}`}>
         {value}
       </div>
       <div className="mt-2 flex items-center gap-2">
