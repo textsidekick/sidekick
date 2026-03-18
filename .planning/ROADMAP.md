@@ -141,11 +141,11 @@ Plans:
   2. KnowledgeGaps section renders the gap analysis area with an "Analyze Gaps" CTA button using amber styling (`bg-amber-500 hover:bg-amber-600 text-white`)
   3. With `showMockData={true}`, the knowledge gaps section populates with mock gap data; with `showMockData={false}`, the EmptyState component is displayed
   4. The entire AI Studio tab renders correctly in both light and dark mode
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 08-01: TBD
-- [ ] 08-02: TBD
+- [ ] 08-01-PLAN.md — Build VideoUpload (max-w-2xl drag-and-drop zone) and KnowledgeGaps (amber CTA + conditional gap list)
+- [ ] 08-02-PLAN.md — Assemble AIStudioTab (Create Content heading + sub-components) and wire into dashboard page
 
 ### Phase 9: Polish and Verification
 **Goal**: The complete dashboard passes a systematic quality audit -- dark mode is flawless, typography matches the CLAUDE.md scale, responsive grids collapse correctly, and all showMockData toggles work
