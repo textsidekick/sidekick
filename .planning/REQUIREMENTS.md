@@ -30,12 +30,12 @@
 
 ### Analytics Tab
 
-- [ ] **ANLX-01**: Analytics tab renders 4 KPI metric cards (Total Questions, Active Workers, Avg Response Time, Resolution Rate)
-- [ ] **ANLX-02**: QuestionsChart renders a Recharts bar/area chart with time range selector (7d / 30d / 90d)
-- [ ] **ANLX-03**: QuestionsChart uses `ResponsiveContainer` with an explicit-height parent wrapper
-- [ ] **ANLX-04**: Recent Questions feed card renders a list of the latest worker questions
-- [ ] **ANLX-05**: Activity feed card renders recent team activity events
-- [ ] **ANLX-06**: Analytics tab accepts `showMockData?: boolean` prop — when true, all cards and chart populate with mock data
+- [x] **ANLX-01**: Analytics tab renders 4 KPI metric cards (Total Questions, Active Workers, Avg Response Time, Resolution Rate)
+- [x] **ANLX-02**: QuestionsChart renders a Recharts bar/area chart with time range selector (7d / 30d / 90d)
+- [x] **ANLX-03**: QuestionsChart uses `ResponsiveContainer` with an explicit-height parent wrapper
+- [x] **ANLX-04**: Recent Questions feed card renders a list of the latest worker questions
+- [x] **ANLX-05**: Activity feed card renders recent team activity events
+- [x] **ANLX-06**: Analytics tab accepts `showMockData?: boolean` prop — when true, all cards and chart populate with mock data
 
 ### Workers Tab
 
@@ -112,12 +112,12 @@
 | ALRT-02 | Phase 4 | Complete |
 | ALRT-03 | Phase 4 | Complete |
 | ALRT-04 | Phase 4 | Complete |
-| ANLX-01 | Phase 5 | Pending |
-| ANLX-02 | Phase 5 | Pending |
-| ANLX-03 | Phase 5 | Pending |
-| ANLX-04 | Phase 5 | Pending |
-| ANLX-05 | Phase 5 | Pending |
-| ANLX-06 | Phase 5 | Pending |
+| ANLX-01 | Phase 5 | Complete |
+| ANLX-02 | Phase 5 | Complete |
+| ANLX-03 | Phase 5 | Complete |
+| ANLX-04 | Phase 5 | Complete |
+| ANLX-05 | Phase 5 | Complete |
+| ANLX-06 | Phase 5 | Complete |
 | WORK-01 | Phase 6 | Pending |
 | WORK-02 | Phase 6 | Pending |
 | WORK-03 | Phase 6 | Pending |
