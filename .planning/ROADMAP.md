@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 4: Alerts Tab** - Build the highest-priority tab: 4 KPI cards, filtered issues table, segmented status control
 - [x] **Phase 5: Analytics Tab** - Build usage metrics, Recharts questions chart, recent questions feed, and activity feed (completed 2026-03-18)
 - [x] **Phase 6: Workers Tab** - Build JOIN code display, QR code modal, and worker roster with verified badges (completed 2026-03-18)
-- [ ] **Phase 7: Documents Tab** - Build drag-and-drop upload zone, 4 neutral integration connectors, and documents table
+- [x] **Phase 7: Documents Tab** - Build drag-and-drop upload zone, 4 neutral integration connectors, and documents table (completed 2026-03-18)
 - [ ] **Phase 8: AI Studio Tab** - Build video upload zone and knowledge gaps section with Analyze Gaps CTA
 - [ ] **Phase 9: Polish and Verification** - Dark mode sweep, typography audit, responsive grid verification, showMockData validation
 
@@ -187,6 +187,6 @@ Note: Phases 4-8 depend on Phase 3 but are independent of each other. The recomm
 | 4. Alerts Tab | 1/2 | In Progress|  |
 | 5. Analytics Tab | 1/1 | Complete   | 2026-03-18 |
 | 6. Workers Tab | 2/2 | Complete   | 2026-03-18 |
-| 7. Documents Tab | 1/2 | In Progress|  |
+| 7. Documents Tab | 2/2 | Complete   | 2026-03-18 |
 | 8. AI Studio Tab | 0/2 | Not started | - |
 | 9. Polish and Verification | 0/3 | Not started | - |

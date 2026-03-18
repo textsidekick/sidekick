@@ -49,8 +49,8 @@
 
 - [x] **DOCS-01**: UploadZone renders a drag-and-drop file upload area with dashed border, upload icon, helper text, and hover state
 - [x] **DOCS-02**: IntegrationsRow renders 4 integration cards (Google Drive, Dropbox, Gusto, Microsoft 365) each with a neutral `variant="outline"` connect button — no brand colors
-- [ ] **DOCS-03**: DocumentsTable renders a list of uploaded documents with columns for name, type, size, and upload date
-- [ ] **DOCS-04**: Documents tab accepts `showMockData?: boolean` prop — when true, table populates with mock document data
+- [x] **DOCS-03**: DocumentsTable renders a list of uploaded documents with columns for name, type, size, and upload date
+- [x] **DOCS-04**: Documents tab accepts `showMockData?: boolean` prop — when true, table populates with mock document data
 
 ### AI Studio Tab
 
@@ -125,8 +125,8 @@
 | WORK-05 | Phase 6 | Complete |
 | DOCS-01 | Phase 7 | Complete |
 | DOCS-02 | Phase 7 | Complete |
-| DOCS-03 | Phase 7 | Pending |
-| DOCS-04 | Phase 7 | Pending |
+| DOCS-03 | Phase 7 | Complete |
+| DOCS-04 | Phase 7 | Complete |
 | AIST-01 | Phase 8 | Pending |
 | AIST-02 | Phase 8 | Pending |
 | AIST-03 | Phase 8 | Pending |
