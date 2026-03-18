@@ -1,12 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { FileText, Sparkles, Users } from 'lucide-react'
+import { FileText, Sparkles } from 'lucide-react'
 import { TopBar } from '@/components/dashboard/layout/TopBar'
 import { SubHeader } from '@/components/dashboard/layout/SubHeader'
 import { TabNav, type TabId } from '@/components/dashboard/layout/TabNav'
 import { AnalyticsTab } from '@/components/dashboard/analytics/AnalyticsTab'
 import { AlertsTab } from '@/components/dashboard/alerts/AlertsTab'
+import { WorkersTab } from '@/components/dashboard/workers/WorkersTab'
 import { EmptyState } from '@/components/dashboard/shared/EmptyState'
 
 export default function DashboardPage() {
@@ -43,13 +44,7 @@ export default function DashboardPage() {
             description="Create training content and analyze knowledge gaps here. This tab is under construction."
           />
         )}
-        {activeTab === 'workers' && (
-          <EmptyState
-            icon={Users}
-            title="Workers Coming Soon"
-            description="Manage your team, view registration codes, and track worker status here. This tab is under construction."
-          />
-        )}
+        {activeTab === 'workers' && <WorkersTab showMockData={true} />}
       </div>
     </div>
   )
