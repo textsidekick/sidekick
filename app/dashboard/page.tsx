@@ -1,11 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { ShieldAlert, FileText, Sparkles, Users } from 'lucide-react'
+import { FileText, Sparkles, Users } from 'lucide-react'
 import { TopBar } from '@/components/dashboard/layout/TopBar'
 import { SubHeader } from '@/components/dashboard/layout/SubHeader'
 import { TabNav, type TabId } from '@/components/dashboard/layout/TabNav'
 import { AnalyticsTab } from '@/components/dashboard/analytics/AnalyticsTab'
+import { AlertsTab } from '@/components/dashboard/alerts/AlertsTab'
 import { EmptyState } from '@/components/dashboard/shared/EmptyState'
 
 export default function DashboardPage() {
@@ -27,13 +28,7 @@ export default function DashboardPage() {
       {/* Tab content area */}
       <div className="max-w-7xl mx-auto px-6 py-6">
         {activeTab === 'analytics' && <AnalyticsTab />}
-        {activeTab === 'alerts' && (
-          <EmptyState
-            icon={ShieldAlert}
-            title="Alerts Coming Soon"
-            description="Safety alerts and issue tracking will appear here. This tab is under construction."
-          />
-        )}
+        {activeTab === 'alerts' && <AlertsTab showMockData={true} />}
         {activeTab === 'documents' && (
           <EmptyState
             icon={FileText}
