@@ -95,12 +95,10 @@ Plans:
   4. Recent Questions feed card and Activity feed card each render a list of items with timestamps
   5. With `showMockData={true}`, all cards, chart, and feeds populate with realistic mock data; with `showMockData={false}`, empty states are shown where appropriate
   6. The entire Analytics tab renders correctly in both light and dark mode, including chart colors that are visible against the dark mode card background
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 05-01: TBD
-- [ ] 05-02: TBD
-- [ ] 05-03: TBD
+- [ ] 05-01-PLAN.md — Add showMockData prop to AnalyticsTab, populate feed cards with mock data, wire into dashboard page
 
 ### Phase 6: Workers Tab
 **Goal**: A manager can see their team JOIN code, generate a QR code for it, and view the full worker roster with verification status
@@ -189,7 +187,7 @@ Note: Phases 4-8 depend on Phase 3 but are independent of each other. The recomm
 | 2. Shared Components | 0/1 | Planned | - |
 | 3. Layout Shell | 2/2 | Complete   | 2026-03-18 |
 | 4. Alerts Tab | 1/2 | In Progress|  |
-| 5. Analytics Tab | 0/3 | Not started | - |
+| 5. Analytics Tab | 0/1 | Planned | - |
 | 6. Workers Tab | 0/3 | Not started | - |
 | 7. Documents Tab | 0/3 | Not started | - |
 | 8. AI Studio Tab | 0/2 | Not started | - |
