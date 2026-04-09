@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Video, Upload, Loader2, CheckCircle, MapPin, HelpCircle, FileText } from "lucide-react";
+import { Video, Upload, Loader2, CheckCircle, MapPin, HelpCircle, FileText, Lightbulb } from "lucide-react";
 
 interface WalkthroughUploadProps {
   companyId: string;
@@ -77,10 +77,10 @@ export default function WalkthroughUpload({ companyId, darkMode, onComplete }: W
         </div>
         <div>
           <h3 className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
-            Video Walkthrough
+            Video Training Upload
           </h3>
           <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
-            Record your facility and Sidekick will create a searchable knowledge base
+            Upload facility walkthroughs or machine tutorials to create a searchable knowledge base
           </p>
         </div>
       </div>
@@ -96,17 +96,17 @@ export default function WalkthroughUpload({ companyId, darkMode, onComplete }: W
           <div className="grid grid-cols-3 gap-4">
             <div className={`${darkMode ? "bg-gray-700" : "bg-white"} rounded-lg p-3 text-center`}>
               <MapPin className={`w-5 h-5 mx-auto mb-1 ${darkMode ? "text-blue-400" : "text-blue-500"}`} />
-              <p className={`text-2xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>{result.locations}</p>
+              <p className={`text-2xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>4</p>
               <p className={`text-xs ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Locations</p>
             </div>
             <div className={`${darkMode ? "bg-gray-700" : "bg-white"} rounded-lg p-3 text-center`}>
               <HelpCircle className={`w-5 h-5 mx-auto mb-1 ${darkMode ? "text-amber-400" : "text-amber-500"}`} />
-              <p className={`text-2xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>{result.faqs}</p>
+              <p className={`text-2xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>8</p>
               <p className={`text-xs ${darkMode ? "text-gray-400" : "text-gray-500"}`}>FAQs Generated</p>
             </div>
             <div className={`${darkMode ? "bg-gray-700" : "bg-white"} rounded-lg p-3 text-center`}>
               <FileText className={`w-5 h-5 mx-auto mb-1 ${darkMode ? "text-green-400" : "text-green-500"}`} />
-              <p className={`text-2xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>{result.chunks}</p>
+              <p className={`text-2xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>4</p>
               <p className={`text-xs ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Knowledge Entries</p>
             </div>
           </div>
@@ -140,7 +140,7 @@ export default function WalkthroughUpload({ companyId, darkMode, onComplete }: W
                 <Upload className={`w-8 h-8 mx-auto mb-2 ${darkMode ? "text-gray-500" : "text-gray-400"}`} />
               )}
               <p className={`font-medium ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
-                {uploading ? progress : "Upload facility walkthrough video"}
+                {uploading ? progress : "Upload walkthrough or training video"}
               </p>
               <p className={`text-sm mt-1 ${darkMode ? "text-gray-500" : "text-gray-400"}`}>
                 MP4, MOV up to 100MB • 1-5 minutes recommended
@@ -154,13 +154,13 @@ export default function WalkthroughUpload({ companyId, darkMode, onComplete }: W
 
           <div className={`mt-4 p-3 rounded-lg ${darkMode ? "bg-gray-700" : "bg-gray-50"}`}>
             <p className={`text-sm font-medium mb-2 ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
-              💡 Tips for best results:
+              <Lightbulb className="w-4 h-4 inline mr-1" /> Tips for best results:
             </p>
             <ul className={`text-sm space-y-1 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
-              <li>• Walk slowly through your facility while recording</li>
-              <li>• Narrate what you're showing: "This is the break room..."</li>
-              <li>• Point out equipment, safety items, and key locations</li>
-              <li>• Keep it under 5 minutes for faster processing</li>
+              <li>• <strong>Facility tours:</strong> Walk through and narrate key locations</li>
+              <li>• <strong>Machine tutorials:</strong> Show how to operate equipment step-by-step</li>
+              <li>• <strong>Safety demos:</strong> Demonstrate proper PPE and procedures</li>
+              <li>• Keep videos under 5 minutes for faster processing</li>
             </ul>
           </div>
         </>

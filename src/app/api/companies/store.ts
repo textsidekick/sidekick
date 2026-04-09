@@ -16,9 +16,10 @@ export interface Company {
 
 export interface Worker {
   phone: string;
-  companyId: string;
-  locationId: string;
-  registeredAt: string;
+  company_id: string;
+  location_id: string;
+  registered_at: string;
+  name?: string;
 }
 
 export async function getCompanies(): Promise<Company[]> {
@@ -37,6 +38,7 @@ export async function getCompanies(): Promise<Company[]> {
     name: c.name,
     locations: c.locations || [],
     createdAt: c.created_at,
+    access_code: c.access_code,
   }));
 }
 
@@ -99,8 +101,9 @@ export async function getWorkers(): Promise<Worker[]> {
 
   return (data || []).map((w: any) => ({
     phone: w.phone,
-    companyId: w.company_id,
-    locationId: w.location_id,
-    registeredAt: w.created_at,
+    company_id: w.company_id,
+    location_id: w.location_id,
+    registered_at: w.created_at,
+    name: w.name,
   }));
 }

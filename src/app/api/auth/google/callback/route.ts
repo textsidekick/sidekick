@@ -78,7 +78,7 @@ export async function GET(req: Request) {
       console.error("Failed to store tokens:", dbError);
     }
 
-    return NextResponse.redirect(new URL(`/manager?google_connected=true&companyId=${state}`, baseUrl));
+    return NextResponse.redirect(new URL(`/onboarding?google_connected=true&companyId=${state}`, baseUrl));
   } catch (err) {
     console.error("OAuth callback error:", err);
     return NextResponse.redirect(new URL(`/manager?error=oauth_failed`, baseUrl));

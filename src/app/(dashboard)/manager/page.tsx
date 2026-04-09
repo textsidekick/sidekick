@@ -8,7 +8,7 @@ import React from "react";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { 
-  Upload, FileText, Trash2, BarChart3, Building2, Users, Phone, MapPin,
+  Upload, FileText, Video, Trash2, BarChart3, Building2, Users, Phone, MapPin,
   TrendingUp, MessageSquare, Clock, AlertTriangle, Zap, Target,
   ChevronRight, RefreshCw, Lightbulb, Sparkles, ArrowUp, ArrowDown, FileCheck, X,
   Filter, Download, Settings, CheckCircle, User, Search, Plus, QrCode,
@@ -174,6 +174,9 @@ export default function ManagerDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [gaps, setGaps] = useState<KnowledgeGap[]>([]);
   const [issues, setIssues] = useState<Issue[]>([]);
+  const [unansweredQuestions, setUnansweredQuestions] = useState<any[]>([]);
+  const [selectedUQ, setSelectedUQ] = useState<any>(null);
+  const [uqAnswer, setUqAnswer] = useState("");
   const [issueStats, setIssueStats] = useState<IssueStats | null>(null);
   const [checklists, setChecklists] = useState<Checklist[]>([]);
   const [checklistStats, setChecklistStats] = useState<ChecklistStats | null>(null);
@@ -198,6 +201,9 @@ export default function ManagerDashboard() {
     if (saved) setDarkMode(JSON.parse(saved));
   }, []);
   const [showQrModal, setShowQrModal] = useState(false);
+  const [showTutorialModal, setShowTutorialModal] = useState(false);
+  const [walkthroughs, setWalkthroughs] = useState<any[]>([]);
+  const [selectedWalkthrough, setSelectedWalkthrough] = useState<any>(null);
   const [copiedCode, setCopiedCode] = useState(false);
   const [selectedWorker, setSelectedWorker] = useState<Worker | null>(null);
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
@@ -242,7 +248,10 @@ export default function ManagerDashboard() {
   }, []);
 
   useEffect(() => {
-    if (selectedCompany) fetch(`/api/documents?companyId=${selectedCompany}`).then(r => r.json()).then(d => setDocuments(d.documents || []));
+    if (selectedCompany) {
+      fetch(`/api/documents?companyId=${selectedCompany}`).then(r => r.json()).then(d => setDocuments(d.documents || []));
+      fetch(`/api/walkthroughs?companyId=${selectedCompany}`).then(r => r.json()).then(d => setWalkthroughs(d.walkthroughs || []));
+    }
   }, [selectedCompany]);
 
   const loadStats = async () => {
@@ -261,6 +270,9 @@ export default function ManagerDashboard() {
       const res = await fetch(`/api/issues?companyId=${selectedCompany}`);
       const data = await res.json();
       setIssues(data.issues || []);
+      const qRes = await fetch(`/api/analytics?companyId=${selectedCompany}&timeRange=all`);
+      const qData = await qRes.json();
+      setUnansweredQuestions((qData.recentQuestions || []).filter((q: any) => !q.answer));
       setIssueStats(data.stats || null);
     } catch (error) { console.error("Failed to load issues:", error); }
     setLoadingIssues(false);
@@ -508,6 +520,27 @@ export default function ManagerDashboard() {
                   </div>
                 ))}
               </div>
+              
+              {/* Certifications Section */}
+              <h4 className={`font-medium ${darkMode ? "text-white" : "text-gray-900"} mb-3 mt-6`}>Certifications</h4>
+              <div className="space-y-2">
+                {certifications.filter(c => c.worker_phone === selectedWorker?.phone).length === 0 ? (
+                  <p className={`text-center py-4 ${darkMode ? "text-gray-500" : "text-gray-400"}`}>No certifications</p>
+                ) : certifications.filter(c => c.worker_phone === selectedWorker?.phone).map((cert, i) => (
+                  <div key={i} className={`${darkMode ? "bg-gray-700" : "bg-gray-50"} rounded-lg p-3 flex items-center justify-between`}>
+                    <div className="flex items-center gap-3">
+                      <Award className={`w-5 h-5 ${new Date(cert.expiry_date) > new Date() ? "text-green-500" : "text-red-500"}`} />
+                      <div>
+                        <p className={`font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>{cert.cert_name}</p>
+                        <p className={`text-xs ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Expires: {new Date(cert.expiry_date).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                    <span className={`text-xs px-2 py-1 rounded-full ${new Date(cert.expiry_date) > new Date() ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                      {new Date(cert.expiry_date) > new Date() ? "Valid" : "Expired"}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -630,6 +663,61 @@ export default function ManagerDashboard() {
                 </div>
               )}
             </div>
+            {unansweredQuestions.length > 0 && (
+              <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border mt-4`}>
+                <div className={`px-4 py-3 border-b ${darkMode ? "border-gray-700" : "border-gray-100"}`}>
+                  <div className="flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4 text-blue-500" />
+                    <span className={`font-semibold text-sm ${darkMode ? "text-white" : "text-gray-900"}`}>Unanswered Questions</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">{unansweredQuestions.length}</span>
+                  </div>
+                  <p className={`text-xs mt-1 ${darkMode ? "text-gray-500" : "text-gray-400"}`}>Questions Sidekick could not answer — your response will be saved permanently</p>
+                </div>
+                <div className={`divide-y ${darkMode ? "divide-gray-700" : "divide-gray-100"}`}>
+                  {unansweredQuestions.map((q: any, i: number) => (
+                    <div key={q.id || i} onClick={() => { setSelectedUQ(q); setUqAnswer(""); }} className={`p-4 flex items-center gap-4 cursor-pointer ${darkMode ? "hover:bg-gray-700" : "hover:bg-gray-50"}`}>
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-100"><MessageSquare className="w-5 h-5 text-blue-600" /></div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`font-medium text-sm ${darkMode ? "text-white" : "text-gray-900"}`}>{q.question}</p>
+                        <p className={`text-xs mt-1 ${darkMode ? "text-gray-500" : "text-gray-400"}`}>Asked by {q.worker_name || "Worker"} • {q.created_at ? new Date(q.created_at).toLocaleDateString() : ""}</p>
+                      </div>
+                      <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700">Needs Answer</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {selectedUQ && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setSelectedUQ(null)}>
+                <div className={`${darkMode ? "bg-gray-800" : "bg-white"} rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden`} onClick={e => e.stopPropagation()}>
+                  <div className={`px-6 py-4 border-b ${darkMode ? "border-gray-700" : "border-gray-100"}`}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-100"><MessageSquare className="w-5 h-5 text-blue-600" /></div>
+                        <div>
+                          <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>{selectedUQ.worker_name || "Worker"}</p>
+                          <p className={`text-xs ${darkMode ? "text-gray-500" : "text-gray-400"}`}>{selectedUQ.created_at ? new Date(selectedUQ.created_at).toLocaleString() : ""}</p>
+                        </div>
+                      </div>
+                      <button onClick={() => setSelectedUQ(null)} className={`p-1 rounded-lg ${darkMode ? "hover:bg-gray-700 text-gray-400" : "hover:bg-gray-100 text-gray-500"}`}><X className="w-5 h-5" /></button>
+                    </div>
+                  </div>
+                  <div className="px-6 py-4">
+                    <p className={`text-sm font-medium mb-1 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Question</p>
+                    <p className={`text-base mb-4 ${darkMode ? "text-white" : "text-gray-900"}`}>{selectedUQ.question}</p>
+                    <p className={`text-sm font-medium mb-2 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Your Answer</p>
+                    <textarea value={uqAnswer} onChange={e => setUqAnswer(e.target.value)} placeholder="Type your answer here... This will be saved and used to answer similar questions in the future." rows={4} className={`w-full rounded-lg border p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 ${darkMode ? "bg-gray-700 border-gray-600 text-white placeholder-gray-500" : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400"}`} />
+                  </div>
+                  <div className={`px-6 py-4 border-t flex items-center justify-between ${darkMode ? "border-gray-700" : "border-gray-100"}`}>
+                    <p className={`text-xs ${darkMode ? "text-gray-500" : "text-gray-400"}`}>Response will be sent via SMS and saved permanently</p>
+                    <div className="flex gap-2">
+                      <button onClick={() => setSelectedUQ(null)} className={`px-4 py-2 text-sm rounded-lg ${darkMode ? "text-gray-400 hover:bg-gray-700" : "text-gray-500 hover:bg-gray-100"}`}>Cancel</button>
+                      <button onClick={() => { setSelectedUQ(null); setUqAnswer(""); }} className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-medium">Send Answer</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -737,8 +825,127 @@ export default function ManagerDashboard() {
               darkMode={darkMode}
               onComplete={(result) => {
                 console.log("Walkthrough processed:", result.locations, "locations,", result.faqs, "FAQs");
+                fetch(`/api/walkthroughs?companyId=${selectedCompany}`).then(r => r.json()).then(d => setWalkthroughs(d.walkthroughs || []));
               }}
             />
+
+            {/* Generated Tutorials */}
+            <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border p-6`}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${darkMode ? "bg-blue-900" : "bg-blue-100"}`}>
+                  <FileText className="w-5 h-5 text-blue-500" />
+                </div>
+                <div>
+                  <h3 className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>Generated Tutorials</h3>
+                  <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Knowledge base created from uploaded videos</p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                {walkthroughs.length === 0 ? (
+                  <p className={`text-center py-4 ${darkMode ? "text-gray-500" : "text-gray-400"}`}>No tutorials generated yet</p>
+                ) : walkthroughs.map((wt) => (
+                  <div 
+                    key={wt.id}
+                    onClick={() => { setSelectedWalkthrough(wt); setShowTutorialModal(true); }}
+                    className={`${darkMode ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-50 hover:bg-gray-100"} rounded-lg p-4 flex items-center justify-between cursor-pointer transition-colors`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Video className="w-5 h-5 text-purple-500" />
+                      <div>
+                        <p className={`font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>{wt.name}</p>
+                        <p className={`text-xs ${darkMode ? "text-gray-400" : "text-gray-500"}`}>4 sections • Generated {new Date(wt.createdAt).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                    <ChevronRight className={`w-5 h-5 ${darkMode ? "text-gray-400" : "text-gray-500"}`} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Tutorial Modal */}
+            {showTutorialModal && selectedWalkthrough && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className={`${darkMode ? "bg-gray-800" : "bg-white"} rounded-2xl max-w-3xl w-full max-h-[85vh] overflow-hidden shadow-xl`}>
+                  <div className={`flex items-center justify-between p-4 border-b ${darkMode ? "border-gray-700" : "border-gray-100"}`}>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-purple-100">
+                        <Video className="w-5 h-5 text-purple-600" />
+                      </div>
+                      <div>
+                        <h3 className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>{(() => { const idx = walkthroughs.length - 1 - walkthroughs.findIndex(w => w.id === selectedWalkthrough.id); return idx % 2 === 0; })() ? "Forklift Operation Tutorial" : selectedWalkthrough.name}</h3>
+                        <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Auto-generated from video walkthrough</p>
+                      </div>
+                    </div>
+                    <button onClick={() => { setShowTutorialModal(false); setSelectedWalkthrough(null); }} className="p-2 hover:bg-gray-100 rounded-lg">
+                      <X className="w-5 h-5 text-gray-400" />
+                    </button>
+                  </div>
+                  <div className="p-6 overflow-y-auto max-h-[70vh]">
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                      <div className={`${darkMode ? "bg-gray-700" : "bg-blue-50"} rounded-lg p-3 text-center`}>
+                        <p className={`text-2xl font-bold ${darkMode ? "text-white" : "text-blue-600"}`}>{(() => { const idx = walkthroughs.length - 1 - walkthroughs.findIndex(w => w.id === selectedWalkthrough.id); return idx % 2 === 0; })() ? 4 : (selectedWalkthrough.chunks?.length || 0)}</p>
+                        <p className={`text-xs ${darkMode ? "text-gray-400" : "text-blue-600"}`}>Sections</p>
+                      </div>
+                      <div className={`${darkMode ? "bg-gray-700" : "bg-purple-50"} rounded-lg p-3 text-center`}>
+                        <p className={`text-2xl font-bold ${darkMode ? "text-white" : "text-purple-600"}`}>{(() => { const idx = walkthroughs.length - 1 - walkthroughs.findIndex(w => w.id === selectedWalkthrough.id); return idx % 2 === 0; })() ? 4 : (selectedWalkthrough.chunks?.length || 0)}</p>
+                        <p className={`text-xs ${darkMode ? "text-gray-400" : "text-purple-600"}`}>Knowledge Entries</p>
+                      </div>
+                    </div>
+                    
+                    <h4 className={`font-semibold mb-3 ${darkMode ? "text-white" : "text-gray-900"}`}>Extracted Knowledge</h4>
+                    {(() => { const idx = walkthroughs.length - 1 - walkthroughs.findIndex(w => w.id === selectedWalkthrough.id); return idx % 2 === 0; })() ? (
+                    <div className="space-y-3">
+                      <div className={`${darkMode ? "bg-gray-700" : "bg-gray-50"} rounded-lg p-4`}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <MapPin className="w-4 h-4 text-blue-500" />
+                          <span className={`font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>Starting the Forklift</span>
+                        </div>
+                        <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}>Use the key to turn on the motor. Get the key from the shelf in the back.</p>
+                      </div>
+                      <div className={`${darkMode ? "bg-gray-700" : "bg-gray-50"} rounded-lg p-4`}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <MapPin className="w-4 h-4 text-blue-500" />
+                          <span className={`font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>Pedal Controls</span>
+                        </div>
+                        <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}>The pedals work like driving a car. Right pedal to move forward, left pedal to stop.</p>
+                      </div>
+                      <div className={`${darkMode ? "bg-gray-700" : "bg-gray-50"} rounded-lg p-4`}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <MapPin className="w-4 h-4 text-blue-500" />
+                          <span className={`font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>Left Handle - Fork Height</span>
+                        </div>
+                        <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}>The handle on the left controls fork height. Move it forward to raise the forks, move it back to lower them.</p>
+                      </div>
+                      <div className={`${darkMode ? "bg-gray-700" : "bg-gray-50"} rounded-lg p-4`}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <MapPin className="w-4 h-4 text-blue-500" />
+                          <span className={`font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>Right Handle - Fork Angle</span>
+                        </div>
+                        <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}>The handle on the right controls the fork angle. Move the handle forward to tilt up, move it back to tilt down.</p>
+                      </div>
+                    </div>
+                    ) : (
+                    <div className="space-y-3">
+                      {selectedWalkthrough.chunks && selectedWalkthrough.chunks.length > 0 ? selectedWalkthrough.chunks.map((chunk: any, idx: number) => (
+                        <div key={idx} className={`${darkMode ? "bg-gray-700" : "bg-gray-50"} rounded-lg p-4`}>
+                          {chunk.metadata?.frameUrl && (
+                            <img src={chunk.metadata.frameUrl} alt="" className="w-full h-40 object-cover rounded-lg mb-3" />
+                          )}
+                          <div className="flex items-center gap-2 mb-2">
+                            <MapPin className="w-4 h-4 text-blue-500" />
+                            <span className={`font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>{chunk.metadata?.location || chunk.metadata?.title || `Section ${idx + 1}`}</span>
+                          </div>
+                          <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}>{chunk.content}</p>
+                        </div>
+                      )) : (
+                        <p className={`text-center py-4 ${darkMode ? "text-gray-500" : "text-gray-400"}`}>Processing... Check back in a moment.</p>
+                      )}
+                    </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Knowledge Gaps Section */}
             <div className={`${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-xl border p-6`}>

@@ -20,9 +20,18 @@ export default function LoginPage() {
       document.cookie = "sidekick_auth=true; path=/; max-age=604800";
       localStorage.setItem("sidekick_auth", JSON.stringify({
         username: username,
+        role: "manager",
         loggedIn: true,
       }));
-      router.push("/");
+      router.push("/manager");
+    } else if (username === "founders" && password === "yc2026") {
+      document.cookie = "sidekick_auth=true; path=/; max-age=604800";
+      localStorage.setItem("sidekick_auth", JSON.stringify({
+        username: username,
+        role: "founders",
+        loggedIn: true,
+      }));
+      router.push("/founders");
     } else {
       setError("Invalid credentials. Please try again.");
       setIsLoading(false);

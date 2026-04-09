@@ -1,8 +1,9 @@
 "use client";
 import React from "react";
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { Upload, Mic, Moon, Sun, ChevronLeft, Check, Building2, Users, Globe, FileText, Phone, Sparkles, Mail, AlertCircle, CheckCircle2, Loader2, Link as LinkIcon, Factory, ShoppingCart, Package, Car, Hotel, HeartPulse, Truck, Hammer, Home } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { Upload, Mic, Moon, Sun, ChevronLeft, Check, Building2, Users, Globe, FileText, Phone, Sparkles, Mail, AlertCircle, CheckCircle2, Loader2, Link as LinkIcon, Factory, ShoppingCart, Package, Car, Hotel, HeartPulse, Truck, Hammer, Home, Rocket, Lock, Smartphone } from "lucide-react";
 
 const industries = [
   { id: "manufacturing", label: "Manufacturing", icon: Factory },
@@ -94,8 +95,13 @@ interface OnboardingResult {
   joinCommand: string;
 }
 
-export default function OnboardingWizard() {
+function OnboardingWizard() {
   const [step, setStep] = useState(0);
+  const [googleConnected, setGoogleConnected] = useState(false);
+  const [driveFiles, setDriveFiles] = useState<any[]>([]);
+  const [loadingDriveFiles, setLoadingDriveFiles] = useState(false);
+  const [showDrivePicker, setShowDrivePicker] = useState(false);
+  const searchParams = useSearchParams();
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [isLaunching, setIsLaunching] = useState(false);
@@ -113,6 +119,35 @@ export default function OnboardingWizard() {
     const saved = localStorage.getItem("sidekickDarkMode");
     if (saved) setDarkMode(JSON.parse(saved));
   }, []);
+  
+  useEffect(() => {
+    const connected = searchParams.get("google_connected");
+    const companyId = searchParams.get("companyId");
+    if (connected === "true" && !googleConnected) {
+      // Restore form data from localStorage
+      const savedForm = localStorage.getItem('sidekickOnboardingForm');
+      if (savedForm) {
+        try {
+          const parsed = JSON.parse(savedForm);
+          setForm(prev => ({ ...prev, ...parsed }));
+        } catch (e) {
+          console.error("Failed to restore form:", e);
+        }
+      }
+      setGoogleConnected(true);
+      setShowDrivePicker(true);
+      setStep(4); // Stay on documents step (step 5 is index 4)
+      // Fetch drive files
+      setLoadingDriveFiles(true);
+      fetch(`/api/integrations/google-drive/files?companyId=${companyId || 'demo'}`)
+        .then(r => r.json())
+        .then(data => {
+          setDriveFiles(data.files || []);
+          setLoadingDriveFiles(false);
+        })
+        .catch(() => setLoadingDriveFiles(false));
+    }
+  }, [searchParams, googleConnected]);
   const [otherLanguage, setOtherLanguage] = useState("");
   const [otherAnswers, setOtherAnswers] = useState<Record<number, string>>({});
   
@@ -332,7 +367,7 @@ export default function OnboardingWizard() {
 
               <div>
                 <label style={{ display: "block", fontSize: "14px", fontWeight: 500, color: "#374151", marginBottom: "8px" }}>Location</label>
-                <input type="text" value={form.location} onChange={e => updateForm("location", e.target.value)} placeholder="e.g., Houston, TX" 
+                <input type="text" value={form.location} onChange={e => updateForm("location", e.target.value)} placeholder="e.g., San Francisco, CA" 
                   style={{ width: "100%", padding: "12px 16px", borderRadius: "12px", border: "2px solid #e2e8f0", outline: "none", fontSize: "16px", color: "#1e293b", background: "white" }} />
               </div>
 
@@ -518,10 +553,20 @@ export default function OnboardingWizard() {
               <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                 <p style={{ fontSize: "14px", fontWeight: 500, color: "#374151", marginBottom: "4px" }}>Import from cloud storage</p>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-                  <button onClick={() => window.open(`/api/auth/google?companyId=${form.companyName.toLowerCase().replace(/\s+/g, '-')}`, '_self')} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "12px 16px", background: "white", border: "1px solid #e2e8f0", borderRadius: "10px", cursor: "pointer", fontSize: "14px", fontWeight: 500, color: "#374151" }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-                    Google Drive
-                  </button>
+                  {googleConnected ? (
+                    <button onClick={() => setShowDrivePicker(true)} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "12px 16px", background: "#dcfce7", border: "1px solid #22c55e", borderRadius: "10px", cursor: "pointer", fontSize: "14px", fontWeight: 500, color: "#166534" }}>
+                      <CheckCircle2 className="w-5 h-5" />
+                      Browse Google Drive
+                    </button>
+                  ) : (
+                    <button onClick={() => (() => {
+                        localStorage.setItem('sidekickOnboardingForm', JSON.stringify(form));
+                        window.open(`/api/auth/google?companyId=${form.companyName.toLowerCase().replace(/\s+/g, '-')}`, '_self');
+                      })()} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "12px 16px", background: "white", border: "1px solid #e2e8f0", borderRadius: "10px", cursor: "pointer", fontSize: "14px", fontWeight: 500, color: "#374151" }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                      Google Drive
+                    </button>
+                  )}
                   <button onClick={() => window.open(`/api/auth/dropbox?companyId=${form.companyName.toLowerCase().replace(/\s+/g, '-')}`, '_self')} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "12px 16px", background: "white", border: "1px solid #e2e8f0", borderRadius: "10px", cursor: "pointer", fontSize: "14px", fontWeight: 500, color: "#374151" }}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="#0061FF"><path d="M12 6.134L6 9.866l6 3.732 6-3.732-6-3.732zM6 13.866l6 3.732 6-3.732-6-3.732-6 3.732zm6 4.268l-6-3.732v3.732l6 3.732 6-3.732v-3.732l-6 3.732z"/></svg>
                     Dropbox
@@ -539,6 +584,72 @@ export default function OnboardingWizard() {
 
               <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
                 <div style={{ flex: 1, height: "1px", background: "#e2e8f0" }} />
+                {/* Google Drive File Picker Modal */}
+                {showDrivePicker && (
+                  <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50 }}>
+                    <div style={{ background: "white", borderRadius: "16px", width: "100%", maxWidth: "600px", maxHeight: "80vh", overflow: "hidden", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)" }}>
+                      <div style={{ padding: "16px 20px", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                          <svg width="24" height="24" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                          <span style={{ fontWeight: 600, fontSize: "16px" }}>Select from Google Drive</span>
+                        </div>
+                        <button onClick={() => setShowDrivePicker(false)} style={{ background: "none", border: "none", cursor: "pointer", padding: "8px" }}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                        </button>
+                      </div>
+                      <div style={{ padding: "20px", overflowY: "auto", maxHeight: "60vh" }}>
+                        {loadingDriveFiles ? (
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "40px" }}>
+                            <Loader2 className="w-6 h-6 animate-spin" style={{ color: "#3b82f6" }} />
+                            <span style={{ marginLeft: "12px", color: "#64748b" }}>Loading files...</span>
+                          </div>
+                        ) : driveFiles.length === 0 ? (
+                          <div style={{ textAlign: "center", padding: "40px", color: "#64748b" }}>
+                            <FileText style={{ width: "48px", height: "48px", margin: "0 auto 16px", opacity: 0.5 }} />
+                            <p>No files found in your Google Drive</p>
+                          </div>
+                        ) : (
+                          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                            {driveFiles.map((file: any) => (
+                              <button
+                                key={file.id}
+                                onClick={async () => {
+                                  const companyId = searchParams.get("companyId") || form.companyName.toLowerCase().replace(/\s+/g, '-') || 'demo';
+                                  try {
+                                    const res = await fetch(`/api/integrations/google-drive/import`, {
+                                      method: "POST",
+                                      headers: { "Content-Type": "application/json" },
+                                      body: JSON.stringify({ fileId: file.id, fileName: file.name, companyId, mimeType: file.mimeType })
+                                    });
+                                    const data = await res.json();
+                                    if (res.ok) {
+                                      updateForm("documents", [...form.documents, { name: file.name, content: "Imported from Google Drive", status: "done" }]);
+                                      setShowDrivePicker(false);
+                                    } else {
+                                      console.error("Import failed:", data);
+                                      alert("Failed to import: " + (data.error || "Unknown error"));
+                                    }
+                                  } catch (err) {
+                                    console.error("Import error:", err);
+                                    alert("Failed to import file");
+                                  }
+                                }}
+                                style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 16px", background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "10px", cursor: "pointer", textAlign: "left", width: "100%" }}
+                              >
+                                <FileText style={{ width: "20px", height: "20px", color: "#3b82f6", flexShrink: 0 }} />
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <p style={{ fontWeight: 500, fontSize: "14px", color: "#1e293b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file.name}</p>
+                                  <p style={{ fontSize: "12px", color: "#64748b" }}>{file.mimeType?.split("/").pop() || "file"}</p>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <span style={{ fontSize: "14px", color: "#94a3b8" }}>or upload directly</span>
                 <div style={{ flex: 1, height: "1px", background: "#e2e8f0" }} />
               </div>
@@ -646,7 +757,7 @@ export default function OnboardingWizard() {
             <div style={{ display: "flex", flexDirection: "column", gap: "24px", textAlign: "center" }}>
               <div style={{ padding: "32px 0" }}>
                 <div style={{ width: "96px", height: "96px", margin: "0 auto 24px", background: "linear-gradient(to bottom right, #4ade80, #16a34a)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 10px 25px rgba(0,0,0,0.1)" }}>
-                  <span style={{ fontSize: "48px" }}>🚀</span>
+                  <Rocket className="w-12 h-12 text-white" />
                 </div>
                 <h1 style={{ fontSize: "30px", fontWeight: "bold", color: "#1e293b", marginBottom: "8px" }}>You&apos;re all set!</h1>
                 <p style={{ color: "#64748b", fontSize: "18px" }}>Sidekick is ready for {onboardingResult.companyName}.</p>
@@ -681,7 +792,7 @@ export default function OnboardingWizard() {
               </div>
 
               <div style={{ background: "linear-gradient(to right, #eff6ff, #f1f5f9)", borderRadius: "16px", padding: "24px", textAlign: "left", border: "1px solid #bfdbfe" }}>
-                <p style={{ fontWeight: 600, color: "#1e40af", marginBottom: "16px" }}>🔐 Your Company Access Code</p>
+                <p style={{ fontWeight: 600, color: "#1e40af", marginBottom: "16px" }}><Lock className="w-5 h-5 inline mr-2 text-blue-800" />Your Company Access Code</p>
                 <div style={{ background: "white", borderRadius: "12px", padding: "20px", textAlign: "center", border: "2px solid #3b82f6" }}>
                   <div style={{ fontSize: "36px", fontWeight: "bold", color: "#1d4ed8", fontFamily: "monospace", letterSpacing: "8px" }}>{onboardingResult.accessCode}</div>
                   <p style={{ fontSize: "14px", color: "#64748b", marginTop: "12px" }}>Share this code with your workers to join</p>
@@ -689,7 +800,7 @@ export default function OnboardingWizard() {
               </div>
 
               <div style={{ background: "#eff6ff", borderRadius: "16px", padding: "24px", textAlign: "left" }}>
-                <p style={{ fontWeight: 600, color: "#1e293b", marginBottom: "16px" }}>📱 How workers join</p>
+                <p style={{ fontWeight: 600, color: "#1e293b", marginBottom: "16px" }}><Smartphone className="w-5 h-5 inline mr-2 text-gray-800" />How workers join</p>
                 <div style={{ background: "white", borderRadius: "12px", padding: "16px" }}>
                   <p style={{ fontSize: "14px", color: "#475569", marginBottom: "8px" }}>Workers text this to your Sidekick number:</p>
                   <div style={{ fontSize: "20px", fontWeight: "bold", color: "#2563eb", fontFamily: "monospace", background: "#eff6ff", borderRadius: "8px", padding: "12px", textAlign: "center" }}>{onboardingResult.joinCommand}</div>
@@ -717,11 +828,19 @@ export default function OnboardingWizard() {
                 color: canProceed() && !isLaunching ? "white" : "#94a3b8",
                 display: "flex", alignItems: "center", justifyContent: "center", gap: "8px"
               }}>
-              {isLaunching ? (<><Loader2 style={{ width: "20px", height: "20px" }} />Saving...</>) : step === steps.length - 2 ? "Launch Sidekick 🚀" : "Continue"}
+              {isLaunching ? (<><Loader2 style={{ width: "20px", height: "20px" }} />Saving...</>) : step === steps.length - 2 ? "Launch Sidekick" : "Continue"}
             </button>
           </div>
         </div>
       )}
     </div>
+  );
+}
+
+export default function OnboardingPage() {
+  return (
+    <Suspense fallback={<div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>Loading...</div>}>
+      <OnboardingWizard />
+    </Suspense>
   );
 }

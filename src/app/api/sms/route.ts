@@ -802,9 +802,111 @@ export async function POST(request: NextRequest) {
     }
 
     // ============================================
+    // ============================================
+    // NEW: Handle audio messages
+    // ============================================
+    const isAudio = mediaType?.startsWith("audio/") || mediaType?.includes("amr") || mediaType?.includes("ogg");
+    if (numMedia > 0 && mediaUrl && isAudio) {
+      console.log("[SMS] Processing audio from", worker.name, "MediaType:", mediaType);
+      
+      try {
+        // Fetch the audio file from Twilio
+        const response = await fetch(mediaUrl, {
+          headers: {
+            Authorization: `Basic ${Buffer.from(`${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_TOKEN}`).toString("base64")}`,
+          },
+        });
+        
+        if (!response.ok) {
+          console.error("[SMS] Failed to fetch audio:", response.status, response.statusText);
+          return twimlResponse("Sorry, I couldn't load that audio. Please try again.");
+        }
+        
+        const audioBuffer = await response.arrayBuffer();
+        console.log("[SMS] Audio buffer size:", audioBuffer.byteLength);
+        
+        // Use Deepgram which supports AMR format natively
+        console.log("[SMS] Transcribing audio via Deepgram, mediaType:", mediaType);
+        
+        const deepgramResponse = await fetch("https://api.deepgram.com/v1/listen?model=nova-2&smart_format=true", {
+          method: "POST",
+          headers: {
+            "Authorization": `Token ${process.env.DEEPGRAM_API_KEY}`,
+            "Content-Type": mediaType || "audio/amr",
+          },
+          body: Buffer.from(audioBuffer),
+        });
+        
+        if (!deepgramResponse.ok) {
+          const errText = await deepgramResponse.text();
+          console.error("[SMS] Deepgram error:", errText);
+          throw new Error(`Deepgram: ${errText.slice(0, 100)}`);
+        }
+        
+        const deepgramResult = await deepgramResponse.json();
+        const transcribedText = deepgramResult?.results?.channels?.[0]?.alternatives?.[0]?.transcript || "";
+        console.log("[SMS] Transcribed audio:", transcribedText);
+        
+        if (!transcribedText || transcribedText.trim().length === 0) {
+          return twimlResponse("I couldn't understand the audio. Could you try speaking more clearly or send a text message?");
+        }
+        
+        // Now process the transcribed text as a regular question
+        // Search for relevant documents
+        const relevantChunks = await searchDocuments(transcribedText, worker.company_id);
+        const bestSimilarity = relevantChunks.length > 0 
+          ? Math.round(Math.max(...relevantChunks.map((c: any) => c.similarity)) * 100)
+          : 0;
+        
+        // Build context and generate answer
+        const context = relevantChunks.map((c: any) => c.content).join("\n\n");
+        const systemPrompt = `You are Sidekick, a helpful workplace assistant for ${worker.name || "a worker"} at ${company?.name || "their company"}.
+Answer questions based on the provided context. Be concise, friendly, and helpful. Keep responses under 300 characters for SMS.
+If you don't have enough information to answer, say so honestly and mention they should check with their manager.`;
+        
+        const userMessage = context
+          ? `Context from company documents:\n${context}\n\nQuestion: ${transcribedText}`
+          : `Question: ${transcribedText}\n\nNote: No relevant documents found. Provide a helpful general response.`;
+        
+        const answer = await getAIResponse(systemPrompt, userMessage);
+        
+        const responseTime = Date.now() - startTime;
+        const lowConfidence = isLowConfidenceAnswer(answer) || bestSimilarity < 40;
+        
+        // Log the question
+        const { data: questionRecord } = await supabase.from("questions").insert({
+          company_id: worker.company_id,
+          worker_phone: from,
+          worker_name: worker.name,
+          question: `[VOICE] ${transcribedText}`,
+          answer: answer,
+          confidence: bestSimilarity,
+          response_time_ms: responseTime,
+          manager_notified: false,
+        }).select().single();
+        
+        // Handle low confidence with escalation option
+        if (lowConfidence && company?.manager_phone && questionRecord) {
+          await supabase
+            .from("workers")
+            .update({ pending_escalation_question_id: questionRecord.id })
+            .eq("phone", from);
+          
+          return twimlResponse(`🎤 I heard: "${transcribedText}"\n\n${answer}\n\n---\n⚠️ Want me to notify ${company.manager_name || "your manager"} about this question?\n\nReply Y for Yes, N for No`);
+        }
+        
+        return twimlResponse(`🎤 I heard: "${transcribedText}"\n\n${answer}`);
+      } catch (error: any) {
+        console.error("[SMS] Audio processing error:", error?.message || error);
+        console.error("[SMS] Audio error stack:", error?.stack);
+        console.error("[SMS] Audio mediaType was:", mediaType);
+        return twimlResponse(`Audio error: mediaType=${mediaType}, err=${error?.message?.slice(0, 80) || "unknown"}`);
+      }
+    }
+
     // NEW: Handle image messages
     // ============================================
-    if (numMedia > 0 && mediaUrl) {
+    if (numMedia > 0 && mediaUrl && mediaType?.startsWith("image/")) {
       console.log("[SMS] Processing image from", worker.name, "MediaType:", mediaType);
       
       // Fetch and analyze the image
