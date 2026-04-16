@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { supabase } from "@/lib/supabase";
 import { createEmbedding } from "@/lib/embeddings";
+import { normalizePhoneNumber } from "@/lib/phone";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
@@ -137,21 +138,36 @@ export async function POST(request: NextRequest) {
     return new NextResponse("Missing fields", { status: 400 });
   }
 
-  console.log(`[SMS] ${from}: "${body}"`);
+  // Normalize incoming phone number to handle multiple formats
+  const normalizedPhone = normalizePhoneNumber(from);
+  console.log(`[SMS] ${from} (normalized: ${normalizedPhone}): "${body}"`);
 
-  // Get worker's company (default to "eds" for now)
-  // TODO: Look up worker's company from database
-  const companyId = "eds";
+  // Look up worker's company by normalized phone number
+  let companyId = "eds"; // Default fallback
+  try {
+    const { data: worker } = await supabase
+      .from("workers")
+      .select("company_id")
+      .eq("phone", normalizedPhone)
+      .single();
+    
+    if (worker?.company_id) {
+      companyId = worker.company_id;
+      console.log(`[SMS] Worker found: company_id=${companyId}`);
+    }
+  } catch (e) {
+    console.log(`[SMS] Worker lookup failed, using default company (eds)`);
+  }
 
   const lang = await detectLanguage(body);
   const chunks = await findRelevantChunks(companyId, body);
   const { response, frameUrl } = await generateResponse(body, chunks, lang);
 
-  // Log interaction
+  // Log interaction with normalized phone number
   try {
     await supabase.from("interactions").insert({
       company_id: companyId,
-      phone: from,
+      phone: normalizedPhone,
       question: body,
       answer: response,
       language: lang,
@@ -161,7 +177,7 @@ export async function POST(request: NextRequest) {
     console.error("Failed to log interaction:", e);
   }
 
-  // Send response (with image if available)
+  // Send response back to sender (use original from number)
   await sendSMS(from, response, frameUrl);
 
   return new NextResponse('<?xml version="1.0"?><Response></Response>', {
