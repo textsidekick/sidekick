@@ -23,7 +23,7 @@ export default function OnboardingChat() {
     {
       role: "assistant",
       content:
-        "Hey there! 👋 I'm here to help you get Sidekick set up. First things first—what's your company name?",
+        "Company/Organization or Event? (1 or 2)",
     },
   ]);
   const [input, setInput] = useState("");
