@@ -1,7 +1,8 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { Send, Home, Loader2, Lock, Smartphone, CheckCircle2 } from "lucide-react";
+import { Send, Home, Loader2, Lock, Smartphone, CheckCircle2, Copy } from "lucide-react";
+import { formatPhoneForDisplay, formatPhoneUnformatted, createSmsLink } from "@/lib/phone";
 
 interface Message {
   role: "user" | "assistant";
@@ -343,7 +344,7 @@ export default function OnboardingChat() {
                 style={{
                   fontSize: "14px",
                   color: "#475569",
-                  marginBottom: "8px",
+                  marginBottom: "12px",
                 }}
               >
                 Workers text this to your Sidekick number:
@@ -358,28 +359,92 @@ export default function OnboardingChat() {
                   borderRadius: "8px",
                   padding: "12px",
                   textAlign: "center",
-                  marginBottom: "12px",
+                  marginBottom: "16px",
                 }}
               >
                 {onboardingResult.joinCommand}
               </div>
-              <p
+              <div
                 style={{
-                  fontSize: "14px",
-                  color: "#64748b",
-                  textAlign: "center",
+                  background: "#f8fafc",
+                  borderRadius: "8px",
+                  padding: "12px",
+                  marginBottom: "12px",
                 }}
               >
-                Sidekick number:{" "}
-                <span
+                <p
                   style={{
-                    fontFamily: "monospace",
+                    fontSize: "12px",
+                    color: "#64748b",
+                    marginBottom: "8px",
                     fontWeight: 500,
                   }}
                 >
-                  {onboardingResult.twilioNumber}
-                </span>
-              </p>
+                  Sidekick number:
+                </p>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "12px",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <div>
+                    <p
+                      style={{
+                        fontSize: "13px",
+                        color: "#64748b",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      Formatted:
+                    </p>
+                    <a
+                      href={createSmsLink(onboardingResult.twilioNumber)}
+                      style={{
+                        fontSize: "16px",
+                        fontWeight: "600",
+                        color: "#2563eb",
+                        textDecoration: "none",
+                        fontFamily: "monospace",
+                      }}
+                    >
+                      {formatPhoneForDisplay(onboardingResult.twilioNumber)}
+                    </a>
+                  </div>
+                  <div>
+                    <p
+                      style={{
+                        fontSize: "13px",
+                        color: "#64748b",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      Simple:
+                    </p>
+                    <p
+                      style={{
+                        fontSize: "16px",
+                        fontWeight: "600",
+                        color: "#1e293b",
+                        fontFamily: "monospace",
+                      }}
+                    >
+                      {formatPhoneUnformatted(onboardingResult.twilioNumber)}
+                    </p>
+                  </div>
+                </div>
+                <p
+                  style={{
+                    fontSize: "12px",
+                    color: "#64748b",
+                    marginTop: "8px",
+                  }}
+                >
+                  📱 Tap formatted number on mobile to text directly
+                </p>
+              </div>
             </div>
           </div>
 
