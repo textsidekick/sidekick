@@ -17,11 +17,23 @@ function generateAccessCode(): string {
   return result;
 }
 
+// Generate smart suggestions when a custom code is taken
+function generateCodeSuggestions(baseCode: string): string[] {
+  const suggestions: string[] = [];
+  // Add numeric suffixes
+  for (const suffix of ["1", "2", "3", "123", "01"]) {
+    suggestions.push(baseCode + suffix);
+  }
+  // Add year suffix
+  suggestions.push(baseCode + new Date().getFullYear().toString().slice(-2));
+  return suggestions;
+}
+
 export async function POST(request: NextRequest) {
   console.log("[Onboarding Complete] === API HIT ===");
 
   try {
-    const { messages } = await request.json();
+    const { messages, customCode } = await request.json();
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json(
@@ -99,18 +111,53 @@ Return ONLY the JSON object, no markdown or extra text.`;
       .replace(/-+/g, "-")
       .replace(/^-|-$/g, "");
 
-    let accessCode = generateAccessCode();
-    let attempts = 0;
-    while (attempts < 10) {
+    let accessCode: string;
+    let codeSuggestions: string[] | undefined;
+
+    if (customCode) {
+      // User wants a custom code — check availability
+      const sanitized = customCode.toUpperCase().replace(/[^A-Z0-9]/g, "");
       const { data: existing } = await supabase
         .from("companies")
         .select("id")
-        .eq("access_code", accessCode)
+        .eq("access_code", sanitized)
         .single();
 
-      if (!existing) break;
+      if (existing) {
+        // Code is taken — generate suggestions and return them
+        const suggestions = generateCodeSuggestions(sanitized);
+        const availableSuggestions: string[] = [];
+        for (const suggestion of suggestions) {
+          const { data: sugExists } = await supabase
+            .from("companies")
+            .select("id")
+            .eq("access_code", suggestion)
+            .single();
+          if (!sugExists) availableSuggestions.push(suggestion);
+        }
+        return NextResponse.json({
+          success: false,
+          codeTaken: true,
+          requestedCode: sanitized,
+          suggestions: availableSuggestions.slice(0, 4),
+        });
+      }
+      accessCode = sanitized;
+    } else {
+      // Auto-generate code
       accessCode = generateAccessCode();
-      attempts++;
+      let attempts = 0;
+      while (attempts < 10) {
+        const { data: existing } = await supabase
+          .from("companies")
+          .select("id")
+          .eq("access_code", accessCode)
+          .single();
+
+        if (!existing) break;
+        accessCode = generateAccessCode();
+        attempts++;
+      }
     }
 
     console.log(

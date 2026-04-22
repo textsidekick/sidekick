@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { Send, Home, Loader2, Lock, Smartphone, CheckCircle2, Copy } from "lucide-react";
+import { Send, Home, Loader2, Lock, Smartphone, CheckCircle2, Copy, Pencil } from "lucide-react";
 import { formatPhoneForDisplay, formatPhoneUnformatted, createSmsLink } from "@/lib/phone";
 
 interface Message {
@@ -33,6 +33,11 @@ export default function OnboardingChat() {
   const [isComplete, setIsComplete] = useState(false);
   const [onboardingResult, setOnboardingResult] = useState<OnboardingResult | null>(null);
   const [completionError, setCompletionError] = useState<string | null>(null);
+  const [editingCode, setEditingCode] = useState(false);
+  const [customCode, setCustomCode] = useState("");
+  const [codeError, setCodeError] = useState<string | null>(null);
+  const [codeSuggestions, setCodeSuggestions] = useState<string[]>([]);
+  const [savingCode, setSavingCode] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -42,6 +47,61 @@ export default function OnboardingChat() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const handleCheckCode = async (code: string) => {
+    if (!code.trim() || !onboardingResult) return;
+    setCodeError(null);
+    setCodeSuggestions([]);
+    try {
+      const res = await fetch("/api/onboarding/check-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, companyId: onboardingResult.companyId }),
+      });
+      const data = await res.json();
+      if (data.available) {
+        setCodeError(null);
+        setCodeSuggestions([]);
+      } else if (data.error) {
+        setCodeError(data.error);
+      } else {
+        setCodeError(`"${data.code}" is taken`);
+        setCodeSuggestions(data.suggestions || []);
+      }
+    } catch {
+      setCodeError("Failed to check code");
+    }
+  };
+
+  const handleSaveCode = async (code: string) => {
+    if (!onboardingResult) return;
+    setSavingCode(true);
+    setCodeError(null);
+    try {
+      const res = await fetch("/api/onboarding/update-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ companyId: onboardingResult.companyId, newCode: code }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setOnboardingResult({
+          ...onboardingResult,
+          accessCode: data.accessCode,
+          joinCommand: data.joinCommand,
+        });
+        setEditingCode(false);
+        setCustomCode("");
+        setCodeSuggestions([]);
+      } else {
+        setCodeError(data.error || "Failed to update code");
+      }
+    } catch {
+      setCodeError("Failed to save code");
+    } finally {
+      setSavingCode(false);
+    }
+  };
 
   const handleSendMessage = async () => {
     if (!input.trim()) return;
@@ -134,7 +194,7 @@ export default function OnboardingChat() {
       <div
         style={{
           minHeight: "100vh",
-          background: "linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%)",
+          background: "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)",
           display: "flex",
           flexDirection: "column",
           padding: "24px 16px",
@@ -144,10 +204,10 @@ export default function OnboardingChat() {
           style={{
             position: "sticky",
             top: 0,
-            background: "rgba(255,255,255,0.9)",
-            backdropFilter: "blur(8px)",
-            borderBottom: "1px solid #e2e8f0",
-            padding: "12px 16px",
+            background: "rgba(15, 23, 42, 0.8)",
+            backdropFilter: "blur(12px)",
+            borderBottom: "1px solid rgba(59, 130, 246, 0.2)",
+            padding: "16px 16px",
             zIndex: 40,
             marginLeft: "-16px",
             marginRight: "-16px",
@@ -165,22 +225,34 @@ export default function OnboardingChat() {
               justifyContent: "space-between",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
               <Link
                 href="/"
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "8px",
+                  gap: "10px",
                   textDecoration: "none",
                 }}
               >
-                <img
-                  src="/images/logo/sidekick-logo-blue.png"
-                  alt="Sidekick"
-                  style={{ width: "32px", height: "32px" }}
-                />
-                <span style={{ fontWeight: 600, color: "#1e293b" }}>
+                <div
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    background: "linear-gradient(135deg, #3b82f6, #2563eb)",
+                    borderRadius: "10px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <img
+                    src="/images/logo/sidekick-logo-blue.png"
+                    alt="Sidekick"
+                    style={{ width: "24px", height: "24px", filter: "brightness(2)" }}
+                  />
+                </div>
+                <span style={{ fontWeight: 700, color: "#f8fafc", fontSize: "18px" }}>
                   Sidekick
                 </span>
               </Link>
@@ -188,13 +260,14 @@ export default function OnboardingChat() {
             <Link
               href="/"
               style={{
-                padding: "8px",
-                borderRadius: "8px",
-                background: "#f1f5f9",
-                color: "#64748b",
+                padding: "10px 14px",
+                borderRadius: "10px",
+                background: "rgba(59, 130, 246, 0.1)",
+                color: "#60a5fa",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                border: "1px solid rgba(59, 130, 246, 0.2)",
               }}
             >
               <Home size={20} />
@@ -212,6 +285,7 @@ export default function OnboardingChat() {
             maxWidth: "672px",
             margin: "0 auto",
             width: "100%",
+            paddingTop: "32px",
           }}
         >
           <div
@@ -225,20 +299,21 @@ export default function OnboardingChat() {
                 width: "80px",
                 height: "80px",
                 borderRadius: "50%",
-                background: "#dcfce7",
+                background: "rgba(34, 197, 94, 0.15)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 margin: "0 auto 24px",
+                border: "1px solid rgba(34, 197, 94, 0.3)",
               }}
             >
-              <CheckCircle2 size={48} color="#16a34a" />
+              <CheckCircle2 size={48} color="#22c55e" />
             </div>
             <h1
               style={{
                 fontSize: "28px",
                 fontWeight: "bold",
-                color: "#1e293b",
+                color: "#f8fafc",
                 marginBottom: "12px",
               }}
             >
@@ -247,7 +322,7 @@ export default function OnboardingChat() {
             <p
               style={{
                 fontSize: "16px",
-                color: "#64748b",
+                color: "#94a3b8",
               }}
             >
               {onboardingResult.companyName} is ready to go.
@@ -256,74 +331,240 @@ export default function OnboardingChat() {
 
           <div
             style={{
-              background: "linear-gradient(to right, #eff6ff, #f1f5f9)",
+              background: "rgba(59, 130, 246, 0.1)",
               borderRadius: "16px",
               padding: "24px",
               textAlign: "left",
-              border: "1px solid #bfdbfe",
+              border: "1px solid rgba(59, 130, 246, 0.2)",
               marginBottom: "24px",
               width: "100%",
             }}
           >
-            <p
-              style={{
-                fontWeight: 600,
-                color: "#1e40af",
-                marginBottom: "16px",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <Lock size={20} />
-              Your Company Access Code
-            </p>
             <div
               style={{
-                background: "white",
-                borderRadius: "12px",
-                padding: "20px",
-                textAlign: "center",
-                border: "2px solid #3b82f6",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "16px",
               }}
             >
-              <div
-                style={{
-                  fontSize: "36px",
-                  fontWeight: "bold",
-                  color: "#1d4ed8",
-                  fontFamily: "monospace",
-                  letterSpacing: "8px",
-                }}
-              >
-                {onboardingResult.accessCode}
-              </div>
               <p
                 style={{
-                  fontSize: "14px",
-                  color: "#64748b",
-                  marginTop: "12px",
+                  fontWeight: 600,
+                  color: "#60a5fa",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
                 }}
               >
-                Share this code with your workers to join
+                <Lock size={20} />
+                Your Company Access Code
               </p>
+              {!editingCode && (
+                <button
+                  onClick={() => {
+                    setEditingCode(true);
+                    setCustomCode(onboardingResult.accessCode);
+                  }}
+                  style={{
+                    background: "rgba(59, 130, 246, 0.1)",
+                    border: "1px solid rgba(59, 130, 246, 0.3)",
+                    borderRadius: "8px",
+                    padding: "6px 12px",
+                    color: "#60a5fa",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    fontSize: "13px",
+                    fontWeight: 500,
+                  }}
+                >
+                  <Pencil size={14} />
+                  Customize
+                </button>
+              )}
             </div>
+            {editingCode ? (
+              <div
+                style={{
+                  background: "rgba(15, 23, 42, 0.6)",
+                  borderRadius: "12px",
+                  padding: "20px",
+                  border: "2px solid #3b82f6",
+                }}
+              >
+                <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+                  <input
+                    type="text"
+                    value={customCode}
+                    onChange={(e) => {
+                      const val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+                      setCustomCode(val);
+                      setCodeError(null);
+                      setCodeSuggestions([]);
+                    }}
+                    placeholder="Enter custom code"
+                    maxLength={12}
+                    style={{
+                      flex: 1,
+                      padding: "12px 14px",
+                      borderRadius: "10px",
+                      border: "2px solid rgba(59, 130, 246, 0.3)",
+                      fontSize: "18px",
+                      fontFamily: "monospace",
+                      fontWeight: "bold",
+                      letterSpacing: "4px",
+                      textAlign: "center",
+                      outline: "none",
+                      color: "#f8fafc",
+                      background: "rgba(30, 41, 59, 0.6)",
+                    }}
+                  />
+                </div>
+                <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
+                  <button
+                    onClick={() => handleCheckCode(customCode)}
+                    disabled={!customCode.trim() || customCode.length < 2}
+                    style={{
+                      padding: "8px 16px",
+                      borderRadius: "8px",
+                      background: "rgba(59, 130, 246, 0.2)",
+                      color: "#60a5fa",
+                      border: "1px solid rgba(59, 130, 246, 0.3)",
+                      cursor: customCode.trim() && customCode.length >= 2 ? "pointer" : "not-allowed",
+                      fontSize: "13px",
+                      fontWeight: 500,
+                    }}
+                  >
+                    Check Availability
+                  </button>
+                  <button
+                    onClick={() => handleSaveCode(customCode)}
+                    disabled={savingCode || !customCode.trim() || customCode.length < 2 || !!codeError}
+                    style={{
+                      padding: "8px 16px",
+                      borderRadius: "8px",
+                      background: !savingCode && customCode.trim() && customCode.length >= 2 && !codeError
+                        ? "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)"
+                        : "rgba(59, 130, 246, 0.1)",
+                      color: "white",
+                      border: "none",
+                      cursor: !savingCode && customCode.trim() && !codeError ? "pointer" : "not-allowed",
+                      fontSize: "13px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {savingCode ? "Saving..." : "Save Code"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setEditingCode(false);
+                      setCustomCode("");
+                      setCodeError(null);
+                      setCodeSuggestions([]);
+                    }}
+                    style={{
+                      padding: "8px 16px",
+                      borderRadius: "8px",
+                      background: "transparent",
+                      color: "#94a3b8",
+                      border: "1px solid rgba(148, 163, 184, 0.3)",
+                      cursor: "pointer",
+                      fontSize: "13px",
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+                {codeError && (
+                  <p style={{ color: "#f87171", fontSize: "13px", marginTop: "12px", textAlign: "center" }}>
+                    {codeError}
+                  </p>
+                )}
+                {codeSuggestions.length > 0 && (
+                  <div style={{ marginTop: "12px", textAlign: "center" }}>
+                    <p style={{ color: "#94a3b8", fontSize: "13px", marginBottom: "8px" }}>
+                      Try one of these:
+                    </p>
+                    <div style={{ display: "flex", gap: "8px", justifyContent: "center", flexWrap: "wrap" }}>
+                      {codeSuggestions.map((suggestion) => (
+                        <button
+                          key={suggestion}
+                          onClick={() => {
+                            setCustomCode(suggestion);
+                            setCodeError(null);
+                            setCodeSuggestions([]);
+                          }}
+                          style={{
+                            padding: "6px 14px",
+                            borderRadius: "8px",
+                            background: "rgba(59, 130, 246, 0.15)",
+                            color: "#60a5fa",
+                            border: "1px solid rgba(59, 130, 246, 0.3)",
+                            cursor: "pointer",
+                            fontFamily: "monospace",
+                            fontWeight: 600,
+                            fontSize: "14px",
+                            letterSpacing: "2px",
+                          }}
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div
+                style={{
+                  background: "rgba(15, 23, 42, 0.6)",
+                  borderRadius: "12px",
+                  padding: "20px",
+                  textAlign: "center",
+                  border: "2px solid #3b82f6",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "36px",
+                    fontWeight: "bold",
+                    color: "#60a5fa",
+                    fontFamily: "monospace",
+                    letterSpacing: "8px",
+                  }}
+                >
+                  {onboardingResult.accessCode}
+                </div>
+                <p
+                  style={{
+                    fontSize: "14px",
+                    color: "#94a3b8",
+                    marginTop: "12px",
+                  }}
+                >
+                  Share this code with your workers to join
+                </p>
+              </div>
+            )}
           </div>
 
           <div
             style={{
-              background: "#eff6ff",
+              background: "rgba(30, 41, 59, 0.6)",
               borderRadius: "16px",
               padding: "24px",
               textAlign: "left",
               width: "100%",
               marginBottom: "24px",
+              border: "1px solid rgba(59, 130, 246, 0.1)",
             }}
           >
             <p
               style={{
                 fontWeight: 600,
-                color: "#1e293b",
+                color: "#f8fafc",
                 marginBottom: "16px",
                 display: "flex",
                 alignItems: "center",
@@ -335,7 +576,7 @@ export default function OnboardingChat() {
             </p>
             <div
               style={{
-                background: "white",
+                background: "rgba(15, 23, 42, 0.6)",
                 borderRadius: "12px",
                 padding: "16px",
               }}
@@ -343,7 +584,7 @@ export default function OnboardingChat() {
               <p
                 style={{
                   fontSize: "14px",
-                  color: "#475569",
+                  color: "#94a3b8",
                   marginBottom: "12px",
                 }}
               >
@@ -353,20 +594,21 @@ export default function OnboardingChat() {
                 style={{
                   fontSize: "20px",
                   fontWeight: "bold",
-                  color: "#2563eb",
+                  color: "#60a5fa",
                   fontFamily: "monospace",
-                  background: "#eff6ff",
+                  background: "rgba(59, 130, 246, 0.1)",
                   borderRadius: "8px",
                   padding: "12px",
                   textAlign: "center",
                   marginBottom: "16px",
+                  border: "1px solid rgba(59, 130, 246, 0.2)",
                 }}
               >
                 {onboardingResult.joinCommand}
               </div>
               <div
                 style={{
-                  background: "#f8fafc",
+                  background: "rgba(30, 41, 59, 0.6)",
                   borderRadius: "8px",
                   padding: "12px",
                   marginBottom: "12px",
@@ -375,7 +617,7 @@ export default function OnboardingChat() {
                 <p
                   style={{
                     fontSize: "12px",
-                    color: "#64748b",
+                    color: "#94a3b8",
                     marginBottom: "8px",
                     fontWeight: 500,
                   }}
@@ -394,7 +636,7 @@ export default function OnboardingChat() {
                     <p
                       style={{
                         fontSize: "13px",
-                        color: "#64748b",
+                        color: "#94a3b8",
                         marginBottom: "4px",
                       }}
                     >
@@ -405,7 +647,7 @@ export default function OnboardingChat() {
                       style={{
                         fontSize: "16px",
                         fontWeight: "600",
-                        color: "#2563eb",
+                        color: "#60a5fa",
                         textDecoration: "none",
                         fontFamily: "monospace",
                       }}
@@ -417,7 +659,7 @@ export default function OnboardingChat() {
                     <p
                       style={{
                         fontSize: "13px",
-                        color: "#64748b",
+                        color: "#94a3b8",
                         marginBottom: "4px",
                       }}
                     >
@@ -427,7 +669,7 @@ export default function OnboardingChat() {
                       style={{
                         fontSize: "16px",
                         fontWeight: "600",
-                        color: "#1e293b",
+                        color: "#f8fafc",
                         fontFamily: "monospace",
                       }}
                     >
@@ -438,7 +680,7 @@ export default function OnboardingChat() {
                 <p
                   style={{
                     fontSize: "12px",
-                    color: "#64748b",
+                    color: "#94a3b8",
                     marginTop: "8px",
                   }}
                 >
@@ -453,14 +695,16 @@ export default function OnboardingChat() {
             style={{
               display: "block",
               width: "100%",
-              background: "#2563eb",
+              background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
               color: "white",
               padding: "16px",
-              borderRadius: "12px",
+              borderRadius: "14px",
               fontWeight: 600,
               fontSize: "18px",
               textDecoration: "none",
               textAlign: "center",
+              border: "1px solid rgba(59, 130, 246, 0.3)",
+              boxShadow: "0 8px 16px rgba(59, 130, 246, 0.3)",
             }}
           >
             Go to Dashboard →
@@ -476,7 +720,7 @@ export default function OnboardingChat() {
       <div
         style={{
           minHeight: "100vh",
-          background: "linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%)",
+          background: "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)",
           display: "flex",
           flexDirection: "column",
           padding: "24px 16px",
@@ -484,10 +728,10 @@ export default function OnboardingChat() {
       >
         <header
           style={{
-            background: "rgba(255,255,255,0.9)",
-            backdropFilter: "blur(8px)",
-            borderBottom: "1px solid #e2e8f0",
-            padding: "12px 16px",
+            background: "rgba(15, 23, 42, 0.8)",
+            backdropFilter: "blur(12px)",
+            borderBottom: "1px solid rgba(59, 130, 246, 0.2)",
+            padding: "16px 16px",
             zIndex: 40,
             marginLeft: "-16px",
             marginRight: "-16px",
@@ -503,22 +747,34 @@ export default function OnboardingChat() {
               justifyContent: "space-between",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
               <Link
                 href="/"
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "8px",
+                  gap: "10px",
                   textDecoration: "none",
                 }}
               >
-                <img
-                  src="/images/logo/sidekick-logo-blue.png"
-                  alt="Sidekick"
-                  style={{ width: "32px", height: "32px" }}
-                />
-                <span style={{ fontWeight: 600, color: "#1e293b" }}>
+                <div
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    background: "linear-gradient(135deg, #3b82f6, #2563eb)",
+                    borderRadius: "10px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <img
+                    src="/images/logo/sidekick-logo-blue.png"
+                    alt="Sidekick"
+                    style={{ width: "24px", height: "24px", filter: "brightness(2)" }}
+                  />
+                </div>
+                <span style={{ fontWeight: 700, color: "#f8fafc", fontSize: "18px" }}>
                   Sidekick
                 </span>
               </Link>
@@ -538,17 +794,17 @@ export default function OnboardingChat() {
         >
           <div
             style={{
-              background: "#fef2f2",
-              border: "1px solid #fecaca",
+              background: "rgba(239, 68, 68, 0.1)",
+              border: "1px solid rgba(239, 68, 68, 0.3)",
               borderRadius: "12px",
               padding: "24px",
               textAlign: "center",
             }}
           >
-            <h2 style={{ color: "#b91c1c", marginBottom: "8px" }}>
+            <h2 style={{ color: "#f87171", marginBottom: "8px" }}>
               Oops! Something went wrong
             </h2>
-            <p style={{ color: "#7f1d1d", marginBottom: "24px" }}>
+            <p style={{ color: "#fca5a5", marginBottom: "24px" }}>
               {completionError}
             </p>
             <button
@@ -560,10 +816,10 @@ export default function OnboardingChat() {
                 background: "#dc2626",
                 color: "white",
                 padding: "12px 24px",
-                borderRadius: "8px",
+                borderRadius: "10px",
                 border: "none",
                 cursor: "pointer",
-                fontWeight: 500,
+                fontWeight: 600,
               }}
             >
               Try Again
