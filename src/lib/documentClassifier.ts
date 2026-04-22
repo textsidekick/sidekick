@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 
 const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
+  apiKey: process.env.ANTHROPIC_API_KEY || 'placeholder',
 });
 
 export type DocumentType = 

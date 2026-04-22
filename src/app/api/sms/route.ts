@@ -5,9 +5,9 @@ import twilio from "twilio";
 import { supabase } from "@/lib/supabase";
 import { createEmbedding } from "@/lib/embeddings";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || 'placeholder' });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || 'placeholder' });
+const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID || 'AC00000000000000000000000000000000', process.env.TWILIO_AUTH_TOKEN || 'placeholder');
 
 const LOW_CONFIDENCE_PHRASES = [
   "don't have information",
