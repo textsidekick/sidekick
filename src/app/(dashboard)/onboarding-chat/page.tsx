@@ -868,6 +868,88 @@ export default function OnboardingChat() {
             </div>
           </div>
 
+          {/* QR Code for SMS */}
+          <div
+            style={{
+              background: "rgba(30, 41, 59, 0.6)",
+              borderRadius: "16px",
+              padding: "24px",
+              textAlign: "center",
+              width: "100%",
+              marginBottom: "24px",
+              border: "1px solid rgba(59, 130, 246, 0.1)",
+            }}
+          >
+            <p
+              style={{
+                fontWeight: 600,
+                color: "#f8fafc",
+                marginBottom: "16px",
+                fontSize: "16px",
+              }}
+            >
+              📱 Scan to Join
+            </p>
+            <p
+              style={{
+                color: "#94a3b8",
+                fontSize: "14px",
+                marginBottom: "16px",
+              }}
+            >
+              Print this QR code and post it where workers can scan
+            </p>
+            <div
+              style={{
+                background: "white",
+                borderRadius: "12px",
+                padding: "12px",
+                display: "inline-block",
+                marginBottom: "16px",
+              }}
+            >
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(
+                  `sms:${onboardingResult.twilioNumber}?body=JOIN%20${onboardingResult.accessCode}`
+                )}`}
+                alt="Join Sidekick QR Code"
+                style={{
+                  width: "250px",
+                  height: "250px",
+                  borderRadius: "8px",
+                }}
+              />
+            </div>
+            <p
+              style={{
+                color: "#64748b",
+                fontSize: "12px",
+                marginTop: "12px",
+              }}
+            >
+              Scans open SMS with your number & code auto-filled
+            </p>
+            <a
+              href={`https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(
+                `sms:${onboardingResult.twilioNumber}?body=JOIN%20${onboardingResult.accessCode}`
+              )}`}
+              download={`sidekick-join-${onboardingResult.accessCode}.png`}
+              style={{
+                display: "inline-block",
+                marginTop: "12px",
+                padding: "10px 20px",
+                borderRadius: "10px",
+                background: "rgba(59, 130, 246, 0.2)",
+                color: "#60a5fa",
+                textDecoration: "none",
+                fontSize: "13px",
+                fontWeight: 600,
+              }}
+            >
+              ⬇️ Download High-Res
+            </a>
+          </div>
+
           <Link
             href="/manager"
             style={{
