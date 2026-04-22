@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Send, Home, Loader2, Lock, Smartphone, CheckCircle2, Copy, Pencil, Mic, MicOff, Paperclip, X, FileText, Link as LinkIcon } from "lucide-react";
+import { Send, Home, Loader2, Lock, Smartphone, CheckCircle2, Copy, Pencil, Mic, MicOff, Paperclip, X, FileText, Link as LinkIcon, KeyRound } from "lucide-react";
 import { formatPhoneForDisplay, formatPhoneUnformatted, createSmsLink } from "@/lib/phone";
 
 interface Message {
@@ -38,6 +38,8 @@ export default function OnboardingChat() {
   const [codeError, setCodeError] = useState<string | null>(null);
   const [codeSuggestions, setCodeSuggestions] = useState<string[]>([]);
   const [savingCode, setSavingCode] = useState(false);
+  const [managerCredentials, setManagerCredentials] = useState<{ username: string; password: string } | null>(null);
+  const [generatingCredentials, setGeneratingCredentials] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [showIntegrations, setShowIntegrations] = useState(false);
@@ -266,6 +268,26 @@ export default function OnboardingChat() {
       }
 
       setOnboardingResult(data);
+
+      // Generate manager credentials
+      if (data.companyId) {
+        setGeneratingCredentials(true);
+        try {
+          const credRes = await fetch("/api/auth/generate-credentials", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ companyId: data.companyId }),
+          });
+          const credData = await credRes.json();
+          if (credData.success) {
+            setManagerCredentials({ username: credData.username, password: credData.password });
+          }
+        } catch (e) {
+          console.error("Failed to generate credentials:", e);
+        } finally {
+          setGeneratingCredentials(false);
+        }
+      }
     } catch (error) {
       console.error("Completion error:", error);
       setCompletionError(
@@ -950,8 +972,106 @@ export default function OnboardingChat() {
             </a>
           </div>
 
+          {/* Manager Login Credentials */}
+          {(managerCredentials || generatingCredentials) && (
+            <div
+              style={{
+                background: "rgba(34, 197, 94, 0.1)",
+                borderRadius: "16px",
+                padding: "24px",
+                textAlign: "left",
+                width: "100%",
+                marginBottom: "24px",
+                border: "1px solid rgba(34, 197, 94, 0.3)",
+              }}
+            >
+              <p
+                style={{
+                  fontWeight: 600,
+                  color: "#4ade80",
+                  marginBottom: "8px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <KeyRound size={20} />
+                Your Manager Login
+              </p>
+              <p style={{ color: "#94a3b8", fontSize: "13px", marginBottom: "16px" }}>
+                Save these credentials — you'll need them to access your dashboard
+              </p>
+              {generatingCredentials ? (
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#94a3b8" }}>
+                  <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} />
+                  Generating credentials...
+                </div>
+              ) : managerCredentials ? (
+                <div
+                  style={{
+                    background: "rgba(15, 23, 42, 0.6)",
+                    borderRadius: "12px",
+                    padding: "16px",
+                    border: "1px solid rgba(34, 197, 94, 0.2)",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                    <div>
+                      <p style={{ fontSize: "12px", color: "#94a3b8", marginBottom: "4px" }}>Username</p>
+                      <p style={{ fontSize: "18px", fontWeight: 700, color: "#f8fafc", fontFamily: "monospace" }}>
+                        {managerCredentials.username}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(managerCredentials.username)}
+                      style={{
+                        background: "rgba(59, 130, 246, 0.1)",
+                        border: "1px solid rgba(59, 130, 246, 0.2)",
+                        borderRadius: "8px",
+                        padding: "6px 10px",
+                        color: "#60a5fa",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "4px",
+                        fontSize: "12px",
+                      }}
+                    >
+                      <Copy size={12} /> Copy
+                    </button>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <p style={{ fontSize: "12px", color: "#94a3b8", marginBottom: "4px" }}>Password</p>
+                      <p style={{ fontSize: "18px", fontWeight: 700, color: "#f8fafc", fontFamily: "monospace" }}>
+                        {managerCredentials.password}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(managerCredentials.password)}
+                      style={{
+                        background: "rgba(59, 130, 246, 0.1)",
+                        border: "1px solid rgba(59, 130, 246, 0.2)",
+                        borderRadius: "8px",
+                        padding: "6px 10px",
+                        color: "#60a5fa",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "4px",
+                        fontSize: "12px",
+                      }}
+                    >
+                      <Copy size={12} /> Copy
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          )}
+
           <Link
-            href="/manager"
+            href="/login"
             style={{
               display: "block",
               width: "100%",

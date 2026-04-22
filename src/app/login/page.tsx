@@ -16,6 +16,7 @@ export default function LoginPage() {
     setIsLoading(true);
     setError("");
 
+    // Check hardcoded admin credentials first
     if (username === "demo" && password === "sidekick") {
       document.cookie = "sidekick_auth=true; path=/; max-age=604800";
       localStorage.setItem("sidekick_auth", JSON.stringify({
@@ -33,8 +34,31 @@ export default function LoginPage() {
       }));
       router.push("/founders");
     } else {
-      setError("Invalid credentials. Please try again.");
-      setIsLoading(false);
+      // Try database auth for company managers
+      try {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          document.cookie = "sidekick_auth=true; path=/; max-age=604800";
+          localStorage.setItem("sidekick_auth", JSON.stringify({
+            username: username,
+            role: "manager",
+            companyId: data.companyId,
+            loggedIn: true,
+          }));
+          router.push("/manager");
+        } else {
+          setError("Invalid credentials. Please try again.");
+          setIsLoading(false);
+        }
+      } catch {
+        setError("Invalid credentials. Please try again.");
+        setIsLoading(false);
+      }
     }
   };
 

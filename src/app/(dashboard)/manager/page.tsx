@@ -241,8 +241,18 @@ export default function ManagerDashboard() {
 
   useEffect(() => {
     fetch("/api/companies").then(r => r.json()).then(d => {
-      setCompanies(d.companies || []);
-      if (d.companies?.length > 0 && !selectedCompany) setSelectedCompany(d.companies[0].id);
+      let allCompanies = d.companies || [];
+
+      // Scope to company if manager has a companyId
+      try {
+        const authData = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
+        if (authData.companyId) {
+          allCompanies = allCompanies.filter((c: any) => c.id === authData.companyId);
+        }
+      } catch {}
+
+      setCompanies(allCompanies);
+      if (allCompanies.length > 0 && !selectedCompany) setSelectedCompany(allCompanies[0].id);
       if (d.workers) setWorkers(d.workers);
     });
   }, []);
