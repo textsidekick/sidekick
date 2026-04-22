@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const MICROSOFT_CLIENT_ID = process.env.MICROSOFT_CLIENT_ID!;
+const MICROSOFT_CLIENT_ID = process.env.MICROSOFT_CLIENT_ID || 'placeholder';
 
 export async function GET(req: Request) {
   const { searchParams, origin } = new URL(req.url);

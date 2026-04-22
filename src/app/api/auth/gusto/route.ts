@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const GUSTO_CLIENT_ID = process.env.GUSTO_CLIENT_ID!;
+const GUSTO_CLIENT_ID = process.env.GUSTO_CLIENT_ID || 'placeholder';
 
 export async function GET(req: Request) {
   const { searchParams, origin } = new URL(req.url);

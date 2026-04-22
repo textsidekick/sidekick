@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const QUICKBOOKS_CLIENT_ID = process.env.QUICKBOOKS_CLIENT_ID!;
+const QUICKBOOKS_CLIENT_ID = process.env.QUICKBOOKS_CLIENT_ID || 'placeholder';
 
 export async function GET(req: Request) {
   const { searchParams, origin } = new URL(req.url);

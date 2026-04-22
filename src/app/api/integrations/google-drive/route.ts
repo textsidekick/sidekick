@@ -6,8 +6,8 @@ import fs from "fs";
 import path from "path";
 
 const STORAGE_DIR = "/tmp/sidekick-documents";
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || 'placeholder';
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || 'placeholder';
 
 async function getValidAccessToken(companyId: string): Promise<string | null> {
   const { data: connection } = await supabase

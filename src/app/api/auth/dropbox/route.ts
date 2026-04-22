@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const DROPBOX_APP_KEY = process.env.DROPBOX_APP_KEY!;
+const DROPBOX_APP_KEY = process.env.DROPBOX_APP_KEY || 'placeholder';
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
