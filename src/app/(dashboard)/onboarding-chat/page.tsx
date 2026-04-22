@@ -1,7 +1,7 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Send, Home, Loader2, Lock, Smartphone, CheckCircle2, Copy, Pencil } from "lucide-react";
+import { Send, Home, Loader2, Lock, Smartphone, CheckCircle2, Copy, Pencil, Mic, MicOff, Paperclip, X, FileText, Link as LinkIcon } from "lucide-react";
 import { formatPhoneForDisplay, formatPhoneUnformatted, createSmsLink } from "@/lib/phone";
 
 interface Message {
@@ -38,6 +38,12 @@ export default function OnboardingChat() {
   const [codeError, setCodeError] = useState<string | null>(null);
   const [codeSuggestions, setCodeSuggestions] = useState<string[]>([]);
   const [savingCode, setSavingCode] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [showIntegrations, setShowIntegrations] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -100,6 +106,82 @@ export default function OnboardingChat() {
       setCodeError("Failed to save code");
     } finally {
       setSavingCode(false);
+    }
+  };
+
+  // Voice recording
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) audioChunksRef.current.push(event.data);
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        stream.getTracks().forEach((t) => t.stop());
+        await transcribeAudio(audioBlob);
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch {
+      alert("Microphone access is required for voice input.");
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      mediaRecorderRef.current.stop();
+    }
+    setIsRecording(false);
+  };
+
+  const transcribeAudio = async (audioBlob: Blob) => {
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("audio", audioBlob, "recording.webm");
+      const res = await fetch("/api/onboarding/transcribe", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.text) {
+        setInput(data.text);
+      }
+    } catch {
+      alert("Failed to transcribe audio. Please type your answer instead.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // File upload
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setUploadedFiles((prev) => [...prev, ...files]);
+    // Reset input so the same file can be selected again
+    e.target.value = "";
+  };
+
+  const removeFile = (index: number) => {
+    setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const uploadFiles = async (companyId: string) => {
+    for (const file of uploadedFiles) {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("companyId", companyId);
+      await fetch("/api/onboarding/upload", {
+        method: "POST",
+        body: formData,
+      });
     }
   };
 
@@ -176,6 +258,13 @@ export default function OnboardingChat() {
       }
 
       const data = await response.json();
+
+      // Upload any attached files
+      if (uploadedFiles.length > 0 && data.companyId) {
+        await uploadFiles(data.companyId);
+        setUploadedFiles([]);
+      }
+
       setOnboardingResult(data);
     } catch (error) {
       console.error("Completion error:", error);
@@ -1003,39 +1092,150 @@ export default function OnboardingChat() {
         style={{
           background: "rgba(15, 23, 42, 0.8)",
           borderTop: "1px solid rgba(59, 130, 246, 0.2)",
-          padding: "20px 16px",
+          padding: "16px 16px 20px",
           position: "sticky",
           bottom: 0,
           backdropFilter: "blur(12px)",
         }}
       >
+        {/* File preview bar */}
+        {uploadedFiles.length > 0 && (
+          <div
+            style={{
+              maxWidth: "672px",
+              margin: "0 auto 10px",
+              display: "flex",
+              gap: "8px",
+              flexWrap: "wrap",
+            }}
+          >
+            {uploadedFiles.map((file, i) => (
+              <div
+                key={i}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  background: "rgba(59, 130, 246, 0.15)",
+                  border: "1px solid rgba(59, 130, 246, 0.3)",
+                  borderRadius: "8px",
+                  padding: "4px 10px",
+                  fontSize: "13px",
+                  color: "#60a5fa",
+                }}
+              >
+                <FileText size={14} />
+                <span style={{ maxWidth: "120px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {file.name}
+                </span>
+                <button
+                  onClick={() => removeFile(i)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#94a3b8",
+                    cursor: "pointer",
+                    padding: "2px",
+                    display: "flex",
+                  }}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
         <div
           style={{
             maxWidth: "672px",
             margin: "0 auto",
             display: "flex",
-            gap: "12px",
+            gap: "8px",
+            alignItems: "center",
           }}
         >
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept=".pdf,.doc,.docx,.txt,.csv,.xlsx,.xls"
+            onChange={handleFileSelect}
+            style={{ display: "none" }}
+          />
+
+          {/* Attachment button */}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={loading || isComplete}
+            title="Upload documents"
+            style={{
+              padding: "12px",
+              borderRadius: "12px",
+              background: "rgba(59, 130, 246, 0.1)",
+              color: "#60a5fa",
+              border: "1px solid rgba(59, 130, 246, 0.2)",
+              cursor: loading || isComplete ? "not-allowed" : "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <Paperclip size={20} />
+          </button>
+
+          {/* Mic button */}
+          <button
+            onClick={isRecording ? stopRecording : startRecording}
+            disabled={loading || isComplete}
+            title={isRecording ? "Stop recording" : "Voice input"}
+            style={{
+              padding: "12px",
+              borderRadius: "12px",
+              background: isRecording
+                ? "rgba(239, 68, 68, 0.2)"
+                : "rgba(59, 130, 246, 0.1)",
+              color: isRecording ? "#f87171" : "#60a5fa",
+              border: isRecording
+                ? "1px solid rgba(239, 68, 68, 0.4)"
+                : "1px solid rgba(59, 130, 246, 0.2)",
+              cursor: loading || isComplete ? "not-allowed" : "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              animation: isRecording ? "pulse 1.5s ease-in-out infinite" : "none",
+            }}
+          >
+            {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
+          </button>
+
+          {/* Text input */}
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Type your answer..."
-            disabled={loading}
+            placeholder={isRecording ? "Listening..." : "Type or speak your answer..."}
+            disabled={loading || isRecording}
             style={{
               flex: 1,
               padding: "14px 18px",
               borderRadius: "14px",
-              border: "2px solid rgba(59, 130, 246, 0.3)",
+              border: isRecording
+                ? "2px solid rgba(239, 68, 68, 0.4)"
+                : "2px solid rgba(59, 130, 246, 0.3)",
               fontSize: "15px",
               outline: "none",
               color: "#f8fafc",
               background: loading ? "rgba(30, 41, 59, 0.8)" : "rgba(30, 41, 59, 0.6)",
-              cursor: loading ? "not-allowed" : "text",
+              cursor: loading || isRecording ? "not-allowed" : "text",
             }}
           />
+
+          {/* Send button */}
           <button
             onClick={handleSendMessage}
             disabled={loading || !input.trim() || isComplete}
@@ -1055,6 +1255,7 @@ export default function OnboardingChat() {
               alignItems: "center",
               gap: "8px",
               fontWeight: 600,
+              flexShrink: 0,
             }}
           >
             {loading || isComplete ? (
@@ -1067,12 +1268,31 @@ export default function OnboardingChat() {
             )}
           </button>
         </div>
+
+        {/* Quick action hint */}
+        <div
+          style={{
+            maxWidth: "672px",
+            margin: "8px auto 0",
+            display: "flex",
+            gap: "12px",
+            justifyContent: "center",
+          }}
+        >
+          <span style={{ fontSize: "12px", color: "#64748b" }}>
+            🎙️ Voice &bull; 📎 Upload docs &bull; Type to reply
+          </span>
+        </div>
       </div>
 
       <style>{`
         @keyframes spin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
         }
       `}</style>
     </div>
