@@ -578,7 +578,7 @@ export default function OnboardingChat() {
     <div
       style={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%)",
+        background: "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)",
         display: "flex",
         flexDirection: "column",
       }}
@@ -588,10 +588,10 @@ export default function OnboardingChat() {
         style={{
           position: "sticky",
           top: 0,
-          background: "rgba(255,255,255,0.9)",
-          backdropFilter: "blur(8px)",
-          borderBottom: "1px solid #e2e8f0",
-          padding: "12px 16px",
+          background: "rgba(15, 23, 42, 0.8)",
+          backdropFilter: "blur(12px)",
+          borderBottom: "1px solid rgba(59, 130, 246, 0.2)",
+          padding: "16px 16px",
           zIndex: 40,
         }}
       >
@@ -604,40 +604,49 @@ export default function OnboardingChat() {
             justifyContent: "space-between",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             <Link
               href="/"
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "8px",
+                gap: "10px",
                 textDecoration: "none",
               }}
             >
-              <img
-                src="/images/logo/sidekick-logo-blue.png"
-                alt="Sidekick"
-                style={{ width: "32px", height: "32px" }}
-              />
-              <span style={{ fontWeight: 600, color: "#1e293b" }}>
+              <div
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  background: "linear-gradient(135deg, #3b82f6, #2563eb)",
+                  borderRadius: "10px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <img
+                  src="/images/logo/sidekick-logo-blue.png"
+                  alt="Sidekick"
+                  style={{ width: "24px", height: "24px", filter: "brightness(2)" }}
+                />
+              </div>
+              <span style={{ fontWeight: 700, color: "#f8fafc", fontSize: "18px" }}>
                 Sidekick
               </span>
             </Link>
-            <span style={{ color: "#cbd5e1" }}>|</span>
-            <span style={{ fontSize: "14px", color: "#64748b" }}>
-              Quick Setup
-            </span>
           </div>
           <Link
             href="/"
             style={{
-              padding: "8px",
-              borderRadius: "8px",
-              background: "#f1f5f9",
-              color: "#64748b",
+              padding: "10px 14px",
+              borderRadius: "10px",
+              background: "rgba(59, 130, 246, 0.1)",
+              color: "#60a5fa",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              border: "1px solid rgba(59, 130, 246, 0.2)",
             }}
           >
             <Home size={20} />
@@ -650,7 +659,7 @@ export default function OnboardingChat() {
         style={{
           flex: 1,
           overflow: "auto",
-          padding: "24px 16px",
+          padding: "32px 16px",
           display: "flex",
           flexDirection: "column",
           justifyContent: "flex-start",
@@ -671,29 +680,29 @@ export default function OnboardingChat() {
               <div
                 style={{
                   maxWidth: "85%",
-                  padding: "12px 16px",
+                  padding: msg.role === "user" ? "12px 18px" : "14px 18px",
                   borderRadius:
                     msg.role === "user"
-                      ? "16px 16px 4px 16px"
-                      : "16px 16px 16px 4px",
+                      ? "18px 18px 4px 18px"
+                      : "18px 18px 18px 4px",
                   background:
                     msg.role === "user"
-                      ? "#3b82f6"
-                      : "#ffffff",
+                      ? "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)"
+                      : "rgba(255, 255, 255, 0.95)",
                   color:
                     msg.role === "user"
                       ? "white"
                       : "#1e293b",
                   fontSize: "15px",
-                  lineHeight: "1.5",
+                  lineHeight: "1.6",
                   border:
                     msg.role === "user"
                       ? "none"
-                      : "1px solid #e2e8f0",
+                      : "1px solid rgba(59, 130, 246, 0.1)",
                   boxShadow:
                     msg.role === "user"
-                      ? "0 2px 8px rgba(59, 130, 246, 0.2)"
-                      : "0 1px 3px rgba(0,0,0,0.1)",
+                      ? "0 8px 16px rgba(59, 130, 246, 0.3)"
+                      : "0 4px 12px rgba(0, 0, 0, 0.08)",
                 }}
               >
                 {msg.content}
@@ -705,19 +714,20 @@ export default function OnboardingChat() {
               style={{
                 display: "flex",
                 justifyContent: "flex-start",
-                marginBottom: "16px",
+                marginBottom: "20px",
               }}
             >
               <div
                 style={{
-                  padding: "12px 16px",
-                  borderRadius: "16px 16px 16px 4px",
-                  background: "#ffffff",
+                  padding: "14px 18px",
+                  borderRadius: "18px 18px 18px 4px",
+                  background: "rgba(255, 255, 255, 0.95)",
                   color: "#64748b",
-                  border: "1px solid #e2e8f0",
+                  border: "1px solid rgba(59, 130, 246, 0.1)",
                   display: "flex",
                   alignItems: "center",
-                  gap: "8px",
+                  gap: "10px",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
                 }}
               >
                 <Loader2
@@ -735,11 +745,12 @@ export default function OnboardingChat() {
       {/* Input */}
       <div
         style={{
-          background: "white",
-          borderTop: "1px solid #e2e8f0",
-          padding: "16px",
+          background: "rgba(15, 23, 42, 0.8)",
+          borderTop: "1px solid rgba(59, 130, 246, 0.2)",
+          padding: "20px 16px",
           position: "sticky",
           bottom: 0,
+          backdropFilter: "blur(12px)",
         }}
       >
         <div
@@ -759,13 +770,13 @@ export default function OnboardingChat() {
             disabled={loading}
             style={{
               flex: 1,
-              padding: "12px 16px",
-              borderRadius: "12px",
-              border: "2px solid #e2e8f0",
-              fontSize: "16px",
+              padding: "14px 18px",
+              borderRadius: "14px",
+              border: "2px solid rgba(59, 130, 246, 0.3)",
+              fontSize: "15px",
               outline: "none",
-              color: "#1e293b",
-              background: loading ? "#f1f5f9" : "white",
+              color: "#f8fafc",
+              background: loading ? "rgba(30, 41, 59, 0.8)" : "rgba(30, 41, 59, 0.6)",
               cursor: loading ? "not-allowed" : "text",
             }}
           />
@@ -773,19 +784,21 @@ export default function OnboardingChat() {
             onClick={handleSendMessage}
             disabled={loading || !input.trim() || isComplete}
             style={{
-              padding: "12px 20px",
-              borderRadius: "12px",
+              padding: "14px 22px",
+              borderRadius: "14px",
               background:
-                !loading && input.trim() && !isComplete ? "#3b82f6" : "#e2e8f0",
+                !loading && input.trim() && !isComplete
+                  ? "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)"
+                  : "rgba(59, 130, 246, 0.2)",
               color:
-                !loading && input.trim() && !isComplete ? "white" : "#94a3b8",
-              border: "none",
+                !loading && input.trim() && !isComplete ? "white" : "#60a5fa",
+              border: "1px solid rgba(59, 130, 246, 0.2)",
               cursor:
                 !loading && input.trim() && !isComplete ? "pointer" : "not-allowed",
               display: "flex",
               alignItems: "center",
               gap: "8px",
-              fontWeight: 500,
+              fontWeight: 600,
             }}
           >
             {loading || isComplete ? (
