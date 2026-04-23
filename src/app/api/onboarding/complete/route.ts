@@ -151,24 +151,38 @@ Return ONLY valid JSON, no markdown. Example:
     }
 
     // Create company
-    const companyId = crypto.randomUUID();
-    console.log("[Complete] Creating company:", companyId);
+    const companyId = `sidekick-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    console.log("[Complete] Creating company:", companyId, "with code:", accessCode);
 
-    const { error: insertError } = await supabase.from("companies").insert({
+    const insertData = {
       id: companyId,
       name: extractedData.companyName,
       access_code: accessCode,
       manager_name: extractedData.managerName || null,
       manager_phone: managerPhone,
       onboarding_completed: true,
-    });
+    };
+    
+    console.log("[Complete] Insert data:", JSON.stringify(insertData));
+
+    const { data: insertResult, error: insertError } = await supabase
+      .from("companies")
+      .insert([insertData])
+      .select();
+
+    console.log("[Complete] Insert result:", insertResult, "Error:", insertError);
 
     if (insertError) {
-      console.error("[Complete] Insert failed:", insertError);
-      throw insertError;
+      console.error("[Complete] Insert failed with error:", insertError);
+      throw new Error(`Supabase insert failed: ${insertError.message}`);
     }
 
-    console.log("[Complete] Company created successfully");
+    if (!insertResult || insertResult.length === 0) {
+      console.error("[Complete] Insert returned no data");
+      throw new Error("Insert returned no data");
+    }
+
+    console.log("[Complete] Company created successfully:", insertResult[0]);
 
     const twilioNumber = "+1 (888) 707-4659";
 
@@ -181,9 +195,9 @@ Return ONLY valid JSON, no markdown. Example:
       joinCommand: "JOIN " + accessCode,
     });
   } catch (error) {
-    console.error("[Complete] FATAL:", error);
-    const message =
-      error instanceof Error ? error.message : "Unknown error";
+    console.error("[Complete] FATAL ERROR:", error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("[Complete] Error message:", message);
     return NextResponse.json(
       {
         error: "Failed to complete onboarding",
