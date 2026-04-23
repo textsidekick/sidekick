@@ -57,7 +57,8 @@ export async function POST(request: NextRequest) {
   "numLocations": "number or null",
   "numWorkers": "number or null",
   "painPoints": ["string array of main challenges"],
-  "communicationMethods": ["string array of current methods"]
+  "managerName": "string or null",
+  "managerPhone": "string or null"
 }
 
 Conversation:
@@ -109,12 +110,8 @@ Return ONLY the JSON object, no markdown or extra text.`;
       );
     }
 
-    // Generate company ID and access code
-    const companyId = extractedData.companyName
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/-+/g, "-")
-      .replace(/^-|-$/g, "");
+    // Generate company ID
+    const companyId = crypto.randomUUID();
 
     let accessCode: string;
     let codeSuggestions: string[] | undefined;
@@ -172,22 +169,28 @@ Return ONLY the JSON object, no markdown or extra text.`;
       accessCode
     );
 
+    // Normalize manager phone
+    const managerPhone = extractedData.managerPhone
+      ? normalizePhoneNumber(extractedData.managerPhone)
+      : null;
+
     // Save to Supabase
     const { error: companyError } = await supabase
       .from("companies")
-      .upsert(
-        {
-          id: companyId,
-          name: extractedData.companyName,
-          industry: extractedData.industry || null,
-          num_locations: extractedData.numLocations || null,
-          num_workers: extractedData.numWorkers || null,
-          pain_points: extractedData.painPoints || [],
-          communication_methods: extractedData.communicationMethods || [],
-          access_code: accessCode,
+      .insert({
+        id: companyId,
+        name: extractedData.companyName,
+        access_code: accessCode,
+        manager_name: extractedData.managerName || null,
+        manager_phone: managerPhone,
+        onboarding_completed: true,
+        onboarding_progress: {
+          industry: extractedData.industry,
+          numLocations: extractedData.numLocations,
+          numWorkers: extractedData.numWorkers,
+          painPoints: extractedData.painPoints || [],
         },
-        { onConflict: "id" }
-      );
+      });
 
     if (companyError) {
       console.error("[Onboarding Complete] Company error:", companyError);
