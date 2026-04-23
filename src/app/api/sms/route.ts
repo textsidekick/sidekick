@@ -4,6 +4,7 @@ import OpenAI from "openai";
 import twilio from "twilio";
 import { supabase } from "@/lib/supabase";
 import { createEmbedding } from "@/lib/embeddings";
+import { normalizePhoneNumber } from "@/lib/phone";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || 'placeholder' });
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || 'placeholder' });
@@ -492,7 +493,7 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const body = formData.get("Body")?.toString()?.trim() || "";
-    const from = formData.get("From")?.toString() || "";
+    const from = normalizePhoneNumber(formData.get("From")?.toString() || "");
     
     // NEW: Check for media attachments (images)
     const numMedia = parseInt(formData.get("NumMedia")?.toString() || "0", 10);
@@ -610,47 +611,62 @@ export async function POST(request: NextRequest) {
     }
 
     // CASE 1: New user trying to join with access code
-    if (!worker && body.toUpperCase().startsWith("JOIN ")) {
-      const accessCode = body.substring(5).trim().toUpperCase();
+    // Accept: "JOIN CODE" (preferred) and be tolerant of extra whitespace/newlines.
+    // Reject: "JOIN" without a code.
+    if (!worker) {
+      const normalized = body.replace(/\s+/g, " ").trim().toUpperCase();
       
-      const { data: company } = await supabase
-        .from("companies")
-        .select("id, name, access_code")
-        .eq("access_code", accessCode)
-        .single();
+      if (normalized === "JOIN") {
+        return twimlResponse("Please text JOIN followed by your company's code. Example: JOIN ABC123");
+      }
       
-      if (!company) {
-        const companyName = body.substring(5).trim();
-        const companyId = companyName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      if (normalized.startsWith("JOIN ")) {
+        const accessCode = normalized.slice(5).trim();
         
-        const { data: legacyCompany } = await supabase
-          .from("companies")
-          .select("id, name")
-          .eq("id", companyId)
-          .single();
-        
-        if (!legacyCompany) {
-          return twimlResponse("Sorry, that access code wasn't recognized. Please check with your manager for the correct code.");
+        // Safety: ensure we didn't accidentally parse an empty code
+        if (!accessCode) {
+          return twimlResponse("Please text JOIN followed by your company's code. Example: JOIN ABC123");
         }
         
+        const { data: company } = await supabase
+          .from("companies")
+          .select("id, name, access_code")
+          .eq("access_code", accessCode)
+          .single();
+
+        if (!company) {
+          const companyName = normalized.slice(5).trim();
+          const companyId = companyName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+          const { data: legacyCompany } = await supabase
+            .from("companies")
+            .select("id, name")
+            .eq("id", companyId)
+            .single();
+
+          if (!legacyCompany) {
+            return twimlResponse("Sorry, that access code wasn't recognized. Please check with your manager for the correct code.");
+          }
+
+          await supabase.from("workers").insert({
+            phone: from,
+            company_id: legacyCompany.id,
+            name: null,
+            verified: false,
+          });
+
+          return twimlResponse(`Welcome to ${legacyCompany.name}! What's your first name?`);
+        }
+
         await supabase.from("workers").insert({
           phone: from,
-          company_id: legacyCompany.id,
+          company_id: company.id,
           name: null,
           verified: false,
         });
-        
-        return twimlResponse(`Welcome to ${legacyCompany.name}! What's your first name?`);
+
+        return twimlResponse(`Welcome to ${company.name}! 🎉 What's your first name?`);
       }
-      
-      await supabase.from("workers").insert({
-        phone: from,
-        company_id: company.id,
-        name: null,
-        verified: false,
-      });
-      
-      return twimlResponse(`Welcome to ${company.name}! 🎉 What's your first name?`);
     }
 
     // CASE 2: New user without JOIN command
@@ -892,7 +908,7 @@ If you don't have enough information to answer, say so honestly and mention they
             .update({ pending_escalation_question_id: questionRecord.id })
             .eq("phone", from);
           
-          return twimlResponse(`🎤 I heard: "${transcribedText}"\n\n${answer}\n\n---\n⚠️ Want me to notify ${company.manager_name || "your manager"} about this question?\n\nReply Y for Yes, N for No`);
+          return twimlResponse(`🎤 I heard: "${transcribedText}"\n\n${answer}\n\n---\nWant me to notify ${company.manager_name || "your manager"} about this question?\n\nReply Y for Yes, N for No`);
         }
         
         return twimlResponse(`🎤 I heard: "${transcribedText}"\n\n${answer}`);
@@ -1092,7 +1108,7 @@ If you don't have enough information to answer, say so honestly and mention they
         .update({ pending_escalation_question_id: questionRecord.id })
         .eq("phone", from);
       
-      return twimlResponse(`${answer}\n\n---\n⚠️ Want me to notify ${company.manager_name || "your manager"} about this question?\n\nReply Y for Yes, N for No`);
+      return twimlResponse(`${answer}\n\n---\nWant me to notify ${company.manager_name || "your manager"} about this question?\n\nReply Y for Yes, N for No`);
     }
 
     return twimlResponse(answer);
@@ -1102,3 +1118,4 @@ If you don't have enough information to answer, say so honestly and mention they
     return twimlResponse("Sorry, I encountered an error. Please try again in a moment.");
   }
 }
+
