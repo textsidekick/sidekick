@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+"use client";
+import React, { useState, useRef } from "react";
 import Link from "next/link";
 import { CheckCircle2, Copy, Check, Lock, Smartphone, Home, Pencil, QrCode, Download } from "lucide-react";
 import { formatPhoneForDisplay, formatPhoneUnformatted } from "@/lib/phone";
+import { QRCodeSVG } from "qrcode.react";
 
 interface SuccessScreenProps {
   onboardingResult: {
@@ -222,6 +224,26 @@ export default function SuccessScreen({
                 </div>
               </div>
             )}
+          </div>
+
+          {/* QR Code */}
+          <div style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: "12px", padding: "32px", marginBottom: "24px", textAlign: "center" }}>
+            <h3 style={{ fontWeight: 600, color: "#111827", fontSize: "16px", marginBottom: "8px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+              <QrCode size={18} />
+              Scan to Join
+            </h3>
+            <p style={{ fontSize: "14px", color: "#6b7280", marginBottom: "16px" }}>Workers scan this QR code to send the JOIN text automatically.</p>
+            <div style={{ display: "inline-block", padding: "16px", background: "white", borderRadius: "8px", border: "1px solid #e5e7eb" }}>
+              <QRCodeSVG value={smsLink} size={200} level="M" />
+            </div>
+            <div style={{ marginTop: "12px" }}>
+              <a
+                href={smsLink}
+                style={{ fontSize: "13px", color: "#3b82f6", textDecoration: "none" }}
+              >
+                Or tap here to send via SMS →
+              </a>
+            </div>
           </div>
 
           {/* Worker Join Instructions */}

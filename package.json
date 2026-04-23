@@ -34,6 +34,7 @@
     "odometer_countup": "^1.0.4",
     "openai": "^6.16.0",
     "pdf-parse": "^1.1.4",
+    "qrcode.react": "^4.2.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-range-slider-input": "^3.3.2",
