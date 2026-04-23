@@ -218,7 +218,7 @@ export default function OnboardingChat() {
       setMessages([...newMessages, assistantMessage]);
 
       // Check if interview is complete
-      if (data.message.includes("Perfect! I have everything I need")) {
+      if (data.message.includes("All set! Setting up your account now") || data.message.includes("Perfect! I have everything I need")) {
         setIsComplete(true);
         handleCompleteInterview([...newMessages, assistantMessage]);
       }
