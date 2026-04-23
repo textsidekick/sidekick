@@ -4,10 +4,9 @@ import { supabase } from "@/lib/supabase";
 import { normalizePhoneNumber } from "@/lib/phone";
 
 const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+  apiKey: process.env.ANTHROPIC_API_KEY || "sk-placeholder",
 });
 
-// Generate a random 6-character access code
 function generateAccessCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let result = "";
@@ -17,226 +16,155 @@ function generateAccessCode(): string {
   return result;
 }
 
-// Generate smart suggestions when a custom code is taken
-function generateCodeSuggestions(baseCode: string): string[] {
-  const suggestions: string[] = [];
-  // Add numeric suffixes
-  for (const suffix of ["1", "2", "3", "123", "01"]) {
-    suggestions.push(baseCode + suffix);
-  }
-  // Add year suffix
-  suggestions.push(baseCode + new Date().getFullYear().toString().slice(-2));
-  return suggestions;
-}
-
 export async function POST(request: NextRequest) {
-  console.log("[Onboarding Complete] === API HIT ===");
+  console.log("[Complete] ===== START =====");
 
   try {
-    const { messages, customCode } = await request.json();
+    const body = await request.json();
+    const { messages } = body;
 
-    if (!messages || !Array.isArray(messages)) {
+    if (!messages?.length) {
+      console.error("[Complete] No messages");
       return NextResponse.json(
-        { error: "messages array is required" },
+        { error: "No messages provided" },
         { status: 400 }
       );
     }
 
-    // Extract structured data from conversation
+    console.log("[Complete] Extracting from", messages.length, "messages");
+
+    // Format conversation
     const conversationText = messages
-      .map((msg: any) => `${msg.role}: ${msg.content}`)
+      .map((m: any) => `${m.role}: ${m.content}`)
       .join("\n");
 
-    console.log("[Onboarding Complete] Extracting data from conversation...");
-
-    const extractionPrompt = `Extract the following information from this onboarding conversation. Return ONLY a valid JSON object with these fields (use null for missing values):
-
-{
-  "companyName": "string",
-  "industry": "string",
-  "numLocations": "number or null",
-  "numWorkers": "number or null",
-  "painPoints": ["string array of main challenges"],
-  "managerName": "string or null",
-  "managerPhone": "string or null"
-}
+    // Extract data from conversation
+    const extractionPrompt = `Extract ONLY these fields from this conversation:
+- companyName: company name (required, string)
+- managerName: manager/contact name (string or null)
+- managerPhone: manager phone number (string or null)
 
 Conversation:
 ${conversationText}
 
-Return ONLY the JSON object, no markdown or extra text.`;
+Return ONLY valid JSON, no markdown. Example:
+{"companyName":"Acme Corp","managerName":"John","managerPhone":"5551234567"}`;
+
+    console.log("[Complete] Calling Anthropic for extraction...");
 
     const response = await anthropic.messages.create({
       model: "claude-haiku-4-5",
-      max_tokens: 512,
-      messages: [
-        {
-          role: "user",
-          content: extractionPrompt,
-        },
-      ],
+      max_tokens: 256,
+      messages: [{ role: "user", content: extractionPrompt }],
     });
 
-    const responseText =
-      response.content[0].type === "text" ? response.content[0].text : "{}";
+    const rawText =
+      response.content[0]?.type === "text" ? response.content[0].text : "";
+    console.log("[Complete] Raw response:", rawText);
 
-    // Parse extracted data
-    let extractedData;
-    try {
-      // Strip markdown code blocks if present
-      let cleanJson = responseText.trim();
-      if (cleanJson.startsWith("```")) {
-        cleanJson = cleanJson.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
-      }
-      extractedData = JSON.parse(cleanJson);
-    } catch (e) {
-      console.error("[Onboarding Complete] JSON parse error:", responseText);
-      extractedData = {
-        companyName: null,
-        industry: null,
-        numLocations: null,
-        numWorkers: null,
-        painPoints: [],
-        communicationMethods: [],
-      };
+    // Parse JSON (handle markdown wrapping)
+    let cleanJson = rawText.trim();
+    if (cleanJson.startsWith("```")) {
+      cleanJson = cleanJson
+        .replace(/^```(?:json)?\s*\n?/, "")
+        .replace(/\n?```$/, "");
     }
 
-    console.log("[Onboarding Complete] Extracted data:", extractedData);
+    let extractedData;
+    try {
+      extractedData = JSON.parse(cleanJson);
+      console.log("[Complete] Extracted:", extractedData);
+    } catch (e) {
+      console.error("[Complete] Parse failed:", cleanJson);
+      return NextResponse.json(
+        {
+          error: "Failed to extract company information",
+          details: `Invalid response: ${cleanJson}`,
+        },
+        { status: 400 }
+      );
+    }
 
+    // Validate required field
     if (!extractedData.companyName) {
+      console.error("[Complete] No company name in extraction");
       return NextResponse.json(
         { error: "Could not extract company name from conversation" },
         { status: 400 }
       );
     }
 
-    // Generate company ID
-    const companyId = crypto.randomUUID();
+    // Generate access code
+    let accessCode = generateAccessCode();
+    let attempts = 0;
 
-    let accessCode: string;
-    let codeSuggestions: string[] | undefined;
-
-    if (customCode) {
-      // User wants a custom code — check availability
-      const sanitized = customCode.toUpperCase().replace(/[^A-Z0-9]/g, "");
-      const { data: existing } = await supabase
+    while (attempts < 10) {
+      const { data: existing, error: checkError } = await supabase
         .from("companies")
         .select("id")
-        .eq("access_code", sanitized)
-        .single();
+        .eq("access_code", accessCode)
+        .maybeSingle();
 
-      if (existing) {
-        // Code is taken — generate suggestions and return them
-        const suggestions = generateCodeSuggestions(sanitized);
-        const availableSuggestions: string[] = [];
-        for (const suggestion of suggestions) {
-          const { data: sugExists } = await supabase
-            .from("companies")
-            .select("id")
-            .eq("access_code", suggestion)
-            .single();
-          if (!sugExists) availableSuggestions.push(suggestion);
-        }
-        return NextResponse.json({
-          success: false,
-          codeTaken: true,
-          requestedCode: sanitized,
-          suggestions: availableSuggestions.slice(0, 4),
-        });
+      if (checkError) {
+        console.error("[Complete] Check code error:", checkError);
+        throw checkError;
       }
-      accessCode = sanitized;
-    } else {
-      // Auto-generate code
+
+      if (!existing) break;
       accessCode = generateAccessCode();
-      let attempts = 0;
-      while (attempts < 10) {
-        const { data: existing } = await supabase
-          .from("companies")
-          .select("id")
-          .eq("access_code", accessCode)
-          .single();
+      attempts++;
+    }
 
-        if (!existing) break;
-        accessCode = generateAccessCode();
-        attempts++;
+    console.log("[Complete] Using access code:", accessCode);
+
+    // Normalize phone if present
+    let managerPhone = null;
+    if (extractedData.managerPhone) {
+      try {
+        managerPhone = normalizePhoneNumber(extractedData.managerPhone);
+      } catch (e) {
+        console.warn("[Complete] Phone normalization failed:", e);
       }
     }
 
-    console.log(
-      "[Onboarding Complete] Creating company:",
-      companyId,
-      "with access code:",
-      accessCode
-    );
+    // Create company
+    const companyId = crypto.randomUUID();
+    console.log("[Complete] Creating company:", companyId);
 
-    // Normalize manager phone
-    const managerPhone = extractedData.managerPhone
-      ? normalizePhoneNumber(extractedData.managerPhone)
-      : null;
+    const { error: insertError } = await supabase.from("companies").insert({
+      id: companyId,
+      name: extractedData.companyName,
+      access_code: accessCode,
+      manager_name: extractedData.managerName || null,
+      manager_phone: managerPhone,
+      onboarding_completed: true,
+    });
 
-    // Save to Supabase
-    const { error: companyError } = await supabase
-      .from("companies")
-      .insert({
-        id: companyId,
-        name: extractedData.companyName,
-        access_code: accessCode,
-        manager_name: extractedData.managerName || null,
-        manager_phone: managerPhone,
-        onboarding_completed: true,
-        onboarding_progress: {
-          industry: extractedData.industry,
-          numLocations: extractedData.numLocations,
-          numWorkers: extractedData.numWorkers,
-          painPoints: extractedData.painPoints || [],
-        },
-      });
-
-    if (companyError) {
-      console.error("[Onboarding Complete] Company error:", companyError);
-      throw companyError;
+    if (insertError) {
+      console.error("[Complete] Insert failed:", insertError);
+      throw insertError;
     }
 
-    // Save conversation to knowledge base
-    const knowledgeContent = `Company: ${extractedData.companyName}
-Industry: ${extractedData.industry}
-Locations: ${extractedData.numLocations || "Unknown"}
-Workers: ${extractedData.numWorkers || "Unknown"}
-Pain Points: ${(extractedData.painPoints || []).join(", ")}
-Communication Methods: ${(extractedData.communicationMethods || []).join(", ")}`;
+    console.log("[Complete] Company created successfully");
 
-    const { data: doc, error: docError } = await supabase
-      .from("documents")
-      .insert({
-        company_id: companyId,
-        name: "Onboarding Interview",
-        content: knowledgeContent,
-      })
-      .select()
-      .single();
+    const twilioNumber = "+1 (888) 707-4659";
 
-    if (docError) {
-      console.error("[Onboarding Complete] Doc error:", docError);
-    }
-
-    const twilioNumber = process.env.TWILIO_PHONE_NUMBER || "+1 (888) 707-4659";
-
-    console.log("[Onboarding Complete] SUCCESS");
     return NextResponse.json({
       success: true,
       companyId,
       companyName: extractedData.companyName,
-      industry: extractedData.industry,
       accessCode,
       twilioNumber,
       joinCommand: "JOIN " + accessCode,
     });
   } catch (error) {
-    console.error("[Onboarding Complete] Error:", error);
+    console.error("[Complete] FATAL:", error);
+    const message =
+      error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
       {
         error: "Failed to complete onboarding",
-        details: error instanceof Error ? error.message : "Unknown error",
+        details: message,
       },
       { status: 500 }
     );
