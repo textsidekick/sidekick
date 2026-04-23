@@ -82,7 +82,12 @@ Return ONLY the JSON object, no markdown or extra text.`;
     // Parse extracted data
     let extractedData;
     try {
-      extractedData = JSON.parse(responseText);
+      // Strip markdown code blocks if present
+      let cleanJson = responseText.trim();
+      if (cleanJson.startsWith("```")) {
+        cleanJson = cleanJson.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
+      }
+      extractedData = JSON.parse(cleanJson);
     } catch (e) {
       console.error("[Onboarding Complete] JSON parse error:", responseText);
       extractedData = {
