@@ -16,6 +16,24 @@ function generateAccessCode(): string {
   return result;
 }
 
+// Generate a memorable code from a company/event name
+// e.g. "Acme Manufacturing" → "ACME", "Jim Falk Motors" → "JIMFALK"
+function generateNameBasedCode(name: string): string {
+  const cleaned = name.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  
+  // If short enough (≤8 chars), use the whole thing
+  if (cleaned.length <= 8) return cleaned;
+  
+  // Try acronym from words (e.g. "Acme Manufacturing" → "AM")
+  const words = name.trim().split(/\s+/).filter(w => w.length > 0);
+  const acronym = words.map(w => w[0].toUpperCase()).join("").replace(/[^A-Z]/g, "");
+  
+  // If acronym is too short, use first 6 chars of cleaned name
+  if (acronym.length < 3) return cleaned.slice(0, 6);
+  
+  return acronym;
+}
+
 export async function POST(request: NextRequest) {
   console.log("[Complete] ===== START =====");
 
@@ -94,8 +112,9 @@ Return ONLY valid JSON, no markdown. Example:
       );
     }
 
-    // Generate access code
-    let accessCode = generateAccessCode();
+    // Generate access code based on company name
+    let baseCode = generateNameBasedCode(extractedData.companyName);
+    let accessCode = baseCode;
     let attempts = 0;
 
     while (attempts < 10) {
@@ -111,9 +130,13 @@ Return ONLY valid JSON, no markdown. Example:
       }
 
       if (!existing) break;
-      accessCode = generateAccessCode();
+      // Append a number to make unique
       attempts++;
+      accessCode = baseCode + attempts;
     }
+
+    // Fallback to random if all name-based attempts failed
+    if (attempts >= 10) accessCode = generateAccessCode();
 
     console.log("[Complete] Using access code:", accessCode);
 
