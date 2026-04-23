@@ -865,7 +865,7 @@ export default function OnboardingChat() {
           }}
         >
           <span style={{ fontSize: "12px", color: "#9ca3af" }}>
-            🎙️ Voice &bull; 📎 Upload docs &bull; Type to reply
+            Voice input &bull; Upload docs &bull; Type to reply
           </span>
           {onboardingResult && (
             <button

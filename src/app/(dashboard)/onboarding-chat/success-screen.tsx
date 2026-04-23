@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef } from "react";
 import Link from "next/link";
-import { CheckCircle2, Copy, Check, Lock, Smartphone, Home, Pencil, QrCode, Download } from "lucide-react";
+import { CheckCircle2, Copy, Check, Lock, Smartphone, Home, Pencil, QrCode, Download, Sparkles } from "lucide-react";
 import { formatPhoneForDisplay, formatPhoneUnformatted } from "@/lib/phone";
 import { QRCodeSVG } from "qrcode.react";
 
@@ -91,7 +91,7 @@ export default function SuccessScreen({
             >
               <CheckCircle2 size={48} color="#1e40af" />
             </div>
-            <h1 style={{ fontSize: "32px", fontWeight: "bold", color: "#111827", marginBottom: "12px" }}>You're all set! 🎉</h1>
+            <h1 style={{ fontSize: "32px", fontWeight: "bold", color: "#111827", marginBottom: "12px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>You're all set <Sparkles size={28} color="#3b82f6" /></h1>
             <p style={{ fontSize: "16px", color: "#6b7280" }}>{onboardingResult.companyName} is ready to go.</p>
           </div>
 
