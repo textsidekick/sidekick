@@ -256,7 +256,11 @@ export default function OnboardingChat() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to complete onboarding");
+        const errorData = await response.json();
+        console.error("[Completion Error]", errorData);
+        setCompletionError(errorData.error || "Failed to complete onboarding");
+        setLoading(false);
+        return;
       }
 
       const data = await response.json();
@@ -268,25 +272,27 @@ export default function OnboardingChat() {
       }
 
       setOnboardingResult(data);
+      setLoading(false);
 
-      // Generate manager credentials
+      // Generate manager credentials in background (non-blocking)
       if (data.companyId) {
         setGeneratingCredentials(true);
-        try {
-          const credRes = await fetch("/api/auth/generate-credentials", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ companyId: data.companyId }),
+        fetch("/api/auth/generate-credentials", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ companyId: data.companyId }),
+        })
+          .then(res => res.json())
+          .then(credData => {
+            if (credData.success) {
+              setManagerCredentials({ username: credData.username, password: credData.password });
+            }
+            setGeneratingCredentials(false);
+          })
+          .catch(e => {
+            console.error("Failed to generate credentials:", e);
+            setGeneratingCredentials(false);
           });
-          const credData = await credRes.json();
-          if (credData.success) {
-            setManagerCredentials({ username: credData.username, password: credData.password });
-          }
-        } catch (e) {
-          console.error("Failed to generate credentials:", e);
-        } finally {
-          setGeneratingCredentials(false);
-        }
       }
     } catch (error) {
       console.error("Completion error:", error);
@@ -294,7 +300,6 @@ export default function OnboardingChat() {
         error instanceof Error ? error.message : "Failed to save onboarding data"
       );
       setIsComplete(false);
-    } finally {
       setLoading(false);
     }
   };
