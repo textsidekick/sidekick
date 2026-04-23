@@ -315,7 +315,7 @@ export default function OnboardingChat() {
       <div
         style={{
           minHeight: "100vh",
-          background: "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)",
+          background: "#0f172a",
           display: "flex",
           flexDirection: "column",
           padding: "24px 16px",
@@ -420,15 +420,15 @@ export default function OnboardingChat() {
                 width: "80px",
                 height: "80px",
                 borderRadius: "50%",
-                background: "rgba(34, 197, 94, 0.15)",
+                background: "rgba(59, 130, 246, 0.1)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 margin: "0 auto 24px",
-                border: "1px solid rgba(34, 197, 94, 0.3)",
+                border: "1px solid rgba(59, 130, 246, 0.2)",
               }}
             >
-              <CheckCircle2 size={48} color="#22c55e" />
+              <CheckCircle2 size={48} color="#3b82f6" />
             </div>
             <h1
               style={{
@@ -452,11 +452,11 @@ export default function OnboardingChat() {
 
           <div
             style={{
-              background: "rgba(59, 130, 246, 0.1)",
-              borderRadius: "16px",
+              background: "rgba(30, 41, 59, 0.4)",
+              borderRadius: "12px",
               padding: "24px",
               textAlign: "left",
-              border: "1px solid rgba(59, 130, 246, 0.2)",
+              border: "1px solid rgba(59, 130, 246, 0.15)",
               marginBottom: "24px",
               width: "100%",
             }}
@@ -509,10 +509,10 @@ export default function OnboardingChat() {
             {editingCode ? (
               <div
                 style={{
-                  background: "rgba(15, 23, 42, 0.6)",
+                  background: "rgba(15, 23, 42, 0.3)",
                   borderRadius: "12px",
                   padding: "20px",
-                  border: "2px solid #3b82f6",
+                  border: "1px solid rgba(59, 130, 246, 0.15)",
                 }}
               >
                 <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
@@ -567,7 +567,7 @@ export default function OnboardingChat() {
                       padding: "8px 16px",
                       borderRadius: "8px",
                       background: !savingCode && customCode.trim() && customCode.length >= 2 && !codeError
-                        ? "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)"
+                        ? "#3b82f6"
                         : "rgba(59, 130, 246, 0.1)",
                       color: "white",
                       border: "none",
@@ -640,11 +640,11 @@ export default function OnboardingChat() {
             ) : (
               <div
                 style={{
-                  background: "rgba(15, 23, 42, 0.6)",
+                  background: "rgba(15, 23, 42, 0.3)",
                   borderRadius: "12px",
                   padding: "20px",
                   textAlign: "center",
-                  border: "2px solid #3b82f6",
+                  border: "1px solid rgba(59, 130, 246, 0.15)",
                 }}
               >
                 <div
