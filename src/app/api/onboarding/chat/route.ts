@@ -32,9 +32,11 @@ RULES:
 - No filler phrases (no "great!", "perfect!", "awesome!")
 - One question at a time, direct tone
 - Users can upload documents (handbooks, SOPs) and use voice — acknowledge if mentioned
-- When all info is collected, say EXACTLY: "All set! Setting up your account now."
+- When all 7 questions are answered, respond with ONLY: "All set! Setting up your account now."
+- After that response, STOP — do not say anything else
 - Do NOT ask for email
-- Be warm but efficient — this should feel like 60 seconds, not a form`;
+- Be warm but efficient — this should feel like 60 seconds, not a form
+- CRITICAL: The completion message must be word-for-word: "All set! Setting up your account now."`;
 
 export async function POST(request: NextRequest) {
   try {
