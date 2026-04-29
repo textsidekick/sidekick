@@ -390,10 +390,10 @@ function DCArtboardFrame({ sectionId, artboard, label, order, onRename, onReorde
  me.classList.remove('dc-dragging');
  me.style.transform = `translateX(${(slotXs[finalSlot] - homes[startIdx].x) / scale}px)`;
  setTimeout(() => {
- for (const h of homes) { h.el.style.transition = 'none'; (h.el as HTMLElement).style.transform = ''; }
+ for (const h of homes) { (h.el as HTMLElement).style.transition = 'none'; (h.el as HTMLElement).style.transform = ''; }
  if (liveOrder.join('|') !== order.join('|')) onReorder(liveOrder);
  requestAnimationFrame(() => requestAnimationFrame(() => {
- for (const h of homes) h.el.style.transition = '';
+ for (const h of homes) (h.el as HTMLElement).style.transition = '';
  }));
  }, 180);
  };
