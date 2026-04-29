@@ -1,12 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ["ffmpeg-static"],
-  experimental: {
-    serverActions: {
-      bodySizeLimit: "100mb",
-    },
-  },
+  /* config options here */
 };
 
 export default nextConfig;
