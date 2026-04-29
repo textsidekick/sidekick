@@ -4,12 +4,14 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
-  // Allow access to login page, API routes, and static files
+  // Allow access to public pages, API routes, and static files
   if (
+    pathname === "/" || // Landing page
     pathname === "/login" ||
     pathname.startsWith("/api/") ||
     pathname.startsWith("/_next/") ||
     pathname.startsWith("/images/") ||
+    pathname.startsWith("/onboarding") || // Onboarding flow (signup)
     pathname.includes(".") // static files like .png, .ico, etc.
   ) {
     return NextResponse.next();
