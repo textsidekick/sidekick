@@ -111,3 +111,23 @@ body {
 }
 
 /* Responsive hero background */
+
+/* Dashboard CSS variables — light mode */
+:root {
+  --page-bg: #f9fafb;
+  --card-bg: #ffffff;
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  --card-shadow-hover: 0 4px 12px rgba(0,0,0,0.12);
+  --border-subtle: #f0f0f0;
+}
+
+/* Dashboard CSS variables — dark mode (next-themes uses .dark class) */
+.dark {
+  --page-bg: #0f1117;
+  --card-bg: #1a1d27;
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  --card-shadow-hover: 0 4px 12px rgba(0,0,0,0.5);
+  --border-subtle: #2a2d3a;
+  --background: #0f1117;
+  --foreground: #ededed;
+}
