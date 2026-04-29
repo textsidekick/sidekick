@@ -60,8 +60,8 @@ function IntegrationsRow({}: IntegrationsRowProps) {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
-                    <Icon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/30">
+                    <Icon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-gray-900 dark:text-white">

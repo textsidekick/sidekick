@@ -3,6 +3,8 @@
 import { Sparkles } from 'lucide-react'
 import { VideoUpload } from './VideoUpload'
 import { KnowledgeGaps, MOCK_GAPS } from './KnowledgeGaps'
+import { ContentCards } from './ContentCards'
+import { StorageSidebar } from './StorageSidebar'
 
 interface AIStudioTabProps {
   showMockData?: boolean
@@ -26,10 +28,17 @@ function AIStudioTab({ showMockData = false }: AIStudioTabProps) {
         </div>
       </div>
 
-      {/* Sections */}
-      <div className="space-y-6">
-        <VideoUpload />
-        <KnowledgeGaps gaps={gaps} />
+      {/* Two-column layout: main content + storage sidebar */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+        {/* Main content */}
+        <div className="space-y-6">
+          <ContentCards showMockData={showMockData} />
+          <VideoUpload />
+          <KnowledgeGaps gaps={gaps} />
+        </div>
+
+        {/* Sidebar */}
+        <StorageSidebar showMockData={showMockData} />
       </div>
     </div>
   )

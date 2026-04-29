@@ -26,53 +26,51 @@ function VideoUpload({}: VideoUploadProps) {
         </div>
       </div>
 
-      <div className="max-w-2xl">
-        <input
-          type="file"
-          ref={fileInputRef}
-          accept=".mp4,.mov"
-          className="hidden"
-        />
-        <div
-          className={cn(
-            'border-2 border-dashed rounded-xl bg-white dark:bg-[var(--card-bg)] min-h-[160px] flex flex-col items-center justify-center gap-3 transition-colors duration-150 cursor-pointer',
-            isDragOver
-              ? 'border-blue-400 bg-blue-50/30 dark:border-blue-600'
-              : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:bg-blue-50/30 dark:hover:border-blue-700'
-          )}
-          onDragOver={(e) => {
-            e.preventDefault()
-            setIsDragOver(true)
-          }}
-          onDragLeave={() => setIsDragOver(false)}
-          onDrop={(e) => {
-            e.preventDefault()
-            setIsDragOver(false)
-          }}
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <Upload className="h-8 w-8 text-gray-400 dark:text-gray-500" />
-          <div className="text-center">
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Upload facility walkthrough video
-            </p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-              MP4, MOV up to 100MB &middot; 1-5 minutes recommended
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            💡 Tips for best results:
+      <input
+        type="file"
+        ref={fileInputRef}
+        accept=".mp4,.mov"
+        className="hidden"
+      />
+      <div
+        className={cn(
+          'border-2 border-dashed rounded-xl bg-white dark:bg-[var(--card-bg)] min-h-[180px] flex flex-col items-center justify-center gap-3 transition-colors duration-150 cursor-pointer',
+          isDragOver
+            ? 'border-blue-400 bg-blue-50/30 dark:border-blue-600'
+            : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:bg-blue-50/30 dark:hover:border-blue-700'
+        )}
+        onDragOver={(e) => {
+          e.preventDefault()
+          setIsDragOver(true)
+        }}
+        onDragLeave={() => setIsDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault()
+          setIsDragOver(false)
+        }}
+        onClick={() => fileInputRef.current?.click()}
+      >
+        <Upload className="h-10 w-10 text-gray-400 dark:text-gray-500" />
+        <div className="text-center">
+          <p className="text-base font-medium text-gray-700 dark:text-gray-300">
+            Upload facility walkthrough video
           </p>
-          <ul className="list-disc list-inside space-y-1 mt-2 text-sm text-gray-500 dark:text-gray-400">
-            <li>Walk through each area at a steady pace</li>
-            <li>Narrate what you&apos;re showing as you go</li>
-            <li>Cover all key work areas and equipment</li>
-            <li>Keep the video between 1-5 minutes</li>
-          </ul>
+          <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+            MP4, MOV up to 100MB &middot; 1-5 minutes recommended
+          </p>
         </div>
+      </div>
+
+      <div className="mt-4">
+        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          💡 Tips for best results:
+        </p>
+        <ul className="list-disc list-inside space-y-1 mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <li>Walk through each area at a steady pace</li>
+          <li>Narrate what you&apos;re showing as you go</li>
+          <li>Cover all key work areas and equipment</li>
+          <li>Keep the video between 1-5 minutes</li>
+        </ul>
       </div>
     </div>
   )
