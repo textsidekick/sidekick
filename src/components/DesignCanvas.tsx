@@ -363,7 +363,7 @@ function DCArtboardFrame({ sectionId, artboard, label, order, onRename, onReorde
  for (const h of homes) {
  if (h.id === id) continue;
  const slot = liveOrder.indexOf(h.id);
- h.el.style.transform = `translateX(${(slotXs[slot] - h.x) / scale}px)`;
+ (h.el as HTMLElement).style.transform = `translateX(${(slotXs[slot] - h.x) / scale}px)`;
  }
  };
 
@@ -390,7 +390,7 @@ function DCArtboardFrame({ sectionId, artboard, label, order, onRename, onReorde
  me.classList.remove('dc-dragging');
  me.style.transform = `translateX(${(slotXs[finalSlot] - homes[startIdx].x) / scale}px)`;
  setTimeout(() => {
- for (const h of homes) { h.el.style.transition = 'none'; h.el.style.transform = ''; }
+ for (const h of homes) { h.el.style.transition = 'none'; (h.el as HTMLElement).style.transform = ''; }
  if (liveOrder.join('|') !== order.join('|')) onReorder(liveOrder);
  requestAnimationFrame(() => requestAnimationFrame(() => {
  for (const h of homes) h.el.style.transition = '';
