@@ -25,7 +25,8 @@ export default function OnboardingChat() {
     {
       role: "assistant",
       content:
-        "Company/Organization or Event? (1 or 2)",
+        "Hey! Let's get Sidekick set up for your team. First - is this for a company or an event?
+[suggestions: Company | Event]",
     },
   ]);
   const [input, setInput] = useState("");
@@ -436,16 +437,6 @@ export default function OnboardingChat() {
     );
   }
 
-
-  // Parse suggestions from assistant messages
-  const parseSuggestions = (text: string): { clean: string; suggestions: string[] } => {
-    const match = text.match(/\[suggestions?:\s*([^\]]+)\]/i);
-    if (!match) return { clean: text, suggestions: [] };
-    const suggestions = match[1].split("|").map(s => s.trim()).filter(Boolean);
-    const clean = text.replace(/\[suggestions?:[^\]]+\]/i, "").trim();
-    return { clean, suggestions };
-  };
-
   return (
     <div
       style={{
@@ -574,32 +565,7 @@ export default function OnboardingChat() {
                   boxShadow: "0 1px 3px rgba(0, 0, 0, 0.06)",
                 }}
               >
-                {(() => {
-                const { clean, suggestions } = msg.role === "assistant" ? parseSuggestions(msg.content) : { clean: msg.content, suggestions: [] };
-                return (
-                  <>
-                    {clean}
-                    {suggestions.length > 0 && (
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
-                        {suggestions.map((s, i) => (
-                          <button
-                            key={i}
-                            onClick={() => { setInput(s); }}
-                            style={{
-                              padding: "6px 12px", borderRadius: 20,
-                              background: "rgba(201,100,66,0.1)", border: "1px solid rgba(201,100,66,0.2)",
-                              color: "#A74D30", fontSize: 12, fontWeight: 500,
-                              cursor: "pointer", whiteSpace: "nowrap",
-                            }}
-                          >
-                            {s}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                );
-              })()}
+                {msg.content}
               </div>
             </div>
           ))}
