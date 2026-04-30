@@ -28,8 +28,8 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
   if (!active || !payload?.[0]) return null
   const data = payload[0]
   return (
-    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 [box-shadow:var(--card-shadow)]">
-      <p className="text-xs font-medium text-gray-900 dark:text-white">{data.name}</p>
+    <div className="rounded-lg border border-gray-200 dark:border-gray-200 bg-white dark:bg-white px-3 py-2 [box-shadow:var(--card-shadow)]">
+      <p className="text-xs font-medium text-gray-900 dark:text-gray-900">{data.name}</p>
       <p className="text-xs text-gray-500 dark:text-gray-400">{data.value.toLocaleString()} questions</p>
     </div>
   )
@@ -47,7 +47,7 @@ function AnswerSourcesChart() {
   const isDark = mounted && resolvedTheme === 'dark'
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)] [box-shadow:var(--card-shadow)] p-5">
+    <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
       <SectionHeader title="Answer Sources" subtitle="How questions are being resolved" />
       <div className="flex items-center gap-6">
         <div className="relative h-[180px] w-[180px] shrink-0">
@@ -75,7 +75,7 @@ function AnswerSourcesChart() {
           </ResponsiveContainer>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className="text-xs text-gray-500 dark:text-gray-400">Total</span>
-            <span className="text-2xl font-bold text-gray-900 dark:text-white">
+            <span className="text-2xl font-bold text-gray-900 dark:text-gray-900">
               {total.toLocaleString()}
             </span>
           </div>
@@ -92,7 +92,7 @@ function AnswerSourcesChart() {
                   {source.name}
                 </span>
               </div>
-              <span className="text-xs font-medium text-gray-900 dark:text-white tabular-nums">
+              <span className="text-xs font-medium text-gray-900 dark:text-gray-900 tabular-nums">
                 {source.value.toLocaleString()}
               </span>
             </div>
