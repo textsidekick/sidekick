@@ -8,7 +8,7 @@ export default function Nav() {
   };
 
   return (
-    <div style={{ position: "sticky", top: 16, zIndex: 50, display: "flex", justifyContent: "center", padding: "0 16px", pointerEvents: "none" }}>
+    <div style={{ position: "fixed", top: 16, left: 0, right: 0, zIndex: 50, display: "flex", justifyContent: "center", padding: "0 16px", pointerEvents: "none" }}>
       <nav
         style={{
           pointerEvents: "auto",
