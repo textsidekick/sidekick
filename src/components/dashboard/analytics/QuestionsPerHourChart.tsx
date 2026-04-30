@@ -60,8 +60,8 @@ interface CustomTooltipProps {
 function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload?.[0]) return null
   return (
-    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 [box-shadow:var(--card-shadow)]">
-      <p className="text-xs font-medium text-gray-900 dark:text-white">{label}</p>
+    <div className="rounded-lg border border-gray-200 dark:border-gray-200 bg-white dark:bg-white px-3 py-2 [box-shadow:var(--card-shadow)]">
+      <p className="text-xs font-medium text-gray-900 dark:text-gray-900">{label}</p>
       <p className="text-xs text-gray-500 dark:text-gray-400">
         {payload[0].value} question{payload[0].value !== 1 ? 's' : ''}
       </p>
@@ -81,13 +81,13 @@ function QuestionsPerHourChart() {
   const isDark = mounted && resolvedTheme === 'dark'
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)] [box-shadow:var(--card-shadow)] p-5">
+    <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
       <SectionHeader
         title="Questions per Hour"
         subtitle="Question volume"
         action={
           <div className="flex items-center gap-2">
-            <div className="flex gap-1 rounded-lg bg-gray-100 dark:bg-gray-800 p-0.5">
+            <div className="flex gap-1 rounded-lg bg-gray-100 dark:bg-white p-0.5">
               {TIME_RANGES.map((r) => (
                 <button
                   key={r}
@@ -95,8 +95,8 @@ function QuestionsPerHourChart() {
                   onClick={() => setRange(r)}
                   className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
                     range === r
-                      ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white [box-shadow:var(--card-shadow)]'
-                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                      ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-900 [box-shadow:var(--card-shadow)]'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-600'
                   }`}
                 >
                   {r}
