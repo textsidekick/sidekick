@@ -19,7 +19,7 @@ function AIStudioTab({ showMockData = false }: AIStudioTabProps) {
       <div className="flex items-center gap-3 mb-6">
         <Sparkles className="h-6 w-6 text-purple-600 dark:text-purple-400" />
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-900">
             Create Content
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">
