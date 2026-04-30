@@ -92,7 +92,7 @@ export default function LoginPage() {
         border: "1px solid rgba(28,26,22,0.06)",
       }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <div style={{ width: 56, height: 56, margin: "0 auto 20px", position: "relative" }}>
+          <div style={{ width: 56, height: 56, margin: "0 auto 20px", position: "relative", background: "#C96442", borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", padding: 10 }}>
             <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={56} height={56} style={{ objectFit: "contain" }} />
           </div>
           <h1 style={{
