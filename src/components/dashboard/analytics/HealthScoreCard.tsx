@@ -24,7 +24,7 @@ function HealthScoreCard({ score, maxScore = 100 }: HealthScoreCardProps) {
   const percentage = Math.min((score / maxScore) * 100, 100)
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)] [box-shadow:var(--card-shadow)] p-5">
+    <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
       <div className="flex items-start justify-between">
         <span className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
           Health Score
@@ -43,7 +43,7 @@ function HealthScoreCard({ score, maxScore = 100 }: HealthScoreCardProps) {
             {score}/{maxScore}
           </span>
         </div>
-        <div className="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-800">
+        <div className="h-2 w-full rounded-full bg-gray-100 dark:bg-white">
           <div
             className={`h-2 rounded-full ${colors.bar} transition-all duration-500`}
             style={{ width: `${percentage}%` }}
