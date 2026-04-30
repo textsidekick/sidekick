@@ -24,7 +24,7 @@ function SubHeader({}: SubHeaderProps) {
   const [company, setCompany] = useState('sunrise-cafe')
 
   return (
-    <div className="bg-white dark:bg-[var(--card-bg)]">
+    <div className="bg-white dark:bg-[#ffffff]">
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between py-3">
         {/* Left: Tagline */}
         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -33,7 +33,7 @@ function SubHeader({}: SubHeaderProps) {
 
         {/* Right: Company Selector */}
         <Select value={company} onValueChange={(value) => { if (value) setCompany(value) }}>
-          <SelectTrigger className="w-[200px] border-gray-200 dark:border-gray-700 bg-transparent">
+          <SelectTrigger className="w-[200px] border-gray-200 dark:border-gray-200 bg-transparent">
             <Building className="h-4 w-4 text-gray-500 dark:text-gray-400 shrink-0" />
             <SelectValue />
           </SelectTrigger>
