@@ -21,10 +21,10 @@ export default function CTA() {
           </p>
           <div className="flex gap-3 items-center">
             <a
-              href="#contact"
+              href="/login"
               className="inline-flex items-center gap-2.5 bg-cream text-ink px-[26px] py-4 rounded-full text-[15px] font-medium"
             >
-              Book a demo <ArrowIcon size={14} />
+              Try Sidekick free <ArrowIcon size={14} />
             </a>
             <a
               href="#playbook"
