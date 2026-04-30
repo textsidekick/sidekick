@@ -131,3 +131,23 @@ body {
   --background: #0f1117;
   --foreground: #ededed;
 }
+
+/* Force correct text colors in light mode */
+:root {
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+/* Ensure dashboard cards have correct text in light mode */
+:root {
+  --card-text: #111827;
+  --card-text-secondary: #6b7280;
+}
+
+.dark {
+  --card-text: #ffffff;
+  --card-text-secondary: #9ca3af;
+}
