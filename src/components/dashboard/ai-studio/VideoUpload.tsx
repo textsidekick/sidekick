@@ -11,13 +11,13 @@ function VideoUpload({}: VideoUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)] [box-shadow:var(--card-shadow)] p-5">
+    <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
       <div className="flex items-start gap-4 mb-4">
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-purple-100 dark:bg-purple-900/30">
           <Video className="h-6 w-6 text-purple-600 dark:text-purple-400" />
         </div>
         <div>
-          <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+          <h3 className="text-base font-semibold text-gray-900 dark:text-gray-900">
             Video Walkthrough
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
@@ -34,10 +34,10 @@ function VideoUpload({}: VideoUploadProps) {
       />
       <div
         className={cn(
-          'border-2 border-dashed rounded-xl bg-white dark:bg-[var(--card-bg)] min-h-[180px] flex flex-col items-center justify-center gap-3 transition-colors duration-150 cursor-pointer',
+          'border-2 border-dashed rounded-xl bg-white dark:bg-[#ffffff] min-h-[180px] flex flex-col items-center justify-center gap-3 transition-colors duration-150 cursor-pointer',
           isDragOver
-            ? 'border-blue-400 bg-blue-50/30 dark:border-blue-600'
-            : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:bg-blue-50/30 dark:hover:border-blue-700'
+            ? 'border-blue-400 bg-blue-50/30 dark:border-[#C96442]'
+            : 'border-gray-200 dark:border-gray-200 hover:border-blue-300 hover:bg-blue-50/30 dark:hover:border-blue-700'
         )}
         onDragOver={(e) => {
           e.preventDefault()
@@ -52,7 +52,7 @@ function VideoUpload({}: VideoUploadProps) {
       >
         <Upload className="h-10 w-10 text-gray-400 dark:text-gray-500" />
         <div className="text-center">
-          <p className="text-base font-medium text-gray-700 dark:text-gray-300">
+          <p className="text-base font-medium text-gray-700 dark:text-gray-600">
             Upload facility walkthrough video
           </p>
           <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
@@ -62,7 +62,7 @@ function VideoUpload({}: VideoUploadProps) {
       </div>
 
       <div className="mt-4">
-        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <p className="text-sm font-medium text-gray-700 dark:text-gray-600">
           💡 Tips for best results:
         </p>
         <ul className="list-disc list-inside space-y-1 mt-2 text-sm text-gray-500 dark:text-gray-400">
