@@ -33,7 +33,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 const CATEGORY_COLORS: Record<string, string> = {
   Safety: '#ef4444',
-  Equipment: '#3b82f6',
+  Equipment: '#C96442',
   Compliance: '#f59e0b',
   Health: '#8b5cf6',
 }
@@ -57,7 +57,7 @@ interface CustomTooltipProps {
 function ChartTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload?.length) return null
   return (
-    <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-700 dark:bg-[var(--card-bg)] [box-shadow:var(--card-shadow)]">
+    <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-200 dark:bg-[#ffffff] [box-shadow:var(--card-shadow)]">
       {label && (
         <p className="mb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
           {label}
@@ -69,7 +69,7 @@ function ChartTooltip({ active, payload, label }: CustomTooltipProps) {
             className="inline-block h-2.5 w-2.5 rounded-full"
             style={{ backgroundColor: entry.color }}
           />
-          <span className="text-gray-900 dark:text-white">
+          <span className="text-gray-900 dark:text-gray-900">
             {entry.name}: <span className="font-semibold">{entry.value}</span>
           </span>
         </div>
@@ -137,7 +137,7 @@ function AlertCharts({ alerts }: AlertChartsProps) {
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
       {/* Left: Weekly Trend — spans 2 cols */}
-      <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)] [box-shadow:var(--card-shadow)] p-5 lg:col-span-2">
+      <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5 lg:col-span-2">
         <SectionHeader title="Weekly Trend" />
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
           Alerts reported per day over the last 7 days
@@ -171,7 +171,7 @@ function AlertCharts({ alerts }: AlertChartsProps) {
               <Bar
                 dataKey="alerts"
                 name="Alerts"
-                fill="#3b82f6"
+                fill="#C96442"
                 radius={[6, 6, 0, 0]}
                 maxBarSize={40}
               />
@@ -183,7 +183,7 @@ function AlertCharts({ alerts }: AlertChartsProps) {
       {/* Right: Stacked breakdown charts */}
       <div className="flex flex-col gap-6">
         {/* Severity Distribution donut */}
-        <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)] [box-shadow:var(--card-shadow)] p-5">
+        <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
           <SectionHeader title="Severity Breakdown" />
           <div className="mt-2 h-[140px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -244,7 +244,7 @@ function AlertCharts({ alerts }: AlertChartsProps) {
         </div>
 
         {/* Resolution Rate donut */}
-        <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)] [box-shadow:var(--card-shadow)] p-5">
+        <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
           <SectionHeader title="Resolution Rate" />
           <div className="mt-2 h-[140px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -306,7 +306,7 @@ function AlertCharts({ alerts }: AlertChartsProps) {
       </div>
 
       {/* Bottom: Category Breakdown — full width */}
-      <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)] [box-shadow:var(--card-shadow)] p-5 lg:col-span-3">
+      <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5 lg:col-span-3">
         <SectionHeader title="Alerts by Category" />
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
           Issue distribution across safety categories
@@ -318,13 +318,13 @@ function AlertCharts({ alerts }: AlertChartsProps) {
             const color = CATEGORY_COLORS[cat.name] || '#6b7280'
             return (
               <div key={cat.name} className="flex items-center gap-3">
-                <span className="w-24 text-sm font-medium text-gray-700 dark:text-gray-300">
+                <span className="w-24 text-sm font-medium text-gray-700 dark:text-gray-600">
                   {cat.name}
                 </span>
                 <div className="flex-1">
-                  <div className="h-6 w-full overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800">
+                  <div className="h-6 w-full overflow-hidden rounded-md bg-gray-100 dark:bg-white">
                     <div
-                      className="flex h-full items-center rounded-md px-2 text-xs font-semibold text-white transition-all duration-500"
+                      className="flex h-full items-center rounded-md px-2 text-xs font-semibold text-gray-900 transition-all duration-500"
                       style={{
                         width: `${Math.max(pct, 12)}%`,
                         backgroundColor: color,
