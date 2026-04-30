@@ -9,7 +9,7 @@ interface GapItem {
   gapScore: number
 }
 
-const MOCK_GAPS: GapItem[] = [
+const []: GapItem[] = [
   { topic: 'Forklift certification renewal', category: 'Safety', frequency: 34, gapScore: 92 },
   { topic: 'Overtime pay calculation', category: 'HR', frequency: 28, gapScore: 87 },
   { topic: 'Chemical spill procedure', category: 'Safety', frequency: 22, gapScore: 85 },
@@ -46,7 +46,7 @@ function TopGapsTable() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50 dark:divide-gray-800/50">
-            {MOCK_GAPS.map((gap) => (
+            {[].map((gap) => (
               <tr key={gap.topic} className="group">
                 <td className="py-2.5 pr-4 text-sm font-medium text-gray-900 dark:text-gray-900">
                   {gap.topic}
