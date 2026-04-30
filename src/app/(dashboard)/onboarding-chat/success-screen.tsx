@@ -35,7 +35,7 @@ export default function SuccessScreen({
     setTimeout(() => setCopiedField(null), 2000);
   };
 
-  const smsLink = `sms:${onboardingResult.twilioNumber.replace(/[^0-9]/g, '')}?body=${encodeURIComponent(onboardingResult.joinCommand)}`;
+  const smsLink = `sms:${onboardingResult.twilioNumber.replace(/[^0-9]/g, "")}?body=${encodeURIComponent("JOIN " + customCode)}`;
 
   return (
     <div style={{ minHeight: "100vh", background: "#F7F3EC", display: "flex", flexDirection: "column" }}>
@@ -139,10 +139,10 @@ export default function SuccessScreen({
                 }}
               >
                 <div style={{ fontSize: "36px", fontWeight: "bold", color: "#1C1A16", fontFamily: "monospace", letterSpacing: "4px", marginBottom: "16px" }}>
-                  {onboardingResult.accessCode}
+                  {customCode}
                 </div>
                 <button
-                  onClick={() => handleCopy(onboardingResult.accessCode, "code")}
+                  onClick={() => handleCopy(customCode, "code")}
                   style={{
                     background: "rgba(201,100,66,0.12)",
                     border: "1px solid rgba(201,100,66,0.25)",
