@@ -57,16 +57,26 @@ export async function POST(request: NextRequest) {
       .join("\n");
 
     // Extract data from conversation
-    const extractionPrompt = `Extract ONLY these fields from this conversation:
-- companyName: company name (required, string)
-- managerName: manager/contact name (string or null)
-- managerPhone: manager phone number (string or null)
+    const extractionPrompt = `Extract ALL available fields from this onboarding conversation. Include everything mentioned.
+
+REQUIRED:
+- companyName: company/event name (string)
+
+OPTIONAL (include if mentioned):
+- managerName: manager/organizer name (string or null)
+- managerPhone: phone number (string or null)
+- industry: industry or event type (string or null)
+- workerCount: approximate number of workers/attendees (number or null)
+- locations: number of locations/sites (number or null)
+- painPoints: main challenges or needs mentioned (string[] or null)
+- commonQuestions: types of questions workers/attendees commonly ask (string[] or null)
+- wishKnew: what the manager wishes their team just knew (string or null)
+- additionalInfo: any other relevant details mentioned (string or null)
 
 Conversation:
-${conversationText}
+\${conversationText}
 
-Return ONLY valid JSON, no markdown. Example:
-{"companyName":"Acme Corp","managerName":"John","managerPhone":"5551234567"}`;
+Return ONLY valid JSON, no markdown. Include all fields that have data.`;
 
     console.log("[Complete] Calling Anthropic for extraction...");
 
@@ -161,6 +171,15 @@ Return ONLY valid JSON, no markdown. Example:
       manager_name: extractedData.managerName || null,
       manager_phone: managerPhone,
       onboarding_completed: true,
+      industry: extractedData.industry || null,
+      worker_count: extractedData.workerCount || null,
+      metadata: JSON.stringify({
+        locations: extractedData.locations,
+        painPoints: extractedData.painPoints,
+        commonQuestions: extractedData.commonQuestions,
+        wishKnew: extractedData.wishKnew,
+        additionalInfo: extractedData.additionalInfo,
+      }),
     };
     
     console.log("[Complete] Insert data:", JSON.stringify(insertData));
