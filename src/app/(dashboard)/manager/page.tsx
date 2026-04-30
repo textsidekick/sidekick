@@ -890,7 +890,7 @@ export default function ManagerDashboard() {
             </div>
 
             {/* Workers table wired to real data */}
-            <WorkersTab joinCode={currentCompany?.access_code} workers={mappedWorkers} />
+            <WorkersTab joinCode={currentCompany?.access_code} />
 
             {/* Certifications — real data */}
             <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-white p-5">
