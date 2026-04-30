@@ -162,3 +162,26 @@ html, html.dark, [data-theme="dark"] {
 .dark {
   color-scheme: light !important;
 }
+
+/* Landing page color utilities */
+@layer utilities {
+  .bg-cream { background-color: #F7F3EC; }
+  .bg-cream2 { background-color: #FAF6EE; }
+  .bg-cream\/85 { background-color: rgba(247,243,236,0.85); }
+  .text-ink { color: #1C1A16; }
+  .text-ink\/5 { color: rgba(28,26,22,0.05); }
+  .text-ink\/10 { color: rgba(28,26,22,0.1); }
+  .text-ink\/50 { color: rgba(28,26,22,0.5); }
+  .text-ink\/70 { color: rgba(28,26,22,0.7); }
+  .text-ink\/75 { color: rgba(28,26,22,0.75); }
+  .bg-ink { background-color: #1C1A16; }
+  .bg-ink\/5 { background-color: rgba(28,26,22,0.05); }
+  .bg-ink\/10 { background-color: rgba(28,26,22,0.1); }
+  .text-cream { color: #F7F3EC; }
+  .text-accent { color: #C96442; }
+  .bg-accent { background-color: #C96442; }
+  .border-ink\/10 { border-color: rgba(28,26,22,0.1); }
+  .border-ink\/5 { border-color: rgba(28,26,22,0.05); }
+  .font-serif { font-family: var(--font-instrument), ui-serif, Georgia, serif; }
+  .font-sans { font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif; }
+}
