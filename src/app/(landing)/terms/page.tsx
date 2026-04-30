@@ -9,10 +9,10 @@ export default function Terms() {
     <div style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
       <div style={{ position: "sticky", top: 0, zIndex: 50, padding: "16px 24px", borderBottom: "1px solid rgba(28,26,22,0.06)", background: "rgba(247,243,236,0.95)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", gap: 10 }}><a href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", color: "#1C1A16" }}><span style={{ fontSize: 16, fontWeight: 600 }}>← Sidekick</span></a></div>
       
-      <main style={{ paddingTop: '120px', paddingBottom: '60px', minHeight: '100vh', background: '#F7F3EC' }}>
-        <div className="container">
-          <div className="row justify-content-center">
-            <div className="col-lg-8">
+      <main style={{ paddingTop: '80px', paddingBottom: '60px', minHeight: '100vh', background: '#F7F3EC' }}>
+        <div style={{ maxWidth: 800, margin: "0 auto", padding: "0 24px" }}>
+          <div>
+            <div>
               <div style={{ marginBottom: '40px' }}>
                 <h1 style={{ fontSize: '48px', fontWeight: '700', color: '#1A1615', marginBottom: '16px', fontFamily: 'var(--tj-ff-heading)' }}>
                   Terms of Service
