@@ -29,7 +29,7 @@ function RegistrationCard({}: RegistrationCardProps) {
   }
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)] [box-shadow:var(--card-shadow)] p-5">
+    <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
       <SectionHeader
         title="Worker Registration"
         action={
@@ -45,7 +45,7 @@ function RegistrationCard({}: RegistrationCardProps) {
           <p className="text-xs text-gray-400 dark:text-gray-500">
             Workers text this to join:
           </p>
-          <p className="font-mono text-2xl font-bold text-blue-600 dark:text-blue-400 tracking-wider">
+          <p className="font-mono text-2xl font-bold text-[#C96442] dark:text-[#C96442] tracking-wider">
             JOIN {TEAM_JOIN_CODE}
           </p>
           <p className="text-xs text-gray-400 dark:text-gray-500">
