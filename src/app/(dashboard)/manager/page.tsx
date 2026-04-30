@@ -44,6 +44,7 @@ import { KnowledgeGaps } from "@/components/dashboard/ai-studio/KnowledgeGaps";
 import { ContentCards } from "@/components/dashboard/ai-studio/ContentCards";
 import { StorageSidebar } from "@/components/dashboard/ai-studio/StorageSidebar";
 import { WorkersTable } from "@/components/dashboard/workers/WorkersTable";
+import { WorkersTab } from "@/components/dashboard/workers/WorkersTab";
 import { RegistrationCard } from "@/components/dashboard/workers/RegistrationCard";
 import { QRCodeModal } from "@/components/dashboard/workers/QRCodeModal";
 
