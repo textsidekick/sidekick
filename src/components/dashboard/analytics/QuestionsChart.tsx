@@ -100,7 +100,7 @@ function QuestionsChart() {
                 onClick={() => setRange(r)}
                 className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
                   range === r
-                    ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-900 [box-shadow:var(--card-shadow)]'
+                    ? 'bg-[#C96442] text-white [box-shadow:var(--card-shadow)]'
                     : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-600'
                 }`}
               >
