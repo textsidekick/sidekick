@@ -19,18 +19,18 @@ const MOCK_GAPS: GapItem[] = [
 
 const CATEGORY_COLORS: Record<string, string> = {
   Safety: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-  HR: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  HR: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-[#C96442]',
   Training: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
 }
 
 function TopGapsTable() {
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)] [box-shadow:var(--card-shadow)] p-5">
+    <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
       <SectionHeader title="Top Unanswered Topics" subtitle="Questions Sidekick couldn't resolve" />
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-100 dark:border-gray-800">
+            <tr className="border-b border-gray-100 dark:border-gray-200">
               <th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
                 Topic
               </th>
@@ -48,13 +48,13 @@ function TopGapsTable() {
           <tbody className="divide-y divide-gray-50 dark:divide-gray-800/50">
             {MOCK_GAPS.map((gap) => (
               <tr key={gap.topic} className="group">
-                <td className="py-2.5 pr-4 text-sm font-medium text-gray-900 dark:text-white">
+                <td className="py-2.5 pr-4 text-sm font-medium text-gray-900 dark:text-gray-900">
                   {gap.topic}
                 </td>
                 <td className="py-2.5 pr-4">
                   <span
                     className={`inline-block rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                      CATEGORY_COLORS[gap.category] ?? 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
+                      CATEGORY_COLORS[gap.category] ?? 'bg-gray-100 text-gray-700 dark:bg-white dark:text-gray-400'
                     }`}
                   >
                     {gap.category}
