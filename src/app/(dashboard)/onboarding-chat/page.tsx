@@ -327,7 +327,7 @@ export default function OnboardingChat() {
       <div
         style={{
           minHeight: "100vh",
-          background: "#fafafa",
+          background: "#F7F3EC",
           display: "flex",
           flexDirection: "column",
           padding: "24px 16px",
@@ -336,7 +336,7 @@ export default function OnboardingChat() {
         <header
           style={{
             background: "white",
-            borderBottom: "1px solid #e5e7eb",
+            borderBottom: "1px solid rgba(28,26,22,0.1)",
             padding: "16px 16px",
             zIndex: 40,
             marginLeft: "-16px",
@@ -367,7 +367,7 @@ export default function OnboardingChat() {
                   style={{
                     width: "40px",
                     height: "40px",
-                    background: "linear-gradient(135deg, #3b82f6, #2563eb)",
+                    background: "linear-gradient(135deg, #C96442, #A74D30)",
                     borderRadius: "10px",
                     display: "flex",
                     alignItems: "center",
@@ -440,7 +440,7 @@ export default function OnboardingChat() {
     <div
       style={{
         minHeight: "100vh",
-        background: "#fafafa",
+        background: "#F7F3EC",
         display: "flex",
         flexDirection: "column",
       }}
@@ -451,7 +451,7 @@ export default function OnboardingChat() {
           position: "sticky",
           top: 0,
           background: "white",
-          borderBottom: "1px solid #e5e7eb",
+          borderBottom: "1px solid rgba(28,26,22,0.1)",
           padding: "16px 16px",
           zIndex: 40,
         }}
@@ -479,7 +479,7 @@ export default function OnboardingChat() {
                 style={{
                   width: "40px",
                   height: "40px",
-                  background: "#3b82f6",
+                  background: "#C96442",
                   borderRadius: "8px",
                   display: "flex",
                   alignItems: "center",
@@ -492,7 +492,7 @@ export default function OnboardingChat() {
                   style={{ width: "24px", height: "24px", filter: "brightness(0) invert(1)" }}
                 />
               </div>
-              <span style={{ fontWeight: 700, color: "#111827", fontSize: "18px" }}>
+              <span style={{ fontWeight: 700, color: "#1C1A16", fontSize: "18px" }}>
                 Sidekick
               </span>
             </Link>
@@ -502,12 +502,12 @@ export default function OnboardingChat() {
             style={{
               padding: "10px 14px",
               borderRadius: "8px",
-              background: "#f3f4f6",
-              color: "#374151",
+              background: "#F0EBE3",
+              color: "#1C1A16",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              border: "1px solid #e5e7eb",
+              border: "1px solid rgba(28,26,22,0.1)",
               textDecoration: "none",
             }}
           >
@@ -549,18 +549,18 @@ export default function OnboardingChat() {
                       : "18px 18px 18px 4px",
                   background:
                     msg.role === "user"
-                      ? "#3b82f6"
+                      ? "#C96442"
                       : "white",
                   color:
                     msg.role === "user"
                       ? "white"
-                      : "#111827",
+                      : "#1C1A16",
                   fontSize: "15px",
                   lineHeight: "1.6",
                   border:
                     msg.role === "user"
                       ? "none"
-                      : "1px solid #e5e7eb",
+                      : "1px solid rgba(28,26,22,0.1)",
                   boxShadow: "0 1px 3px rgba(0, 0, 0, 0.06)",
                 }}
               >
@@ -581,8 +581,8 @@ export default function OnboardingChat() {
                   padding: "14px 18px",
                   borderRadius: "18px 18px 18px 4px",
                   background: "white",
-                  color: "#6b7280",
-                  border: "1px solid #e5e7eb",
+                  color: "rgba(28,26,22,0.5)",
+                  border: "1px solid rgba(28,26,22,0.1)",
                   display: "flex",
                   alignItems: "center",
                   gap: "10px",
@@ -605,7 +605,7 @@ export default function OnboardingChat() {
       <div
         style={{
           background: "white",
-          borderTop: "1px solid #e5e7eb",
+          borderTop: "1px solid rgba(28,26,22,0.1)",
           padding: "16px 16px 20px",
           position: "sticky",
           bottom: 0,
@@ -757,9 +757,9 @@ export default function OnboardingChat() {
             style={{
               padding: "12px",
               borderRadius: "8px",
-              background: "#f3f4f6",
-              color: "#374151",
-              border: "1px solid #e5e7eb",
+              background: "#F0EBE3",
+              color: "#1C1A16",
+              border: "1px solid rgba(28,26,22,0.1)",
               cursor: loading || isComplete ? "not-allowed" : "pointer",
               display: "flex",
               alignItems: "center",
@@ -780,11 +780,11 @@ export default function OnboardingChat() {
               borderRadius: "12px",
               background: isRecording
                 ? "#fef2f2"
-                : "#f3f4f6",
-              color: isRecording ? "#ef4444" : "#374151",
+                : "#F0EBE3",
+              color: isRecording ? "#ef4444" : "#1C1A16",
               border: isRecording
                 ? "1px solid #fecaca"
-                : "1px solid #e5e7eb",
+                : "1px solid rgba(28,26,22,0.1)",
               cursor: loading || isComplete ? "not-allowed" : "pointer",
               display: "flex",
               alignItems: "center",
@@ -810,11 +810,11 @@ export default function OnboardingChat() {
               borderRadius: "14px",
               border: isRecording
                 ? "2px solid #ef4444"
-                : "1px solid #d1d5db",
+                : "1px solid rgba(28,26,22,0.15)",
               fontSize: "15px",
               outline: "none",
-              color: "#111827",
-              background: loading ? "#f3f4f6" : "white",
+              color: "#1C1A16",
+              background: loading ? "#F0EBE3" : "white",
               cursor: loading || isRecording ? "not-allowed" : "text",
             }}
           />
@@ -828,11 +828,11 @@ export default function OnboardingChat() {
               borderRadius: "14px",
               background:
                 !loading && input.trim() && !isComplete
-                  ? "#3b82f6"
-                  : "#f3f4f6",
+                  ? "#C96442"
+                  : "#F0EBE3",
               color:
-                !loading && input.trim() && !isComplete ? "white" : "#9ca3af",
-              border: "1px solid #e5e7eb",
+                !loading && input.trim() && !isComplete ? "white" : "rgba(28,26,22,0.35)",
+              border: "1px solid rgba(28,26,22,0.1)",
               cursor:
                 !loading && input.trim() && !isComplete ? "pointer" : "not-allowed",
               display: "flex",
@@ -864,7 +864,7 @@ export default function OnboardingChat() {
             alignItems: "center",
           }}
         >
-          <span style={{ fontSize: "12px", color: "#9ca3af" }}>
+          <span style={{ fontSize: "12px", color: "rgba(28,26,22,0.35)" }}>
             Voice input &bull; Upload docs &bull; Type to reply
           </span>
           {onboardingResult && (
