@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 
 export async function POST() {
   try {
@@ -10,28 +9,78 @@ export async function POST() {
       return NextResponse.json({ error: "Missing credentials" }, { status: 500 });
     }
 
-    const supabase = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
+    // Extract project ref from URL
+    const projectRef = new URL(supabaseUrl).hostname.split('.')[0];
 
-    // Try inserting a test row to check if tables exist, create them via individual operations
-    // Since we can't run raw DDL via PostgREST, we'll test if tables exist
+    // Use the Supabase Management API SQL endpoint
+    // POST https://api.supabase.com/v1/projects/{ref}/sql
+    // But this requires a management API token, not service role key
 
-    // Test verification_codes
-    const { error: e1 } = await supabase.from("verification_codes").select("id").limit(1);
-    const { error: e2 } = await supabase.from("manager_accounts").select("id").limit(1);
-    const { error: e3 } = await supabase.from("manager_sessions").select("id").limit(1);
+    // Alternative: use the pg-meta endpoint which accepts service role key
+    const sql = `
+      CREATE TABLE IF NOT EXISTS verification_codes (
+        id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+        phone text NOT NULL,
+        code text NOT NULL,
+        expires_at timestamptz NOT NULL,
+        used boolean DEFAULT false,
+        created_at timestamptz DEFAULT now()
+      );
+      CREATE TABLE IF NOT EXISTS manager_accounts (
+        id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+        phone text UNIQUE NOT NULL,
+        company_id uuid,
+        trial_ends_at timestamptz,
+        questions_used integer DEFAULT 0,
+        questions_limit integer DEFAULT 50,
+        documents_limit integer DEFAULT 3,
+        plan text DEFAULT 'trial',
+        created_at timestamptz DEFAULT now()
+      );
+      CREATE TABLE IF NOT EXISTS manager_sessions (
+        id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+        account_id uuid REFERENCES manager_accounts(id),
+        token text UNIQUE NOT NULL,
+        expires_at timestamptz NOT NULL,
+        created_at timestamptz DEFAULT now()
+      );
+    `;
 
-    const tables = {
-      verification_codes: e1 ? `missing (${e1.message})` : "exists",
-      manager_accounts: e2 ? `missing (${e2.message})` : "exists",
-      manager_sessions: e3 ? `missing (${e3.message})` : "exists",
-    };
-
-    // Return the actual Supabase URL and service key prefix for debugging
-    return NextResponse.json({
-      supabaseUrl,
-      serviceKeyPrefix: serviceKey.substring(0, 20) + "...",
-      tables,
+    // Try the pg-meta query endpoint
+    const pgRes = await fetch(`${supabaseUrl}/pg/query`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${serviceKey}`,
+        "apikey": serviceKey,
+      },
+      body: JSON.stringify({ query: sql }),
     });
+
+    if (pgRes.ok) {
+      const result = await pgRes.json();
+      return NextResponse.json({ success: true, method: "pg/query", result });
+    }
+
+    // Try alternate endpoint
+    const altRes = await fetch(`${supabaseUrl}/rest/v1/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${serviceKey}`,
+        "apikey": serviceKey,
+        "Prefer": "return=minimal",
+      },
+      body: sql,
+    });
+
+    return NextResponse.json({
+      error: "Could not run DDL",
+      pgStatus: pgRes.status,
+      pgBody: await pgRes.text().catch(() => ""),
+      altStatus: altRes.status,
+      projectRef,
+    }, { status: 500 });
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error);
     return NextResponse.json({ error: msg }, { status: 500 });
