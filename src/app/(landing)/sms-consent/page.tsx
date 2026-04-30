@@ -1,5 +1,3 @@
-import Header from "@/components/layout/header/Header";
-import Footer from "@/components/layout/footer/Footer";
 
 export const metadata = {
   title: "SMS Consent | Sidekick",
@@ -8,11 +6,10 @@ export const metadata = {
 
 export default function SMSConsent() {
   return (
-    <div>
-      <Header headerType={10} />
-      <Header headerType={10} isStickyHeader={true} />
+    <div style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
+      <div style={{ padding: "16px 24px", borderBottom: "1px solid rgba(28,26,22,0.06)", display: "flex", alignItems: "center", gap: 10 }}><a href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", color: "#1C1A16" }}><span style={{ fontSize: 16, fontWeight: 600 }}>← Sidekick</span></a></div>
       
-      <main style={{ paddingTop: '120px', paddingBottom: '60px', minHeight: '100vh', background: 'linear-gradient(180deg, #F5F3F0 0%, #ffffff 100%)' }}>
+      <main style={{ paddingTop: '120px', paddingBottom: '60px', minHeight: '100vh', background: '#F7F3EC' }}>
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-lg-8">
@@ -84,7 +81,7 @@ export default function SMSConsent() {
         </div>
       </main>
 
-      <Footer />
+      <div style={{ textAlign: "center", padding: "40px 20px", borderTop: "1px solid rgba(28,26,22,0.1)" }}><a href="/" style={{ color: "#C96442", textDecoration: "none", fontWeight: 500 }}>← Back to Sidekick</a></div>
     </div>
   );
 }
