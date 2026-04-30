@@ -818,6 +818,9 @@ export default function ManagerDashboard() {
               </div>
             )}
           </div>
+        </div>
+        )}
+
         {/* DOCUMENTS TAB */}
         {activeTab === "documents" && (
           <div className="space-y-6">
