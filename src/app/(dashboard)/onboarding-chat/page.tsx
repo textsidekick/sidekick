@@ -25,8 +25,7 @@ export default function OnboardingChat() {
     {
       role: "assistant",
       content:
-        "Hey! Let's get Sidekick set up for your team. First - is this for a company or an event?
-[suggestions: Company | Event]",
+        "Company/Organization or Event? (1 or 2)",
     },
   ]);
   const [input, setInput] = useState("");
