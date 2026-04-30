@@ -12,6 +12,12 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/_next/") ||
     pathname.startsWith("/images/") ||
     pathname.startsWith("/onboarding") || // Onboarding flow (signup)
+    pathname === "/privacy" ||
+    pathname === "/terms" ||
+    pathname === "/sms-consent" ||
+    pathname === "/sms-terms" ||
+    pathname === "/contact" ||
+    pathname === "/about" ||
     pathname.includes(".") // static files like .png, .ico, etc.
   ) {
     return NextResponse.next();
