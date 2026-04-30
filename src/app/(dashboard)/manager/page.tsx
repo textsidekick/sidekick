@@ -39,10 +39,6 @@ import { AlertCharts } from "@/components/dashboard/alerts/AlertCharts";
 import { AlertsTable } from "@/components/dashboard/alerts/AlertsTable";
 import { DocumentsTable } from "@/components/dashboard/documents/DocumentsTable";
 import { UploadZone } from "@/components/dashboard/documents/UploadZone";
-import { VideoUpload } from "@/components/dashboard/ai-studio/VideoUpload";
-import { KnowledgeGaps } from "@/components/dashboard/ai-studio/KnowledgeGaps";
-import { ContentCards } from "@/components/dashboard/ai-studio/ContentCards";
-import { StorageSidebar } from "@/components/dashboard/ai-studio/StorageSidebar";
 import { WorkersTable } from "@/components/dashboard/workers/WorkersTable";
 import { RegistrationCard } from "@/components/dashboard/workers/RegistrationCard";
 import { QRCodeModal } from "@/components/dashboard/workers/QRCodeModal";
@@ -138,7 +134,7 @@ function AnimatedNumber({ value, duration = 1000 }: { value: number; duration?: 
 // ─── Main component ────────────────────────────────────────────────────────────
 export default function ManagerDashboard() {
   // All existing state (unchanged)
-  const [activeTab, setActiveTab] = useState<"analytics" | "alerts" | "documents" | "ai-studio" | "workers">("analytics");
+  const [activeTab, setActiveTab] = useState<"analytics" | "alerts" | "documents" | "workers">("analytics");
   const [companies, setCompanies] = useState<Company[]>([]);
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [selectedCompany, setSelectedCompany] = useState<string>("");
@@ -211,7 +207,12 @@ export default function ManagerDashboard() {
       let allCompanies = d.companies || [];
       try {
         const authData = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
-        if (authData.companyId) allCompanies = allCompanies.filter((c: any) => c.id === authData.companyId);
+        if (authData.companyId) {
+          allCompanies = allCompanies.filter((c: any) => c.id === authData.companyId);
+        } else if (authData.phone) {
+          // Filter to companies created by this phone number
+          allCompanies = allCompanies.filter((c: any) => c.manager_phone === authData.phone);
+        }
       } catch {}
       setCompanies(allCompanies);
       if (allCompanies.length > 0 && !selectedCompany) setSelectedCompany(allCompanies[0].id);
@@ -653,7 +654,6 @@ export default function ManagerDashboard() {
               { id: "analytics",  label: "Analytics",  Icon: BarChart3 },
               { id: "alerts",     label: "Alerts",     Icon: AlertTriangle },
               { id: "documents",  label: "Documents",  Icon: FileText },
-              { id: "ai-studio",  label: "AI Studio",  Icon: Sparkles },
               { id: "workers",    label: "Workers",    Icon: Users },
             ] as const).map(tab => (
               <button
@@ -794,7 +794,6 @@ export default function ManagerDashboard() {
         )}
 
         {/* AI STUDIO TAB */}
-        {activeTab === "ai-studio" && (
           <div>
             <div className="flex items-center gap-3 mb-6">
               <Sparkles className="h-6 w-6 text-purple-600 dark:text-purple-400" />
