@@ -45,7 +45,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${instrument.variable}`}>
-      <body className="antialiased" style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
+      <body className="antialiased" style={{ fontFamily: "Inter, system-ui, sans-serif", overflowX: "hidden" }}>
         {children}
       </body>
     </html>
