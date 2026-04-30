@@ -34,16 +34,16 @@ export default function Hero() {
           </p>
           <div className="flex items-center gap-3.5">
             <a
-              href="#contact"
+              href="/login"
               className="inline-flex items-center gap-2.5 bg-ink text-cream px-[26px] py-4 rounded-full text-[15px] font-medium"
             >
-              Book a demo <ArrowIcon size={14} />
+              Try Sidekick <ArrowIcon size={14} />
             </a>
             <a
-              href="#tour"
+              href="#contact"
               className="inline-flex items-center border border-ink/15 bg-transparent text-ink px-[22px] py-[15px] rounded-full text-[15px] font-medium"
             >
-              Watch 90-second tour
+              Contact us
             </a>
           </div>
           <div className="flex items-center gap-2 mt-7 text-[13px] text-ink/55">
