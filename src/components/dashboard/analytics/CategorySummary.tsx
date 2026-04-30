@@ -20,26 +20,26 @@ function CategorySummary() {
   const total = MOCK_CATEGORIES.reduce((sum, c) => sum + c.count, 0)
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)] [box-shadow:var(--card-shadow)] p-5">
+    <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
       <SectionHeader title="Question Categories" />
       <div className="space-y-3">
         {MOCK_CATEGORIES.map((cat) => (
           <div key={cat.name} className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <span className={`h-2.5 w-2.5 rounded-full ${cat.color}`} />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-600">
                 {cat.name}
               </span>
             </div>
-            <span className="rounded-md bg-gray-100 dark:bg-gray-800 px-2.5 py-1 text-sm font-semibold text-gray-900 dark:text-white tabular-nums">
+            <span className="rounded-md bg-gray-100 dark:bg-white px-2.5 py-1 text-sm font-semibold text-gray-900 dark:text-gray-900 tabular-nums">
               {cat.count.toLocaleString()}
             </span>
           </div>
         ))}
       </div>
-      <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex justify-between">
+      <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-200 flex justify-between">
         <span className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Total</span>
-        <span className="text-sm font-bold text-gray-900 dark:text-white tabular-nums">
+        <span className="text-sm font-bold text-gray-900 dark:text-gray-900 tabular-nums">
           {total.toLocaleString()}
         </span>
       </div>
