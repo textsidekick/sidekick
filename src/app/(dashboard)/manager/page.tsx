@@ -38,15 +38,9 @@ import { AlertMetrics } from "@/components/dashboard/alerts/AlertMetrics";
 import { AlertCharts } from "@/components/dashboard/alerts/AlertCharts";
 import { AlertsTable } from "@/components/dashboard/alerts/AlertsTable";
 import { DocumentsTable } from "@/components/dashboard/documents/DocumentsTable";
-import { DocumentsTab } from "@/components/dashboard/documents/DocumentsTab";
 import { UploadZone } from "@/components/dashboard/documents/UploadZone";
-import { VideoUpload } from "@/components/dashboard/ai-studio/VideoUpload";
-import { KnowledgeGaps } from "@/components/dashboard/ai-studio/KnowledgeGaps";
-import { ContentCards } from "@/components/dashboard/ai-studio/ContentCards";
-import { StorageSidebar } from "@/components/dashboard/ai-studio/StorageSidebar";
 import { WorkersTable } from "@/components/dashboard/workers/WorkersTable";
 import { WorkersTab } from "@/components/dashboard/workers/WorkersTab";
-import { RegistrationCard } from "@/components/dashboard/workers/RegistrationCard";
 import { QRCodeModal } from "@/components/dashboard/workers/QRCodeModal";
 
 // ─── Existing interfaces (unchanged) ─────────────────────────────────────────
@@ -140,7 +134,7 @@ function AnimatedNumber({ value, duration = 1000 }: { value: number; duration?: 
 // ─── Main component ────────────────────────────────────────────────────────────
 export default function ManagerDashboard() {
   // All existing state (unchanged)
-  const [activeTab, setActiveTab] = useState<"analytics" | "alerts" | "documents" | "ai-studio" | "workers">("analytics");
+  const [activeTab, setActiveTab] = useState<"analytics" | "alerts" | "documents" | "workers">("analytics");
   const [companies, setCompanies] = useState<Company[]>([]);
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [selectedCompany, setSelectedCompany] = useState<string>("");
@@ -655,8 +649,7 @@ export default function ManagerDashboard() {
               { id: "analytics",  label: "Analytics",  Icon: BarChart3 },
               { id: "alerts",     label: "Alerts",     Icon: AlertTriangle },
               { id: "documents",  label: "Documents",  Icon: FileText },
-              { id: "ai-studio",  label: "AI Studio",  Icon: Sparkles },
-              { id: "workers",    label: "Workers",    Icon: Users },
+                            { id: "workers",    label: "Workers",    Icon: Users },
             ] as const).map(tab => (
               <button
                 key={tab.id}
@@ -791,71 +784,12 @@ export default function ManagerDashboard() {
             </div>
 
             {/* Documents table wired to real data */}
-            <DocumentsTab companyId={selectedCompany} documents={mappedDocuments} />
+            <DocumentsTable documents={mappedDocuments} />
           </div>
         )}
 
         {/* AI STUDIO TAB */}
-        {activeTab === "ai-studio" && (
-          <div>
-            <div className="flex items-center gap-3 mb-6">
-              <Sparkles className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-900">Create Content</h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Generate training materials, policies, and guides from your facility knowledge</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
-              <div className="space-y-6">
-                <ContentCards showMockData={false} />
-
-                {/* Real WalkthroughUpload preserved */}
-                <WalkthroughUpload
-                  companyId={selectedCompany}
-                  darkMode={false}
-                  onComplete={(result) => {
-                    console.log("Walkthrough processed:", result.locations, "locations,", result.faqs, "FAQs");
-                    fetch(`/api/walkthroughs?companyId=${selectedCompany}`).then(r => r.json()).then(d => setWalkthroughs(d.walkthroughs || []));
-                  }}
-                />
-
-                {/* Knowledge gaps wired to real analyzed gaps */}
-                <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-white p-5">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-start gap-4">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/30">
-                        <Zap className="h-6 w-6 text-amber-600 dark:text-amber-400" />
-                      </div>
-                      <div>
-                        <h3 className="text-base font-semibold text-gray-900 dark:text-gray-900">Generate from Knowledge Gaps</h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Create policies based on unanswered worker questions</p>
-                      </div>
-                    </div>
-                    <button onClick={analyzeGaps} disabled={analyzingGaps || !stats?.knowledgeGaps?.length} className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-gray-900 rounded-lg text-sm font-medium disabled:opacity-50">
-                      <Zap className={`h-4 w-4 ${analyzingGaps ? "animate-spin" : ""}`} />
-                      {analyzingGaps ? "Analyzing..." : "Analyze Gaps"}
-                    </button>
-                  </div>
-                  {mappedGaps.length === 0 ? (
-                    <EmptyState icon={Lightbulb} title="No knowledge gaps detected yet" description="Knowledge gaps will appear here when workers ask questions your documents don't cover." />
-                  ) : (
-                    <div className="space-y-3">
-                      {mappedGaps.slice(0, 5).map(gap => (
-                        <div key={gap.id} className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-200 last:border-0">
-                          <div>
-                            <p className="text-sm text-gray-900 dark:text-gray-900">{gap.question}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{gap.category}</p>
-                          </div>
-                          <div className="flex items-center gap-3 ml-4 shrink-0">
-                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{gap.frequency} asks</span>
-                            <button onClick={() => generateDraft(gaps.find(g => g.id === gap.id)!)} disabled={generatingDraft === gap.id} className="text-xs px-3 py-1.5 bg-[#C96442] text-gray-900 rounded-lg hover:bg-blue-700 disabled:opacity-50">
-                              {generatingDraft === gap.id ? "..." : "Generate"}
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                            </div>
                   )}
                 </div>
               </div>
@@ -868,29 +802,7 @@ export default function ManagerDashboard() {
         {/* WORKERS TAB */}
         {activeTab === "workers" && (
           <div className="space-y-6">
-            {/* Registration card with real company access code */}
-            <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-white p-5">
-              <SectionHeader
-                title="Worker Registration"
-                action={
-                  <button onClick={() => setShowQrModal(true)} className="flex items-center gap-2 px-4 py-2 bg-[#C96442] text-gray-900 rounded-lg text-sm font-medium hover:bg-blue-700">
-                    <QrCode className="h-4 w-4" /> Show QR Code
-                  </button>
-                }
-              />
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="text-xs text-gray-400">Workers text this to join:</p>
-                  <p className="font-mono text-2xl font-bold text-[#C96442] dark:text-[#C96442] tracking-wider">JOIN {currentCompany?.access_code || "XXXXXX"}</p>
-                  <p className="text-xs text-gray-400">Send to: +1 (888) 707-4659</p>
-                </div>
-                <button onClick={copyAccessCode} className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-gray-100 dark:hover:bg-white">
-                  {copiedCode ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4 text-gray-400" />}
-                </button>
-              </div>
-            </div>
-
-            {/* Workers table wired to real data */}
+            {/* Workers section */}
             <WorkersTab joinCode={currentCompany?.access_code} />
 
             {/* Certifications — real data */}
