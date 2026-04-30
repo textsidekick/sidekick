@@ -35,6 +35,31 @@ export default function SuccessScreen({
     setTimeout(() => setCopiedField(null), 2000);
   };
 
+
+  const handleSaveCode = async () => {
+    if (!customCode.trim()) return;
+    setSavingCode(true);
+    setCodeError(null);
+    try {
+      const res = await fetch("/api/onboarding/update-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ companyId: onboardingResult.companyId, newCode: customCode }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setEditingCode(false);
+        onboardingResult.accessCode = data.accessCode;
+        onboardingResult.joinCommand = data.joinCommand;
+      } else {
+        setCodeError(data.error || "Failed to update code");
+      }
+    } catch {
+      setCodeError("Failed to save code");
+    }
+    setSavingCode(false);
+  };
+
   const smsLink = `sms:${onboardingResult.twilioNumber.replace(/[^0-9]/g, "")}?body=${encodeURIComponent("JOIN " + customCode)}`;
 
   return (
@@ -199,13 +224,15 @@ export default function SuccessScreen({
                       fontSize: "13px",
                       fontWeight: "500",
                     }}
+                    onClick={handleSaveCode}
+                    disabled={savingCode}
                   >
-                    Save
+                    {savingCode ? "Saving..." : "Save"}
                   </button>
                   <button
                     onClick={() => {
                       setEditingCode(false);
-                      setCustomCode("");
+                      setCustomCode(onboardingResult.accessCode);
                       setCodeError(null);
                     }}
                     style={{
