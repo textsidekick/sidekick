@@ -48,8 +48,8 @@ function ChartTooltip({ active, payload }: CustomTooltipProps) {
   if (!active || !payload?.length) return null
   const entry = payload[0]
   return (
-    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 [box-shadow:var(--card-shadow)]">
-      <p className="text-xs font-medium text-gray-900 dark:text-white">
+    <div className="rounded-lg border border-gray-200 dark:border-gray-200 bg-white dark:bg-white px-3 py-2 [box-shadow:var(--card-shadow)]">
+      <p className="text-xs font-medium text-gray-900 dark:text-gray-900">
         {entry.name}
       </p>
       <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -79,8 +79,8 @@ function StorageSidebar({ showMockData = false }: StorageSidebarProps) {
   return (
     <div className="space-y-6">
       {/* Storage Donut Chart */}
-      <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)] [box-shadow:var(--card-shadow)] p-5">
-        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">
+      <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
+        <h3 className="text-base font-semibold text-gray-900 dark:text-gray-900 mb-4">
           My Storage
         </h3>
 
@@ -109,7 +109,7 @@ function StorageSidebar({ showMockData = false }: StorageSidebarProps) {
           </ResponsiveContainer>
           {/* Center label */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <span className="text-2xl font-bold text-gray-900 dark:text-white leading-none">
+            <span className="text-2xl font-bold text-gray-900 dark:text-gray-900 leading-none">
               {totalStorage > 0 ? `${totalStorage.toFixed(1)}` : '0'}
             </span>
             <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
@@ -131,7 +131,7 @@ function StorageSidebar({ showMockData = false }: StorageSidebarProps) {
                   {entry.name}
                 </span>
               </div>
-              <span className="text-sm font-medium text-gray-900 dark:text-white tabular-nums">
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-900 tabular-nums">
                 {showMockData ? `${entry.value} gb` : '—'}
               </span>
             </div>
@@ -140,8 +140,8 @@ function StorageSidebar({ showMockData = false }: StorageSidebarProps) {
       </div>
 
       {/* Recent Activity */}
-      <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)] [box-shadow:var(--card-shadow)] p-5">
-        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">
+      <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
+        <h3 className="text-base font-semibold text-gray-900 dark:text-gray-900 mb-4">
           Recent Activity
         </h3>
 
@@ -156,10 +156,10 @@ function StorageSidebar({ showMockData = false }: StorageSidebarProps) {
             {activityData.map((item, index) => (
               <div key={index} className="flex items-start gap-3">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30">
-                  <Upload className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  <Upload className="h-4 w-4 text-[#C96442] dark:text-[#C96442]" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-900">
                     {item.action} {item.detail}
                   </p>
                   <p className="text-xs text-gray-400 dark:text-gray-500">
