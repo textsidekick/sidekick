@@ -21,10 +21,10 @@ function UploadZone({}: UploadZoneProps) {
       />
       <div
         className={cn(
-          'border-2 border-dashed rounded-xl bg-white dark:bg-[var(--card-bg)] min-h-[160px] flex flex-col items-center justify-center gap-3 transition-colors duration-150 cursor-pointer',
+          'border-2 border-dashed rounded-xl bg-white dark:bg-[#ffffff] min-h-[160px] flex flex-col items-center justify-center gap-3 transition-colors duration-150 cursor-pointer',
           isDragOver
-            ? 'border-blue-400 bg-blue-50/30 dark:border-blue-600'
-            : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:bg-blue-50/30 dark:hover:border-blue-700'
+            ? 'border-blue-400 bg-blue-50/30 dark:border-[#C96442]'
+            : 'border-gray-200 dark:border-gray-200 hover:border-blue-300 hover:bg-blue-50/30 dark:hover:border-blue-700'
         )}
         onDragOver={(e) => {
           e.preventDefault()
@@ -39,7 +39,7 @@ function UploadZone({}: UploadZoneProps) {
       >
         <Upload className="h-8 w-8 text-gray-400 dark:text-gray-500" />
         <div className="text-center">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-600">
             Drop files here or click to upload
           </p>
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
