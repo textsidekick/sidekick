@@ -732,28 +732,29 @@ export default function ManagerDashboard() {
         )}
 
         {/* ANALYTICS TAB */}
-        {activeTab === "analytics" && (stats && stats.totalQuestions === 0 ? (
-          <div style={{
-            maxWidth: 600, margin: "60px auto", textAlign: "center", padding: "40px 24px",
-            background: "white", borderRadius: 16, border: "1px solid rgba(28,26,22,0.08)",
-          }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>📊</div>
-            <h2 style={{ fontSize: 22, fontWeight: 600, color: "#1C1A16", marginBottom: 8 }}>No questions yet</h2>
-            <p style={{ fontSize: 15, color: "rgba(28,26,22,0.5)", marginBottom: 24, lineHeight: 1.6 }}>
-              Share your access code with workers so they can start texting questions. Analytics will populate automatically as questions come in.
-            </p>
-            <div style={{
-              display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 20px",
-              background: "rgba(201,100,66,0.08)", borderRadius: 10, fontSize: 14, color: "#A74D30", fontWeight: 500,
-            }}>
-              Access Code: <span style={{ fontFamily: "monospace", fontWeight: 700, letterSpacing: 2 }}>{currentCompany?.access_code || "—"}</span>
-            </div>
-            <p style={{ fontSize: 13, color: "rgba(28,26,22,0.35)", marginTop: 12 }}>
-              Workers text <strong>JOIN {currentCompany?.access_code || "CODE"}</strong> to +1 (888) 707-4659
-            </p>
-          </div>
-        ) : (
+        {activeTab === "analytics" && (
           <div className="space-y-6">
+            {stats && stats.totalQuestions === 0 && (
+              <div style={{
+                maxWidth: 600, margin: "20px auto", textAlign: "center", padding: "40px 24px",
+                background: "white", borderRadius: 16, border: "1px solid rgba(28,26,22,0.08)",
+              }}>
+                <div style={{ fontSize: 48, marginBottom: 16 }}>📊</div>
+                <h2 style={{ fontSize: 22, fontWeight: 600, color: "#1C1A16", marginBottom: 8 }}>No questions yet</h2>
+                <p style={{ fontSize: 15, color: "rgba(28,26,22,0.5)", marginBottom: 24, lineHeight: 1.6 }}>
+                  Share your access code with workers so they can start texting questions.
+                </p>
+                <div style={{
+                  display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 20px",
+                  background: "rgba(201,100,66,0.08)", borderRadius: 10, fontSize: 14, color: "#A74D30", fontWeight: 500,
+                }}>
+                  Access Code: <span style={{ fontFamily: "monospace", fontWeight: 700, letterSpacing: 2 }}>{currentCompany?.access_code || "—"}</span>
+                </div>
+                <p style={{ fontSize: 13, color: "rgba(28,26,22,0.35)", marginTop: 12 }}>
+                  Workers text <strong>JOIN {currentCompany?.access_code || "CODE"}</strong> to +1 (888) 707-4659
+                </p>
+              </div>
+            )}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <MetricCard label="Questions Today" value={stats?.todayCount || 0} icon={MessageSquare} subtext={`${stats?.weekCount || 0} this week`} change={weekTrend || undefined} />
               <MetricCard label="Answer Accuracy" value={`${stats?.avgConfidence || 0}%`} icon={Target} subtext={`${stats?.answeredRate || 0}% answered`} />
@@ -791,8 +792,6 @@ export default function ManagerDashboard() {
           </div>
         )}
 
-        )}
-
         {/* ALERTS TAB */}
         {activeTab === "alerts" && (
           <div className="space-y-6">
@@ -819,8 +818,6 @@ export default function ManagerDashboard() {
               </div>
             )}
           </div>
-        )}
-
         {/* DOCUMENTS TAB */}
         {activeTab === "documents" && (
           <div className="space-y-6">
