@@ -176,7 +176,6 @@ export default function ManagerDashboard() {
   const [showAllQuestions, setShowAllQuestions] = useState(false);
   const [checklistDate, setChecklistDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [trialInfo, setTrialInfo] = useState<{plan: string; questionsUsed: number; questionsLimit: number; trialEndsAt: string} | null>(null);
-  const [trialInfo, setTrialInfo] = useState<{plan: string; questionsUsed: number; questionsLimit: number; trialEndsAt: string} | null>(null);
 
   // All existing derived values (unchanged)
   const currentCompany = companies.find(c => c.id === selectedCompany);
@@ -740,17 +739,7 @@ export default function ManagerDashboard() {
           </div>
         )}
 
-        {/* Trial Banner */}
-        {trialInfo && trialInfo.plan === "trial" && (
-          <div style={{ maxWidth: 1200, margin: "0 auto 16px", padding: "14px 20px", background: "rgba(201,100,66,0.08)", border: "1px solid rgba(201,100,66,0.15)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-            <span style={{ fontSize: 14, color: "#A74D30", fontWeight: 500 }}>
-              Free Trial — {Math.max(0, (trialInfo.questionsLimit || 50) - (trialInfo.questionsUsed || 0))} questions remaining
-            </span>
-            <a href="https://textsidekick.com/#contact" style={{ padding: "8px 16px", background: "#C96442", color: "white", borderRadius: 8, fontSize: 13, fontWeight: 600, textDecoration: "none" }}>Contact us to upgrade</a>
-          </div>
-        )}
-
-        {/* ANALYTICS TAB */}
+{/* ANALYTICS TAB */}
         {activeTab === "analytics" && (
           <div className="space-y-6">
             {stats && stats.totalQuestions === 0 && (
