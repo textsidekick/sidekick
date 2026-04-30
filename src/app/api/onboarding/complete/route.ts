@@ -186,6 +186,35 @@ Return ONLY valid JSON, no markdown. Example:
 
     const twilioNumber = "+1 (888) 707-4659";
 
+    // Send notification email to team
+    try {
+      const resendKey = process.env.RESEND_API_KEY;
+      if (resendKey) {
+        await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${resendKey}`,
+          },
+          body: JSON.stringify({
+            from: "Sidekick <notifications@textsidekick.com>",
+            to: ["hello@textsidekick.com"],
+            subject: `🎉 New signup: ${extractedData.companyName}`,
+            html: `<h2>New company signed up!</h2>
+              <p><strong>Company:</strong> ${extractedData.companyName}</p>
+              <p><strong>Manager:</strong> ${extractedData.managerName || "Not provided"}</p>
+              <p><strong>Phone:</strong> ${managerPhone || "Not provided"}</p>
+              <p><strong>Access Code:</strong> ${accessCode}</p>
+              <p><strong>Plan:</strong> Trial (50 questions / 7 days)</p>
+              <hr>
+              <p style="color:#666">This is an automated notification from Sidekick onboarding.</p>`,
+          }),
+        });
+      }
+    } catch (emailErr) {
+      console.warn("[Complete] Email notification failed:", emailErr);
+    }
+
     return NextResponse.json({
       success: true,
       companyId,
