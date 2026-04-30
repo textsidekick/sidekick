@@ -7,7 +7,7 @@ export const metadata = {
 export default function Privacy() {
   return (
     <div style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
-      <div style={{ padding: "16px 24px", borderBottom: "1px solid rgba(28,26,22,0.06)", display: "flex", alignItems: "center", gap: 10 }}><a href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", color: "#1C1A16" }}><span style={{ fontSize: 16, fontWeight: 600 }}>← Sidekick</span></a></div>
+      <div style={{ position: "sticky", top: 0, zIndex: 50, padding: "16px 24px", borderBottom: "1px solid rgba(28,26,22,0.06)", background: "rgba(247,243,236,0.95)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", gap: 10 }}><a href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", color: "#1C1A16" }}><span style={{ fontSize: 16, fontWeight: 600 }}>← Sidekick</span></a></div>
       
       <main style={{ paddingTop: '120px', paddingBottom: '60px', minHeight: '100vh', background: '#F7F3EC' }}>
         <div className="container">
@@ -125,7 +125,7 @@ export default function Privacy() {
                   lineHeight: '1.8',
                 }}>
                   <p style={{ margin: 0 }}><strong>Sidekick AI Inc.</strong></p>
-                  <p style={{ margin: '8px 0' }}>Email: <a href="mailto:hello@textsidekick.com" style={{ color: '#3B82F6' }}>hello@textsidekick.com</a></p>
+                  <p style={{ margin: '8px 0' }}>Email: <a href="mailto:hello@textsidekick.com" style={{ color: '#C96442' }}>hello@textsidekick.com</a></p>
                   <p style={{ margin: 0 }}>Santa Clara, CA</p>
                 </div>
               </div>
