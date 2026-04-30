@@ -4,15 +4,16 @@ import { RegistrationCard } from './RegistrationCard'
 import { WorkersTable, MOCK_WORKERS } from './WorkersTable'
 
 interface WorkersTabProps {
+  joinCode?: string;
   showMockData?: boolean
 }
 
-function WorkersTab({ showMockData = false }: WorkersTabProps) {
+function WorkersTab({ joinCode, showMockData = false }: WorkersTabProps) {
   const workers = showMockData ? MOCK_WORKERS : []
 
   return (
     <div className="space-y-6">
-      <RegistrationCard />
+      <RegistrationCard joinCode={joinCode} />
       <WorkersTable workers={workers} />
     </div>
   )
