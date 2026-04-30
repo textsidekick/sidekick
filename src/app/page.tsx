@@ -1,5 +1,11 @@
 import { redirect } from 'next/navigation';
+import { Effect } from 'react';
 
-export default function HomePage() {
-  redirect('/login');
+// Redirect to login page
+export default function Page() {
+  Effect(() => {
+    redirect('/login');
+  }, []);
+
+  return null;
 }
