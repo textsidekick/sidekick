@@ -6,21 +6,21 @@ import { SectionHeader } from '@/components/dashboard/shared/SectionHeader'
 import { Button } from '@/components/ui/button'
 import { QRCodeModal } from '@/components/dashboard/workers/QRCodeModal'
 
-
-
+const TEAM_JOIN_CODE = 'ABC123'
+const TEAM_SMS_NUMBER = '+1 (888) 707-4659'
 
 interface RegistrationCardProps {
-  joinCode?: string;
-  smsNumber?: string;
+  // No props needed — uses internal constants
+  // Future: joinCode and smsNumber from API
 }
 
-function RegistrationCard({ joinCode = 'ABC123', smsNumber = '+1 (888) 707-4659' }: RegistrationCardProps) {
+function RegistrationCard({}: RegistrationCardProps) {
   const [qrOpen, setQrOpen] = useState(false)
   const [copied, setCopied] = useState(false)
 
   function handleCopy() {
     try {
-      navigator.clipboard.writeText(`JOIN ${joinCode}`)
+      navigator.clipboard.writeText(`JOIN ${TEAM_JOIN_CODE}`)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch {
@@ -46,10 +46,10 @@ function RegistrationCard({ joinCode = 'ABC123', smsNumber = '+1 (888) 707-4659'
             Workers text this to join:
           </p>
           <p className="font-mono text-2xl font-bold text-[#C96442] dark:text-[#C96442] tracking-wider">
-            JOIN {joinCode}
+            JOIN {TEAM_JOIN_CODE}
           </p>
           <p className="text-xs text-gray-400 dark:text-gray-500">
-            Send to: {smsNumber}
+            Send to: {TEAM_SMS_NUMBER}
           </p>
         </div>
 
@@ -68,7 +68,7 @@ function RegistrationCard({ joinCode = 'ABC123', smsNumber = '+1 (888) 707-4659'
       </div>
 
       <QRCodeModal
-        joinCode={joinCode}
+        joinCode={TEAM_JOIN_CODE}
         open={qrOpen}
         onOpenChange={setQrOpen}
       />
@@ -76,5 +76,5 @@ function RegistrationCard({ joinCode = 'ABC123', smsNumber = '+1 (888) 707-4659'
   )
 }
 
-export { RegistrationCard, joinCode, smsNumber }
+export { RegistrationCard, TEAM_JOIN_CODE, TEAM_SMS_NUMBER }
 export type { RegistrationCardProps }
