@@ -104,7 +104,7 @@ const TOPIC_LABELS: Record<string, { label: string; icon: string; color: string;
 };
 
 function getAvatarColor(name: string): string {
-  const colors = ["bg-blue-500","bg-green-500","bg-purple-500","bg-pink-500","bg-indigo-500","bg-cyan-500","bg-orange-500","bg-teal-500"];
+  const colors = ["bg-[#C96442]","bg-green-500","bg-purple-500","bg-pink-500","bg-indigo-500","bg-cyan-500","bg-orange-500","bg-teal-500"];
   return colors[name ? name.charCodeAt(0) % colors.length : 0];
 }
 function getInitials(name: string): string {
@@ -191,7 +191,7 @@ export default function ManagerDashboard() {
     ...(stats?.recentQuestions || []).slice(0, 3).map(q => ({
       id: `q-${q.id}`, type: "question" as const,
       message: `${q.worker_name || "A worker"} asked about ${q.question.slice(0, 30)}...`,
-      time: q.created_at, icon: MessageSquare, color: "text-blue-500"
+      time: q.created_at, icon: MessageSquare, color: "text-[#C96442]"
     })),
     ...issues.filter(i => i.status === "open").slice(0, 2).map(i => ({
       id: `i-${i.id}`, type: "issue" as const,
@@ -470,34 +470,34 @@ export default function ManagerDashboard() {
       {/* Issue Detail Modal */}
       {selectedIssue && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-lg w-full shadow-xl">
-            <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700">
+          <div className="bg-white dark:bg-white rounded-2xl max-w-lg w-full shadow-xl">
+            <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-200">
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${selectedIssue.severity === "high" ? "bg-red-100" : selectedIssue.severity === "medium" ? "bg-amber-100" : "bg-green-100"}`}>
                   <AlertTriangle className={`w-5 h-5 ${selectedIssue.severity === "high" ? "text-red-600" : selectedIssue.severity === "medium" ? "text-amber-600" : "text-green-600"}`} />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white">Issue #{selectedIssue.id.slice(0, 8).toUpperCase()}</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-900">Issue #{selectedIssue.id.slice(0, 8).toUpperCase()}</h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400">{formatTimeAgo(selectedIssue.created_at)}</p>
                 </div>
               </div>
               <button onClick={() => setSelectedIssue(null)} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-400" /></button>
             </div>
             <div className="p-4 space-y-4">
-              <div><label className="text-xs font-medium text-gray-500">Reported By</label><p className="text-gray-900 dark:text-white">{selectedIssue.worker_name || "Unknown Worker"}</p></div>
-              {selectedIssue.equipment && <div><label className="text-xs font-medium text-gray-500">Equipment</label><p className="text-gray-900 dark:text-white">{selectedIssue.equipment}</p></div>}
-              <div><label className="text-xs font-medium text-gray-500">Description</label><p className="text-gray-900 dark:text-white">{selectedIssue.description}</p></div>
+              <div><label className="text-xs font-medium text-gray-500">Reported By</label><p className="text-gray-900 dark:text-gray-900">{selectedIssue.worker_name || "Unknown Worker"}</p></div>
+              {selectedIssue.equipment && <div><label className="text-xs font-medium text-gray-500">Equipment</label><p className="text-gray-900 dark:text-gray-900">{selectedIssue.equipment}</p></div>}
+              <div><label className="text-xs font-medium text-gray-500">Description</label><p className="text-gray-900 dark:text-gray-900">{selectedIssue.description}</p></div>
               <div className="flex gap-4">
                 <div><label className="text-xs font-medium text-gray-500">Severity</label><p className={`capitalize font-medium ${selectedIssue.severity === "high" ? "text-red-600" : selectedIssue.severity === "medium" ? "text-amber-600" : "text-green-600"}`}>{selectedIssue.severity}</p></div>
                 <div><label className="text-xs font-medium text-gray-500">Status</label><p className={`capitalize font-medium ${selectedIssue.status === "open" ? "text-amber-600" : "text-green-600"}`}>{selectedIssue.status}</p></div>
               </div>
-              {selectedIssue.resolved_at && <div><label className="text-xs font-medium text-gray-500">Resolved</label><p className="text-gray-700 dark:text-gray-300">{formatTimeAgo(selectedIssue.resolved_at)} {selectedIssue.resolved_by && `by ${selectedIssue.resolved_by}`}</p></div>}
+              {selectedIssue.resolved_at && <div><label className="text-xs font-medium text-gray-500">Resolved</label><p className="text-gray-700 dark:text-gray-600">{formatTimeAgo(selectedIssue.resolved_at)} {selectedIssue.resolved_by && `by ${selectedIssue.resolved_by}`}</p></div>}
             </div>
-            <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-100 dark:border-gray-200">
               {selectedIssue.status === "open" ? (
-                <button onClick={() => updateIssue(selectedIssue.id, { status: "resolved", resolved_by: currentCompany?.name })} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700"><CheckCircle2 className="w-4 h-4" /> Mark Resolved</button>
+                <button onClick={() => updateIssue(selectedIssue.id, { status: "resolved", resolved_by: currentCompany?.name })} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-gray-900 rounded-lg font-medium hover:bg-green-700"><CheckCircle2 className="w-4 h-4" /> Mark Resolved</button>
               ) : (
-                <button onClick={() => updateIssue(selectedIssue.id, { status: "open" })} className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700"><CircleDot className="w-4 h-4" /> Reopen</button>
+                <button onClick={() => updateIssue(selectedIssue.id, { status: "open" })} className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-gray-900 rounded-lg font-medium hover:bg-amber-700"><CircleDot className="w-4 h-4" /> Reopen</button>
               )}
             </div>
           </div>
@@ -507,31 +507,31 @@ export default function ManagerDashboard() {
       {/* Worker Detail Modal */}
       {selectedWorker && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden shadow-xl">
-            <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700">
+          <div className="bg-white dark:bg-white rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden shadow-xl">
+            <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-200">
               <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-medium ${getAvatarColor(selectedWorker.name || "")}`}>{selectedWorker.name ? getInitials(selectedWorker.name) : <User className="w-6 h-6" />}</div>
-                <div><h3 className="font-semibold text-gray-900 dark:text-white">{selectedWorker.name || "Unknown Worker"}</h3><p className="text-sm text-gray-500 dark:text-gray-400">{selectedWorker.phone}</p></div>
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-gray-900 font-medium ${getAvatarColor(selectedWorker.name || "")}`}>{selectedWorker.name ? getInitials(selectedWorker.name) : <User className="w-6 h-6" />}</div>
+                <div><h3 className="font-semibold text-gray-900 dark:text-gray-900">{selectedWorker.name || "Unknown Worker"}</h3><p className="text-sm text-gray-500 dark:text-gray-400">{selectedWorker.phone}</p></div>
               </div>
               <button onClick={() => setSelectedWorker(null)} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-400" /></button>
             </div>
             <div className="p-4 overflow-y-auto max-h-[60vh]">
               <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center"><p className="text-2xl font-bold text-gray-900 dark:text-white">{workerQuestions.length}</p><p className="text-xs text-gray-500 dark:text-gray-400">Questions</p></div>
-                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center"><p className="text-2xl font-bold text-gray-900 dark:text-white">{workerQuestions.length > 0 ? Math.round(workerQuestions.reduce((a, q) => a + q.confidence, 0) / workerQuestions.length) : 0}%</p><p className="text-xs text-gray-500 dark:text-gray-400">Avg Confidence</p></div>
-                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center"><p className="text-2xl font-bold text-gray-900 dark:text-white">{selectedWorker.registered_at ? formatTimeAgo(selectedWorker.registered_at) : "N/A"}</p><p className="text-xs text-gray-500 dark:text-gray-400">Joined</p></div>
+                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center"><p className="text-2xl font-bold text-gray-900 dark:text-gray-900">{workerQuestions.length}</p><p className="text-xs text-gray-500 dark:text-gray-400">Questions</p></div>
+                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center"><p className="text-2xl font-bold text-gray-900 dark:text-gray-900">{workerQuestions.length > 0 ? Math.round(workerQuestions.reduce((a, q) => a + q.confidence, 0) / workerQuestions.length) : 0}%</p><p className="text-xs text-gray-500 dark:text-gray-400">Avg Confidence</p></div>
+                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center"><p className="text-2xl font-bold text-gray-900 dark:text-gray-900">{selectedWorker.registered_at ? formatTimeAgo(selectedWorker.registered_at) : "N/A"}</p><p className="text-xs text-gray-500 dark:text-gray-400">Joined</p></div>
               </div>
-              <h4 className="font-medium text-gray-900 dark:text-white mb-3">Question History</h4>
+              <h4 className="font-medium text-gray-900 dark:text-gray-900 mb-3">Question History</h4>
               <div className="space-y-3">
                 {workerQuestions.length === 0 ? <p className="text-center py-8 text-gray-400">No questions yet</p> : workerQuestions.map((q, i) => (
                   <div key={i} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-                    <div className="flex items-start justify-between mb-2"><p className="font-medium text-gray-900 dark:text-white">{q.question}</p><span className={`text-xs px-2 py-0.5 rounded-full ${q.confidence >= 70 ? "bg-green-100 text-green-700" : q.confidence >= 40 ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700"}`}>{q.confidence}%</span></div>
+                    <div className="flex items-start justify-between mb-2"><p className="font-medium text-gray-900 dark:text-gray-900">{q.question}</p><span className={`text-xs px-2 py-0.5 rounded-full ${q.confidence >= 70 ? "bg-green-100 text-green-700" : q.confidence >= 40 ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700"}`}>{q.confidence}%</span></div>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{q.answer}</p>
                     <p className="text-xs text-gray-400 dark:text-gray-500">{formatTimeAgo(q.created_at)}</p>
                   </div>
                 ))}
               </div>
-              <h4 className="font-medium text-gray-900 dark:text-white mb-3 mt-6">Certifications</h4>
+              <h4 className="font-medium text-gray-900 dark:text-gray-900 mb-3 mt-6">Certifications</h4>
               <div className="space-y-2">
                 {certifications.filter(c => c.worker_phone === selectedWorker?.phone).length === 0 ? (
                   <p className="text-center py-4 text-gray-400">No certifications</p>
@@ -539,7 +539,7 @@ export default function ManagerDashboard() {
                   <div key={i} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <Award className={`w-5 h-5 ${new Date(cert.expiry_date) > new Date() ? "text-green-500" : "text-red-500"}`} />
-                      <div><p className="font-medium text-gray-900 dark:text-white">{cert.cert_name}</p><p className="text-xs text-gray-500 dark:text-gray-400">Expires: {new Date(cert.expiry_date).toLocaleDateString()}</p></div>
+                      <div><p className="font-medium text-gray-900 dark:text-gray-900">{cert.cert_name}</p><p className="text-xs text-gray-500 dark:text-gray-400">Expires: {new Date(cert.expiry_date).toLocaleDateString()}</p></div>
                     </div>
                     <span className={`text-xs px-2 py-1 rounded-full ${new Date(cert.expiry_date) > new Date() ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>{new Date(cert.expiry_date) > new Date() ? "Valid" : "Expired"}</span>
                   </div>
@@ -553,21 +553,21 @@ export default function ManagerDashboard() {
       {/* All Questions Modal */}
       {showAllQuestions && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-4xl w-full max-h-[85vh] overflow-hidden shadow-xl">
-            <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700">
-              <h3 className="font-semibold text-gray-900 dark:text-white">All Questions</h3>
+          <div className="bg-white dark:bg-white rounded-2xl max-w-4xl w-full max-h-[85vh] overflow-hidden shadow-xl">
+            <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-200">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-900">All Questions</h3>
               <button onClick={() => setShowAllQuestions(false)} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-400" /></button>
             </div>
             <div className="p-4">
               <div className="flex gap-3 mb-4">
-                <div className="flex-1 relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" /><input type="text" placeholder="Search questions or workers..." value={questionSearch} onChange={(e) => setQuestionSearch(e.target.value)} className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
-                <select value={questionFilter} onChange={(e) => setQuestionFilter(e.target.value as any)} className="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"><option value="all">All</option><option value="answered">Answered</option><option value="unanswered">Unanswered</option></select>
+                <div className="flex-1 relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" /><input type="text" placeholder="Search questions or workers..." value={questionSearch} onChange={(e) => setQuestionSearch(e.target.value)} className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C96442]" /></div>
+                <select value={questionFilter} onChange={(e) => setQuestionFilter(e.target.value as any)} className="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C96442]"><option value="all">All</option><option value="answered">Answered</option><option value="unanswered">Unanswered</option></select>
               </div>
               <div className="overflow-y-auto max-h-[60vh] space-y-3">
                 {filteredQuestions.length === 0 ? <p className="text-center py-8 text-gray-400">No questions found</p> : filteredQuestions.map((q, i) => (
                   <div key={i} className="bg-gray-50 rounded-lg p-4">
                     <div className="flex items-start gap-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm flex-shrink-0 ${getAvatarColor(q.worker_name || "")}`}>{q.worker_name ? getInitials(q.worker_name) : <User className="w-5 h-5" />}</div>
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-gray-900 font-medium text-sm flex-shrink-0 ${getAvatarColor(q.worker_name || "")}`}>{q.worker_name ? getInitials(q.worker_name) : <User className="w-5 h-5" />}</div>
                       <div className="flex-1">
                         <div className="flex items-start justify-between mb-1"><span className="font-medium text-gray-900">{q.worker_name || "Unknown"}</span><span className={`text-xs px-2 py-0.5 rounded-full ${q.confidence >= 70 ? "bg-green-100 text-green-700" : q.confidence >= 40 ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700"}`}>{q.confidence}% confidence</span></div>
                         <p className="text-gray-700 mb-2">{q.question}</p>
@@ -585,10 +585,10 @@ export default function ManagerDashboard() {
       {/* Draft Modal */}
       {draftModal?.open && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden shadow-xl">
-            <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700"><div className="flex items-center gap-2"><FileCheck className="w-5 h-5 text-green-600" /><h3 className="font-semibold text-gray-900 dark:text-white">Generated Policy Draft</h3></div><button onClick={() => setDraftModal(null)} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-400" /></button></div>
-            <div className="p-6 overflow-y-auto max-h-[60vh]"><pre className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300 font-sans leading-relaxed">{draftModal.draft}</pre></div>
-            <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-100 dark:border-gray-700"><button onClick={() => setDraftModal(null)} className="px-4 py-2 text-gray-600">Close</button><button onClick={() => navigator.clipboard.writeText(draftModal.draft)} className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700">Copy to Clipboard</button></div>
+          <div className="bg-white dark:bg-white rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden shadow-xl">
+            <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-200"><div className="flex items-center gap-2"><FileCheck className="w-5 h-5 text-green-600" /><h3 className="font-semibold text-gray-900 dark:text-gray-900">Generated Policy Draft</h3></div><button onClick={() => setDraftModal(null)} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-400" /></button></div>
+            <div className="p-6 overflow-y-auto max-h-[60vh]"><pre className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-600 font-sans leading-relaxed">{draftModal.draft}</pre></div>
+            <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-100 dark:border-gray-200"><button onClick={() => setDraftModal(null)} className="px-4 py-2 text-gray-600">Close</button><button onClick={() => navigator.clipboard.writeText(draftModal.draft)} className="px-4 py-2 bg-[#C96442] text-gray-900 rounded-lg font-medium hover:bg-blue-700">Copy to Clipboard</button></div>
           </div>
         </div>
       )}
@@ -596,27 +596,27 @@ export default function ManagerDashboard() {
       {/* Unanswered Question Modal */}
       {selectedUQ && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setSelectedUQ(null)}>
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden" onClick={e => e.stopPropagation()}>
-            <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+          <div className="bg-white dark:bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-200">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-100"><MessageSquare className="w-5 h-5 text-blue-600" /></div>
-                  <div><p className="font-semibold text-gray-900 dark:text-white">{selectedUQ.worker_name || "Worker"}</p><p className="text-xs text-gray-400">{selectedUQ.created_at ? new Date(selectedUQ.created_at).toLocaleString() : ""}</p></div>
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-100"><MessageSquare className="w-5 h-5 text-[#C96442]" /></div>
+                  <div><p className="font-semibold text-gray-900 dark:text-gray-900">{selectedUQ.worker_name || "Worker"}</p><p className="text-xs text-gray-400">{selectedUQ.created_at ? new Date(selectedUQ.created_at).toLocaleString() : ""}</p></div>
                 </div>
                 <button onClick={() => setSelectedUQ(null)} className="p-1 rounded-lg hover:bg-gray-100 text-gray-500"><X className="w-5 h-5" /></button>
               </div>
             </div>
             <div className="px-6 py-4">
               <p className="text-sm font-medium mb-1 text-gray-500">Question</p>
-              <p className="text-base mb-4 text-gray-900 dark:text-white">{selectedUQ.question}</p>
+              <p className="text-base mb-4 text-gray-900 dark:text-gray-900">{selectedUQ.question}</p>
               <p className="text-sm font-medium mb-2 text-gray-500">Your Answer</p>
-              <textarea value={uqAnswer} onChange={e => setUqAnswer(e.target.value)} placeholder="Type your answer here..." rows={4} className="w-full rounded-lg border border-gray-200 p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <textarea value={uqAnswer} onChange={e => setUqAnswer(e.target.value)} placeholder="Type your answer here..." rows={4} className="w-full rounded-lg border border-gray-200 p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#C96442]" />
             </div>
-            <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
+            <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-200 flex items-center justify-between">
               <p className="text-xs text-gray-400">Response will be sent via SMS and saved permanently</p>
               <div className="flex gap-2">
                 <button onClick={() => setSelectedUQ(null)} className="px-4 py-2 text-sm rounded-lg text-gray-500 hover:bg-gray-100">Cancel</button>
-                <button onClick={() => { setSelectedUQ(null); setUqAnswer(""); }} className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-medium">Send Answer</button>
+                <button onClick={() => { setSelectedUQ(null); setUqAnswer(""); }} className="px-4 py-2 text-sm rounded-lg bg-[#C96442] text-gray-900 hover:bg-blue-700 font-medium">Send Answer</button>
               </div>
             </div>
           </div>
@@ -629,7 +629,7 @@ export default function ManagerDashboard() {
       </div>
 
       {/* SubHeader with real company selector */}
-      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+      <div className="bg-white dark:bg-white border-b border-gray-200 dark:border-gray-200">
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between py-3">
           <p className="text-sm text-gray-500 dark:text-gray-400">An overview of how your team is using Sidekick.</p>
           <div className="flex items-center gap-2">
@@ -637,7 +637,7 @@ export default function ManagerDashboard() {
             <select
               value={selectedCompany}
               onChange={(e) => setSelectedCompany(e.target.value)}
-              className="border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-1.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-200 dark:border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white dark:bg-white text-gray-900 dark:text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#C96442]"
             >
               {companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
@@ -646,7 +646,7 @@ export default function ManagerDashboard() {
       </div>
 
       {/* TabNav wired to real tab state */}
-      <div className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+      <div className="border-b border-gray-200 dark:border-gray-200 bg-white dark:bg-white">
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <div className="flex gap-0 overflow-x-auto">
             {([
@@ -661,8 +661,8 @@ export default function ManagerDashboard() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap ${
                   activeTab === tab.id
-                    ? "border-blue-600 text-gray-900 dark:text-white"
-                    : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                    ? "border-[#C96442] text-gray-900 dark:text-gray-900"
+                    : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-600"
                 }`}
               >
                 <tab.Icon className="h-4 w-4" />
@@ -676,7 +676,7 @@ export default function ManagerDashboard() {
               </button>
             ))}
           </div>
-          <button onClick={() => setShowQrModal(true)} className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700">
+          <button onClick={() => setShowQrModal(true)} className="flex items-center gap-2 px-3 py-1.5 bg-[#C96442] text-gray-900 text-sm font-medium rounded-lg hover:bg-blue-700">
             <QrCode className="h-4 w-4" /> Invite Workers
           </button>
         </div>
@@ -743,14 +743,14 @@ export default function ManagerDashboard() {
 
             {/* Unanswered Questions — preserved from existing dashboard */}
             {unansweredQuestions.length > 0 && (
-              <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5">
+              <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-white p-5">
                 <SectionHeader title="Unanswered Questions" subtitle="Questions Sidekick could not answer — your response will be saved permanently" />
                 <div className="divide-y divide-gray-100 dark:divide-gray-800">
                   {unansweredQuestions.map((q: any, i: number) => (
-                    <div key={q.id || i} onClick={() => { setSelectedUQ(q); setUqAnswer(""); }} className="p-4 flex items-center gap-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-100"><MessageSquare className="w-5 h-5 text-blue-600" /></div>
+                    <div key={q.id || i} onClick={() => { setSelectedUQ(q); setUqAnswer(""); }} className="p-4 flex items-center gap-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-white/50">
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-100"><MessageSquare className="w-5 h-5 text-[#C96442]" /></div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm text-gray-900 dark:text-white">{q.question}</p>
+                        <p className="font-medium text-sm text-gray-900 dark:text-gray-900">{q.question}</p>
                         <p className="text-xs mt-1 text-gray-400">Asked by {q.worker_name || "Worker"} · {q.created_at ? new Date(q.created_at).toLocaleDateString() : ""}</p>
                       </div>
                       <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700">Needs Answer</span>
@@ -766,19 +766,19 @@ export default function ManagerDashboard() {
         {activeTab === "documents" && (
           <div className="space-y-6">
             {/* Upload zone wired to real upload handler */}
-            <div className="rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-8 text-center hover:border-blue-400 transition-colors cursor-pointer">
+            <div className="rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-200 bg-white dark:bg-white p-8 text-center hover:border-blue-400 transition-colors cursor-pointer">
               <input type="file" id="upload" className="hidden" accept=".pdf,.txt,.doc,.docx,.xlsx,.csv" onChange={handleUpload} disabled={uploading} />
               <label htmlFor="upload" className="cursor-pointer flex flex-col items-center gap-3">
                 <Upload className="h-8 w-8 text-gray-400" />
                 <div>
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{uploading ? "Uploading..." : "Drop files here or click to upload"}</p>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-600">{uploading ? "Uploading..." : "Drop files here or click to upload"}</p>
                   <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">PDF, Word, Excel, or text files</p>
                 </div>
               </label>
             </div>
 
             {/* Real integrations preserved */}
-            <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5">
+            <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-white p-5">
               <SectionHeader title="Import from Integrations" />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <GoogleDriveIntegration companyId={selectedCompany} darkMode={false} onDocumentImported={(doc) => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title, confidence: 1 } }])} />
@@ -799,7 +799,7 @@ export default function ManagerDashboard() {
             <div className="flex items-center gap-3 mb-6">
               <Sparkles className="h-6 w-6 text-purple-600 dark:text-purple-400" />
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Create Content</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-900">Create Content</h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Generate training materials, policies, and guides from your facility knowledge</p>
               </div>
             </div>
@@ -819,18 +819,18 @@ export default function ManagerDashboard() {
                 />
 
                 {/* Knowledge gaps wired to real analyzed gaps */}
-                <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5">
+                <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-white p-5">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-start gap-4">
                       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/30">
                         <Zap className="h-6 w-6 text-amber-600 dark:text-amber-400" />
                       </div>
                       <div>
-                        <h3 className="text-base font-semibold text-gray-900 dark:text-white">Generate from Knowledge Gaps</h3>
+                        <h3 className="text-base font-semibold text-gray-900 dark:text-gray-900">Generate from Knowledge Gaps</h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400">Create policies based on unanswered worker questions</p>
                       </div>
                     </div>
-                    <button onClick={analyzeGaps} disabled={analyzingGaps || !stats?.knowledgeGaps?.length} className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-medium disabled:opacity-50">
+                    <button onClick={analyzeGaps} disabled={analyzingGaps || !stats?.knowledgeGaps?.length} className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-gray-900 rounded-lg text-sm font-medium disabled:opacity-50">
                       <Zap className={`h-4 w-4 ${analyzingGaps ? "animate-spin" : ""}`} />
                       {analyzingGaps ? "Analyzing..." : "Analyze Gaps"}
                     </button>
@@ -840,14 +840,14 @@ export default function ManagerDashboard() {
                   ) : (
                     <div className="space-y-3">
                       {mappedGaps.slice(0, 5).map(gap => (
-                        <div key={gap.id} className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-800 last:border-0">
+                        <div key={gap.id} className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-200 last:border-0">
                           <div>
-                            <p className="text-sm text-gray-900 dark:text-white">{gap.question}</p>
+                            <p className="text-sm text-gray-900 dark:text-gray-900">{gap.question}</p>
                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{gap.category}</p>
                           </div>
                           <div className="flex items-center gap-3 ml-4 shrink-0">
                             <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{gap.frequency} asks</span>
-                            <button onClick={() => generateDraft(gaps.find(g => g.id === gap.id)!)} disabled={generatingDraft === gap.id} className="text-xs px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
+                            <button onClick={() => generateDraft(gaps.find(g => g.id === gap.id)!)} disabled={generatingDraft === gap.id} className="text-xs px-3 py-1.5 bg-[#C96442] text-gray-900 rounded-lg hover:bg-blue-700 disabled:opacity-50">
                               {generatingDraft === gap.id ? "..." : "Generate"}
                             </button>
                           </div>
@@ -867,11 +867,11 @@ export default function ManagerDashboard() {
         {activeTab === "workers" && (
           <div className="space-y-6">
             {/* Registration card with real company access code */}
-            <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5">
+            <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-white p-5">
               <SectionHeader
                 title="Worker Registration"
                 action={
-                  <button onClick={() => setShowQrModal(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+                  <button onClick={() => setShowQrModal(true)} className="flex items-center gap-2 px-4 py-2 bg-[#C96442] text-gray-900 rounded-lg text-sm font-medium hover:bg-blue-700">
                     <QrCode className="h-4 w-4" /> Show QR Code
                   </button>
                 }
@@ -879,10 +879,10 @@ export default function ManagerDashboard() {
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
                   <p className="text-xs text-gray-400">Workers text this to join:</p>
-                  <p className="font-mono text-2xl font-bold text-blue-600 dark:text-blue-400 tracking-wider">JOIN {currentCompany?.access_code || "XXXXXX"}</p>
+                  <p className="font-mono text-2xl font-bold text-[#C96442] dark:text-[#C96442] tracking-wider">JOIN {currentCompany?.access_code || "XXXXXX"}</p>
                   <p className="text-xs text-gray-400">Send to: +1 (888) 707-4659</p>
                 </div>
-                <button onClick={copyAccessCode} className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+                <button onClick={copyAccessCode} className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-gray-100 dark:hover:bg-white">
                   {copiedCode ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4 text-gray-400" />}
                 </button>
               </div>
@@ -892,12 +892,12 @@ export default function ManagerDashboard() {
             <WorkersTable workers={mappedWorkers} />
 
             {/* Certifications — real data */}
-            <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5">
+            <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-white p-5">
               <SectionHeader
                 title="Certifications"
                 subtitle="Worker certification status and expiry dates"
                 action={
-                  <button onClick={() => setShowAddCertModal(true)} className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+                  <button onClick={() => setShowAddCertModal(true)} className="flex items-center gap-2 px-3 py-1.5 bg-[#C96442] text-gray-900 rounded-lg text-sm font-medium hover:bg-blue-700">
                     <Plus className="h-4 w-4" /> Add
                   </button>
                 }
@@ -907,13 +907,13 @@ export default function ManagerDashboard() {
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead><tr className="border-b border-gray-100 dark:border-gray-800"><th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Worker</th><th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Certification</th><th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Expiry</th><th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Status</th><th className="pb-2"></th></tr></thead>
+                    <thead><tr className="border-b border-gray-100 dark:border-gray-200"><th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Worker</th><th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Certification</th><th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Expiry</th><th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Status</th><th className="pb-2"></th></tr></thead>
                     <tbody className="divide-y divide-gray-50 dark:divide-gray-800/50">
                       {mappedCerts.map(cert => {
                         const valid = new Date(cert.expiryDate) > new Date();
                         return (
                           <tr key={cert.id}>
-                            <td className="py-2.5 pr-4 font-medium text-gray-900 dark:text-white">{cert.workerName}</td>
+                            <td className="py-2.5 pr-4 font-medium text-gray-900 dark:text-gray-900">{cert.workerName}</td>
                             <td className="py-2.5 pr-4 text-gray-600 dark:text-gray-400">{cert.certName}</td>
                             <td className="py-2.5 pr-4 text-gray-500 dark:text-gray-400">{new Date(cert.expiryDate).toLocaleDateString()}</td>
                             <td className="py-2.5"><span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${valid ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}>{valid ? "Valid" : "Expired"}</span></td>
@@ -930,20 +930,20 @@ export default function ManagerDashboard() {
             {/* Add Cert Modal */}
             {showAddCertModal && (
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-xl">
-                  <div className="flex items-center justify-between mb-4"><h3 className="font-semibold text-gray-900 dark:text-white">Add Certification</h3><button onClick={() => setShowAddCertModal(false)}><X className="w-5 h-5 text-gray-400" /></button></div>
+                <div className="bg-white dark:bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
+                  <div className="flex items-center justify-between mb-4"><h3 className="font-semibold text-gray-900 dark:text-gray-900">Add Certification</h3><button onClick={() => setShowAddCertModal(false)}><X className="w-5 h-5 text-gray-400" /></button></div>
                   <div className="space-y-4">
-                    <div><label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">Worker</label><select value={newCert.workerPhone} onChange={e => setNewCert(p => ({...p, workerPhone: e.target.value}))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"><option value="">Select worker...</option>{companyWorkers.map(w => <option key={w.phone} value={w.phone}>{w.name || w.phone}</option>)}</select></div>
-                    <div><label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">Certification Type</label><input type="text" value={newCert.certType} onChange={e => setNewCert(p => ({...p, certType: e.target.value}))} placeholder="e.g. Forklift Operator" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
-                    <div><label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">Expiry Date</label><input type="date" value={newCert.expiryDate} onChange={e => setNewCert(p => ({...p, expiryDate: e.target.value}))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
+                    <div><label className="text-sm font-medium text-gray-700 dark:text-gray-600 mb-1 block">Worker</label><select value={newCert.workerPhone} onChange={e => setNewCert(p => ({...p, workerPhone: e.target.value}))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]"><option value="">Select worker...</option>{companyWorkers.map(w => <option key={w.phone} value={w.phone}>{w.name || w.phone}</option>)}</select></div>
+                    <div><label className="text-sm font-medium text-gray-700 dark:text-gray-600 mb-1 block">Certification Type</label><input type="text" value={newCert.certType} onChange={e => setNewCert(p => ({...p, certType: e.target.value}))} placeholder="e.g. Forklift Operator" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]" /></div>
+                    <div><label className="text-sm font-medium text-gray-700 dark:text-gray-600 mb-1 block">Expiry Date</label><input type="date" value={newCert.expiryDate} onChange={e => setNewCert(p => ({...p, expiryDate: e.target.value}))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]" /></div>
                   </div>
-                  <div className="flex gap-3 mt-6"><button onClick={() => setShowAddCertModal(false)} className="flex-1 px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600">Cancel</button><button onClick={addCertification} className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">Add Certification</button></div>
+                  <div className="flex gap-3 mt-6"><button onClick={() => setShowAddCertModal(false)} className="flex-1 px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600">Cancel</button><button onClick={addCertification} className="flex-1 px-4 py-2 bg-[#C96442] text-gray-900 rounded-lg text-sm font-medium hover:bg-blue-700">Add Certification</button></div>
                 </div>
               </div>
             )}
 
             {/* Safety Checklists — real data */}
-            <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5">
+            <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-white p-5">
               <SectionHeader
                 title="Safety Checklists"
                 subtitle="Pre-shift safety compliance"
@@ -954,14 +954,14 @@ export default function ManagerDashboard() {
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead><tr className="border-b border-gray-100 dark:border-gray-800"><th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Worker</th><th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Date</th><th className="pb-2 text-center text-[11px] font-medium uppercase tracking-wide text-gray-500">PPE</th><th className="pb-2 text-center text-[11px] font-medium uppercase tracking-wide text-gray-500">LOTO</th><th className="pb-2 text-center text-[11px] font-medium uppercase tracking-wide text-gray-500">Equipment</th><th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Result</th></tr></thead>
+                    <thead><tr className="border-b border-gray-100 dark:border-gray-200"><th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Worker</th><th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Date</th><th className="pb-2 text-center text-[11px] font-medium uppercase tracking-wide text-gray-500">PPE</th><th className="pb-2 text-center text-[11px] font-medium uppercase tracking-wide text-gray-500">LOTO</th><th className="pb-2 text-center text-[11px] font-medium uppercase tracking-wide text-gray-500">Equipment</th><th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Result</th></tr></thead>
                     <tbody className="divide-y divide-gray-50 dark:divide-gray-800/50">
                       {mappedChecklists.map(entry => {
                         const passed = entry.ppeOk && entry.lotoOk && entry.equipmentOk;
-                        const icon = (v: boolean | null) => v === true ? <CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /> : v === false ? <XCircle className="h-4 w-4 text-red-500 mx-auto" /> : <Minus className="h-4 w-4 text-gray-300 mx-auto" />;
+                        const icon = (v: boolean | null) => v === true ? <CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /> : v === false ? <XCircle className="h-4 w-4 text-red-500 mx-auto" /> : <Minus className="h-4 w-4 text-gray-600 mx-auto" />;
                         return (
                           <tr key={entry.id}>
-                            <td className="py-2.5 pr-4 font-medium text-gray-900 dark:text-white">{entry.workerName}</td>
+                            <td className="py-2.5 pr-4 font-medium text-gray-900 dark:text-gray-900">{entry.workerName}</td>
                             <td className="py-2.5 pr-4 text-gray-500 dark:text-gray-400">{new Date(entry.shiftDate + 'T12:00:00').toLocaleDateString('en-US', {month:'short',day:'numeric'})}</td>
                             <td className="py-2.5 text-center">{icon(entry.ppeOk)}</td>
                             <td className="py-2.5 text-center">{icon(entry.lotoOk)}</td>
