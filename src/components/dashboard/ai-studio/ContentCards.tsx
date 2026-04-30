@@ -25,7 +25,7 @@ const MOCK_CONTENT: ContentCategory[] = [
     label: 'Documents',
     icon: FileText,
     iconBg: 'bg-blue-100 dark:bg-blue-900/30',
-    iconColor: 'text-blue-600 dark:text-blue-400',
+    iconColor: 'text-[#C96442] dark:text-[#C96442]',
     fileCount: 42,
     size: '2.8 gb',
   },
@@ -53,12 +53,12 @@ function ContentCards({ showMockData = false }: ContentCardsProps) {
         return (
           <div
             key={category.label}
-            className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)] [box-shadow:var(--card-shadow)] p-5 hover:[box-shadow:var(--card-shadow-hover)] transition-shadow duration-150 cursor-pointer"
+            className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5 hover:[box-shadow:var(--card-shadow-hover)] transition-shadow duration-150 cursor-pointer"
           >
             <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${category.iconBg} mb-3`}>
               <Icon className={`h-5 w-5 ${category.iconColor}`} />
             </div>
-            <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-gray-900">
               {category.label}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
