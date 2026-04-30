@@ -151,3 +151,14 @@ body {
   --card-text: #ffffff;
   --card-text-secondary: #9ca3af;
 }
+
+/* Force light mode - override all dark variants */
+html, html.dark, [data-theme="dark"] {
+  color-scheme: light !important;
+  --background: #F7F3EC !important;
+  --foreground: #1C1A16 !important;
+}
+
+.dark {
+  color-scheme: light !important;
+}
