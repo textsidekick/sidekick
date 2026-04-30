@@ -26,7 +26,7 @@ interface DataPoint {
   hr: number
 }
 
-const MOCK_DATA_1W: DataPoint[] = [
+const []: DataPoint[] = [
   { label: 'Mon', safety: 12, training: 8, schedule: 15, hr: 5 },
   { label: 'Tue', safety: 18, training: 12, schedule: 9, hr: 7 },
   { label: 'Wed', safety: 15, training: 22, schedule: 11, hr: 4 },
@@ -36,7 +36,7 @@ const MOCK_DATA_1W: DataPoint[] = [
   { label: 'Sun', safety: 4, training: 3, schedule: 4, hr: 1 },
 ]
 
-const MOCK_DATA_1M: DataPoint[] = [
+const []: DataPoint[] = [
   { label: 'Week 1', safety: 85, training: 62, schedule: 71, hr: 28 },
   { label: 'Week 2', safety: 92, training: 78, schedule: 65, hr: 34 },
   { label: 'Week 3', safety: 78, training: 85, schedule: 82, hr: 41 },
@@ -84,7 +84,7 @@ function QuestionsChart() {
   }, [])
 
   const isDark = mounted && resolvedTheme === 'dark'
-  const data = range === '1M' || range === '3M' || range === 'ALL' ? MOCK_DATA_1M : MOCK_DATA_1W
+  const data = range === '1M' || range === '3M' || range === 'ALL' ? [] : []
 
   return (
     <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
