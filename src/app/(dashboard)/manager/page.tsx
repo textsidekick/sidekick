@@ -788,16 +788,6 @@ export default function ManagerDashboard() {
           </div>
         )}
 
-        {/* AI STUDIO TAB */}
-                            </div>
-                  )}
-                </div>
-              </div>
-
-              <StorageSidebar showMockData={false} />
-            </div>
-          </div>
-        )}
 
         {/* WORKERS TAB */}
         {activeTab === "workers" && (
