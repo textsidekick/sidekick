@@ -196,3 +196,17 @@ a:hover, button:hover {
 a:active, button:active {
   transform: translateY(1px) scale(0.97);
 }
+
+/* Mobile responsive fixes */
+@media (max-width: 768px) {
+  .max-w-7xl { padding-left: 12px !important; padding-right: 12px !important; }
+  .grid-cols-2, .grid-cols-3, .grid-cols-4 { grid-template-columns: 1fr !important; }
+  .lg\:grid-cols-2, .lg\:grid-cols-3, .lg\:grid-cols-4 { grid-template-columns: 1fr !important; }
+  table { display: block; overflow-x: auto; }
+  .space-y-6 > * { overflow-x: hidden; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
