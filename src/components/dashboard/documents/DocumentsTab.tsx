@@ -187,8 +187,8 @@ function DocumentsChat({ companyId }: { companyId?: string }) {
 function DocumentsTab({ companyId, documents = [] }: DocumentsTabProps) {
   return (
     <div className="space-y-6">
-      <UploadZone />
       <DocumentsChat companyId={companyId} />
+      <UploadZone />
       <IntegrationsRow />
       <DocumentsTable documents={documents} />
     </div>
