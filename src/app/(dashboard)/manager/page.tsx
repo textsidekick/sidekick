@@ -817,37 +817,12 @@ export default function ManagerDashboard() {
           </div>
         )}
 
-        {/* DOCUMENTS TAB */}
+                {/* DOCUMENTS TAB */}
         {activeTab === "documents" && (
           <div className="space-y-6">
-            {/* Upload zone wired to real upload handler */}
-            <div className="rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-200 bg-white dark:bg-white p-8 text-center hover:border-blue-400 transition-colors cursor-pointer">
-              <input type="file" id="upload" className="hidden" accept=".pdf,.txt,.doc,.docx,.xlsx,.csv" onChange={handleUpload} disabled={uploading} />
-              <label htmlFor="upload" className="cursor-pointer flex flex-col items-center gap-3">
-                <Upload className="h-8 w-8 text-gray-400" />
-                <div>
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-600">{uploading ? "Uploading..." : "Drop files here or click to upload"}</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">PDF, Word, Excel, or text files</p>
-                </div>
-              </label>
-            </div>
-
-            {/* Real integrations preserved */}
-            <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-white p-5">
-              <SectionHeader title="Import from Integrations" />
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <GoogleDriveIntegration companyId={selectedCompany} darkMode={false} onDocumentImported={(doc) => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title, confidence: 1 } }])} />
-                <DropboxIntegration companyId={selectedCompany} darkMode={false} onDocumentImported={(doc) => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title, confidence: 1 } }])} />
-                <GustoIntegration companyId={selectedCompany} darkMode={false} onEmployeesImported={(count) => console.log("Imported employees:", count)} />
-                <MicrosoftTeamsIntegration companyId={selectedCompany} darkMode={false} />
-              </div>
-            </div>
-
-            {/* Documents table wired to real data */}
-            <DocumentsTable documents={mappedDocuments} />
+            <DocumentsTab companyId={selectedCompany} documents={mappedDocuments} />
           </div>
         )}
-
 
         {/* WORKERS TAB */}
         {activeTab === "workers" && (
