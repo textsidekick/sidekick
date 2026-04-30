@@ -46,13 +46,13 @@ interface CustomTooltipProps {
 function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload?.length) return null
   return (
-    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2.5 [box-shadow:var(--card-shadow)]">
-      <p className="mb-1.5 text-xs font-medium text-gray-900 dark:text-white">{label}</p>
+    <div className="rounded-lg border border-gray-200 dark:border-gray-200 bg-white dark:bg-white px-3 py-2.5 [box-shadow:var(--card-shadow)]">
+      <p className="mb-1.5 text-xs font-medium text-gray-900 dark:text-gray-900">{label}</p>
       {payload.map((entry) => (
         <div key={entry.name} className="flex items-center gap-2 py-0.5">
           <span className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color }} />
           <span className="text-xs text-gray-500 dark:text-gray-400">{entry.name}</span>
-          <span className="ml-auto text-xs font-medium text-gray-900 dark:text-white tabular-nums">
+          <span className="ml-auto text-xs font-medium text-gray-900 dark:text-gray-900 tabular-nums">
             {entry.value}
           </span>
         </div>
@@ -72,7 +72,7 @@ function ResolutionChart() {
   const isDark = mounted && resolvedTheme === 'dark'
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)] [box-shadow:var(--card-shadow)] p-5">
+    <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
       <SectionHeader title="Resolution Rate" subtitle="How questions are handled daily" />
       <div className="h-[280px]">
         <ResponsiveContainer width="100%" height="100%">
