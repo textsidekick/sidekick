@@ -1,91 +1,58 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useTheme } from 'next-themes'
-import { MessageCircle, Sun, Moon, Monitor, Home } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuItem,
-} from '@/components/ui/dropdown-menu'
+import { Home, LogOut } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
-interface TopBarProps {
-  // Self-contained — no props needed currently
-}
+interface TopBarProps {}
 
 function TopBar({}: TopBarProps) {
-  const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
+  const router = useRouter()
+  const [username, setUsername] = useState('')
 
   useEffect(() => {
-    setMounted(true)
+    try {
+      const auth = JSON.parse(localStorage.getItem('sidekick_auth') || '{}')
+      setUsername(auth.username || 'User')
+    } catch { setUsername('User') }
   }, [])
 
-  const cycleTheme = () => {
-    if (theme === 'light') setTheme('dark')
-    else if (theme === 'dark') setTheme('system')
-    else setTheme('light')
+  const handleLogout = () => {
+    localStorage.removeItem('sidekick_auth')
+    document.cookie = 'sidekick_auth=; path=/; max-age=0'
+    router.push('/login')
   }
 
-  const ThemeIcon = theme === 'dark' ? Sun : theme === 'light' ? Moon : Monitor
-
   return (
-    <div className="bg-white dark:bg-[var(--card-bg)]">
-      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-14">
-        {/* Left: Logo */}
-        <div className="flex items-center gap-2">
-          <MessageCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-          <span className="text-base font-semibold text-gray-900 dark:text-white">
-            Sidekick
-          </span>
-          <span className="text-sm text-gray-400 dark:text-gray-500">|</span>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            Dashboard
-          </span>
+    <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(28,26,22,0.06)' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 56 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={28} height={28} style={{ objectFit: 'contain' }} />
+          <span style={{ fontSize: 16, fontWeight: 600, color: '#1C1A16', letterSpacing: '-0.02em' }}>Sidekick</span>
+          <span style={{ fontSize: 13, color: 'rgba(28,26,22,0.35)', marginLeft: 4 }}>Dashboard</span>
         </div>
-
-        {/* Right: Home, Theme Toggle, Avatar */}
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" aria-label="Home">
-            <Home className="h-4 w-4" />
-          </Button>
-
-          {mounted && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={cycleTheme}
-              aria-label="Toggle theme"
-            >
-              <ThemeIcon className="h-4 w-4" />
-            </Button>
-          )}
-
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <button className="inline-flex items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring" />
-              }
-            >
-              <Avatar>
-                <AvatarFallback className="bg-purple-600 text-white text-xs font-medium">
-                  N
-                </AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" sideOffset={8}>
-              <DropdownMenuLabel>Nate Manager</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Sign Out</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button
+            onClick={() => router.push('/')}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: 10, border: 'none', background: 'transparent', cursor: 'pointer', color: 'rgba(28,26,22,0.5)' }}
+            title="Home"
+          >
+            <Home size={18} />
+          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', borderRadius: 10, background: 'rgba(28,26,22,0.04)' }}>
+            <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#C96442', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#F7F3EC', fontSize: 12, fontWeight: 600 }}>
+              {username.charAt(0).toUpperCase()}
+            </div>
+            <span style={{ fontSize: 13, fontWeight: 500, color: '#1C1A16' }}>{username}</span>
+          </div>
+          <button
+            onClick={handleLogout}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: 10, border: 'none', background: 'transparent', cursor: 'pointer', color: 'rgba(28,26,22,0.35)' }}
+            title="Sign out"
+          >
+            <LogOut size={16} />
+          </button>
         </div>
       </div>
     </div>
