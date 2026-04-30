@@ -174,6 +174,7 @@ export default function ManagerDashboard() {
   const [questionFilter, setQuestionFilter] = useState<"all" | "answered" | "unanswered">("all");
   const [showAllQuestions, setShowAllQuestions] = useState(false);
   const [checklistDate, setChecklistDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [trialInfo, setTrialInfo] = useState<{plan: string; questionsUsed: number; questionsLimit: number; trialEndsAt: string} | null>(null);
 
   // All existing derived values (unchanged)
   const currentCompany = companies.find(c => c.id === selectedCompany);
@@ -202,6 +203,21 @@ export default function ManagerDashboard() {
   ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 5);
 
   // All existing API calls (unchanged)
+  // Fetch trial info from auth
+  useEffect(() => {
+    try {
+      const authData = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
+      if (authData.plan) {
+        setTrialInfo({
+          plan: authData.plan,
+          questionsUsed: authData.questionsUsed || 0,
+          questionsLimit: authData.questionsLimit || 50,
+          trialEndsAt: authData.trialEndsAt || "",
+        });
+      }
+    } catch {}
+  }, []);
+
   useEffect(() => {
     fetch("/api/companies").then(r => r.json()).then(d => {
       let allCompanies = d.companies || [];
@@ -688,6 +704,32 @@ export default function ManagerDashboard() {
 
       {/* ── Tab content ───────────────────────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-6 py-6">
+
+        {/* Trial Banner */}
+        {trialInfo && trialInfo.plan === "trial" && (
+          <div style={{
+            maxWidth: 1200, margin: "0 auto 16px", padding: "14px 20px",
+            background: "rgba(201,100,66,0.08)", border: "1px solid rgba(201,100,66,0.15)",
+            borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "space-between",
+            flexWrap: "wrap", gap: 12,
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <span style={{ fontSize: 14, color: "#A74D30", fontWeight: 500 }}>
+                Free Trial — {Math.max(0, (trialInfo.questionsLimit || 50) - (trialInfo.questionsUsed || 0))} questions remaining
+                {trialInfo.trialEndsAt && (() => {
+                  const days = Math.max(0, Math.ceil((new Date(trialInfo.trialEndsAt).getTime() - Date.now()) / (1000*60*60*24)));
+                  return `, ${days} days left`;
+                })()}
+              </span>
+            </div>
+            <a href="https://textsidekick.com/#contact" style={{
+              padding: "8px 16px", background: "#C96442", color: "white",
+              borderRadius: 8, fontSize: 13, fontWeight: 600, textDecoration: "none",
+            }}>
+              Contact us to upgrade
+            </a>
+          </div>
+        )}
 
         {/* ANALYTICS TAB */}
         {activeTab === "analytics" && (
