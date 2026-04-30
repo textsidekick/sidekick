@@ -704,6 +704,32 @@ export async function POST(request: NextRequest) {
       .single();
 
     // ============================================
+    // TRIAL LIMIT CHECK
+    // ============================================
+    if (worker.company_id) {
+      const { data: managerAccount } = await supabase
+        .from("manager_accounts")
+        .select("plan, trial_ends_at, questions_used, questions_limit")
+        .eq("company_id", worker.company_id)
+        .single();
+
+      if (managerAccount && managerAccount.plan === "trial") {
+        const trialExpired = new Date(managerAccount.trial_ends_at) < new Date();
+        const questionsExhausted = managerAccount.questions_used >= managerAccount.questions_limit;
+
+        if (trialExpired || questionsExhausted) {
+          return twimlResponse("⏳ Your company\'s free trial has ended. Ask your manager to upgrade at textsidekick.com to continue using Sidekick!");
+        }
+
+        // Increment questions_used
+        await supabase
+          .from("manager_accounts")
+          .update({ questions_used: managerAccount.questions_used + 1 })
+          .eq("company_id", worker.company_id);
+      }
+    }
+
+    // ============================================
     // CHECKLIST: Start checklist
     // ============================================
     if (body.toUpperCase() === "CHECKLIST" || body.toUpperCase() === "CHECK" || body.toUpperCase() === "SAFETY") {
