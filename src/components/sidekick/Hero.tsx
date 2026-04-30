@@ -53,23 +53,21 @@ export default function Hero() {
           </ul>
 
           <div className="mt-9 flex flex-wrap items-center gap-3">
-            <a href="#contact">
-              <Button
-                size="lg"
-                className="rounded-full bg-ink text-cream hover:bg-ink/90 h-12 px-6 text-[15px]"
-              >
-                Book a demo →
-              </Button>
-            </a>
-            <a href="#product">
-              <Button
-                size="lg"
-                variant="outline"
-                className="rounded-full border-ink/15 bg-transparent hover:bg-ink/5 h-12 px-6 text-[15px]"
-              >
-                See how it works
-              </Button>
-            </a>
+            <Button
+              asChild
+              size="lg"
+              className="rounded-full bg-ink text-cream hover:bg-ink/90 h-12 px-6 text-[15px]"
+            >
+              <a href="#contact">Book a demo →</a>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="rounded-full border-ink/15 bg-transparent hover:bg-ink/5 h-12 px-6 text-[15px]"
+            >
+              <a href="#product">See how it works</a>
+            </Button>
           </div>
 
           <div className="mt-10 flex items-center gap-5">
