@@ -176,7 +176,7 @@ export default function SuccessScreen({
                     width: "100%",
                     padding: "12px",
                     borderRadius: "6px",
-                    border: "1px solid rgba(28,26,22,0.15)",
+                    border: "1px solid #d1d5db",
                     fontSize: "18px",
                     fontFamily: "monospace",
                     fontWeight: "bold",
@@ -304,7 +304,7 @@ export default function SuccessScreen({
                       flex: 1,
                       padding: "8px 12px",
                       borderRadius: "6px",
-                      border: "1px solid rgba(28,26,22,0.15)",
+                      border: "1px solid #d1d5db",
                       background: "white",
                       fontSize: "14px",
                       fontFamily: "monospace",
@@ -316,7 +316,7 @@ export default function SuccessScreen({
                       padding: "8px 12px",
                       borderRadius: "6px",
                       background: "white",
-                      border: "1px solid rgba(28,26,22,0.15)",
+                      border: "1px solid #d1d5db",
                       cursor: "pointer",
                     }}
                   >
@@ -335,7 +335,7 @@ export default function SuccessScreen({
                       flex: 1,
                       padding: "8px 12px",
                       borderRadius: "6px",
-                      border: "1px solid rgba(28,26,22,0.15)",
+                      border: "1px solid #d1d5db",
                       background: "white",
                       fontSize: "14px",
                       fontFamily: "monospace",
@@ -347,7 +347,7 @@ export default function SuccessScreen({
                       padding: "8px 12px",
                       borderRadius: "6px",
                       background: "white",
-                      border: "1px solid rgba(28,26,22,0.15)",
+                      border: "1px solid #d1d5db",
                       cursor: "pointer",
                     }}
                   >
