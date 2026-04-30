@@ -38,12 +38,8 @@ export async function POST(request: NextRequest) {
 
     let isNewUser = false;
 
-    // Admin/paid phone numbers
-    const PAID_PHONES = ["+14088285979", "+4088285979"];
-    const isPaidUser = PAID_PHONES.some(p => phone.includes(p.replace("+1", "")) || phone === p);
-
     if (!account) {
-      // Create new account
+      // Create new account with trial
       isNewUser = true;
       const trialEnds = new Date();
       trialEnds.setDate(trialEnds.getDate() + 7);
@@ -56,8 +52,7 @@ export async function POST(request: NextRequest) {
           questions_used: 0,
           questions_limit: 50,
           documents_limit: 3,
-          plan: isPaidUser ? "paid" : "trial",
-          questions_limit: isPaidUser ? 999999 : 50,
+          plan: "trial",
           created_at: new Date().toISOString(),
         })
         .select()
