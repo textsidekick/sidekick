@@ -56,15 +56,15 @@ function IntegrationsRow({}: IntegrationsRowProps) {
           return (
             <div
               key={integration.id}
-              className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)] [box-shadow:var(--card-shadow)] p-5"
+              className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/30">
-                    <Icon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    <Icon className="h-5 w-5 text-[#C96442] dark:text-[#C96442]" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-900">
                       {integration.name}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
