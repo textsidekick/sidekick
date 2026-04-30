@@ -15,7 +15,7 @@ export function SidekickLogo({ size = 28 }: { size?: number }) {
 
 export function YCBadge({ height = 32 }: { height?: number }) {
   return (
-    <span className="inline-flex items-center gap-4 text-base text-ink/75">
+    <span className="inline-flex items-center gap-2 text-base text-ink/75">
       <span className="font-medium">Backed by</span>
       <Image
         src="/yc-wordmark.png"
