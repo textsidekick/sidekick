@@ -12,7 +12,7 @@ interface SourceData {
   darkColor: string
 }
 
-const MOCK_SOURCES: SourceData[] = [
+const []: SourceData[] = [
   { name: 'Knowledge Base', value: 1247, color: '#6366f1', darkColor: '#818cf8' },
   { name: 'AI Generated', value: 834, color: '#a78bfa', darkColor: '#c4b5fd' },
   { name: 'Escalated to Manager', value: 289, color: '#e2e8f0', darkColor: '#475569' },
@@ -38,7 +38,7 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
 function AnswerSourcesChart() {
   const { resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
-  const total = MOCK_SOURCES.reduce((sum, s) => sum + s.value, 0)
+  const total = [].reduce((sum, s) => sum + s.value, 0)
 
   useEffect(() => {
     setMounted(true)
@@ -54,7 +54,7 @@ function AnswerSourcesChart() {
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
-                data={MOCK_SOURCES}
+                data={[]}
                 cx="50%"
                 cy="50%"
                 innerRadius={55}
@@ -63,7 +63,7 @@ function AnswerSourcesChart() {
                 dataKey="value"
                 strokeWidth={0}
               >
-                {MOCK_SOURCES.map((entry) => (
+                {[].map((entry) => (
                   <Cell
                     key={entry.name}
                     fill={isDark ? entry.darkColor : entry.color}
@@ -81,7 +81,7 @@ function AnswerSourcesChart() {
           </div>
         </div>
         <div className="space-y-2.5 flex-1">
-          {MOCK_SOURCES.map((source) => (
+          {[].map((source) => (
             <div key={source.name} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span
