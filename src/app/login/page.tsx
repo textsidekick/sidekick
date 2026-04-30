@@ -103,7 +103,7 @@ export default function LoginPage() {
     color: "#1C1A16",
     transition: "border-color 0.2s, box-shadow 0.2s",
     letterSpacing: step === "code" ? "0.3em" : "normal",
-    textAlign: (step === "code" ? "center" : "left") as const,
+    textAlign: step === "code" ? "center" as const : "left" as const,
   };
 
   return (
