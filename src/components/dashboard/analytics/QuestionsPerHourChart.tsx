@@ -24,7 +24,7 @@ interface HourlyData {
   questions: number
 }
 
-const MOCK_HOURLY: HourlyData[] = [
+const []: HourlyData[] = [
   { hour: '12a', questions: 2 },
   { hour: '1a', questions: 1 },
   { hour: '2a', questions: 0 },
@@ -111,7 +111,7 @@ function QuestionsPerHourChart() {
       />
       <div className="h-[240px]">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={MOCK_HOURLY} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+          <BarChart data={[]} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
             <CartesianGrid
               strokeDasharray="3 3"
               stroke={isDark ? '#2a2d3a' : '#f0f0f0'}
