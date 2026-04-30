@@ -25,14 +25,14 @@ const MOCK_GAPS: KnowledgeGap[] = [
 
 function KnowledgeGaps({ gaps }: KnowledgeGapsProps) {
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)] [box-shadow:var(--card-shadow)] p-5">
+    <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-start gap-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/30">
             <Zap className="h-6 w-6 text-amber-600 dark:text-amber-400" />
           </div>
           <div>
-            <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-gray-900">
               Generate from Knowledge Gaps
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
@@ -40,7 +40,7 @@ function KnowledgeGaps({ gaps }: KnowledgeGapsProps) {
             </p>
           </div>
         </div>
-        <Button className="bg-amber-500 hover:bg-amber-600 text-white border-transparent">
+        <Button className="bg-amber-500 hover:bg-amber-600 text-gray-900 border-transparent">
           <Zap className="mr-1.5 h-4 w-4" />
           Analyze Gaps
         </Button>
@@ -57,10 +57,10 @@ function KnowledgeGaps({ gaps }: KnowledgeGapsProps) {
           {gaps.map((gap) => (
             <div
               key={gap.id}
-              className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-800 last:border-0"
+              className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-200 last:border-0"
             >
               <div>
-                <p className="text-sm text-gray-900 dark:text-white">
+                <p className="text-sm text-gray-900 dark:text-gray-900">
                   {gap.question}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
