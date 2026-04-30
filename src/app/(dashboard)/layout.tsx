@@ -1,15 +1,20 @@
-import { Inter } from "next/font/google";
+import { Inter, Instrument_Serif } from "next/font/google";
 import "../globals.css";
-import { ThemeProvider } from "next-themes";
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
 });
 
+const instrument = Instrument_Serif({
+  weight: "400",
+  variable: "--font-instrument",
+  subsets: ["latin"],
+});
+
 export const metadata = {
-  title: "Sidekick | AI SMS Assistant for Frontline Workers",
-  description: "The AI SMS assistant that lets frontline workers get instant answers via text or voice memo in any language.",
+  title: "Sidekick | Manager Dashboard",
+  description: "Manage your frontline team with Sidekick.",
 };
 
 export default function DashboardLayout({
@@ -18,14 +23,19 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${instrument.variable}`}>
       <head>
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className={`${inter.variable} antialiased`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
-        </ThemeProvider>
+      <body
+        className={`antialiased`}
+        style={{
+          fontFamily: "Inter, system-ui, sans-serif",
+          background: "#F7F3EC",
+          color: "#1C1A16",
+        }}
+      >
+        {children}
       </body>
     </html>
   );
