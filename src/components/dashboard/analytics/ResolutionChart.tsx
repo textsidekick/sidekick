@@ -21,7 +21,7 @@ interface ResolutionData {
   unanswered: number
 }
 
-const MOCK_DATA: ResolutionData[] = [
+const []: ResolutionData[] = [
   { label: 'Mon', resolved: 32, escalated: 5, unanswered: 3 },
   { label: 'Tue', resolved: 38, escalated: 8, unanswered: 2 },
   { label: 'Wed', resolved: 42, escalated: 4, unanswered: 6 },
@@ -76,7 +76,7 @@ function ResolutionChart() {
       <SectionHeader title="Resolution Rate" subtitle="How questions are handled daily" />
       <div className="h-[280px]">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={MOCK_DATA} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+          <BarChart data={[]} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
             <CartesianGrid
               strokeDasharray="3 3"
               stroke={isDark ? '#2a2d3a' : '#f0f0f0'}
