@@ -50,7 +50,7 @@ export default function Hero() {
             <span className="text-accent">
               <CheckIcon size={14} w={2.4} />
             </span>
-            No app download · Works on any phone · Live in under 2 weeks
+            No app download · Works on any phone · Live in under 5 minutes
           </div>
         </div>
         <div className="flex justify-center relative">
