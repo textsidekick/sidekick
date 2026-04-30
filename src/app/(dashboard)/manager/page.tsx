@@ -38,6 +38,7 @@ import { AlertMetrics } from "@/components/dashboard/alerts/AlertMetrics";
 import { AlertCharts } from "@/components/dashboard/alerts/AlertCharts";
 import { AlertsTable } from "@/components/dashboard/alerts/AlertsTable";
 import { DocumentsTable } from "@/components/dashboard/documents/DocumentsTable";
+import { DocumentsTab } from "@/components/dashboard/documents/DocumentsTab";
 import { UploadZone } from "@/components/dashboard/documents/UploadZone";
 import { WorkersTable } from "@/components/dashboard/workers/WorkersTable";
 import { WorkersTab } from "@/components/dashboard/workers/WorkersTab";
@@ -175,6 +176,7 @@ export default function ManagerDashboard() {
   const [showAllQuestions, setShowAllQuestions] = useState(false);
   const [checklistDate, setChecklistDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [trialInfo, setTrialInfo] = useState<{plan: string; questionsUsed: number; questionsLimit: number; trialEndsAt: string} | null>(null);
+  const [trialInfo, setTrialInfo] = useState<{plan: string; questionsUsed: number; questionsLimit: number; trialEndsAt: string} | null>(null);
 
   // All existing derived values (unchanged)
   const currentCompany = companies.find(c => c.id === selectedCompany);
@@ -215,6 +217,13 @@ export default function ManagerDashboard() {
           trialEndsAt: authData.trialEndsAt || "",
         });
       }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    try {
+      const authData = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
+      if (authData.plan) setTrialInfo({ plan: authData.plan, questionsUsed: authData.questionsUsed || 0, questionsLimit: authData.questionsLimit || 50, trialEndsAt: authData.trialEndsAt || "" });
     } catch {}
   }, []);
 
@@ -731,28 +740,27 @@ export default function ManagerDashboard() {
           </div>
         )}
 
+        {/* Trial Banner */}
+        {trialInfo && trialInfo.plan === "trial" && (
+          <div style={{ maxWidth: 1200, margin: "0 auto 16px", padding: "14px 20px", background: "rgba(201,100,66,0.08)", border: "1px solid rgba(201,100,66,0.15)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+            <span style={{ fontSize: 14, color: "#A74D30", fontWeight: 500 }}>
+              Free Trial — {Math.max(0, (trialInfo.questionsLimit || 50) - (trialInfo.questionsUsed || 0))} questions remaining
+            </span>
+            <a href="https://textsidekick.com/#contact" style={{ padding: "8px 16px", background: "#C96442", color: "white", borderRadius: 8, fontSize: 13, fontWeight: 600, textDecoration: "none" }}>Contact us to upgrade</a>
+          </div>
+        )}
+
         {/* ANALYTICS TAB */}
         {activeTab === "analytics" && (
           <div className="space-y-6">
             {stats && stats.totalQuestions === 0 && (
-              <div style={{
-                maxWidth: 600, margin: "20px auto", textAlign: "center", padding: "40px 24px",
-                background: "white", borderRadius: 16, border: "1px solid rgba(28,26,22,0.08)",
-              }}>
+              <div style={{ maxWidth: 600, margin: "20px auto", textAlign: "center", padding: "40px 24px", background: "white", borderRadius: 16, border: "1px solid rgba(28,26,22,0.08)" }}>
                 <div style={{ fontSize: 48, marginBottom: 16 }}>📊</div>
                 <h2 style={{ fontSize: 22, fontWeight: 600, color: "#1C1A16", marginBottom: 8 }}>No questions yet</h2>
-                <p style={{ fontSize: 15, color: "rgba(28,26,22,0.5)", marginBottom: 24, lineHeight: 1.6 }}>
-                  Share your access code with workers so they can start texting questions.
-                </p>
-                <div style={{
-                  display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 20px",
-                  background: "rgba(201,100,66,0.08)", borderRadius: 10, fontSize: 14, color: "#A74D30", fontWeight: 500,
-                }}>
-                  Access Code: <span style={{ fontFamily: "monospace", fontWeight: 700, letterSpacing: 2 }}>{currentCompany?.access_code || "—"}</span>
+                <p style={{ fontSize: 15, color: "rgba(28,26,22,0.5)", marginBottom: 24 }}>Share your access code with workers so they can start texting questions.</p>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 20px", background: "rgba(201,100,66,0.08)", borderRadius: 10, fontSize: 14, color: "#A74D30", fontWeight: 500 }}>
+                  Workers text <strong style={{ marginLeft: 4 }}>JOIN {currentCompany?.access_code || "CODE"}</strong> <span style={{ marginLeft: 4 }}>to +1 (888) 707-4659</span>
                 </div>
-                <p style={{ fontSize: 13, color: "rgba(28,26,22,0.35)", marginTop: 12 }}>
-                  Workers text <strong>JOIN {currentCompany?.access_code || "CODE"}</strong> to +1 (888) 707-4659
-                </p>
               </div>
             )}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -818,7 +826,6 @@ export default function ManagerDashboard() {
               </div>
             )}
           </div>
-        </div>
         )}
 
         {/* DOCUMENTS TAB */}
