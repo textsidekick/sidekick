@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { supabase } from "@/lib/supabase";
 import fs from "fs";
 import path from "path";
 import { nanoid } from "nanoid";
@@ -20,6 +21,31 @@ export async function POST(req: Request) {
     const file = form.get("file");
     const companyId = String(form.get("companyId") ?? "demo");
     const userProvidedType = form.get("type") as string | null;
+
+    // Check document upload limit for trial accounts
+    if (companyId && companyId !== "demo") {
+      const { data: account } = await supabase
+        .from("manager_accounts")
+        .select("plan, documents_limit")
+        .eq("company_id", companyId)
+        .single();
+
+      if (account && account.plan === "trial") {
+        const { count } = await supabase
+          .from("documents")
+          .select("*", { count: "exact", head: true })
+          .eq("company_id", companyId);
+
+        if ((count || 0) >= (account.documents_limit || 3)) {
+          return NextResponse.json({
+            error: "Document limit reached. Upgrade your plan to upload more documents.",
+            upgrade: true,
+            limit: account.documents_limit,
+            current: count,
+          }, { status: 403 });
+        }
+      }
+    }
 
     if (!file || !(file instanceof File)) {
       return NextResponse.json({ error: "Missing PDF file" }, { status: 400 });
