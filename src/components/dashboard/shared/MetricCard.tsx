@@ -41,11 +41,11 @@ function MetricCard({
   }
   const TrendIcon = change !== undefined ? (change > 0 ? TrendingUp : change < 0 ? TrendingDown : Minus) : null
 
-  const borderClass = isHighlighted ? 'border-blue-200' : 'border-gray-200 dark:border-gray-700'
+  const borderClass = isHighlighted ? 'border-blue-200' : 'border-gray-200 dark:border-gray-200'
   const accentClass = accentColor ? 'border-l-[3px] ' + ACCENT_BORDER[accentColor] : ''
 
   return (
-    <div className={`rounded-xl border bg-white dark:bg-gray-800 p-5 ${borderClass} ${accentClass}`}>
+    <div className={`rounded-xl border bg-white dark:bg-white p-5 ${borderClass} ${accentClass}`}>
       <div className="flex items-start justify-between">
         <div>
           <span className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">{label}</span>
@@ -53,7 +53,7 @@ function MetricCard({
         </div>
         <Icon className={iconClassName} />
       </div>
-      <div className={'mt-2 text-3xl font-bold leading-none ' + (valueClassName || 'text-gray-900 dark:text-white')}>
+      <div className={'mt-2 text-3xl font-bold leading-none ' + (valueClassName || 'text-gray-900 dark:text-gray-900')}>
         {value}
       </div>
       <div className="mt-2 flex items-center gap-2">
