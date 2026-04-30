@@ -62,7 +62,7 @@ export default function Contact() {
           </p>
           <div className="flex flex-col gap-[18px]">
             {[
-              { l: "Email", v: "justin@textsidekick.com" },
+              { l: "Email", v: "hello@textsidekick.com" },
               { l: "Phone", v: "+1 (628) 555-0119" },
               { l: "Office", v: "San Francisco, CA · Mon–Fri 8a–6p PT" },
             ].map((c) => (
