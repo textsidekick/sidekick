@@ -38,6 +38,7 @@ import { AlertMetrics } from "@/components/dashboard/alerts/AlertMetrics";
 import { AlertCharts } from "@/components/dashboard/alerts/AlertCharts";
 import { AlertsTable } from "@/components/dashboard/alerts/AlertsTable";
 import { DocumentsTable } from "@/components/dashboard/documents/DocumentsTable";
+import { DocumentsTab } from "@/components/dashboard/documents/DocumentsTab";
 import { UploadZone } from "@/components/dashboard/documents/UploadZone";
 import { VideoUpload } from "@/components/dashboard/ai-studio/VideoUpload";
 import { KnowledgeGaps } from "@/components/dashboard/ai-studio/KnowledgeGaps";
@@ -790,7 +791,7 @@ export default function ManagerDashboard() {
             </div>
 
             {/* Documents table wired to real data */}
-            <DocumentsTable documents={mappedDocuments} />
+            <DocumentsTab companyId={selectedCompany} documents={mappedDocuments} />
           </div>
         )}
 
