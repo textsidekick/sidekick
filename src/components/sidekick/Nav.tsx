@@ -34,13 +34,14 @@ export default function Nav() {
             </a>
           </div>
         </div>
-        <Button
-          asChild
-          size="sm"
-          className="rounded-full bg-ink text-cream hover:bg-ink/90"
-        >
-          <a href="#contact">Book a demo →</a>
-        </Button>
+        <a href="#contact">
+          <Button
+            size="sm"
+            className="rounded-full bg-ink text-cream hover:bg-ink/90"
+          >
+            Book a demo →
+          </Button>
+        </a>
       </nav>
     </div>
   );
