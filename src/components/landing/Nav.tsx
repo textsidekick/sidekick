@@ -50,10 +50,10 @@ export default function Nav() {
             Login
           </a>
           <a
-            href="/login"
+            href="#contact"
             style={{ background: "#1C1A16", color: "#F7F3EC", padding: "8px 14px", borderRadius: 9999, fontSize: 13, fontWeight: 500, textDecoration: "none", whiteSpace: "nowrap" }}
           >
-            Try Sidekick
+            Book a demo →
           </a>
         </div>
       </nav>
