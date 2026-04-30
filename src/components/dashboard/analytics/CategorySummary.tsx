@@ -8,7 +8,7 @@ interface CategoryItem {
   color: string
 }
 
-const MOCK_CATEGORIES: CategoryItem[] = [
+const []: CategoryItem[] = [
   { name: 'Safety & Compliance', count: 847, color: 'bg-red-400' },
   { name: 'Training & Procedures', count: 623, color: 'bg-blue-400' },
   { name: 'Schedule & Shifts', count: 412, color: 'bg-amber-400' },
@@ -17,13 +17,13 @@ const MOCK_CATEGORIES: CategoryItem[] = [
 ]
 
 function CategorySummary() {
-  const total = MOCK_CATEGORIES.reduce((sum, c) => sum + c.count, 0)
+  const total = [].reduce((sum, c) => sum + c.count, 0)
 
   return (
     <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
       <SectionHeader title="Question Categories" />
       <div className="space-y-3">
-        {MOCK_CATEGORIES.map((cat) => (
+        {[].map((cat) => (
           <div key={cat.name} className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <span className={`h-2.5 w-2.5 rounded-full ${cat.color}`} />
