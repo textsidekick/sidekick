@@ -13,7 +13,7 @@ export default function Hero() {
       <div className="max-w-[1180px] mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-16 items-center">
         <div>
           <div className="mb-6 flex">
-            <YCBadge height={22} />
+            <YCBadge height={32} />
           </div>
           <h1
             className="font-serif font-normal m-0 mb-7"
