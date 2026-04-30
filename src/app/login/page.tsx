@@ -16,25 +16,19 @@ export default function LoginPage() {
     setIsLoading(true);
     setError("");
 
-    // Check hardcoded admin credentials first
     if (username === "demo" && password === "sidekick") {
       document.cookie = "sidekick_auth=true; path=/; max-age=604800";
       localStorage.setItem("sidekick_auth", JSON.stringify({
-        username: username,
-        role: "manager",
-        loggedIn: true,
+        username, role: "manager", loggedIn: true,
       }));
       router.push("/manager");
     } else if (username === "founders" && password === "yc2026") {
       document.cookie = "sidekick_auth=true; path=/; max-age=604800";
       localStorage.setItem("sidekick_auth", JSON.stringify({
-        username: username,
-        role: "founders",
-        loggedIn: true,
+        username, role: "founders", loggedIn: true,
       }));
       router.push("/founders");
     } else {
-      // Try database auth for company managers
       try {
         const res = await fetch("/api/auth/login", {
           method: "POST",
@@ -45,10 +39,7 @@ export default function LoginPage() {
         if (data.success) {
           document.cookie = "sidekick_auth=true; path=/; max-age=604800";
           localStorage.setItem("sidekick_auth", JSON.stringify({
-            username: username,
-            role: "manager",
-            companyId: data.companyId,
-            loggedIn: true,
+            username, role: "manager", companyId: data.companyId, loggedIn: true,
           }));
           router.push("/manager");
         } else {
@@ -62,53 +53,94 @@ export default function LoginPage() {
     }
   };
 
+  const inputStyle = {
+    width: "100%",
+    padding: "14px 16px",
+    border: "1.5px solid #1C1A16/15",
+    borderColor: "rgba(28,26,22,0.15)",
+    borderRadius: 12,
+    fontSize: 15,
+    outline: "none",
+    boxSizing: "border-box" as const,
+    fontFamily: "'Inter', system-ui, sans-serif",
+    backgroundColor: "#ffffff",
+    color: "#1C1A16",
+    transition: "border-color 0.2s, box-shadow 0.2s",
+  };
+
   return (
     <div style={{
       minHeight: "100vh",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      background: "linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%)",
-      fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      background: "#F7F3EC",
+      fontFamily: "'Inter', system-ui, sans-serif",
       padding: 20,
     }}>
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif&display=swap');
       `}</style>
       
       <div style={{
         width: "100%",
         maxWidth: 420,
         background: "#ffffff",
-        borderRadius: 24,
+        borderRadius: 20,
         padding: "48px 40px",
-        boxShadow: "0 20px 60px rgba(0, 0, 0, 0.08)",
+        boxShadow: "0 4px 24px -4px rgba(28,26,22,0.08), 0 2px 8px -2px rgba(28,26,22,0.04)",
+        border: "1px solid rgba(28,26,22,0.06)",
       }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <div style={{ width: 80, height: 80, margin: "0 auto 24px", position: "relative" }}>
-            <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={80} height={80} style={{ objectFit: "contain" }} />
+          <div style={{ width: 56, height: 56, margin: "0 auto 20px", position: "relative" }}>
+            <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={56} height={56} style={{ objectFit: "contain" }} />
           </div>
-          <h1 style={{ fontSize: 28, fontWeight: 700, color: "#1e293b", marginBottom: 8 }}>Welcome to Sidekick</h1>
-          <p style={{ color: "#64748b", fontSize: 15 }}>Sign in to access your dashboard</p>
+          <h1 style={{
+            fontSize: 26,
+            fontWeight: 600,
+            color: "#1C1A16",
+            marginBottom: 8,
+            fontFamily: "'Inter', system-ui, sans-serif",
+            letterSpacing: "-0.02em",
+          }}>Welcome back</h1>
+          <p style={{
+            color: "rgba(28,26,22,0.5)",
+            fontSize: 15,
+            fontFamily: "'Inter', system-ui, sans-serif",
+          }}>Sign in to your dashboard</p>
         </div>
 
         <form onSubmit={handleLogin}>
           <div style={{ marginBottom: 20 }}>
-            <label style={{ display: "block", fontSize: 14, fontWeight: 600, color: "#374151", marginBottom: 8 }}>Username</label>
+            <label style={{
+              display: "block",
+              fontSize: 13,
+              fontWeight: 500,
+              color: "#1C1A16",
+              marginBottom: 8,
+              letterSpacing: "0.01em",
+            }}>Username</label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Enter your username"
               required
-              style={{ width: "100%", padding: "14px 16px", border: "2px solid #e5e7eb", borderRadius: 12, fontSize: 16, outline: "none", boxSizing: "border-box", fontFamily: "inherit", backgroundColor: "#fffffe", color: "#1e293b" }}
-              onFocus={(e) => { e.target.style.borderColor = "#3b82f6"; e.target.style.backgroundColor = "#fffffe"; }}
-              onBlur={(e) => { e.target.style.borderColor = "#e5e7eb"; e.target.style.backgroundColor = "#fffffe"; }}
+              style={inputStyle}
+              onFocus={(e) => { e.target.style.borderColor = "#C96442"; e.target.style.boxShadow = "0 0 0 3px rgba(201,100,66,0.1)"; }}
+              onBlur={(e) => { e.target.style.borderColor = "rgba(28,26,22,0.15)"; e.target.style.boxShadow = "none"; }}
             />
           </div>
 
           <div style={{ marginBottom: 28 }}>
-            <label style={{ display: "block", fontSize: 14, fontWeight: 600, color: "#374151", marginBottom: 8 }}>Password</label>
+            <label style={{
+              display: "block",
+              fontSize: 13,
+              fontWeight: 500,
+              color: "#1C1A16",
+              marginBottom: 8,
+              letterSpacing: "0.01em",
+            }}>Password</label>
             <div style={{ position: "relative" }}>
               <input
                 type={showPassword ? "text" : "password"}
@@ -116,22 +148,27 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                style={{ width: "100%", padding: "14px 48px 14px 16px", border: "2px solid #e5e7eb", borderRadius: 12, fontSize: 16, outline: "none", boxSizing: "border-box", fontFamily: "inherit", backgroundColor: "#fffffe", color: "#1e293b" }}
-                onFocus={(e) => { e.target.style.borderColor = "#3b82f6"; e.target.style.backgroundColor = "#fffffe"; }}
-                onBlur={(e) => { e.target.style.borderColor = "#e5e7eb"; e.target.style.backgroundColor = "#fffffe"; }}
+                style={{ ...inputStyle, paddingRight: 48 }}
+                onFocus={(e) => { e.target.style.borderColor = "#C96442"; e.target.style.boxShadow = "0 0 0 3px rgba(201,100,66,0.1)"; }}
+                onBlur={(e) => { e.target.style.borderColor = "rgba(28,26,22,0.15)"; e.target.style.boxShadow = "none"; }}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#94a3b8", padding: 4, display: "flex", alignItems: "center", justifyContent: "center" }}
+                style={{
+                  position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)",
+                  background: "none", border: "none", cursor: "pointer",
+                  color: "rgba(28,26,22,0.35)", padding: 4,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}
               >
                 {showPassword ? (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
                     <line x1="1" y1="1" x2="23" y2="23"/>
                   </svg>
                 ) : (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                     <circle cx="12" cy="12" r="3"/>
                   </svg>
@@ -141,7 +178,16 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div style={{ padding: "12px 16px", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 10, color: "#dc2626", fontSize: 14, marginBottom: 20, textAlign: "center" }}>
+            <div style={{
+              padding: "12px 16px",
+              background: "rgba(201,100,66,0.08)",
+              border: "1px solid rgba(201,100,66,0.2)",
+              borderRadius: 10,
+              color: "#A74D30",
+              fontSize: 14,
+              marginBottom: 20,
+              textAlign: "center",
+            }}>
               {error}
             </div>
           )}
@@ -152,20 +198,33 @@ export default function LoginPage() {
             style={{
               width: "100%",
               padding: "14px",
-              background: isLoading ? "#94a3b8" : "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
-              color: "white",
+              background: isLoading ? "rgba(28,26,22,0.4)" : "#1C1A16",
+              color: "#F7F3EC",
               border: "none",
               borderRadius: 12,
-              fontSize: 16,
+              fontSize: 15,
               fontWeight: 600,
-              fontFamily: "inherit",
+              fontFamily: "'Inter', system-ui, sans-serif",
               cursor: isLoading ? "not-allowed" : "pointer",
-              boxShadow: isLoading ? "none" : "0 4px 14px rgba(59, 130, 246, 0.4)",
+              letterSpacing: "-0.01em",
+              transition: "opacity 0.2s",
             }}
           >
-            {isLoading ? "Signing in..." : "Sign In"}
+            {isLoading ? "Signing in..." : "Sign in"}
           </button>
         </form>
+
+        <p style={{
+          textAlign: "center",
+          marginTop: 24,
+          fontSize: 13,
+          color: "rgba(28,26,22,0.4)",
+        }}>
+          Don&apos;t have an account?{" "}
+          <a href="https://textsidekick.com/#contact" style={{ color: "#C96442", textDecoration: "none", fontWeight: 500 }}>
+            Book a demo
+          </a>
+        </p>
       </div>
     </div>
   );
