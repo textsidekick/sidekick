@@ -28,7 +28,7 @@ const TABS: TabDefinition[] = [
 
 function TabNav({ activeTab, onTabChange }: TabNavProps) {
   return (
-    <div className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)]">
+    <div className="border-b border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff]">
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         <div className="flex gap-0 overflow-x-auto">
           {TABS.map((tab) => (
@@ -37,8 +37,8 @@ function TabNav({ activeTab, onTabChange }: TabNavProps) {
               className={cn(
                 'flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors',
                 activeTab === tab.id
-                  ? 'border-blue-600 text-gray-900 dark:text-white'
-                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  ? 'border-[#C96442] text-gray-900 dark:text-gray-900'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-600'
               )}
               onClick={() => onTabChange(tab.id)}
             >
