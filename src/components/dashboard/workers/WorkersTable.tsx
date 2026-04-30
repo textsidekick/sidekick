@@ -51,7 +51,7 @@ function WorkersTable({ workers }: WorkersTableProps) {
   const verifiedCount = workers.filter((w) => w.status === 'verified').length
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[var(--card-bg)] [box-shadow:var(--card-shadow)] p-5">
+    <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
       <SectionHeader
         title={`${workers.length} Workers`}
         action={
@@ -71,7 +71,7 @@ function WorkersTable({ workers }: WorkersTableProps) {
         <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="border-b border-gray-100 hover:bg-transparent dark:border-gray-800">
+            <TableRow className="border-b border-gray-100 hover:bg-transparent dark:border-gray-200">
               <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
                 Name
               </TableHead>
@@ -90,9 +90,9 @@ function WorkersTable({ workers }: WorkersTableProps) {
             {workers.map((worker) => (
               <TableRow
                 key={worker.id}
-                className="border-b border-gray-100 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800/50"
+                className="border-b border-gray-100 hover:bg-gray-50 dark:border-gray-200 dark:hover:bg-white/50"
               >
-                <TableCell className="text-sm font-medium text-gray-900 dark:text-white">
+                <TableCell className="text-sm font-medium text-gray-900 dark:text-gray-900">
                   {worker.name}
                 </TableCell>
                 <TableCell className="font-mono text-sm text-gray-500 dark:text-gray-400">
@@ -113,7 +113,7 @@ function WorkersTable({ workers }: WorkersTableProps) {
                   ) : (
                     <Badge
                       variant="secondary"
-                      className="bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 border-transparent"
+                      className="bg-gray-100 text-gray-600 dark:bg-white dark:text-gray-400 border-transparent"
                     >
                       Pending
                     </Badge>
