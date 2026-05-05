@@ -8,6 +8,7 @@ export function middleware(request: NextRequest) {
   if (
     pathname === "/" || // Landing page
     pathname === "/login" ||
+    pathname === "/choose" ||
     pathname.startsWith("/api/") ||
     pathname.startsWith("/_next/") ||
     pathname.startsWith("/images/") ||
