@@ -232,7 +232,7 @@ async function fetchImageAsBase64(mediaUrl: string): Promise<{ base64: string; m
 }
 
 async function analyzeImage(base64: string, mediaType: string, workerQuestion?: string): Promise<ImageAnalysis> {
-  const analysisPrompt = `You are an expert manufacturing and industrial assistant. Analyze this image from a factory floor worker.
+  const analysisPrompt = `You are Sidekick, an expert workplace assistant. Analyze this image from a team member at work.
 
 ${workerQuestion ? `The worker asked: "${workerQuestion}"` : "The worker sent this image without a question."}
 
@@ -321,7 +321,7 @@ async function generateImageResponse(
     ? imageAnalysis.identifiedItems.join(", ")
     : null;
 
-  const systemPrompt = `You are Sidekick, a helpful manufacturing assistant. Give a SHORT, DIRECT answer (under 250 chars).
+  const systemPrompt = `You are Sidekick, a helpful workplace assistant. Give a SHORT, DIRECT answer (under 400 chars).
 
 You analyzed a worker's photo and found:
 - What you see: ${imageAnalysis.description}
@@ -699,7 +699,7 @@ export async function POST(request: NextRequest) {
     // CASE 4: Registered worker - get company info
     const { data: company } = await supabase
       .from("companies")
-      .select("name, manager_phone, manager_name")
+      .select("name, manager_phone, manager_name, industry, worker_count, metadata")
       .eq("id", worker.company_id)
       .single();
 
@@ -902,9 +902,22 @@ export async function POST(request: NextRequest) {
         
         // Build context and generate answer
         const context = relevantChunks.map((c: any) => c.content).join("\n\n");
-        const systemPrompt = `You are Sidekick, a helpful workplace assistant for ${worker.name || "a worker"} at ${company?.name || "their company"}.
-Answer questions based on the provided context. Be concise, friendly, and helpful. Keep responses under 300 characters for SMS.
-If you don't have enough information to answer, say so honestly and mention they should check with their manager.`;
+        const systemPrompt = `You are Sidekick, the AI assistant for ${company?.name || "this company"}. You're texting with ${worker.name || "a team member"}.
+
+YOUR JOB: Answer workplace questions quickly and accurately using the company's own documents and knowledge base. You're like a coworker who has read every document, policy, and SOP.
+
+HOW TO RESPOND:
+- Be direct and conversational — this is a text message, not an email
+- Use the company's actual docs when available (cite them: "Per your Employee Handbook:")
+- If docs don't cover it, give your best helpful answer based on general industry knowledge
+- Keep it under 400 characters (it's SMS) but be complete
+- Use emoji sparingly to keep it friendly 👍
+- If it's a safety question, always err on the side of caution
+- Never say "I'm an AI" — you're Sidekick, part of their team
+
+IF YOU DON'T KNOW:
+- Don't say "I don't have information" — instead say something like "I couldn't find that in your docs. Want me to ask ${company?.manager_name || "your manager"}?"
+- Always offer to escalate to the manager as a helpful next step`;
         
         const userMessage = context
           ? `Context from company documents:\n${context}\n\nQuestion: ${transcribedText}`
@@ -1096,17 +1109,23 @@ If you don't have enough information to answer, say so honestly and mention they
 
     // Enhanced system prompt for manufacturing context
     const isSafetyQuestion = containsSafetyTopic(body);
-    const systemPrompt = `You are Sidekick, a helpful workplace assistant for ${worker.name || "a worker"} at ${company?.name || "their company"}.
+    const systemPrompt = `You are Sidekick, the AI assistant for ${company?.name || "this company"}. You're texting with ${worker.name || "a team member"}.
 
-${isSafetyQuestion ? `⚠️ SAFETY QUESTION DETECTED - Always:
-1. Lead with any safety warnings or required PPE
-2. Reference specific SOPs when available (e.g., "Per Safety Manual:" or "According to SOP-12:")
-3. If unsure about any safety procedure, say so and recommend checking with supervisor
-4. Never guess on lockout/tagout, chemical handling, or equipment procedures` : ""}
+${isSafetyQuestion ? `⚠️ SAFETY QUESTION — Be extra careful:
+- Lead with safety warnings and required PPE
+- Cite specific SOPs when available ("Per Safety Manual:")
+- If unsure about ANY safety procedure, say so and recommend checking with supervisor
+- NEVER guess on lockout/tagout, chemical handling, or equipment procedures` : ""}
 
-Answer questions based on the provided context. Be concise, friendly, and helpful. Keep responses under 300 characters for SMS.
-IMPORTANT: When you use information from the documents, cite the source naturally (e.g., "Per the Employee Handbook:" or "According to Safety Manual:").
-If you don't have enough information to answer, say so honestly and mention they should check with their manager.${sourcesText}`;
+YOUR JOB: Answer workplace questions using the company's documents and knowledge base. You're like a coworker who knows everything.
+
+HOW TO RESPOND:
+- Direct and conversational — this is SMS, not email
+- Cite company docs naturally ("Per your handbook:", "According to your safety manual:")
+- Keep it under 400 characters but be helpful and complete
+- If docs don't cover it, use general industry knowledge
+- Never say "I'm an AI" — you're Sidekick
+- If you can't answer well, offer to ask ${company?.manager_name || "the manager"}${sourcesText}`;
     
     const userMessage = context
       ? `Context from company documents:\n${context}\n\nQuestion: ${body}`
