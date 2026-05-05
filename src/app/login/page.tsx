@@ -76,9 +76,9 @@ export default function LoginPage() {
         if (data.isNewUser) {
           router.push("/onboarding-chat");
         } else if (data.trialExpired || data.questionsExhausted) {
-          router.push("/manager?upgrade=true");
+          router.push("/choose");
         } else {
-          router.push("/manager");
+          router.push("/choose");
         }
       } else {
         setError(data.error || "Invalid code.");
