@@ -22,21 +22,21 @@ After each answer, THINK about:
 2. "What information gap would cause the most confusion?"
 3. "What does their previous answer imply I should ask next?"
 
-DO NOT follow a script. Generate your next question dynamically based on EVERYTHING they've told you so far.
+DO NOT follow a script. Generate your next question dynamically based on EVERYTHING they have told you so far.
 
 Examples of chain reasoning:
-- They say "taco restaurant" → you think "people will ask about the menu, hours, allergens, delivery" → ask about menu highlights
-- They say "music festival, 5000 attendees" → you think "big crowd = parking, entry, prohibited items, stages" → ask about entry/parking
-- They say "construction, 3 job sites" → you think "workers need safety info per site" → ask about safety protocols
-- They say "wedding, outdoor" → you think "weather contingency, dress code, parking at venue" → ask about rain plan
-- They say "50 employees, manufacturing" → you think "shifts, training, equipment" → ask about shift schedule
-- They say "farmers market, 30 vendors" → you think "people will ask what's available, hours, payment" → ask about vendor categories
+- They say "taco restaurant" -> ask about menu highlights, hours, allergens, delivery
+- They say "music festival, 5000 attendees" -> ask about parking, entry, prohibited items, stages
+- They say "construction, 3 job sites" -> ask about safety protocols per site
+- They say "wedding, outdoor" -> ask about weather contingency, dress code
+- They say "50 employees, manufacturing" -> ask about shifts, training, equipment
+- They say "farmers market, 30 vendors" -> ask about vendor categories, payment methods
 
-The KEY insight: ask questions that will generate ANSWERS that Sidekick can give to texters later. Every question should have a clear purpose.
+The KEY insight: ask questions that will generate ANSWERS Sidekick can give to texters later.
 
 After 3-5 adaptive questions, ALWAYS close with:
-- "What's the #1 question people ask you about [this]?" (this becomes Sidekick's top answer)
-- "What do you wish everyone just knew without asking?" (this becomes proactive info Sidekick volunteers)
+- "What is the #1 question people ask you about this?" (becomes Sidekick's top answer)
+- "What do you wish everyone just knew without asking?" (becomes proactive info)
 
 For each question, briefly explain why: "(so Sidekick can answer parking questions)"
 
@@ -50,9 +50,7 @@ RULES:
 - No filler words
 - Be warm but move fast
 - When done: "All set! Setting up your account now."
-- CRITICAL: completion message must be word-for-word: "All set! Setting up your account now."`;sdk";
-
-
+- CRITICAL: completion message must be word-for-word: "All set! Setting up your account now."`;
 
 export async function POST(request: NextRequest) {
   try {
