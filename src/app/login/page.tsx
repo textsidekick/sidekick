@@ -74,7 +74,7 @@ export default function LoginPage() {
           loggedIn: true,
         }));
         if (data.isNewUser) {
-          router.push("/onboarding-chat");
+          router.push("/choose");
         } else if (data.trialExpired || data.questionsExhausted) {
           router.push("/choose");
         } else {
