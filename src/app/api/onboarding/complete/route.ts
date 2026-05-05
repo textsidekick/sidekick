@@ -74,7 +74,7 @@ OPTIONAL (include if mentioned):
 - additionalInfo: any other relevant details mentioned (string or null)
 
 Conversation:
-\${conversationText}
+${conversationText}
 
 Return ONLY valid JSON, no markdown. Include all fields that have data.`;
 
