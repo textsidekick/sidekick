@@ -617,9 +617,24 @@ export async function POST(request: NextRequest) {
       const normalized = body.replace(/\s+/g, " ").trim().toUpperCase();
       
       if (normalized === "JOIN") {
-        return twimlResponse("Please text JOIN followed by your company's code. Example: JOIN ABC123");
+        return twimlResponse("Please text JOIN followed by your event code. Example: JOIN KIRK");
       }
       
+      // Also accept just the code without "JOIN" prefix (e.g. flyers say "TEXT KIRK")
+      if (!normalized.startsWith("JOIN ")) {
+        const { data: directMatch } = await supabase
+          .from("companies")
+          .select("id, name")
+          .eq("access_code", normalized)
+          .single();
+        
+        if (directMatch) {
+          // Treat as "JOIN CODE"
+          await supabase.from("workers").insert({ phone: from, company_id: directMatch.id, location_id: directMatch.id });
+          return twimlResponse(`Welcome to ${directMatch.name}! 🎉 What's your first name?`);
+        }
+      }
+
       if (normalized.startsWith("JOIN ")) {
         const accessCode = normalized.slice(5).trim();
         
