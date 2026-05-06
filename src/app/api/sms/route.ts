@@ -689,11 +689,42 @@ export async function POST(request: NextRequest) {
       
       const { data: company } = await supabase
         .from("companies")
-        .select("name")
+        .select("name, metadata, industry")
         .eq("id", worker.company_id)
         .single();
       
-      return twimlResponse(`Thanks ${name}! 🙌 You're all set. Ask me anything about ${company?.name || "your workplace"} - schedule, location, details, and more. Just ask me anything!`);
+      // Build smart welcome based on event/company type
+      let welcomeOptions = "";
+      try {
+        const companyMeta = typeof company?.metadata === "string" ? JSON.parse(company.metadata) : company?.metadata;
+        const eventType = (companyMeta?.type || company?.industry || "").toLowerCase();
+        
+        if (eventType.includes("concert") || eventType.includes("performance") || eventType.includes("album")) {
+          welcomeOptions = "\n\nHere\'s what I can help with:\n🎤 Event schedule & lineup\n📍 Directions & parking\n🎟️ RSVP status\n🛍️ Merch info\n\nJust text me anytime!";
+        } else if (eventType.includes("market") || eventType.includes("fair")) {
+          welcomeOptions = "\n\nHere\'s what I can help with:\n🛒 See today\'s vendors\n📍 Directions & parking\n⏰ Hours & schedule\n💬 Are you a vendor or shopper? Let me know!";
+        } else if (eventType.includes("casting") || eventType.includes("audition")) {
+          welcomeOptions = "\n\nHere\'s what I can help with:\n🎬 Audition info & time slots\n📸 Free headshot details\n📍 Directions\n🌟 What to bring\n\nText me anything!";
+        } else if (eventType.includes("rally") || eventType.includes("political") || eventType.includes("speaker")) {
+          welcomeOptions = "\n\nHere\'s what I can help with:\n📍 Location & directions\n🔒 Security info\n⏰ Schedule & speakers\n🎟️ RSVP\n\nText me anything!";
+        } else if (eventType.includes("party") || eventType.includes("social")) {
+          welcomeOptions = "\n\nHere\'s what I can help with:\n🎉 Theme & dress code\n📍 Address & parking\n🍕 Food & drinks\n⏰ Schedule\n\nText me anything!";
+        } else if (eventType.includes("blood") || eventType.includes("charity")) {
+          welcomeOptions = "\n\nHere\'s what I can help with:\n❤️ How to prepare\n📍 Location & parking\n⏰ Hours\n🎁 Free stuff for donors\n\nText me anything!";
+        } else if (eventType.includes("meet") || eventType.includes("greet") || eventType.includes("autograph")) {
+          welcomeOptions = "\n\nHere\'s what I can help with:\n✍️ Autograph rules\n📍 Directions\n⏰ Schedule\n🎟️ Entry info\n\nText me anything!";
+        } else if (eventType.includes("kickbox") || eventType.includes("fitness") || eventType.includes("workshop")) {
+          welcomeOptions = "\n\nHere\'s what I can help with:\n🥊 What to bring & wear\n📍 Directions\n⏰ Schedule\n💪 Experience level\n\nText me anything!";
+        } else if (eventType.includes("restaurant") || eventType.includes("food")) {
+          welcomeOptions = "\n\nHere\'s what I can help with:\n🍽️ Menu & specials\n⏰ Hours\n📍 Location\n📞 Reservations\n\nText me anything!";
+        } else {
+          welcomeOptions = "\n\nI can help with schedule, location, details and more. Just text me anything!";
+        }
+      } catch {
+        welcomeOptions = "\n\nI can help with schedule, location, details and more. Just text me anything!";
+      }
+      
+      return twimlResponse(`Thanks ${name}! 🙌 Welcome to ${company?.name || "Sidekick"}.${welcomeOptions}`);
     }
 
     // CASE 4: Registered worker - get company info
