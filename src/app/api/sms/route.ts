@@ -693,38 +693,32 @@ export async function POST(request: NextRequest) {
         .eq("id", worker.company_id)
         .single();
       
-      // Build smart welcome based on event/company type
-      let welcomeOptions = "";
+      // Proactive welcome based on event type
+      let welcomeMsg = `Thanks ${name}! \u{1F64C} Welcome to ${company?.name || "Sidekick"}.\nAsk me anything — schedule, location, details, whatever you need!`;
       try {
-        const companyMeta = typeof company?.metadata === "string" ? JSON.parse(company.metadata) : company?.metadata;
-        const eventType = (companyMeta?.type || company?.industry || "").toLowerCase();
-        
-        if (eventType.includes("concert") || eventType.includes("performance") || eventType.includes("album")) {
-          welcomeOptions = "\n\nHere\'s what I can help with:\n🎤 Event schedule & lineup\n📍 Directions & parking\n🎟️ RSVP status\n🛍️ Merch info\n\nJust text me anytime!";
-        } else if (eventType.includes("market") || eventType.includes("fair")) {
-          welcomeOptions = "\n\nHere\'s what I can help with:\n🛒 See today\'s vendors\n📍 Directions & parking\n⏰ Hours & schedule\n💬 Are you a vendor or shopper? Let me know!";
-        } else if (eventType.includes("casting") || eventType.includes("audition")) {
-          welcomeOptions = "\n\nHere\'s what I can help with:\n🎬 Audition info & time slots\n📸 Free headshot details\n📍 Directions\n🌟 What to bring\n\nText me anything!";
-        } else if (eventType.includes("rally") || eventType.includes("political") || eventType.includes("speaker")) {
-          welcomeOptions = "\n\nHere\'s what I can help with:\n📍 Location & directions\n🔒 Security info\n⏰ Schedule & speakers\n🎟️ RSVP\n\nText me anything!";
-        } else if (eventType.includes("party") || eventType.includes("social")) {
-          welcomeOptions = "\n\nHere\'s what I can help with:\n🎉 Theme & dress code\n📍 Address & parking\n🍕 Food & drinks\n⏰ Schedule\n\nText me anything!";
-        } else if (eventType.includes("blood") || eventType.includes("charity")) {
-          welcomeOptions = "\n\nHere\'s what I can help with:\n❤️ How to prepare\n📍 Location & parking\n⏰ Hours\n🎁 Free stuff for donors\n\nText me anything!";
-        } else if (eventType.includes("meet") || eventType.includes("greet") || eventType.includes("autograph")) {
-          welcomeOptions = "\n\nHere\'s what I can help with:\n✍️ Autograph rules\n📍 Directions\n⏰ Schedule\n🎟️ Entry info\n\nText me anything!";
-        } else if (eventType.includes("kickbox") || eventType.includes("fitness") || eventType.includes("workshop")) {
-          welcomeOptions = "\n\nHere\'s what I can help with:\n🥊 What to bring & wear\n📍 Directions\n⏰ Schedule\n💪 Experience level\n\nText me anything!";
-        } else if (eventType.includes("restaurant") || eventType.includes("food")) {
-          welcomeOptions = "\n\nHere\'s what I can help with:\n🍽️ Menu & specials\n⏰ Hours\n📍 Location\n📞 Reservations\n\nText me anything!";
-        } else {
-          welcomeOptions = "\n\nI can help with schedule, location, details and more. Just text me anything!";
-        }
-      } catch {
-        welcomeOptions = "\n\nI can help with schedule, location, details and more. Just text me anything!";
-      }
+        const meta = typeof company?.metadata === "string" ? JSON.parse(company.metadata) : company?.metadata;
+        const t = (meta?.type || company?.industry || "").toLowerCase();
+        if (t.includes("market") || t.includes("fair"))
+          welcomeMsg = `Thanks ${name}! \u{1F64C} Welcome to ${company?.name}.\n\nQuick question \u2014 are you coming as a shopper or a vendor? This helps me give you the right info!`;
+        else if (t.includes("concert") || t.includes("performance") || t.includes("album"))
+          welcomeMsg = `Thanks ${name}! \u{1F3A4} Welcome to ${company?.name}.\n\nWant me to RSVP you? I can also send you a reminder before the show. Or ask me anything \u2014 lineup, parking, merch.`;
+        else if (t.includes("casting") || t.includes("audition"))
+          welcomeMsg = `Thanks ${name}! \u{1F3AC} Welcome to ${company?.name}.\n\nDo you have any acting experience? No worries either way \u2014 I'll help you prep. I can also sign you up for a time slot!`;
+        else if (t.includes("rally") || t.includes("political") || t.includes("speaker"))
+          welcomeMsg = `Thanks ${name}! \u{1F3A4} Welcome to ${company?.name}.\n\nWant me to RSVP you? Spots are limited. I can also tell you what to bring and walk you through security info.`;
+        else if (t.includes("party") || t.includes("social"))
+          welcomeMsg = `Thanks ${name}! \u{1F389} Welcome to ${company?.name}.\n\nHow many people are you bringing? I can add your crew to the guest list. Also \u2014 the theme is NEON \u{1F525}`;
+        else if (t.includes("blood") || t.includes("charity") || t.includes("drive"))
+          welcomeMsg = `Thanks ${name}! \u{2764} Welcome to ${company?.name}.\n\nHave you donated blood before? I can walk you through what to expect. Want me to save you a time slot so you skip the line?`;
+        else if (t.includes("meet") || t.includes("greet") || t.includes("autograph"))
+          welcomeMsg = `Thanks ${name}! \u{270D} Welcome to ${company?.name}.\n\nBringing anything to get signed? I can tell you the autograph rules so you're ready. Want a reminder before doors open?`;
+        else if (t.includes("kickbox") || t.includes("fitness") || t.includes("workshop"))
+          welcomeMsg = `Thanks ${name}! \u{1F94A} Welcome to ${company?.name}.\n\nWhat's your experience level \u2014 beginner, intermediate, or advanced? I'll tell you exactly what to bring.`;
+        else if (t.includes("restaurant") || t.includes("food"))
+          welcomeMsg = `Thanks ${name}! \u{1F37D} Welcome to ${company?.name}.\n\nLooking to make a reservation, check the menu, or something else? I know this place inside and out.`;
+      } catch {}
       
-      return twimlResponse(`Thanks ${name}! 🙌 Welcome to ${company?.name || "Sidekick"}.${welcomeOptions}`);
+      return twimlResponse(welcomeMsg);
     }
 
     // CASE 4: Registered worker - get company info
