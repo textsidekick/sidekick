@@ -231,7 +231,13 @@ export default function ManagerDashboard() {
       let allCompanies = d.companies || [];
       try {
         const authData = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
-        if (authData.companyId) allCompanies = allCompanies.filter((c: any) => c.id === authData.companyId);
+        const userPhone = authData.phone || "";
+        const isAdmin = userPhone.includes("4088285979");
+        if (!isAdmin && userPhone) {
+          allCompanies = allCompanies.filter((c: any) => c.manager_phone === userPhone || c.manager_phone === userPhone.replace("+1", "+"));
+        } else if (authData.companyId && !isAdmin) {
+          allCompanies = allCompanies.filter((c: any) => c.id === authData.companyId);
+        }
       } catch {}
       setCompanies(allCompanies);
       if (allCompanies.length > 0 && !selectedCompany) setSelectedCompany(allCompanies[0].id);
