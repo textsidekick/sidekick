@@ -39,6 +39,8 @@ export async function getCompanies(): Promise<Company[]> {
     locations: c.locations || [],
     createdAt: c.created_at,
     access_code: c.access_code,
+    manager_phone: c.manager_phone,
+    manager_name: c.manager_name,
   }));
 }
 
