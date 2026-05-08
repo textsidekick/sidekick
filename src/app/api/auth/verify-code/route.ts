@@ -38,8 +38,12 @@ export async function POST(request: NextRequest) {
 
     let isNewUser = false;
 
+    // Auto-paid phone numbers (no trial limits, but only see their own data)
+    const PAID_PHONES = ["+14088285979", "+12243348775"];
+    const isPaidUser = PAID_PHONES.some(p => phone.endsWith(p.slice(-10)));
+
     if (!account) {
-      // Create new account with trial
+      // Create new account
       isNewUser = true;
       const trialEnds = new Date();
       trialEnds.setDate(trialEnds.getDate() + 7);
@@ -52,7 +56,7 @@ export async function POST(request: NextRequest) {
           questions_used: 0,
           questions_limit: 50,
           documents_limit: 3,
-          plan: "trial",
+          plan: isPaidUser ? "paid" : "trial",
           created_at: new Date().toISOString(),
         })
         .select()
