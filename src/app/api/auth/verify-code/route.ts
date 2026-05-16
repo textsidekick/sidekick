@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     let isNewUser = false;
 
     // Auto-paid phone numbers (no trial limits, but only see their own data)
-    const PAID_PHONES = ["+14088285979", "+12243348775"];
+    const PAID_PHONES = ["+14088285979", "+12243348775", "+14083049470"];
     const isPaidUser = PAID_PHONES.some(p => phone.endsWith(p.slice(-10)));
 
     if (!account) {
