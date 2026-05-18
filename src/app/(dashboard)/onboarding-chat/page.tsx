@@ -601,6 +601,18 @@ export default function OnboardingChat() {
         </div>
       </div>
 
+      {/* Integration Panel */}
+      <div style={{ maxWidth: 672, margin: "0 auto", width: "100%", padding: "0 16px 12px" }}>
+        <details style={{ background: "white", borderRadius: 12, border: "1px solid rgba(28,26,22,0.08)", overflow: "hidden" }}>
+          <summary style={{ padding: "12px 16px", cursor: "pointer", fontSize: 14, fontWeight: 600, color: "#1C1A16", display: "flex", alignItems: "center", gap: 8, listStyle: "none" }}>
+            <span style={{ fontSize: 18 }}>🔗</span> Connect Your Tools — pull docs from Google Drive, Slack, Notion & more
+          </summary>
+          <div style={{ padding: "0 8px 8px" }}>
+            <IntegrationSelector companyId={sessionId} />
+          </div>
+        </details>
+      </div>
+
       {/* Input */}
       <div
         style={{
