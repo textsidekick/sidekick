@@ -751,8 +751,32 @@ export default function ManagerDashboard() {
             {stats && stats.totalQuestions === 0 && (
               <div style={{ maxWidth: 600, margin: "20px auto", textAlign: "center", padding: "40px 24px", background: "white", borderRadius: 16, border: "1px solid rgba(28,26,22,0.08)" }}>
                 
-                <h2 style={{ fontSize: 22, fontWeight: 600, color: "#1C1A16", marginBottom: 8 }}>No questions yet</h2>
-                <p style={{ fontSize: 15, color: "rgba(28,26,22,0.5)", marginBottom: 24 }}>Share your access code with workers so they can start texting questions.</p>
+                <h2 style={{ fontSize: 22, fontWeight: 600, color: "#1C1A16", marginBottom: 8 }}>Welcome to Sidekick!</h2>
+                <p style={{ fontSize: 15, color: "rgba(28,26,22,0.5)", marginBottom: 24 }}>Here's how to get started:</p>
+                
+                <div style={{ textAlign: "left", maxWidth: 400, margin: "0 auto 24px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderBottom: "1px solid rgba(28,26,22,0.06)" }}>
+                    <span style={{ width: 28, height: 28, borderRadius: "50%", background: "#C96442", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>1</span>
+                    <span style={{ fontSize: 14, color: "#1C1A16" }}>Upload your company documents (SOPs, handbooks, policies)</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderBottom: "1px solid rgba(28,26,22,0.06)" }}>
+                    <span style={{ width: 28, height: 28, borderRadius: "50%", background: "#C96442", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>2</span>
+                    <span style={{ fontSize: 14, color: "#1C1A16" }}>Share the access code with your workers</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0" }}>
+                    <span style={{ width: 28, height: 28, borderRadius: "50%", background: "#C96442", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>3</span>
+                    <span style={{ fontSize: 14, color: "#1C1A16" }}>Workers text questions, Sidekick answers instantly</span>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginBottom: 16 }}>
+                  <a href={`sms:8887074659?body=JOIN ${currentCompany?.access_code || ""}`} style={{ padding: "10px 20px", background: "#C96442", color: "white", borderRadius: 10, fontSize: 14, fontWeight: 600, textDecoration: "none" }}>
+                    Try it now \u{1F4F1}
+                  </a>
+                  <button onClick={() => setShowQrModal(true)} style={{ padding: "10px 20px", background: "#1C1A16", color: "white", borderRadius: 10, fontSize: 14, fontWeight: 600, border: "none", cursor: "pointer" }}>
+                    Print QR Poster
+                  </button>
+                </div>
                 <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 20px", background: "rgba(201,100,66,0.08)", borderRadius: 10, fontSize: 14, color: "#A74D30", fontWeight: 500 }}>
                   Workers text <strong style={{ marginLeft: 4 }}>JOIN {currentCompany?.access_code || "CODE"}</strong> <span style={{ marginLeft: 4 }}>to +1 (888) 707-4659</span>
                 </div>
