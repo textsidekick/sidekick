@@ -1,6 +1,6 @@
 'use client'
 
-import { HardDrive, Globe, Building2, Laptop } from 'lucide-react'
+import { HardDrive, Globe, Building2, Laptop, MessageSquare, FileText, Database, Layout, Phone, BookOpen, Briefcase, Coffee, Box, Calendar } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SectionHeader } from '@/components/dashboard/shared/SectionHeader'
