@@ -1,4 +1,5 @@
 "use client";
+import IntegrationSelector from "@/components/IntegrationSelector";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Send, Home, Loader2, Lock, Smartphone, CheckCircle2, Copy, Pencil, Mic, MicOff, Paperclip, X, FileText, Link as LinkIcon, KeyRound } from "lucide-react";
@@ -603,9 +604,9 @@ export default function OnboardingChat() {
 
       {/* Integration Panel */}
       <div style={{ maxWidth: 672, margin: "0 auto", width: "100%", padding: "0 16px 12px" }}>
-        <details style={{ background: "white", borderRadius: 12, border: "1px solid rgba(28,26,22,0.08)", overflow: "hidden" }}>
-          <summary style={{ padding: "12px 16px", cursor: "pointer", fontSize: 14, fontWeight: 600, color: "#1C1A16", display: "flex", alignItems: "center", gap: 8, listStyle: "none" }}>
-            <span style={{ fontSize: 18 }}>🔗</span> Connect Your Tools — pull docs from Google Drive, Slack, Notion & more
+        <details style={{ background: "white", borderRadius: 12, border: "1px solid rgba(28,26,22,0.08)" }}>
+          <summary style={{ padding: "12px 16px", cursor: "pointer", fontSize: 14, fontWeight: 600, color: "#1C1A16" }}>
+            \u{1F517} Connect Your Tools \u2014 pull docs from Google Drive, Slack, Notion & more
           </summary>
           <div style={{ padding: "0 8px 8px" }}>
             <IntegrationSelector companyId={sessionId} />
