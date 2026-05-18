@@ -205,6 +205,33 @@ Return ONLY valid JSON, no markdown. Include all fields that have data.`;
 
     const twilioNumber = "+1 (888) 707-4659";
 
+    // Send welcome SMS to manager
+    try {
+      const twilioSid = process.env.TWILIO_ACCOUNT_SID;
+      const twilioAuth = process.env.TWILIO_AUTH_TOKEN;
+      const twilioPhone = process.env.TWILIO_PHONE_NUMBER;
+      
+      if (twilioSid && twilioAuth && twilioPhone && managerPhone) {
+        await fetch(
+          `https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              Authorization: "Basic " + Buffer.from(`${twilioSid}:${twilioAuth}`).toString("base64"),
+            },
+            body: new URLSearchParams({
+              To: managerPhone,
+              From: twilioPhone,
+              Body: `Welcome to Sidekick! ${extractedData.companyName} is all set up. Your workers can text JOIN ${accessCode} to ${twilioPhone} to get started. You can manage everything at textsidekick.com/manager. - The Sidekick Team`,
+            }),
+          }
+        );
+      }
+    } catch (smsErr) {
+      console.warn("[Complete] Welcome SMS failed:", smsErr);
+    }
+
     // Send notification email to team
     try {
       const resendKey = process.env.RESEND_API_KEY;
