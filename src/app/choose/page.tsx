@@ -54,8 +54,8 @@ export default function ChoosePage() {
               <LayoutDashboard size={22} style={{ color: "#C96442" }} />
             </div>
             <div>
-              <div style={{ fontSize: 16, fontWeight: 600, color: "#1C1A16" }}>Existing Company / Event</div>
-              <div style={{ fontSize: 13, color: "rgba(28,26,22,0.5)", marginTop: 2 }}>Go to your dashboard, manage workers, and view analytics</div>
+              <div style={{ fontSize: 16, fontWeight: 600, color: "#1C1A16" }}>Existing Company</div>
+              <div style={{ fontSize: 13, color: "rgba(28,26,22,0.5)", marginTop: 2 }}>Go to your dashboard, manage workers, upload documents, and view analytics</div>
             </div>
           </button>
 
@@ -75,8 +75,8 @@ export default function ChoosePage() {
               <MessageCircle size={22} style={{ color: "#C96442" }} />
             </div>
             <div>
-              <div style={{ fontSize: 16, fontWeight: 600, color: "#1C1A16" }}>New Company / Event</div>
-              <div style={{ fontSize: 13, color: "rgba(28,26,22,0.5)", marginTop: 2 }}>Set up a new team or event with Sidekick</div>
+              <div style={{ fontSize: 16, fontWeight: 600, color: "#1C1A16" }}>New Company</div>
+              <div style={{ fontSize: 13, color: "rgba(28,26,22,0.5)", marginTop: 2 }}>Set up a new company on Sidekick</div>
             </div>
           </button>
 
