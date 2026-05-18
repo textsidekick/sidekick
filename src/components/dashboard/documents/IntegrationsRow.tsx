@@ -13,7 +13,36 @@ interface IntegrationItem {
   connected: boolean
 }
 
-const INTEGRATIONS: IntegrationItem[] = [
+const INTEGRATIONS: IntegrationItem[,
+  {
+    id: 'sharepoint',
+    name: 'SharePoint / OneDrive',
+    description: 'Import from Microsoft 365',
+    icon: Cloud,
+    connected: false,
+  },
+  {
+    id: 'notion',
+    name: 'Notion',
+    description: 'Import pages & databases',
+    icon: Monitor,
+    connected: false,
+  },
+  {
+    id: 'slack',
+    name: 'Slack',
+    description: 'Import knowledge from channels',
+    icon: Cloud,
+    connected: false,
+  },
+  {
+    id: 'quickbooks',
+    name: 'QuickBooks',
+    description: 'Sync employee & payroll data',
+    icon: Building2,
+    connected: false,
+  },
+] = [
   {
     id: 'google-drive',
     name: 'Google Drive',
