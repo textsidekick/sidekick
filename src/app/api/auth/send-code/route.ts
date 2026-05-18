@@ -13,16 +13,19 @@ export async function POST(request: NextRequest) {
     const cleanPhone = phone.replace(/[\s\-\(\)]/g, "");
     const normalizedPhone = cleanPhone.startsWith("+") ? cleanPhone : "+1" + cleanPhone;
 
-    // Rate limit: max 3 codes per hour per phone
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-    const { count } = await supabase
-      .from("verification_codes")
-      .select("*", { count: "exact", head: true })
-      .eq("phone", normalizedPhone)
-      .gte("created_at", oneHourAgo);
+    // Rate limit: max 3 codes per hour per phone (bypass for test numbers)
+    const RATE_LIMIT_BYPASS = ["+14088285979"];
+    if (!RATE_LIMIT_BYPASS.includes(normalizedPhone)) {
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      const { count } = await supabase
+        .from("verification_codes")
+        .select("*", { count: "exact", head: true })
+        .eq("phone", normalizedPhone)
+        .gte("created_at", oneHourAgo);
 
-    if ((count || 0) >= 3) {
-      return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
+      if ((count || 0) >= 3) {
+        return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
+      }
     }
 
     // Generate 6-digit code
