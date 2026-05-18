@@ -23,6 +23,23 @@ export default function SuccessScreen({
   managerCredentials,
   generatingCredentials,
 }: SuccessScreenProps) {
+  
+  // Confetti animation
+  useEffect(() => {
+    const colors = ["#C96442", "#F7F3EC", "#1C1A16", "#FFD700", "#4CAF50"];
+    const container = document.getElementById("confetti-container");
+    if (!container) return;
+    for (let i = 0; i < 50; i++) {
+      const confetti = document.createElement("div");
+      confetti.style.cssText = `position:fixed;width:${Math.random()*10+5}px;height:${Math.random()*10+5}px;background:${colors[Math.floor(Math.random()*colors.length)]};top:-10px;left:${Math.random()*100}vw;opacity:${Math.random()*0.8+0.2};border-radius:${Math.random()>0.5?"50%":"2px"};animation:confetti-fall ${Math.random()*3+2}s linear forwards;z-index:9999;`;
+      container.appendChild(confetti);
+    }
+    const style = document.createElement("style");
+    style.textContent = "@keyframes confetti-fall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}";
+    document.head.appendChild(style);
+    return () => { if (container) container.innerHTML = ""; };
+  }, []);
+
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [editingCode, setEditingCode] = useState(false);
   const [customCode, setCustomCode] = useState(onboardingResult.accessCode);
@@ -62,6 +79,7 @@ export default function SuccessScreen({
   const smsLink = `sms:${onboardingResult.twilioNumber.replace(/[^0-9]/g, "")}?body=${encodeURIComponent("JOIN " + customCode)}`;
 
   return (
+    <div id="confetti-container" />
     <div style={{ minHeight: "100vh", background: "#F7F3EC", display: "flex", flexDirection: "column" }}>
       {/* Header */}
       <header
