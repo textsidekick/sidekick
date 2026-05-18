@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       ? Math.round(questions.reduce((sum, q) => sum + (q.confidence || 0), 0) / questions.length)
       : 0;
 
-    const digest = {
+    const digest: any = {
       period: "Last 7 days",
       totalQuestions,
       uniqueWorkers,
