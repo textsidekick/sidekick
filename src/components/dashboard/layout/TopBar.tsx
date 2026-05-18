@@ -43,7 +43,7 @@ function TopBar({}: TopBarProps) {
           </div>
           <span style={{ fontSize: 16, fontWeight: 600, color: '#1C1A16', letterSpacing: '-0.02em' }}>Sidekick</span>
           <span style={{ fontSize: 13, color: 'rgba(28,26,22,0.35)', marginLeft: 4 }}>Dashboard</span>
-          <span style={{ fontSize: 10, fontWeight: 600, color: '#C96442', background: 'rgba(201,100,66,0.1)', padding: '2px 6px', borderRadius: 4, marginLeft: 8 }}>YC S26</span>
+          <span style={{ fontSize: 10, fontWeight: 600, color: '#C96442', background: 'rgba(201,100,66,0.1)', padding: '2px 6px', borderRadius: 4, marginLeft: 8 }}>YC P26</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div ref={menuRef} style={{ position: 'relative' }}>
