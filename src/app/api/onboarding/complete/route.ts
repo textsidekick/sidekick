@@ -205,6 +205,24 @@ Return ONLY valid JSON, no markdown. Include all fields that have data.`;
 
     const twilioNumber = "+1 (888) 707-4659";
 
+    // Auto-load sample knowledge base for instant demo capability
+    try {
+      const sampleKnowledge = [
+        "General Company Policies:\n- Work hours: Check with your manager for your shift schedule\n- Breaks: Two 15-minute breaks and one 30-minute lunch per 8-hour shift\n- PTO: Submit requests through your manager at least 2 weeks in advance\n- Sick days: Notify your manager before your shift starts",
+        "Safety Guidelines:\n- Always wear required PPE for your work area\n- Report all injuries immediately to your supervisor\n- Know your emergency exits and assembly points\n- Fire extinguishers at every exit\n- First aid kits at every exit door\n- For emergencies call 911 then notify supervisor",
+        "New Employee FAQ:\n- Parking: Employee lot\n- Time off: 2 weeks notice through manager\n- Running late: Call or text supervisor before shift\n- HR issues: Contact manager or HR department",
+      ];
+      for (const chunk of sampleKnowledge) {
+        await supabase.from("document_chunks").insert({
+          company_id: companyId,
+          content: chunk,
+          metadata: { source: "sample", type: "starter-kit" },
+        });
+      }
+    } catch (sampleErr) {
+      console.warn("[Complete] Sample KB load failed:", sampleErr);
+    }
+
     // Send welcome SMS to manager
     try {
       const twilioSid = process.env.TWILIO_ACCOUNT_SID;
