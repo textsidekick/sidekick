@@ -1,6 +1,6 @@
 'use client'
 
-import { HardDrive, Cloud, Building2, Monitor } from 'lucide-react'
+import { HardDrive, Globe, Building2, Laptop } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SectionHeader } from '@/components/dashboard/shared/SectionHeader'
@@ -13,36 +13,7 @@ interface IntegrationItem {
   connected: boolean
 }
 
-const INTEGRATIONS: IntegrationItem[,
-  {
-    id: 'sharepoint',
-    name: 'SharePoint / OneDrive',
-    description: 'Import from Microsoft 365',
-    icon: Cloud,
-    connected: false,
-  },
-  {
-    id: 'notion',
-    name: 'Notion',
-    description: 'Import pages & databases',
-    icon: Monitor,
-    connected: false,
-  },
-  {
-    id: 'slack',
-    name: 'Slack',
-    description: 'Import knowledge from channels',
-    icon: Cloud,
-    connected: false,
-  },
-  {
-    id: 'quickbooks',
-    name: 'QuickBooks',
-    description: 'Sync employee & payroll data',
-    icon: Building2,
-    connected: false,
-  },
-] = [
+const INTEGRATIONS: IntegrationItem[] = [
   {
     id: 'google-drive',
     name: 'Google Drive',
@@ -54,7 +25,7 @@ const INTEGRATIONS: IntegrationItem[,
     id: 'dropbox',
     name: 'Dropbox',
     description: 'Import documents from Dropbox',
-    icon: Cloud,
+    icon: Globe,
     connected: false,
   },
   {
@@ -68,7 +39,7 @@ const INTEGRATIONS: IntegrationItem[,
     id: 'microsoft-365',
     name: 'Microsoft 365',
     description: 'Import documents from Microsoft 365',
-    icon: Monitor,
+    icon: Laptop,
     connected: false,
   },
 ]
