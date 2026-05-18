@@ -58,7 +58,7 @@ export default function IntegrationSelector({ companyId, onConnect }: Integratio
         break;
       case "sharepoint":
       case "teams":
-        authUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=${encodeURIComponent(process.env.NEXT_PUBLIC_MICROSOFT_CLIENT_ID || "")}&response_type=code&redirect_uri=${encodeURIComponent(redirectBase + "/sharepoint/callback")}&scope=${encodeURIComponent("Files.Read.All Sites.Read.All offline_access")}&state=${state}`;
+        authUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=${encodeURIComponent()}&response_type=code&redirect_uri=${encodeURIComponent(redirectBase + "/sharepoint/callback")}&scope=${encodeURIComponent("Files.Read.All Sites.Read.All offline_access")}&state=${state}`;
         break;
       default:
         // For Google Drive, Dropbox, Gusto — use existing integration flows
