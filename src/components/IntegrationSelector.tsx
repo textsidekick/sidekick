@@ -19,17 +19,6 @@ const INTEGRATIONS: Integration[] = [
   { id: "slack", name: "Slack", description: "Channel knowledge", color: "#4A154B", icon: "S", status: "available" },
   { id: "gusto", name: "Gusto", description: "HR & payroll data", color: "#F45D48", icon: "Gu", status: "available" },
   { id: "teams", name: "Microsoft Teams", description: "Team channels & files", color: "#6264A7", icon: "T", status: "available" },
-  { id: "confluence", name: "Confluence", description: "Wiki pages & spaces", color: "#0052CC", icon: "C", status: "coming_soon" },
-  { id: "zendesk", name: "Zendesk", description: "Help center articles", color: "#03363D", icon: "Z", status: "coming_soon" },
-  { id: "salesforce", name: "Salesforce", description: "Knowledge articles", color: "#00A1E0", icon: "SF", status: "coming_soon" },
-  { id: "airtable", name: "Airtable", description: "Bases & records", color: "#18BFFF", icon: "AT", status: "coming_soon" },
-  { id: "monday", name: "Monday.com", description: "Boards & tasks", color: "#6161FF", icon: "M", status: "coming_soon" },
-  { id: "quickbooks", name: "QuickBooks", description: "Employee & payroll", color: "#2CA01C", icon: "QB", status: "coming_soon" },
-  { id: "adp", name: "ADP", description: "HR & payroll sync", color: "#D0271D", icon: "ADP", status: "coming_soon" },
-  { id: "procore", name: "Procore", description: "Construction docs", color: "#F47E20", icon: "P", status: "coming_soon" },
-  { id: "box", name: "Box", description: "Cloud file storage", color: "#0061D5", icon: "B", status: "coming_soon" },
-  { id: "whatsapp", name: "WhatsApp", description: "Messaging channel", color: "#25D366", icon: "W", status: "coming_soon" },
-  { id: "toast", name: "Toast POS", description: "Restaurant data", color: "#FF4C00", icon: "T", status: "coming_soon" },
 ];
 
 interface IntegrationSelectorProps {
