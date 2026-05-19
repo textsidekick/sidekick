@@ -52,6 +52,7 @@ import LanguageBadge from "@/components/dashboard/LanguageBadge";
 import ActivityFeed from "@/components/dashboard/ActivityFeed";
 import SMSSimulator from "@/components/dashboard/SMSSimulator";
 import DemoMode from "@/components/dashboard/DemoMode";
+import KnowledgeGapAlerts from "@/components/dashboard/KnowledgeGapAlerts";
 import { DocumentsTab } from "@/components/dashboard/documents/DocumentsTab";
 import { UploadZone } from "@/components/dashboard/documents/UploadZone";
 import { WorkersTable } from "@/components/dashboard/workers/WorkersTable";
@@ -815,8 +816,11 @@ export default function ManagerDashboard() {
               />
             </div>
 
-            {/* Activity Feed */}
-            <ActivityFeed companyId={selectedCompany} />
+            {/* Activity Feed + Knowledge Gaps side by side */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <ActivityFeed companyId={selectedCompany} />
+              <KnowledgeGapAlerts companyId={selectedCompany} />
+            </div>
           </div>
         )}
 
