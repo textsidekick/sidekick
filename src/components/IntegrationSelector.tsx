@@ -32,7 +32,7 @@ interface IntegrationSelectorProps {
 
 export default function IntegrationSelector({ companyId, onConnect }: IntegrationSelectorProps) {
   const [connected, setConnected] = useState<Set<string>>(new Set());
-  const [filter, setFilter] = useState<"all" | "available" | "connected">("all");
+  const [filter, setFilter] = useState<"all" | "connected">("all");
 
   const handleConnect = (integration: Integration) => {
     if (integration.status === "coming_soon") return;
@@ -82,7 +82,6 @@ export default function IntegrationSelector({ companyId, onConnect }: Integratio
 
   const filtered = INTEGRATIONS.filter(i => {
     if (filter === "connected") return connected.has(i.id);
-    if (filter === "available") return i.status === "available";
     return true;
   });
 
@@ -92,7 +91,7 @@ export default function IntegrationSelector({ companyId, onConnect }: Integratio
         <h3 style={{ fontSize: 16, fontWeight: 600, color: "#1C1A16", margin: "0 0 4px" }}>Connect Your Tools</h3>
         <p style={{ fontSize: 13, color: "rgba(28,26,22,0.5)", margin: 0 }}>Pull your company knowledge from anywhere</p>
         <div style={{ display: "flex", gap: 6, marginTop: 12 }}>
-          {(["all", "available", "connected"] as const).map(f => (
+          {(["all", "connected"] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)} style={{
               padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 500,
               border: "1px solid rgba(28,26,22,0.1)",
