@@ -12,15 +12,15 @@ interface Message {
 const conversations: Message[][] = [
   [
     { id: 1, text: "Hello, today is my first day on the job at EDS Manufacturing in Santa Clara", sender: "worker", delay: 0 },
-    { id: 2, text: "Welcome to EDS Manufacturing, Santa Clara! 🎉 I'm Sidekick, your workplace assistant. Ask me anything!", sender: "sidekick", delay: 2000 },
+    { id: 2, text: "Welcome to EDS Manufacturing, Santa Clara! ! I'm Sidekick, your workplace assistant. Ask me anything!", sender: "sidekick", delay: 2000 },
     { id: 3, text: "Where do I park?", sender: "worker", delay: 4500 },
-    { id: 4, text: "Employee parking is in Lot B behind the main building. Visitor parking is in front. 🅿️", sender: "sidekick", delay: 6000 },
+    { id: 4, text: "Employee parking is in Lot B behind the main building. Visitor parking is in front. ️", sender: "sidekick", delay: 6000 },
     { id: 5, text: "¿A qué hora es el almuerzo?", sender: "worker", delay: 8500 },
-    { id: 6, text: "El almuerzo es a las 11:30 AM para el primer turno. Es un descanso de 30 minutos. 🍽️", sender: "sidekick", delay: 10000 },
+    { id: 6, text: "El almuerzo es a las 11:30 AM para el primer turno. Es un descanso de 30 minutos. ️", sender: "sidekick", delay: 10000 },
     { id: 7, text: "안전 장비는 어디서 받나요?", sender: "worker", delay: 13000 },
-    { id: 8, text: "안전 장비는 도구 보관소에서 받을 수 있습니다. 노란색 구역에서는 안전모가 필수입니다. 🦺", sender: "sidekick", delay: 15000 },
+    { id: 8, text: "안전 장비는 도구 보관소에서 받을 수 있습니다. 노란색 구역에서는 안전모가 필수입니다. Safety vest", sender: "sidekick", delay: 15000 },
     { id: 9, text: "When is payday?", sender: "worker", delay: 18000 },
-    { id: 10, text: "Payday is every other Friday. Direct deposit hits by 8am. Paper checks available at HR after 10am. 💰", sender: "sidekick", delay: 20000 },
+    { id: 10, text: "Payday is every other Friday. Direct deposit hits by 8am. Paper checks available at HR after 10am. Pay:", sender: "sidekick", delay: 20000 },
   ],
 ];
 

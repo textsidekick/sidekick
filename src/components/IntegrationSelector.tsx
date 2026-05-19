@@ -128,7 +128,7 @@ export default function IntegrationSelector({ companyId, onConnect }: Integratio
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: "#1C1A16", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   {integration.name}
-                  {connected.has(integration.id) && " ✓"}
+                  {connected.has(integration.id) && " "}
                 </div>
                 <div style={{ fontSize: 11, color: "rgba(28,26,22,0.4)" }}>
                   {integration.status === "coming_soon" ? "Coming soon" : integration.description}

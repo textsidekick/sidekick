@@ -77,9 +77,9 @@ const HIGH_SEVERITY_KEYWORDS = [
 // Safety Checklist Configuration
 // ============================================
 const CHECKLIST_ITEMS = [
-  { id: "ppe", label: "PPE on", emoji: "🥽" },
-  { id: "loto", label: "LOTO performed", emoji: "🔒" },
-  { id: "equipment", label: "Equipment inspected", emoji: "🔧" },
+  { id: "ppe", label: "PPE on", emoji: "" },
+  { id: "loto", label: "LOTO performed", emoji: "" },
+  { id: "equipment", label: "Equipment inspected", emoji: "" },
 ];
 
 function parseChecklistResponse(response: string): { ppe: boolean | null; loto: boolean | null; equipment: boolean | null } {
@@ -98,32 +98,32 @@ function formatChecklistResult(results: { ppe: boolean | null; loto: boolean | n
   
   // PPE
   if (results.ppe === true) {
-    message += "✅ PPE: Good\n";
+    message += "OK PPE: Good\n";
   } else if (results.ppe === false) {
-    message += "❌ PPE: NOT WORN\n";
+    message += "NOT OK PPE: NOT WORN\n";
     failures.push("PPE not worn");
   } else {
-    message += "⚠️ PPE: No response\n";
+    message += "️ PPE: No response\n";
   }
   
   // LOTO
   if (results.loto === true) {
-    message += "✅ LOTO: Good\n";
+    message += "OK LOTO: Good\n";
   } else if (results.loto === false) {
-    message += "❌ LOTO: NOT PERFORMED\n";
+    message += "NOT OK LOTO: NOT PERFORMED\n";
     failures.push("LOTO not performed");
   } else {
-    message += "⚠️ LOTO: No response\n";
+    message += "️ LOTO: No response\n";
   }
   
   // Equipment
   if (results.equipment === true) {
-    message += "✅ Equipment: Good";
+    message += "OK Equipment: Good";
   } else if (results.equipment === false) {
-    message += "❌ Equipment: NOT INSPECTED";
+    message += "NOT OK Equipment: NOT INSPECTED";
     failures.push("Equipment not inspected");
   } else {
-    message += "⚠️ Equipment: No response";
+    message += "️ Equipment: No response";
   }
   
   return { message, hasFailures: failures.length > 0, failures };
@@ -333,7 +333,7 @@ ${workerQuestion ? `Worker asked: "${workerQuestion}"` : "Worker wants to know a
 RESPOND DIRECTLY. Examples of GOOD responses:
 - "Those are Phillips head screws. You'll need a #2 Phillips screwdriver."
 - "That's a 3/8" hex bolt. Use a 9/16" wrench or socket."
-- "Per Safety Manual: ⚠️ Hydraulic line - depressurize before disconnecting."
+- "Per Safety Manual: ️ Hydraulic line - depressurize before disconnecting."
 
 DO NOT say "I don't have information" - you DO have information from the image analysis above.
 DO NOT ask clarifying questions - just answer based on what you see.${sourcesHint}
@@ -368,7 +368,7 @@ function buildDirectResponse(imageAnalysis: ImageAnalysis, workerQuestion?: stri
   const items = identifiedItems.length > 0 ? identifiedItems.join(", ") : description;
   
   if (isSafetyRelated) {
-    return `⚠️ I see: ${items}. Check safety procedures before proceeding.`;
+    return `️ I see: ${items}. Check safety procedures before proceeding.`;
   }
   
   // Try to give tool suggestions based on common items
@@ -536,7 +536,7 @@ export async function POST(request: NextRequest) {
       const companyName = (pendingQuestion.companies as any)?.name || "Your manager";
       await sendSMS(
         pendingQuestion.worker_phone,
-        `💬 ${companyName} replied to your question:\n\n"${pendingQuestion.question}"\n\n➡️ ${managerAnswer}`
+        `REPLY: ${companyName} replied to your question:\n\n"${pendingQuestion.question}"\n\n️ ${managerAnswer}`
       );
       
       await saveToKnowledgeBase(
@@ -545,7 +545,7 @@ export async function POST(request: NextRequest) {
         managerAnswer
       );
       
-      return twimlResponse(`Thanks! I've sent your answer to ${pendingQuestion.worker_name || "the worker"} and saved it for future questions. 👍`);
+      return twimlResponse(`Thanks! I've sent your answer to ${pendingQuestion.worker_name || "the worker"} and saved it for future questions. OK`);
     }
 
     // Check if worker exists
@@ -584,7 +584,7 @@ export async function POST(request: NextRequest) {
             
             await sendSMS(
               company.manager_phone,
-              `📋 Sidekick Alert for ${company.name}\n\n${worker.name || "A worker"} asked:\n"${question.question}"\n\n💬 Reply with your answer and I'll send it to them & remember it for next time.\n\nOr reply SKIP to ignore.`
+              `NOTE Sidekick Alert for ${company.name}\n\n${worker.name || "A worker"} asked:\n"${question.question}"\n\nREPLY: Reply with your answer and I'll send it to them & remember it for next time.\n\nOr reply SKIP to ignore.`
             );
           }
           
@@ -593,7 +593,7 @@ export async function POST(request: NextRequest) {
             .update({ pending_escalation_question_id: null })
             .eq("phone", from);
           
-          return twimlResponse(`Got it! I've asked ${company?.manager_name || "your manager"}. They can reply directly and I'll forward their answer to you. 👍`);
+          return twimlResponse(`Got it! I've asked ${company?.manager_name || "your manager"}. They can reply directly and I'll forward their answer to you. OK`);
         }
       } else if (response === "N" || response === "NO") {
         await supabase
@@ -601,7 +601,7 @@ export async function POST(request: NextRequest) {
           .update({ pending_escalation_question_id: null })
           .eq("phone", from);
         
-        return twimlResponse("No problem! Let me know if you have other questions. 👍");
+        return twimlResponse("No problem! Let me know if you have other questions. OK");
       }
       
       await supabase
@@ -665,13 +665,13 @@ export async function POST(request: NextRequest) {
           verified: false,
         });
 
-        return twimlResponse(`Welcome to ${company.name}! 🎉 What's your first name?`);
+        return twimlResponse(`Welcome to ${company.name}! ! What's your first name?`);
       }
     }
 
     // CASE 2: New user without JOIN command
     if (!worker) {
-      return twimlResponse("Welcome to Sidekick! 👋 Text JOIN followed by your company's 6-letter code to get started.\n\nExample: JOIN ABC123");
+      return twimlResponse("Welcome to Sidekick! Hi Text JOIN followed by your company's 6-letter code to get started.\n\nExample: JOIN ABC123");
     }
 
     // CASE 3: Worker exists but hasn't provided name yet
@@ -764,7 +764,7 @@ export async function POST(request: NextRequest) {
         .update({ pending_checklist: true })
         .eq("phone", from);
       
-      return twimlResponse(`🔒 Shift Safety Check\n\n1. PPE on? (Y/N)\n2. LOTO performed? (Y/N)\n3. Equipment inspected? (Y/N)\n\nReply like: Y Y Y`);
+      return twimlResponse(` Shift Safety Check\n\n1. PPE on? (Y/N)\n2. LOTO performed? (Y/N)\n3. Equipment inspected? (Y/N)\n\nReply like: Y Y Y`);
     }
 
     // ============================================
@@ -800,15 +800,15 @@ export async function POST(request: NextRequest) {
         if (hasFailures && company?.manager_phone) {
           await sendSMS(
             company.manager_phone,
-            `⚠️ Safety Checklist Alert\n\nWorker: ${worker.name}\nIssues: ${failures.join(", ")}\n\nPlease follow up.`
+            `️ Safety Checklist Alert\n\nWorker: ${worker.name}\nIssues: ${failures.join(", ")}\n\nPlease follow up.`
           );
         }
         
         let response = message;
         if (hasFailures) {
-          response += `\n\n⚠️ ${company?.manager_name || "Manager"} has been notified. Please address issues before starting work.`;
+          response += `\n\n️ ${company?.manager_name || "Manager"} has been notified. Please address issues before starting work.`;
         } else {
-          response += `\n\n✅ All clear! Have a safe shift.`;
+          response += `\n\nOK All clear! Have a safe shift.`;
         }
         
         return twimlResponse(response);
@@ -831,19 +831,19 @@ export async function POST(request: NextRequest) {
         .order("expiry_date", { ascending: true });
 
       if (!certs || certs.length === 0) {
-        return twimlResponse("📋 You don't have any certifications on file yet.\n\nAsk your manager to add your certifications to Sidekick.");
+        return twimlResponse("NOTE You don't have any certifications on file yet.\n\nAsk your manager to add your certifications to Sidekick.");
       }
 
       const today = new Date();
-      let response = "📋 Your Certifications:\n\n";
+      let response = "NOTE Your Certifications:\n\n";
       
       certs.forEach(cert => {
         const expiry = new Date(cert.expiry_date);
         const daysUntil = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
         
-        let status = "✅";
-        if (daysUntil < 0) status = "❌ EXPIRED";
-        else if (daysUntil <= 30) status = "⚠️ Expiring soon";
+        let status = "OK";
+        if (daysUntil < 0) status = "NOT OK EXPIRED";
+        else if (daysUntil <= 30) status = "️ Expiring soon";
         
         response += `${status} ${cert.cert_name}\n`;
         if (daysUntil < 0) {
@@ -862,7 +862,7 @@ export async function POST(request: NextRequest) {
       });
 
       if (expiringSoon.length > 0) {
-        response += `⚠️ ${expiringSoon.length} cert(s) need renewal soon. Contact your manager.`;
+        response += `️ ${expiringSoon.length} cert(s) need renewal soon. Contact your manager.`;
       }
 
       return twimlResponse(response);
@@ -936,7 +936,7 @@ HOW TO RESPOND:
 - Use the company's actual docs when available (cite them: "Per your Employee Handbook:")
 - If docs don't cover it, give your best helpful answer based on general industry knowledge
 - Keep it under 400 characters (it's SMS) but be complete
-- Use emoji sparingly to keep it friendly 👍
+- Use emoji sparingly to keep it friendly OK
 - If it's a safety question, always err on the side of caution
 - Never say "I'm an AI" — you're Sidekick
 - If the worker texts in ANY language other than English, respond in THEIR language. Auto-detect and match. Spanish, Chinese, Vietnamese, Tagalog, Korean, etc, part of their team
@@ -973,10 +973,10 @@ IF YOU DON'T KNOW:
             .update({ pending_escalation_question_id: questionRecord.id })
             .eq("phone", from);
           
-          return twimlResponse(`🎤 I heard: "${transcribedText}"\n\n${answer}\n\n---\nWant me to notify ${company.manager_name || "your manager"} about this question?\n\nReply Y for Yes, N for No`);
+          return twimlResponse(`Voice: I heard: "${transcribedText}"\n\n${answer}\n\n---\nWant me to notify ${company.manager_name || "your manager"} about this question?\n\nReply Y for Yes, N for No`);
         }
         
-        return twimlResponse(`🎤 I heard: "${transcribedText}"\n\n${answer}`);
+        return twimlResponse(`Voice: I heard: "${transcribedText}"\n\n${answer}`);
       } catch (error: any) {
         console.error("[SMS] Audio processing error:", error?.message || error);
         console.error("[SMS] Audio error stack:", error?.stack);
@@ -1060,7 +1060,7 @@ IF YOU DON'T KNOW:
           .update({ pending_escalation_question_id: questionRecord.id })
           .eq("phone", from);
         
-        const safetyPrefix = imageAnalysis.isSafetyRelated ? "⚠️ SAFETY: " : "";
+        const safetyPrefix = imageAnalysis.isSafetyRelated ? "️ SAFETY: " : "";
         return twimlResponse(`${safetyPrefix}${answer}\n\n---\nWant me to ask ${company.manager_name || "your manager"} about this?\n\nReply Y/N`);
       }
 
@@ -1100,7 +1100,7 @@ IF YOU DON'T KNOW:
       
       // Notify manager
       if (company?.manager_phone) {
-        const severityEmoji = issueAnalysis.severity === "high" ? "🚨" : issueAnalysis.severity === "medium" ? "⚠️" : "📋";
+        const severityEmoji = issueAnalysis.severity === "high" ? "ALERT" : issueAnalysis.severity === "medium" ? "️" : "NOTE";
         await sendSMS(
           company.manager_phone,
           `${severityEmoji} Issue Report #${issueRecord.id.slice(0, 8)}\n\nFrom: ${worker.name || "Worker"}\n${issueAnalysis.equipment ? `Equipment: ${issueAnalysis.equipment}\n` : ""}Issue: ${body}\n\nReply to this thread or check dashboard.`
@@ -1110,7 +1110,7 @@ IF YOU DON'T KNOW:
       // Confirm to worker
       const issueId = issueRecord.id.slice(0, 8).toUpperCase();
       const equipmentAck = issueAnalysis.equipment ? ` for ${issueAnalysis.equipment}` : "";
-      return twimlResponse(`✅ Logged issue #${issueId}${equipmentAck}. ${company?.manager_name || "Your manager"} has been notified. We'll follow up soon.`);
+      return twimlResponse(`OK Logged issue #${issueId}${equipmentAck}. ${company?.manager_name || "Your manager"} has been notified. We'll follow up soon.`);
     }
     // ============================================
     // END: Issue Detection
@@ -1137,7 +1137,7 @@ IF YOU DON'T KNOW:
     const isSafetyQuestion = containsSafetyTopic(body);
     const systemPrompt = `You are Sidekick, the AI assistant for ${company?.name || "this company"}. You're texting with ${worker.name || "a team member"}.
 
-${isSafetyQuestion ? `⚠️ SAFETY QUESTION — Be extra careful:
+${isSafetyQuestion ? `️ SAFETY QUESTION — Be extra careful:
 - Lead with safety warnings and required PPE
 - Cite specific SOPs when available ("Per Safety Manual:")
 - If unsure about ANY safety procedure, say so and recommend checking with supervisor

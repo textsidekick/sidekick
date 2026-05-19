@@ -426,10 +426,10 @@ const ProductDetailsPrimary = ({ setCurrentTitle, currentItemId }) => {
 																						className="fill-ratings"
 																						style={{ width: "100%" }}
 																					>
-																						<span>★★★★★</span>
+																						<span></span>
 																					</div>
 																					<div className="empty-ratings">
-																						<span>★★★★★</span>
+																						<span></span>
 																					</div>
 																				</div>
 																			</div>

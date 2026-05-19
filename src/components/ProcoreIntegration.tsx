@@ -43,7 +43,7 @@ export default function ProcoreIntegration({ companyId, darkMode = false, onDocu
           </button>
         </div>
       ) : (
-        <div style={{ fontSize: "12px", color: "#0a7", fontWeight: 500 }}>✓ Connected</div>
+        <div style={{ fontSize: "12px", color: "#0a7", fontWeight: 500 }}> Connected</div>
       )}
     </div>
   );

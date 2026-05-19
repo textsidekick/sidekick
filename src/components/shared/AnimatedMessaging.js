@@ -20,7 +20,7 @@ const AnimatedMessaging = () => {
     { type: 'question', icon: '?', color: '#007AFF' },
     { type: 'voice', icon: '●', color: '#34C759' },
     { type: 'file', icon: '▢', color: '#FF9500' },
-    { type: 'answer', icon: '✓', color: '#5856D6' },
+    { type: 'answer', icon: '', color: '#5856D6' },
   ];
 
   useEffect(() => {

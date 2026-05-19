@@ -108,7 +108,7 @@ const About1 = () => {
               >
                 <div style={{display: 'flex', gap: '4px', marginBottom: '16px'}}>
                   {[1,2,3,4,5].map(i => (
-                    <span key={i} style={{color: '#facc15', fontSize: '20px'}}>★</span>
+                    <span key={i} style={{color: '#facc15', fontSize: '20px'}}></span>
                   ))}
                 </div>
                 <p style={{color: '#1A1615', fontSize: '15px', lineHeight: '1.7', marginBottom: '20px'}}>

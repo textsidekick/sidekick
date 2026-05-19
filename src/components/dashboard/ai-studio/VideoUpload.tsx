@@ -63,7 +63,7 @@ function VideoUpload({}: VideoUploadProps) {
 
       <div className="mt-4">
         <p className="text-sm font-medium text-gray-700 dark:text-gray-600">
-          💡 Tips for best results:
+          Tip: Tips for best results:
         </p>
         <ul className="list-disc list-inside space-y-1 mt-2 text-sm text-gray-500 dark:text-gray-400">
           <li>Walk through each area at a steady pace</li>

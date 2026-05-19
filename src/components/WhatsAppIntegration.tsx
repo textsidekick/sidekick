@@ -41,7 +41,7 @@ export default function WhatsAppIntegration({ companyId, darkMode = false, onDoc
           </button>
         </div>
       ) : (
-        <div style={{ fontSize: "12px", color: "#0a7", fontWeight: 500 }}>✓ Connected</div>
+        <div style={{ fontSize: "12px", color: "#0a7", fontWeight: 500 }}> Connected</div>
       )}
     </div>
   );

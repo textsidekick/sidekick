@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     for (const worker of workers) {
       try {
         await twilioClient.messages.create({
-          body: `📢 ${message}`,
+          body: `NOTICE: ${message}`,
           from: twilioPhone,
           to: worker.phone,
         });

@@ -65,7 +65,7 @@ export async function POST(request: Request) {
       // ONLY valid completion path:
       return NextResponse.json({
         reply:
-          "🎉 Thanks — you’re all set! We’ll reach out soon with your next steps. Welcome to the team!",
+          "! Thanks — you’re all set! We’ll reach out soon with your next steps. Welcome to the team!",
         nextStep: 5,
         done: true,
       });

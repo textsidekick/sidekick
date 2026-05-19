@@ -6,6 +6,13 @@ import GoogleDriveIntegration from "@/components/GoogleDriveIntegration";
 import DropboxIntegration from "@/components/DropboxIntegration";
 import GustoIntegration from "@/components/GustoIntegration";
 import MicrosoftTeamsIntegration from "@/components/MicrosoftTeamsIntegration";
+import SharePointIntegration from "@/components/SharePointIntegration";
+import NotionIntegration from "@/components/NotionIntegration";
+import SlackIntegration from "@/components/SlackIntegration";
+import QuickBooksIntegration from "@/components/QuickBooksIntegration";
+import ConfluenceIntegration from "@/components/ConfluenceIntegration";
+import BoxIntegration from "@/components/BoxIntegration";
+import ZendeskIntegration from "@/components/ZendeskIntegration";
 import React from "react";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
@@ -844,6 +851,13 @@ export default function ManagerDashboard() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <GoogleDriveIntegration companyId={selectedCompany} darkMode={false} onDocumentImported={(doc) => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title, confidence: 1 } }])} />
                 <DropboxIntegration companyId={selectedCompany} darkMode={false} onDocumentImported={(doc) => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title, confidence: 1 } }])} />
+                <SharePointIntegration companyId={selectedCompany} darkMode={false} onDocumentImported={(doc) => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title, confidence: 1 } }])} />
+                <NotionIntegration companyId={selectedCompany} darkMode={false} onDocumentImported={(doc) => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title, confidence: 1 } }])} />
+                <SlackIntegration companyId={selectedCompany} darkMode={false} onDocumentImported={(doc) => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title, confidence: 1 } }])} />
+                <ConfluenceIntegration companyId={selectedCompany} darkMode={false} onDocumentImported={(doc) => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title, confidence: 1 } }])} />
+                <BoxIntegration companyId={selectedCompany} darkMode={false} onDocumentImported={(doc) => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title, confidence: 1 } }])} />
+                <ZendeskIntegration companyId={selectedCompany} darkMode={false} onDocumentImported={(doc) => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title, confidence: 1 } }])} />
+                <QuickBooksIntegration companyId={selectedCompany} darkMode={false} />
                 <GustoIntegration companyId={selectedCompany} darkMode={false} onEmployeesImported={(count) => console.log("Imported employees:", count)} />
                 <MicrosoftTeamsIntegration companyId={selectedCompany} darkMode={false} />
               </div>

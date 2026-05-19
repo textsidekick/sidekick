@@ -122,7 +122,7 @@ export default function MockupVoiceMemo() {
               color: colors.textMuted,
               fontStyle: 'italic',
             }}>
-              <span style={{ color: colors.purple }}>🎤 Transcribed:</span> "¿Dónde están los cascos de seguridad?"
+              <span style={{ color: colors.purple }}>Voice: Transcribed:</span> "¿Dónde están los cascos de seguridad?"
             </div>
           </div>
 
@@ -138,7 +138,7 @@ export default function MockupVoiceMemo() {
             }}>
               Los cascos de seguridad están en el armario de EPP junto a la entrada del almacén. Código de acceso: 4521.
               <div style={{ marginTop: 10, padding: 10, background: colors.cardLight, borderRadius: 8 }}>
-                <div style={{ fontSize: 11, color: colors.textMuted, marginBottom: 4 }}>📍 Location</div>
+                <div style={{ fontSize: 11, color: colors.textMuted, marginBottom: 4 }}>Location: Location</div>
                 <div style={{ fontSize: 12, color: colors.text }}>Warehouse Entrance - PPE Cabinet #3</div>
               </div>
             </div>

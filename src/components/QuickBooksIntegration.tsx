@@ -53,7 +53,7 @@ export default function QuickBooksIntegration({ companyId, darkMode = false, onD
           {loading ? "Connecting..." : "Connect QuickBooks"}
         </button>
       ) : (
-        <div style={{ fontSize: "12px", color: "#0a7", fontWeight: 500 }}>✓ Connected — Employee data synced</div>
+        <div style={{ fontSize: "12px", color: "#0a7", fontWeight: 500 }}> Connected — Employee data synced</div>
       )}
     </div>
   );

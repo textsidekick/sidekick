@@ -364,7 +364,7 @@ export default function QAInterface() {
 
             {/* Info */}
             <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4">
-              <h3 className="font-semibold text-blue-900 mb-2">💡 How it works</h3>
+              <h3 className="font-semibold text-blue-900 mb-2">Tip: How it works</h3>
               <ul className="space-y-2 text-sm text-blue-800">
                 <li>1. Upload your documents (handbooks, manuals)</li>
                 <li>2. AI automatically classifies and indexes them</li>

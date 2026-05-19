@@ -11,7 +11,7 @@ type Msg = {
 
 const ALL_MESSAGES: Msg[] = [
   { id: 0, text: "JOIN EDS", sender: "user" },
-  { id: 1, text: "Welcome to EDS Manufacturing 👋 I'm Sidekick, your text-based assistant. To get you set up, what's your name and role?", sender: "sidekick" },
+  { id: 1, text: "Welcome to EDS Manufacturing Hi I'm Sidekick, your text-based assistant. To get you set up, what's your name and role?", sender: "sidekick" },
   { id: 2, text: "Marcus Reyes — forklift operator, swing shift", sender: "user" },
   { id: 3, text: "Got it, Marcus. You're all set — text me anytime, in any language. Try asking about your shift, parking, uniforms, or anything in the SOPs.", sender: "sidekick" },
   { id: 4, text: "What time does my shift start tomorrow?", sender: "user" },

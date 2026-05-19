@@ -109,7 +109,7 @@ const tjMagicCursorAnimation = () => {
 
 	itCursor();
 
-	// 🔥 Cleanup function
+	//  Cleanup function
 	return () => {
 		listeners.forEach(({ el, event, handler }) => {
 			el.removeEventListener(event, handler);

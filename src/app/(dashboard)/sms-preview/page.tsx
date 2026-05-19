@@ -162,18 +162,18 @@ const FeatureMarquee = () => {
 const SMSDemo = () => {
   const [messages, setMessages] = useState<Array<{type: string, text?: string, isVoice?: boolean, duration?: string}>>([
     { type: 'outgoing', text: "Hello, today is my first day on the job at EDS Manufacturing in Santa Clara" },
-    { type: 'incoming', text: "Welcome to EDS Manufacturing, Santa Clara! 🎉 I'm Sidekick, your workplace assistant. Ask me anything!" },
+    { type: 'incoming', text: "Welcome to EDS Manufacturing, Santa Clara! ! I'm Sidekick, your workplace assistant. Ask me anything!" },
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   
   const conversationFlow = [
     { type: 'outgoing', text: 'Where do I park?' },
-    { type: 'incoming', text: 'Employee parking is in Lot B behind the main building. Visitor parking is in front. 🅿️' },
+    { type: 'incoming', text: 'Employee parking is in Lot B behind the main building. Visitor parking is in front. ️' },
     { type: 'outgoing', text: '¿A qué hora es el almuerzo?' },
-    { type: 'incoming', text: 'El almuerzo es de 12:00 PM a 1:00 PM. La cafetería está en el edificio principal. 🍽️' },
+    { type: 'incoming', text: 'El almuerzo es de 12:00 PM a 1:00 PM. La cafetería está en el edificio principal. ️' },
     { type: 'outgoing', isVoice: true, duration: '0:15' },
-    { type: 'incoming', text: '🎤 Got it! I learned 2 things from your voice message:\n\n"Safety vests are in the warehouse entrance. Hard hats are required in Zone B."' },
+    { type: 'incoming', text: 'Voice: Got it! I learned 2 things from your voice message:\n\n"Safety vests are in the warehouse entrance. Hard hats are required in Zone B."' },
     { type: 'outgoing', text: '안전 장비는 어디서 받나요?' },
     { type: 'incoming', text: '안전 장비는 창고 입구 옆 장비실에서 받으실 수 있습니다.' },
   ];
@@ -193,7 +193,7 @@ const SMSDemo = () => {
       const resetTimer = setTimeout(() => {
         setMessages([
           { type: 'outgoing', text: "Hello, today is my first day on the job at EDS Manufacturing in Santa Clara" },
-          { type: 'incoming', text: "Welcome to EDS Manufacturing, Santa Clara! 🎉 I'm Sidekick, your workplace assistant. Ask me anything!" },
+          { type: 'incoming', text: "Welcome to EDS Manufacturing, Santa Clara! ! I'm Sidekick, your workplace assistant. Ask me anything!" },
         ]);
         setFlowIndex(0);
       }, 3000);

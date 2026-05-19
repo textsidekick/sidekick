@@ -29,16 +29,16 @@ const staggerContainer = {
 const SMSDemo = () => {
   const [messages, setMessages] = useState([
     { type: 'outgoing', text: "Hello, today is my first day on the job at EDS Manufacturing in Santa Clara" },
-    { type: 'incoming', text: "Welcome to EDS Manufacturing, Santa Clara! 🎉 I'm Sidekick, your workplace assistant. Ask me anything!" },
+    { type: 'incoming', text: "Welcome to EDS Manufacturing, Santa Clara! ! I'm Sidekick, your workplace assistant. Ask me anything!" },
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const messagesContainerRef = useRef(null);
   
   const conversationFlow = [
     { type: 'outgoing', text: 'Where do I park?' },
-    { type: 'incoming', text: 'Employee parking is in Lot B behind the main building. Visitor parking is in front. 🅿️' },
+    { type: 'incoming', text: 'Employee parking is in Lot B behind the main building. Visitor parking is in front. ️' },
     { type: 'outgoing', text: '¿A qué hora es el almuerzo?' },
-    { type: 'incoming', text: 'El almuerzo es de 12:00 PM a 1:00 PM. La cafetería está en el edificio principal. 🍽️' },
+    { type: 'incoming', text: 'El almuerzo es de 12:00 PM a 1:00 PM. La cafetería está en el edificio principal. ️' },
   ];
   
   const [flowIndex, setFlowIndex] = useState(0);
@@ -54,7 +54,7 @@ const SMSDemo = () => {
       const resetTimer = setTimeout(() => {
         setMessages([
           { type: 'outgoing', text: "Hello, today is my first day on the job at EDS Manufacturing in Santa Clara" },
-          { type: 'incoming', text: "Welcome to EDS Manufacturing, Santa Clara! 🎉 I'm Sidekick, your workplace assistant. Ask me anything!" },
+          { type: 'incoming', text: "Welcome to EDS Manufacturing, Santa Clara! ! I'm Sidekick, your workplace assistant. Ask me anything!" },
         ]);
         setFlowIndex(0);
       }, 3000);
@@ -210,10 +210,10 @@ const Header = () => {
 // ============ HERO COMPONENT ============
 const Hero = () => {
   const featurePills = [
-    { icon: "🎤", title: "Voice Memos", desc: "Speak questions instead of typing" },
-    { icon: "🌍", title: "10+ Languages", desc: "Spanish, Korean, Mandarin & more" },
-    { icon: "📚", title: "Learns Over Time", desc: "From docs, voice memos & manager answers" },
-    { icon: "📱", title: "No App Needed", desc: "Works via SMS on any phone" },
+    { icon: "Voice:", title: "Voice Memos", desc: "Speak questions instead of typing" },
+    { icon: "", title: "10+ Languages", desc: "Spanish, Korean, Mandarin & more" },
+    { icon: "", title: "Learns Over Time", desc: "From docs, voice memos & manager answers" },
+    { icon: "", title: "No App Needed", desc: "Works via SMS on any phone" },
   ];
 
   return (
@@ -228,7 +228,7 @@ const Hero = () => {
             variants={staggerContainer}
           >
             <motion.p variants={fadeInUp} className="inline-block px-5 py-2 border border-[#1A161530] rounded-full text-sm font-medium text-[#1A1615] bg-white/80 mb-6">
-              ✨ Every hero needs a Sidekick
+               Every hero needs a Sidekick
             </motion.p>
             <motion.h1 variants={fadeInUp} className="text-5xl lg:text-6xl font-serif text-[#1A1615] mb-6 leading-tight">
               <em>Onboard</em> Faster.<br/>Answer Instantly.
@@ -287,7 +287,7 @@ const Marquee = () => {
         <div className="marquee-track">
           {[...items, ...items, ...items, ...items].map((item, idx) => (
             <div key={idx} className="marquee-item">
-              <span className="text-yellow-400 text-lg">★</span>
+              <span className="text-yellow-400 text-lg"></span>
               <span className="text-white text-xl font-medium">{item}</span>
             </div>
           ))}
@@ -322,9 +322,9 @@ const Marquee = () => {
 // ============ FEATURES COMPONENT ============
 const Features = () => {
   const features = [
-    { icon: "💬", title: "SMS & Voice Support", desc: "Workers text or send voice memos in any language. No app downloads, no training required—just instant answers via SMS." },
-    { icon: "🌍", title: "10+ Languages", desc: "Sidekick understands and responds in Spanish, Korean, Mandarin, Vietnamese, and more. Every worker gets help in their preferred language." },
-    { icon: "📊", title: "Gap Detection & Insights", desc: "AI identifies training gaps, trending questions, and suggests improvements—helping managers take action before small issues become big problems." },
+    { icon: "REPLY:", title: "SMS & Voice Support", desc: "Workers text or send voice memos in any language. No app downloads, no training required—just instant answers via SMS." },
+    { icon: "", title: "10+ Languages", desc: "Sidekick understands and responds in Spanish, Korean, Mandarin, Vietnamese, and more. Every worker gets help in their preferred language." },
+    { icon: "SHEET", title: "Gap Detection & Insights", desc: "AI identifies training gaps, trending questions, and suggests improvements—helping managers take action before small issues become big problems." },
   ];
 
   return (
@@ -337,7 +337,7 @@ const Features = () => {
           variants={staggerContainer}
           className="text-center mb-12"
         >
-          <motion.span variants={fadeInUp} className="text-sm font-medium text-[#1A1615] mb-4 block">✨ Why Sidekick</motion.span>
+          <motion.span variants={fadeInUp} className="text-sm font-medium text-[#1A1615] mb-4 block"> Why Sidekick</motion.span>
           <motion.h2 variants={fadeInUp} className="text-4xl font-serif text-[#1A1615]">Built for <span>Frontline Teams.</span></motion.h2>
         </motion.div>
         
@@ -394,7 +394,7 @@ const About = () => {
             viewport={{ once: true, margin: "-100px" }}
             variants={staggerContainer}
           >
-            <motion.span variants={fadeInUp} className="text-sm font-medium text-[#1A1615] mb-4 block">✨ The Problem We Solve</motion.span>
+            <motion.span variants={fadeInUp} className="text-sm font-medium text-[#1A1615] mb-4 block"> The Problem We Solve</motion.span>
             <motion.h2 variants={fadeInUp} className="text-4xl font-serif text-[#1A1615] mb-6">80% of workers don't sit at a desk. Onboarding them shouldn't be <span>this hard.</span></motion.h2>
             <motion.p variants={fadeInUp} className="text-[#1A1615]/80 mb-4">Frontline workers in manufacturing, retail, and logistics are constantly interrupting managers with the same questions. Paper handbooks get lost. Training videos get skipped. And turnover keeps climbing.</motion.p>
             <motion.p variants={fadeInUp} className="text-[#1A1615]/80 mb-8">Sidekick changes that. Workers simply text their questions and get instant, accurate answers from your company documents—in any language, 24/7.</motion.p>
@@ -407,7 +407,7 @@ const About = () => {
             
             <motion.div variants={fadeInUp} className="mt-8 bg-[#F5F3F0]/90 rounded-3xl p-8">
               <div className="flex gap-1 mb-4">
-                {[1,2,3,4,5].map(i => <span key={i} className="text-yellow-400 text-xl">★</span>)}
+                {[1,2,3,4,5].map(i => <span key={i} className="text-yellow-400 text-xl"></span>)}
               </div>
               <p className="text-[#1A1615] mb-6">"Sidekick cut our onboarding time in half. New hires used to interrupt managers constantly—now they just text and get instant answers."</p>
               <div>
@@ -465,7 +465,7 @@ const Portfolio = () => {
           variants={staggerContainer}
           className="mb-12"
         >
-          <motion.span variants={fadeInUp} className="text-sm font-medium text-[#1A1615] mb-4 block">✨ See It In Action</motion.span>
+          <motion.span variants={fadeInUp} className="text-sm font-medium text-[#1A1615] mb-4 block"> See It In Action</motion.span>
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <motion.h2 variants={fadeInUp} className="text-4xl font-serif text-[#1A1615]">Two Views. One <span>Platform.</span></motion.h2>
             <motion.p variants={fadeInUp} className="text-[#1A1615]/80 max-w-md">Workers get instant answers via text. Managers get insights and analytics to improve onboarding.</motion.p>
@@ -529,7 +529,7 @@ const Testimonials = () => {
           variants={staggerContainer}
           className="text-center mb-12"
         >
-          <motion.span variants={fadeInUp} className="text-sm font-medium text-[#1A1615] mb-4 block">✨ What Our Customers Say</motion.span>
+          <motion.span variants={fadeInUp} className="text-sm font-medium text-[#1A1615] mb-4 block"> What Our Customers Say</motion.span>
           <motion.h2 variants={fadeInUp} className="text-4xl font-serif text-[#1A1615]">Trusted by Frontline Teams Everywhere.</motion.h2>
         </motion.div>
         
@@ -586,7 +586,7 @@ const FAQ = () => {
             variants={fadeInLeft}
             className="bg-[#F5F3F0]/90 rounded-[32px] p-10 h-fit"
           >
-            <span className="text-sm font-medium text-[#1A1615] mb-4 block">✨ Common Questions</span>
+            <span className="text-sm font-medium text-[#1A1615] mb-4 block"> Common Questions</span>
             <h2 className="text-4xl font-serif text-[#1A1615] mb-4">Frequently Asked Questions</h2>
             <p className="text-[#1A1615]/70 mb-8">Everything you need to know about Sidekick. Can't find the answer you're looking for? Book a demo and we'll walk you through it.</p>
             <a href="https://cal.com/justin-so-xnr0oc/sidekick-demo" target="_blank" className="inline-flex bg-[#1A1615] text-white px-7 py-3 rounded-full font-medium hover:bg-blue-500 transition-colors">

@@ -18,10 +18,10 @@ const TestimonialsCard8 = ({ testimonial, idx, className }) => {
 		>
 			<div className="star-ratings">
 				<div className="fill-ratings">
-					<span>★★★★★</span>
+					<span></span>
 				</div>
 				<div className="empty-ratings">
-					<span>★★★★★</span>
+					<span></span>
 				</div>
 			</div>
 			<div className="desc">

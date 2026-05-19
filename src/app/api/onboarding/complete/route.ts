@@ -263,7 +263,7 @@ Return ONLY valid JSON, no markdown. Include all fields that have data.`;
           body: JSON.stringify({
             from: "Sidekick <notifications@textsidekick.com>",
             to: ["hello@textsidekick.com"],
-            subject: `🎉 New signup: ${extractedData.companyName}`,
+            subject: `! New signup: ${extractedData.companyName}`,
             html: `<h2>New company signed up!</h2>
               <p><strong>Company:</strong> ${extractedData.companyName}</p>
               <p><strong>Manager:</strong> ${extractedData.managerName || "Not provided"}</p>

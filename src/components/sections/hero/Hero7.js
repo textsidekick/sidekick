@@ -86,10 +86,10 @@ const Hero7 = () => {
 									>
 										<div className="star-ratings">
 											<div className="fill-ratings" style={{ width: "100%" }}>
-												<span>★★★★★</span>
+												<span></span>
 											</div>
 											<div className="empty-ratings">
-												<span>★★★★★</span>
+												<span></span>
 											</div>
 										</div>
 										<h5 className="customers-text">100+ happy customer.</h5>

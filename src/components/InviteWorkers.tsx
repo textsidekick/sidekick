@@ -38,7 +38,7 @@ export default function InviteWorkers({ companyId, accessCode, twilioNumber = "+
 
   if (sent) return (
     <div style={{ textAlign: "center", padding: 20 }}>
-      <div style={{ fontSize: 32, marginBottom: 8 }}>{"✅"}</div>
+      <div style={{ fontSize: 32, marginBottom: 8 }}>{"OK"}</div>
       <p style={{ fontSize: 14, fontWeight: 600, color: "#1C1A16" }}>Invites sent to {count} workers!</p>
       <p style={{ fontSize: 12, color: "rgba(28,26,22,0.5)" }}>They'll receive a text with instructions to join.</p>
       <button onClick={() => { setSent(false); setPhones(""); }} style={{ marginTop: 8, fontSize: 12, color: "#C96442", background: "none", border: "none", cursor: "pointer" }}>Send more</button>

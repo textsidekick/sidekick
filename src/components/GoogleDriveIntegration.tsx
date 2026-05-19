@@ -78,10 +78,10 @@ export default function GoogleDriveIntegration({ companyId, darkMode = false, on
   };
 
   const getMimeTypeIcon = (mimeType: string) => {
-    if (mimeType.includes("pdf")) return "📄";
-    if (mimeType.includes("document") || mimeType.includes("word")) return "📝";
-    if (mimeType.includes("spreadsheet") || mimeType.includes("sheet")) return "📊";
-    return "📁";
+    if (mimeType.includes("pdf")) return "FILE";
+    if (mimeType.includes("document") || mimeType.includes("word")) return "DOC";
+    if (mimeType.includes("spreadsheet") || mimeType.includes("sheet")) return "SHEET";
+    return "FOLDER";
   };
 
   const formatFileSize = (bytes?: string) => {

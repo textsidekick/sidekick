@@ -31,10 +31,10 @@ const TestimonialsCard4 = ({ testimonial }) => {
 				</div>
 				<div className="star-ratings">
 					<div className="fill-ratings" style={{ width: "100%" }}>
-						<span>★★★★★</span>
+						<span></span>
 					</div>
 					<div className="empty-ratings">
-						<span>★★★★★</span>
+						<span></span>
 					</div>
 				</div>
 			</div>
