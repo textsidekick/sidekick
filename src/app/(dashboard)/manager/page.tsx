@@ -53,6 +53,7 @@ import ActivityFeed from "@/components/dashboard/ActivityFeed";
 import SMSSimulator from "@/components/dashboard/SMSSimulator";
 import DemoMode from "@/components/dashboard/DemoMode";
 import KnowledgeGapAlerts from "@/components/dashboard/KnowledgeGapAlerts";
+import UpgradeBanner from "@/components/dashboard/UpgradeBanner";
 import { DocumentsTab } from "@/components/dashboard/documents/DocumentsTab";
 import { UploadZone } from "@/components/dashboard/documents/UploadZone";
 import { WorkersTable } from "@/components/dashboard/workers/WorkersTable";
@@ -739,8 +740,13 @@ export default function ManagerDashboard() {
         <QuickStats companyId={selectedCompany} />
         <div className="flex items-center justify-between gap-4">
           <LanguageBadge />
-          <DemoMode companyId={selectedCompany} />  
+          <DemoMode companyId={selectedCompany} />
         </div>
+
+        {/* Upgrade banner for trial users */}
+        {trialInfo?.plan === "trial" && (
+          <UpgradeBanner companyId={selectedCompany} plan={trialInfo.plan} />  
+        )}
 
         {/* Trial Banner */}
         {trialInfo && trialInfo.plan === "trial" && (
