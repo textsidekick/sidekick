@@ -47,6 +47,11 @@ import { AlertsTable } from "@/components/dashboard/alerts/AlertsTable";
 import { DocumentsTable } from "@/components/dashboard/documents/DocumentsTable";
 import KnowledgeBaseViewer from "@/components/dashboard/documents/KnowledgeBaseViewer";
 import GeneratedReports from "@/components/dashboard/documents/GeneratedReports";
+import QuickStats from "@/components/dashboard/QuickStats";
+import LanguageBadge from "@/components/dashboard/LanguageBadge";
+import ActivityFeed from "@/components/dashboard/ActivityFeed";
+import SMSSimulator from "@/components/dashboard/SMSSimulator";
+import DemoMode from "@/components/dashboard/DemoMode";
 import { DocumentsTab } from "@/components/dashboard/documents/DocumentsTab";
 import { UploadZone } from "@/components/dashboard/documents/UploadZone";
 import { WorkersTable } from "@/components/dashboard/workers/WorkersTable";
@@ -144,7 +149,7 @@ function AnimatedNumber({ value, duration = 1000 }: { value: number; duration?: 
 // ─── Main component ────────────────────────────────────────────────────────────
 export default function ManagerDashboard() {
   // All existing state (unchanged)
-  const [activeTab, setActiveTab] = useState<"analytics" | "alerts" | "documents" | "workers">("analytics");
+  const [activeTab, setActiveTab] = useState<"analytics" | "alerts" | "documents" | "workers" | "test">("analytics");
   const [companies, setCompanies] = useState<Company[]>([]);
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [selectedCompany, setSelectedCompany] = useState<string>("");
@@ -689,6 +694,7 @@ export default function ManagerDashboard() {
               { id: "alerts",     label: "Alerts",     Icon: AlertTriangle },
               { id: "documents",  label: "Documents",  Icon: FileText },
                             { id: "workers",    label: "Workers",    Icon: Users },
+              { id: "test",       label: "Test",       Icon: Phone },
             ] as const).map(tab => (
               <button
                 key={tab.id}
@@ -726,7 +732,14 @@ export default function ManagerDashboard() {
       )}
 
       {/* ── Tab content ───────────────────────────────────────────────────────── */}
-      <div className="max-w-7xl mx-auto px-6 py-6">
+      <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+
+        {/* Quick Stats + Language Badge */}
+        <QuickStats companyId={selectedCompany} />
+        <div className="flex items-center justify-between gap-4">
+          <LanguageBadge />
+          <DemoMode companyId={selectedCompany} />  
+        </div>
 
         {/* Trial Banner */}
         {trialInfo && trialInfo.plan === "trial" && (
@@ -801,6 +814,9 @@ export default function ManagerDashboard() {
                 emptyDescription="Team activity will show up here."
               />
             </div>
+
+            {/* Activity Feed */}
+            <ActivityFeed companyId={selectedCompany} />
           </div>
         )}
 
@@ -967,6 +983,17 @@ export default function ManagerDashboard() {
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {/* TEST TAB - SMS Simulator */}
+        {activeTab === "test" && (
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="text-xl font-semibold text-gray-900">Test Your Knowledge Base</h2>
+              <p className="text-sm text-gray-500 mt-1">See how workers experience Sidekick via SMS. Ask a question below.</p>
+            </div>
+            <SMSSimulator companyId={selectedCompany} />
           </div>
         )}
       </div>
