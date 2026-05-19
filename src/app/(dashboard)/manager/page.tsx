@@ -46,6 +46,7 @@ import { AlertCharts } from "@/components/dashboard/alerts/AlertCharts";
 import { AlertsTable } from "@/components/dashboard/alerts/AlertsTable";
 import { DocumentsTable } from "@/components/dashboard/documents/DocumentsTable";
 import KnowledgeBaseViewer from "@/components/dashboard/documents/KnowledgeBaseViewer";
+import GeneratedReports from "@/components/dashboard/documents/GeneratedReports";
 import { DocumentsTab } from "@/components/dashboard/documents/DocumentsTab";
 import { UploadZone } from "@/components/dashboard/documents/UploadZone";
 import { WorkersTable } from "@/components/dashboard/workers/WorkersTable";
@@ -866,6 +867,9 @@ export default function ManagerDashboard() {
 
             {/* Documents table wired to real data */}
             <DocumentsTable documents={mappedDocuments} />
+
+            {/* AI-Generated Reports */}
+            <GeneratedReports companyId={selectedCompany} />
 
             {/* Knowledge Base - see all imported data */}
             <KnowledgeBaseViewer companyId={selectedCompany} />
