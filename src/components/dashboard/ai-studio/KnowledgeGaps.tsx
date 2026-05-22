@@ -15,27 +15,19 @@ interface KnowledgeGapsProps {
   gaps: KnowledgeGap[]
 }
 
-const MOCK_GAPS: KnowledgeGap[] = [
-  { id: '1', question: 'What is the proper procedure for chemical spills?', frequency: 12, category: 'Safety' },
-  { id: '2', question: 'Where are the emergency exits on the second floor?', frequency: 8, category: 'Safety' },
-  { id: '3', question: 'What are the overtime policies for weekend shifts?', frequency: 6, category: 'HR' },
-  { id: '4', question: 'How do I report a broken piece of equipment?', frequency: 5, category: 'Equipment' },
-  { id: '5', question: 'What PPE is required in the loading dock area?', frequency: 4, category: 'Safety' },
-]
-
 function KnowledgeGaps({ gaps }: KnowledgeGapsProps) {
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
+    <div className="rounded-xl border border-gray-200 bg-white [box-shadow:var(--card-shadow)] p-5">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-start gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/30">
-            <Zap className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-100">
+            <Zap className="h-6 w-6 text-amber-600" />
           </div>
           <div>
-            <h3 className="text-base font-semibold text-gray-900 dark:text-gray-900">
+            <h3 className="text-base font-semibold text-gray-900">
               Generate from Knowledge Gaps
             </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+            <p className="text-sm text-gray-500 leading-relaxed">
               Create policies based on unanswered worker questions
             </p>
           </div>
@@ -57,17 +49,17 @@ function KnowledgeGaps({ gaps }: KnowledgeGapsProps) {
           {gaps.map((gap) => (
             <div
               key={gap.id}
-              className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-200 last:border-0"
+              className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0"
             >
               <div>
-                <p className="text-sm text-gray-900 dark:text-gray-900">
+                <p className="text-sm text-gray-900">
                   {gap.question}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                <p className="text-xs text-gray-500 mt-0.5">
                   {gap.category}
                 </p>
               </div>
-              <span className="text-sm font-medium text-gray-500 dark:text-gray-400 shrink-0 ml-4">
+              <span className="text-sm font-medium text-gray-500 shrink-0 ml-4">
                 {gap.frequency} asks
               </span>
             </div>
@@ -78,5 +70,5 @@ function KnowledgeGaps({ gaps }: KnowledgeGapsProps) {
   )
 }
 
-export { KnowledgeGaps, MOCK_GAPS }
+export { KnowledgeGaps }
 export type { KnowledgeGapsProps, KnowledgeGap }

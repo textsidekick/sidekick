@@ -2,27 +2,21 @@
 
 import { Sparkles } from 'lucide-react'
 import { VideoUpload } from './VideoUpload'
-import { KnowledgeGaps, MOCK_GAPS } from './KnowledgeGaps'
+import { KnowledgeGaps } from './KnowledgeGaps'
 import { ContentCards } from './ContentCards'
 import { StorageSidebar } from './StorageSidebar'
 
-interface AIStudioTabProps {
-  showMockData?: boolean
-}
-
-function AIStudioTab({ showMockData = false }: AIStudioTabProps) {
-  const gaps = showMockData ? MOCK_GAPS : []
-
+function AIStudioTab() {
   return (
     <div>
-      {/* Page heading — unique to AI Studio */}
+      {/* Page heading */}
       <div className="flex items-center gap-3 mb-6">
-        <Sparkles className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+        <Sparkles className="h-6 w-6 text-purple-600" />
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-900">
+          <h2 className="text-lg font-semibold text-gray-900">
             Create Content
           </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-gray-500">
             Generate training materials, policies, and guides from your facility knowledge
           </p>
         </div>
@@ -32,17 +26,16 @@ function AIStudioTab({ showMockData = false }: AIStudioTabProps) {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
         {/* Main content */}
         <div className="space-y-6">
-          <ContentCards showMockData={showMockData} />
+          <ContentCards />
           <VideoUpload />
-          <KnowledgeGaps gaps={gaps} />
+          <KnowledgeGaps gaps={[]} />
         </div>
 
         {/* Sidebar */}
-        <StorageSidebar showMockData={showMockData} />
+        <StorageSidebar />
       </div>
     </div>
   )
 }
 
 export { AIStudioTab }
-export type { AIStudioTabProps }

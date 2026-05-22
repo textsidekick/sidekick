@@ -1,76 +1,79 @@
 'use client'
 
 import { SectionHeader } from '@/components/dashboard/shared/SectionHeader'
+import { EmptyState } from '@/components/dashboard/shared/EmptyState'
+import { Lightbulb } from 'lucide-react'
 
-interface GapItem {
-  topic: string
-  category: string
+export interface GapItem {
+  id: string
+  question: string
   frequency: number
-  gapScore: number
+  category: string
 }
-
-const []: GapItem[] = [
-  { topic: 'Forklift certification renewal', category: 'Safety', frequency: 34, gapScore: 92 },
-  { topic: 'Overtime pay calculation', category: 'HR', frequency: 28, gapScore: 87 },
-  { topic: 'Chemical spill procedure', category: 'Safety', frequency: 22, gapScore: 85 },
-  { topic: 'PTO rollover policy', category: 'HR', frequency: 19, gapScore: 78 },
-  { topic: 'Loading dock protocol', category: 'Training', frequency: 15, gapScore: 71 },
-]
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Safety: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-  HR: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-[#C96442]',
-  Training: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+  Safety: 'bg-red-100 text-red-700',
+  HR: 'bg-blue-100 text-blue-700',
+  Training: 'bg-amber-100 text-amber-700',
+  General: 'bg-gray-100 text-gray-700',
 }
 
-function TopGapsTable() {
+interface TopGapsTableProps {
+  gaps?: GapItem[]
+}
+
+function TopGapsTable({ gaps = [] }: TopGapsTableProps) {
+  const hasData = gaps.length > 0
+
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
+    <div className="rounded-xl border border-gray-200 bg-white [box-shadow:var(--card-shadow)] p-5">
       <SectionHeader title="Top Unanswered Topics" subtitle="Questions Sidekick couldn't resolve" />
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-gray-100 dark:border-gray-200">
-              <th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                Topic
-              </th>
-              <th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                Category
-              </th>
-              <th className="pb-2 text-right text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                Asks
-              </th>
-              <th className="pb-2 text-right text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                Gap Score
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50 dark:divide-gray-800/50">
-            {[].map((gap) => (
-              <tr key={gap.topic} className="group">
-                <td className="py-2.5 pr-4 text-sm font-medium text-gray-900 dark:text-gray-900">
-                  {gap.topic}
-                </td>
-                <td className="py-2.5 pr-4">
-                  <span
-                    className={`inline-block rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                      CATEGORY_COLORS[gap.category] ?? 'bg-gray-100 text-gray-700 dark:bg-white dark:text-gray-400'
-                    }`}
-                  >
-                    {gap.category}
-                  </span>
-                </td>
-                <td className="py-2.5 text-right text-sm tabular-nums text-gray-600 dark:text-gray-400">
-                  {gap.frequency}
-                </td>
-                <td className="py-2.5 text-right text-sm font-semibold tabular-nums text-red-600 dark:text-red-400">
-                  {gap.gapScore}
-                </td>
+      {!hasData ? (
+        <EmptyState
+          icon={Lightbulb}
+          title="No gaps detected"
+          description="Unanswered question topics will appear here once workers start asking questions."
+        />
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-100">
+                <th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">
+                  Topic
+                </th>
+                <th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">
+                  Category
+                </th>
+                <th className="pb-2 text-right text-[11px] font-medium uppercase tracking-wide text-gray-500">
+                  Asks
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {gaps.map((gap) => (
+                <tr key={gap.id} className="group">
+                  <td className="py-2.5 pr-4 text-sm font-medium text-gray-900">
+                    {gap.question}
+                  </td>
+                  <td className="py-2.5 pr-4">
+                    <span
+                      className={`inline-block rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                        CATEGORY_COLORS[gap.category] ?? 'bg-gray-100 text-gray-700'
+                      }`}
+                    >
+                      {gap.category}
+                    </span>
+                  </td>
+                  <td className="py-2.5 text-right text-sm tabular-nums text-gray-600">
+                    {gap.frequency}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   )
 }

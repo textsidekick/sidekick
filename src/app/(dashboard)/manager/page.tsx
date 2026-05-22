@@ -6,13 +6,6 @@ import GoogleDriveIntegration from "@/components/GoogleDriveIntegration";
 import DropboxIntegration from "@/components/DropboxIntegration";
 import GustoIntegration from "@/components/GustoIntegration";
 import MicrosoftTeamsIntegration from "@/components/MicrosoftTeamsIntegration";
-import SharePointIntegration from "@/components/SharePointIntegration";
-import NotionIntegration from "@/components/NotionIntegration";
-import SlackIntegration from "@/components/SlackIntegration";
-import QuickBooksIntegration from "@/components/QuickBooksIntegration";
-import ConfluenceIntegration from "@/components/ConfluenceIntegration";
-import BoxIntegration from "@/components/BoxIntegration";
-import ZendeskIntegration from "@/components/ZendeskIntegration";
 import React from "react";
 import { useState, useEffect, useRef } from "react";
 import {
@@ -45,7 +38,6 @@ import { DocumentsTable } from "@/components/dashboard/documents/DocumentsTable"
 import KnowledgeBaseViewer from "@/components/dashboard/documents/KnowledgeBaseViewer";
 import GeneratedReports from "@/components/dashboard/documents/GeneratedReports";
 import QuickStats from "@/components/dashboard/QuickStats";
-import LanguageBadge from "@/components/dashboard/LanguageBadge";
 import SMSSimulator from "@/components/dashboard/SMSSimulator";
 import DemoMode from "@/components/dashboard/DemoMode";
 import UpgradeBanner from "@/components/dashboard/UpgradeBanner";
@@ -615,8 +607,7 @@ export default function ManagerDashboard() {
           <div className="space-y-6">
             {/* Quick Stats + Language Badge + Demo Mode — analytics only */}
             <QuickStats companyId={selectedCompany} />
-            <div className="flex items-center justify-between gap-4">
-              <LanguageBadge />
+            <div className="flex items-center justify-end gap-4">
               <DemoMode companyId={selectedCompany} />
             </div>
 
@@ -644,19 +635,52 @@ export default function ManagerDashboard() {
             </div>
 
             {/* Main chart: full width */}
-            <QuestionsPerHourChart />
+            <QuestionsPerHourChart data={
+              Array.from({ length: 24 }, (_, i) => ({
+                hour: i === 0 ? '12a' : i < 12 ? `${i}a` : i === 12 ? '12p' : `${i - 12}p`,
+                questions: byHour[i] || 0,
+              }))
+            } />
 
             {/* Three-column row */}
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-              <CategorySummary />
-              <AnswerSourcesChart />
-              <TopGapsTable />
+              <CategorySummary data={Object.entries(stats?.byTopic || {}).map(([topic, count]) => {
+                const topicColors: Record<string, string> = {
+                  parking: 'bg-blue-400', schedule: 'bg-purple-400', safety: 'bg-red-400',
+                  compensation: 'bg-green-400', benefits: 'bg-pink-400', breaks: 'bg-amber-400',
+                  dress_code: 'bg-indigo-400', contacts: 'bg-cyan-400', training: 'bg-violet-400',
+                  pto: 'bg-teal-400', general: 'bg-slate-400',
+                };
+                return { name: TOPIC_LABELS[topic]?.label || topic, count: count as number, color: topicColors[topic] || 'bg-gray-400' };
+              })} />
+              <AnswerSourcesChart data={stats ? [
+                { name: 'Answered', value: Math.round((stats.totalQuestions * stats.answeredRate) / 100), color: '#10b981', darkColor: '#34d399' },
+                { name: 'Unanswered', value: Math.round((stats.totalQuestions * (100 - stats.answeredRate)) / 100), color: '#e2e8f0', darkColor: '#475569' },
+              ].filter(d => d.value > 0) : []} />
+              <TopGapsTable gaps={mappedGaps} />
             </div>
 
             {/* Two-column row: charts */}
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              <QuestionsChart />
-              <ResolutionChart />
+              <QuestionsChart data={(() => {
+                const byDate: Record<string, number> = {};
+                (stats?.recentQuestions || []).forEach(q => {
+                  const d = q.created_at.split('T')[0];
+                  byDate[d] = (byDate[d] || 0) + 1;
+                });
+                return Object.entries(byDate)
+                  .sort(([a], [b]) => a.localeCompare(b))
+                  .slice(-14)
+                  .map(([date, count]) => ({
+                    label: new Date(date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                    count,
+                  }));
+              })()} />
+              <ResolutionChart data={stats ? [{
+                label: 'Overall',
+                resolved: Math.round((stats.totalQuestions * stats.answeredRate) / 100),
+                unanswered: Math.round((stats.totalQuestions * (100 - stats.answeredRate)) / 100),
+              }] : []} />
             </div>
 
             {/* Two-column row: feeds */}
@@ -727,15 +751,8 @@ export default function ManagerDashboard() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <GoogleDriveIntegration companyId={selectedCompany} darkMode={false} onDocumentImported={(doc) => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title, confidence: 1 } }])} />
                 <DropboxIntegration companyId={selectedCompany} darkMode={false} onDocumentImported={(doc) => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title, confidence: 1 } }])} />
-                <SharePointIntegration companyId={selectedCompany} darkMode={false} onDocumentImported={(doc) => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title, confidence: 1 } }])} />
-                <NotionIntegration companyId={selectedCompany} darkMode={false} onDocumentImported={(doc) => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title, confidence: 1 } }])} />
-                <SlackIntegration companyId={selectedCompany} darkMode={false} onDocumentImported={(doc) => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title, confidence: 1 } }])} />
-                <ConfluenceIntegration companyId={selectedCompany} darkMode={false} onDocumentImported={(doc) => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title, confidence: 1 } }])} />
-                <BoxIntegration companyId={selectedCompany} darkMode={false} onDocumentImported={(doc) => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title, confidence: 1 } }])} />
-                <ZendeskIntegration companyId={selectedCompany} darkMode={false} onDocumentImported={(doc) => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title, confidence: 1 } }])} />
-                <QuickBooksIntegration companyId={selectedCompany} darkMode={false} />
-                <GustoIntegration companyId={selectedCompany} darkMode={false} onEmployeesImported={(count) => console.log("Imported employees:", count)} />
                 <MicrosoftTeamsIntegration companyId={selectedCompany} darkMode={false} />
+                <GustoIntegration companyId={selectedCompany} darkMode={false} onEmployeesImported={(count) => console.log("Imported employees:", count)} />
               </div>
             </div>
 

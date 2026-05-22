@@ -12,7 +12,7 @@ interface RegistrationCardProps {
   smsNumber?: string;
 }
 
-function RegistrationCard({ joinCode = 'ABC123', smsNumber = '+1 (888) 707-4659' }: RegistrationCardProps) {
+function RegistrationCard({ joinCode, smsNumber = '+1 (888) 707-4659' }: RegistrationCardProps) {
   const [qrOpen, setQrOpen] = useState(false)
   const [copied, setCopied] = useState(false)
 
@@ -43,9 +43,13 @@ function RegistrationCard({ joinCode = 'ABC123', smsNumber = '+1 (888) 707-4659'
           <p className="text-xs text-gray-400 dark:text-gray-500">
             Workers text this to join:
           </p>
-          <p className="font-mono text-2xl font-bold text-[#C96442] dark:text-[#C96442] tracking-wider">
-            JOIN {joinCode}
-          </p>
+          {joinCode ? (
+            <p className="font-mono text-2xl font-bold text-[#C96442] dark:text-[#C96442] tracking-wider">
+              JOIN {joinCode}
+            </p>
+          ) : (
+            <div className="h-8 w-32 bg-gray-100 animate-pulse rounded" />
+          )}
           <p className="text-xs text-gray-400 dark:text-gray-500">
             Send to: {smsNumber}
           </p>
@@ -65,11 +69,13 @@ function RegistrationCard({ joinCode = 'ABC123', smsNumber = '+1 (888) 707-4659'
         </Button>
       </div>
 
-      <QRCodeModal
-        joinCode={joinCode}
-        open={qrOpen}
-        onOpenChange={setQrOpen}
-      />
+      {joinCode && (
+        <QRCodeModal
+          joinCode={joinCode}
+          open={qrOpen}
+          onOpenChange={setQrOpen}
+        />
+      )}
     </div>
   )
 }
