@@ -23,17 +23,6 @@ interface WorkerItem {
   status: WorkerStatus
 }
 
-const MOCK_WORKERS: WorkerItem[] = [
-  { id: 'w1', name: 'Maria Garcia', phone: '+1 (555) 234-5678', joinDate: '2026-03-01', status: 'verified' },
-  { id: 'w2', name: 'James Wilson', phone: '+1 (555) 345-6789', joinDate: '2026-03-03', status: 'verified' },
-  { id: 'w3', name: 'Aisha Patel', phone: '+1 (555) 456-7890', joinDate: '2026-03-05', status: 'verified' },
-  { id: 'w4', name: 'Carlos Rivera', phone: '+1 (555) 567-8901', joinDate: '2026-03-07', status: 'verified' },
-  { id: 'w5', name: 'Sarah Kim', phone: '+1 (555) 678-9012', joinDate: '2026-03-08', status: 'verified' },
-  { id: 'w6', name: 'Chen Wei', phone: '+1 (555) 789-0123', joinDate: '2026-03-10', status: 'pending' },
-  { id: 'w7', name: 'David Okafor', phone: '+1 (555) 890-1234', joinDate: '2026-03-14', status: 'pending' },
-  { id: 'w8', name: 'Emily Nguyen', phone: '+1 (555) 901-2345', joinDate: '2026-03-16', status: 'pending' },
-]
-
 interface WorkersTableProps {
   workers: WorkerItem[]
 }
@@ -129,5 +118,5 @@ function WorkersTable({ workers }: WorkersTableProps) {
   )
 }
 
-export { WorkersTable, MOCK_WORKERS }
+export { WorkersTable }
 export type { WorkersTableProps, WorkerItem }

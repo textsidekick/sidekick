@@ -22,15 +22,6 @@ interface DocumentItem {
   uploadDate: string
 }
 
-const MOCK_DOCUMENTS: DocumentItem[] = [
-  { id: 'd1', name: 'Employee Safety Manual', type: 'PDF', size: '2.4 MB', uploadDate: '2026-03-01' },
-  { id: 'd2', name: 'Equipment Checklist', type: 'Word', size: '156 KB', uploadDate: '2026-03-05' },
-  { id: 'd3', name: 'Shift Schedule Template', type: 'Excel', size: '89 KB', uploadDate: '2026-03-08' },
-  { id: 'd4', name: 'Onboarding Guide', type: 'PDF', size: '1.8 MB', uploadDate: '2026-03-10' },
-  { id: 'd5', name: 'Cleaning Procedures', type: 'PDF', size: '3.1 MB', uploadDate: '2026-03-12' },
-  { id: 'd6', name: 'Emergency Contacts', type: 'Text', size: '12 KB', uploadDate: '2026-03-15' },
-]
-
 interface DocumentsTableProps {
   documents: DocumentItem[]
 }
@@ -121,5 +112,5 @@ function DocumentsTable({ documents }: DocumentsTableProps) {
   )
 }
 
-export { DocumentsTable, MOCK_DOCUMENTS }
+export { DocumentsTable }
 export type { DocumentsTableProps, DocumentItem }
