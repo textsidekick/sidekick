@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { supabase } from "@/lib/supabase";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", { apiVersion: "2024-12-18.acacia" as any });
+function getStripe() {
+  if (!process.env.STRIPE_SECRET_KEY) return null;
+  return new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2024-12-18.acacia" as any });
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,6 +18,10 @@ export async function POST(request: NextRequest) {
 
     let event: Stripe.Event;
     try {
+      const stripe = getStripe();
+      if (!stripe) {
+        return NextResponse.json({ error: "Stripe not configured" }, { status: 503 });
+      }
       event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET);
     } catch (err) {
       console.error("[Stripe Webhook] Signature verification failed:", err);

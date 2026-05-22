@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", { apiVersion: "2024-12-18.acacia" as any });
+function getStripe() {
+  if (!process.env.STRIPE_SECRET_KEY) return null;
+  return new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2024-12-18.acacia" as any });
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,7 +14,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "companyId required" }, { status: 400 });
     }
 
-    if (!process.env.STRIPE_SECRET_KEY) {
+    const stripe = getStripe();
+    if (!stripe) {
       return NextResponse.json({ error: "Payment service not configured" }, { status: 503 });
     }
 
