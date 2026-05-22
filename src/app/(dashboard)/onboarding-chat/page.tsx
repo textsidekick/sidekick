@@ -499,7 +499,7 @@ export default function OnboardingChat() {
             </Link>
           </div>
           <Link
-            href="/"
+            href="/choose"
             style={{
               padding: "10px 14px",
               borderRadius: "8px",

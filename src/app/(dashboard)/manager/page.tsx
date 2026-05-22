@@ -15,21 +15,18 @@ import BoxIntegration from "@/components/BoxIntegration";
 import ZendeskIntegration from "@/components/ZendeskIntegration";
 import React from "react";
 import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
 import {
-  Upload, FileText, Video, Trash2, BarChart3, Building2, Users, Phone, MapPin,
-  TrendingUp, MessageSquare, Clock, AlertTriangle, Zap, Target,
-  ChevronRight, RefreshCw, Lightbulb, Sparkles, ArrowUp, ArrowDown, FileCheck, X,
+  Upload, FileText, Trash2, BarChart3, Building2, Users, Phone,
+  TrendingUp, MessageSquare, AlertTriangle, Target,
+  RefreshCw, Lightbulb, Sparkles, ArrowUp, ArrowDown, FileCheck, X,
   Filter, Download, Settings, CheckCircle, User, Search, Plus, QrCode,
-  Bell, Activity, ChevronDown, ExternalLink, Copy, Check, Moon, Sun, Home,
+  Bell, Activity, ChevronDown, ExternalLink, Copy, Check, Home,
   Calendar, Hash, Globe, Award, TrendingDown, Minus, Car, CalendarDays, Shield, DollarSign, HeartPulse, GraduationCap, Coffee, Shirt, Palmtree,
   Wrench, AlertCircle, CheckCircle2, CircleDot, ClipboardList, Send, Edit2, XCircle
 } from "lucide-react";
 
 // ─── New design components ────────────────────────────────────────────────────
 import { TopBar } from "@/components/dashboard/layout/TopBar";
-import { SubHeader } from "@/components/dashboard/layout/SubHeader";
-import { TabNav } from "@/components/dashboard/layout/TabNav";
 import { MetricCard } from "@/components/dashboard/shared/MetricCard";
 import { SectionHeader } from "@/components/dashboard/shared/SectionHeader";
 import { EmptyState } from "@/components/dashboard/shared/EmptyState";
@@ -49,16 +46,19 @@ import KnowledgeBaseViewer from "@/components/dashboard/documents/KnowledgeBaseV
 import GeneratedReports from "@/components/dashboard/documents/GeneratedReports";
 import QuickStats from "@/components/dashboard/QuickStats";
 import LanguageBadge from "@/components/dashboard/LanguageBadge";
-import ActivityFeed from "@/components/dashboard/ActivityFeed";
 import SMSSimulator from "@/components/dashboard/SMSSimulator";
 import DemoMode from "@/components/dashboard/DemoMode";
-import KnowledgeGapAlerts from "@/components/dashboard/KnowledgeGapAlerts";
 import UpgradeBanner from "@/components/dashboard/UpgradeBanner";
-import { DocumentsTab } from "@/components/dashboard/documents/DocumentsTab";
-import { UploadZone } from "@/components/dashboard/documents/UploadZone";
-import { WorkersTable } from "@/components/dashboard/workers/WorkersTable";
 import { WorkersTab } from "@/components/dashboard/workers/WorkersTab";
 import { QRCodeModal } from "@/components/dashboard/workers/QRCodeModal";
+import {
+  IssueDetailModal,
+  WorkerDetailModal,
+  AllQuestionsModal,
+  DraftModal,
+  UnansweredQuestionModal,
+  AddCertificationModal,
+} from "@/components/dashboard/modals";
 
 // ─── Existing interfaces (unchanged) ─────────────────────────────────────────
 interface Document { id: string; name: string; uploadedAt: string; chunksCount?: number; classification?: { type: string; title: string; confidence: number }; }
@@ -152,6 +152,7 @@ function AnimatedNumber({ value, duration = 1000 }: { value: number; duration?: 
 export default function ManagerDashboard() {
   // All existing state (unchanged)
   const [activeTab, setActiveTab] = useState<"analytics" | "alerts" | "documents" | "workers" | "test">("analytics");
+  const [workersSubTab, setWorkersSubTab] = useState<"team" | "certifications" | "safety">("team");
   const [companies, setCompanies] = useState<Company[]>([]);
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [selectedCompany, setSelectedCompany] = useState<string>("");
@@ -220,7 +221,6 @@ export default function ManagerDashboard() {
   ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 5);
 
   // All existing API calls (unchanged)
-  // Fetch trial info from auth
   useEffect(() => {
     try {
       const authData = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
@@ -232,13 +232,6 @@ export default function ManagerDashboard() {
           trialEndsAt: authData.trialEndsAt || "",
         });
       }
-    } catch {}
-  }, []);
-
-  useEffect(() => {
-    try {
-      const authData = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
-      if (authData.plan) setTrialInfo({ plan: authData.plan, questionsUsed: authData.questionsUsed || 0, questionsLimit: authData.questionsLimit || 50, trialEndsAt: authData.trialEndsAt || "" });
     } catch {}
   }, []);
 
@@ -433,7 +426,6 @@ export default function ManagerDashboard() {
 
   // ─── Adapters: map real data shapes to new component prop shapes ─────────────
 
-  // Issues → AlertMetrics expects { id, issue, worker, severity, status, date, category }
   const mappedAlerts = issues.map(i => ({
     id: i.id,
     issue: i.description,
@@ -444,7 +436,6 @@ export default function ManagerDashboard() {
     category: (i.equipment ? "equipment" : "safety") as "safety" | "equipment" | "compliance" | "health",
   }));
 
-  // Workers → WorkersTable expects { id, name, phone, joinDate, status }
   const mappedWorkers = companyWorkers.map(w => ({
     id: w.phone,
     name: w.name || "Unknown Worker",
@@ -453,7 +444,6 @@ export default function ManagerDashboard() {
     status: (w.name ? "verified" : "pending") as "verified" | "pending",
   }));
 
-  // Certifications → table rows
   const mappedCerts = certifications.map((c, i) => ({
     id: c.id || String(i),
     workerName: c.worker_name || "Unknown",
@@ -461,7 +451,6 @@ export default function ManagerDashboard() {
     expiryDate: c.expiry_date || c.expiryDate || "",
   }));
 
-  // Checklists → table rows
   const mappedChecklists = checklists.map((c, i) => ({
     id: c.id || String(i),
     workerName: c.worker_name || "Unknown",
@@ -471,7 +460,6 @@ export default function ManagerDashboard() {
     equipmentOk: c.equipment_ok,
   }));
 
-  // Documents → DocumentsTable expects { id, name, type, size, uploadDate }
   const mappedDocuments = documents.map(d => ({
     id: d.id,
     name: d.name,
@@ -480,7 +468,6 @@ export default function ManagerDashboard() {
     uploadDate: d.uploadedAt ? d.uploadedAt.split("T")[0] : new Date().toISOString().split("T")[0],
   }));
 
-  // Recent questions → FeedCard items
   const recentQuestionItems = (stats?.recentQuestions || []).slice(0, 7).map(q => ({
     id: q.id,
     text: q.question,
@@ -488,14 +475,12 @@ export default function ManagerDashboard() {
     category: q.topic || "General",
   }));
 
-  // Activity → FeedCard items
   const activityItems = activityFeed.map(a => ({
     id: a.id,
     text: a.message,
     timestamp: formatTimeAgo(a.time),
   }));
 
-  // Knowledge gaps → KnowledgeGaps component
   const mappedGaps = gaps.map(g => ({
     id: g.id,
     question: g.suggestedPolicy || g.cluster?.[0] || "Unknown gap",
@@ -507,163 +492,52 @@ export default function ManagerDashboard() {
   return (
     <div className="min-h-screen bg-[var(--page-bg,#f9fafb)]">
 
-      {/* ── Existing modals preserved exactly ─────────────────────────────────── */}
+      {/* ── Modals ─────────────────────────────────────────────────────────────── */}
+      <IssueDetailModal
+        issue={selectedIssue}
+        onClose={() => setSelectedIssue(null)}
+        onUpdate={updateIssue}
+        companyName={currentCompany?.name}
+      />
 
-      {/* Issue Detail Modal */}
-      {selectedIssue && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-white rounded-2xl max-w-lg w-full shadow-xl">
-            <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-200">
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${selectedIssue.severity === "high" ? "bg-red-100" : selectedIssue.severity === "medium" ? "bg-amber-100" : "bg-green-100"}`}>
-                  <AlertTriangle className={`w-5 h-5 ${selectedIssue.severity === "high" ? "text-red-600" : selectedIssue.severity === "medium" ? "text-amber-600" : "text-green-600"}`} />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-gray-900">Issue #{selectedIssue.id.slice(0, 8).toUpperCase()}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{formatTimeAgo(selectedIssue.created_at)}</p>
-                </div>
-              </div>
-              <button onClick={() => setSelectedIssue(null)} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-400" /></button>
-            </div>
-            <div className="p-4 space-y-4">
-              <div><label className="text-xs font-medium text-gray-500">Reported By</label><p className="text-gray-900 dark:text-gray-900">{selectedIssue.worker_name || "Unknown Worker"}</p></div>
-              {selectedIssue.equipment && <div><label className="text-xs font-medium text-gray-500">Equipment</label><p className="text-gray-900 dark:text-gray-900">{selectedIssue.equipment}</p></div>}
-              <div><label className="text-xs font-medium text-gray-500">Description</label><p className="text-gray-900 dark:text-gray-900">{selectedIssue.description}</p></div>
-              <div className="flex gap-4">
-                <div><label className="text-xs font-medium text-gray-500">Severity</label><p className={`capitalize font-medium ${selectedIssue.severity === "high" ? "text-red-600" : selectedIssue.severity === "medium" ? "text-amber-600" : "text-green-600"}`}>{selectedIssue.severity}</p></div>
-                <div><label className="text-xs font-medium text-gray-500">Status</label><p className={`capitalize font-medium ${selectedIssue.status === "open" ? "text-amber-600" : "text-green-600"}`}>{selectedIssue.status}</p></div>
-              </div>
-              {selectedIssue.resolved_at && <div><label className="text-xs font-medium text-gray-500">Resolved</label><p className="text-gray-700 dark:text-gray-600">{formatTimeAgo(selectedIssue.resolved_at)} {selectedIssue.resolved_by && `by ${selectedIssue.resolved_by}`}</p></div>}
-            </div>
-            <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-100 dark:border-gray-200">
-              {selectedIssue.status === "open" ? (
-                <button onClick={() => updateIssue(selectedIssue.id, { status: "resolved", resolved_by: currentCompany?.name })} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-gray-900 rounded-lg font-medium hover:bg-green-700"><CheckCircle2 className="w-4 h-4" /> Mark Resolved</button>
-              ) : (
-                <button onClick={() => updateIssue(selectedIssue.id, { status: "open" })} className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-gray-900 rounded-lg font-medium hover:bg-amber-700"><CircleDot className="w-4 h-4" /> Reopen</button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <WorkerDetailModal
+        worker={selectedWorker}
+        onClose={() => setSelectedWorker(null)}
+        workerQuestions={workerQuestions}
+        certifications={certifications}
+      />
 
-      {/* Worker Detail Modal */}
-      {selectedWorker && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-white rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden shadow-xl">
-            <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-200">
-              <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-gray-900 font-medium ${getAvatarColor(selectedWorker.name || "")}`}>{selectedWorker.name ? getInitials(selectedWorker.name) : <User className="w-6 h-6" />}</div>
-                <div><h3 className="font-semibold text-gray-900 dark:text-gray-900">{selectedWorker.name || "Unknown Worker"}</h3><p className="text-sm text-gray-500 dark:text-gray-400">{selectedWorker.phone}</p></div>
-              </div>
-              <button onClick={() => setSelectedWorker(null)} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-400" /></button>
-            </div>
-            <div className="p-4 overflow-y-auto max-h-[60vh]">
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center"><p className="text-2xl font-bold text-gray-900 dark:text-gray-900">{workerQuestions.length}</p><p className="text-xs text-gray-500 dark:text-gray-400">Questions</p></div>
-                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center"><p className="text-2xl font-bold text-gray-900 dark:text-gray-900">{workerQuestions.length > 0 ? Math.round(workerQuestions.reduce((a, q) => a + q.confidence, 0) / workerQuestions.length) : 0}%</p><p className="text-xs text-gray-500 dark:text-gray-400">Avg Confidence</p></div>
-                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center"><p className="text-2xl font-bold text-gray-900 dark:text-gray-900">{selectedWorker.registered_at ? formatTimeAgo(selectedWorker.registered_at) : "N/A"}</p><p className="text-xs text-gray-500 dark:text-gray-400">Joined</p></div>
-              </div>
-              <h4 className="font-medium text-gray-900 dark:text-gray-900 mb-3">Question History</h4>
-              <div className="space-y-3">
-                {workerQuestions.length === 0 ? <p className="text-center py-8 text-gray-400">No questions yet</p> : workerQuestions.map((q, i) => (
-                  <div key={i} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-                    <div className="flex items-start justify-between mb-2"><p className="font-medium text-gray-900 dark:text-gray-900">{q.question}</p><span className={`text-xs px-2 py-0.5 rounded-full ${q.confidence >= 70 ? "bg-green-100 text-green-700" : q.confidence >= 40 ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700"}`}>{q.confidence}%</span></div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{q.answer}</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500">{formatTimeAgo(q.created_at)}</p>
-                  </div>
-                ))}
-              </div>
-              <h4 className="font-medium text-gray-900 dark:text-gray-900 mb-3 mt-6">Certifications</h4>
-              <div className="space-y-2">
-                {certifications.filter(c => c.worker_phone === selectedWorker?.phone).length === 0 ? (
-                  <p className="text-center py-4 text-gray-400">No certifications</p>
-                ) : certifications.filter(c => c.worker_phone === selectedWorker?.phone).map((cert, i) => (
-                  <div key={i} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Award className={`w-5 h-5 ${new Date(cert.expiry_date) > new Date() ? "text-green-500" : "text-red-500"}`} />
-                      <div><p className="font-medium text-gray-900 dark:text-gray-900">{cert.cert_name}</p><p className="text-xs text-gray-500 dark:text-gray-400">Expires: {new Date(cert.expiry_date).toLocaleDateString()}</p></div>
-                    </div>
-                    <span className={`text-xs px-2 py-1 rounded-full ${new Date(cert.expiry_date) > new Date() ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>{new Date(cert.expiry_date) > new Date() ? "Valid" : "Expired"}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <AllQuestionsModal
+        open={showAllQuestions}
+        onClose={() => setShowAllQuestions(false)}
+        filteredQuestions={filteredQuestions}
+        questionSearch={questionSearch}
+        setQuestionSearch={setQuestionSearch}
+        questionFilter={questionFilter}
+        setQuestionFilter={setQuestionFilter}
+      />
 
-      {/* All Questions Modal */}
-      {showAllQuestions && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-white rounded-2xl max-w-4xl w-full max-h-[85vh] overflow-hidden shadow-xl">
-            <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-200">
-              <h3 className="font-semibold text-gray-900 dark:text-gray-900">All Questions</h3>
-              <button onClick={() => setShowAllQuestions(false)} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-400" /></button>
-            </div>
-            <div className="p-4">
-              <div className="flex gap-3 mb-4">
-                <div className="flex-1 relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" /><input type="text" placeholder="Search questions or workers..." value={questionSearch} onChange={(e) => setQuestionSearch(e.target.value)} className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C96442]" /></div>
-                <select value={questionFilter} onChange={(e) => setQuestionFilter(e.target.value as any)} className="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C96442]"><option value="all">All</option><option value="answered">Answered</option><option value="unanswered">Unanswered</option></select>
-              </div>
-              <div className="overflow-y-auto max-h-[60vh] space-y-3">
-                {filteredQuestions.length === 0 ? <p className="text-center py-8 text-gray-400">No questions found</p> : filteredQuestions.map((q, i) => (
-                  <div key={i} className="bg-gray-50 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-gray-900 font-medium text-sm flex-shrink-0 ${getAvatarColor(q.worker_name || "")}`}>{q.worker_name ? getInitials(q.worker_name) : <User className="w-5 h-5" />}</div>
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between mb-1"><span className="font-medium text-gray-900">{q.worker_name || "Unknown"}</span><span className={`text-xs px-2 py-0.5 rounded-full ${q.confidence >= 70 ? "bg-green-100 text-green-700" : q.confidence >= 40 ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700"}`}>{q.confidence}% confidence</span></div>
-                        <p className="text-gray-700 mb-2">{q.question}</p>
-                        <p className="text-sm text-gray-500">{q.answer}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <DraftModal
+        modal={draftModal}
+        onClose={() => setDraftModal(null)}
+      />
 
-      {/* Draft Modal */}
-      {draftModal?.open && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-white rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden shadow-xl">
-            <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-200"><div className="flex items-center gap-2"><FileCheck className="w-5 h-5 text-green-600" /><h3 className="font-semibold text-gray-900 dark:text-gray-900">Generated Policy Draft</h3></div><button onClick={() => setDraftModal(null)} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-400" /></button></div>
-            <div className="p-6 overflow-y-auto max-h-[60vh]"><pre className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-600 font-sans leading-relaxed">{draftModal.draft}</pre></div>
-            <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-100 dark:border-gray-200"><button onClick={() => setDraftModal(null)} className="px-4 py-2 text-gray-600">Close</button><button onClick={() => navigator.clipboard.writeText(draftModal.draft)} className="px-4 py-2 bg-[#C96442] text-gray-900 rounded-lg font-medium hover:bg-blue-700">Copy to Clipboard</button></div>
-          </div>
-        </div>
-      )}
+      <UnansweredQuestionModal
+        question={selectedUQ}
+        onClose={() => setSelectedUQ(null)}
+        answer={uqAnswer}
+        setAnswer={setUqAnswer}
+        onSend={() => { setSelectedUQ(null); setUqAnswer(""); }}
+      />
 
-      {/* Unanswered Question Modal */}
-      {selectedUQ && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setSelectedUQ(null)}>
-          <div className="bg-white dark:bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden" onClick={e => e.stopPropagation()}>
-            <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-100"><MessageSquare className="w-5 h-5 text-[#C96442]" /></div>
-                  <div><p className="font-semibold text-gray-900 dark:text-gray-900">{selectedUQ.worker_name || "Worker"}</p><p className="text-xs text-gray-400">{selectedUQ.created_at ? new Date(selectedUQ.created_at).toLocaleString() : ""}</p></div>
-                </div>
-                <button onClick={() => setSelectedUQ(null)} className="p-1 rounded-lg hover:bg-gray-100 text-gray-500"><X className="w-5 h-5" /></button>
-              </div>
-            </div>
-            <div className="px-6 py-4">
-              <p className="text-sm font-medium mb-1 text-gray-500">Question</p>
-              <p className="text-base mb-4 text-gray-900 dark:text-gray-900">{selectedUQ.question}</p>
-              <p className="text-sm font-medium mb-2 text-gray-500">Your Answer</p>
-              <textarea value={uqAnswer} onChange={e => setUqAnswer(e.target.value)} placeholder="Type your answer here..." rows={4} className="w-full rounded-lg border border-gray-200 p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#C96442]" />
-            </div>
-            <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-200 flex items-center justify-between">
-              <p className="text-xs text-gray-400">Response will be sent via SMS and saved permanently</p>
-              <div className="flex gap-2">
-                <button onClick={() => setSelectedUQ(null)} className="px-4 py-2 text-sm rounded-lg text-gray-500 hover:bg-gray-100">Cancel</button>
-                <button onClick={() => { setSelectedUQ(null); setUqAnswer(""); }} className="px-4 py-2 text-sm rounded-lg bg-[#C96442] text-gray-900 hover:bg-blue-700 font-medium">Send Answer</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <AddCertificationModal
+        open={showAddCertModal}
+        onClose={() => setShowAddCertModal(false)}
+        newCert={newCert}
+        setNewCert={setNewCert}
+        companyWorkers={companyWorkers}
+        onAdd={addCertification}
+      />
 
       {/* ── New design layout ─────────────────────────────────────────────────── */}
       <div className="sticky top-0 z-30">
@@ -671,15 +545,15 @@ export default function ManagerDashboard() {
       </div>
 
       {/* SubHeader with real company selector */}
-      <div className="bg-white dark:bg-white border-b border-gray-200 dark:border-gray-200">
+      <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between py-3">
-          <p className="text-sm text-gray-500 dark:text-gray-400">An overview of how your team is using Sidekick.</p>
+          <p className="text-sm text-gray-500">An overview of how your team is using Sidekick.</p>
           <div className="flex items-center gap-2">
             <Building2 className="h-4 w-4 text-gray-400" />
             <select
               value={selectedCompany}
               onChange={(e) => setSelectedCompany(e.target.value)}
-              className="border border-gray-200 dark:border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white dark:bg-white text-gray-900 dark:text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#C96442]"
+              className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#C96442]"
             >
               {companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
@@ -688,14 +562,14 @@ export default function ManagerDashboard() {
       </div>
 
       {/* TabNav wired to real tab state */}
-      <div className="border-b border-gray-200 dark:border-gray-200 bg-white dark:bg-white">
+      <div className="border-b border-gray-200 bg-white">
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <div className="flex gap-0 overflow-x-auto">
             {([
               { id: "analytics",  label: "Analytics",  Icon: BarChart3 },
               { id: "alerts",     label: "Alerts",     Icon: AlertTriangle },
               { id: "documents",  label: "Documents",  Icon: FileText },
-                            { id: "workers",    label: "Workers",    Icon: Users },
+              { id: "workers",    label: "Workers",    Icon: Users },
               { id: "test",       label: "Test",       Icon: Phone },
             ] as const).map(tab => (
               <button
@@ -703,8 +577,8 @@ export default function ManagerDashboard() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap ${
                   activeTab === tab.id
-                    ? "border-[#C96442] text-gray-900 dark:text-gray-900"
-                    : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-600"
+                    ? "border-[#C96442] text-gray-900"
+                    : "border-transparent text-gray-500 hover:text-gray-700"
                 }`}
               >
                 <tab.Icon className="h-4 w-4" />
@@ -718,13 +592,13 @@ export default function ManagerDashboard() {
               </button>
             ))}
           </div>
-          <button onClick={() => setShowQrModal(true)} className="flex items-center gap-2 px-3 py-1.5 bg-[#C96442] text-gray-900 text-sm font-medium rounded-lg hover:bg-blue-700">
+          <button onClick={() => setShowQrModal(true)} className="flex items-center gap-2 px-3 py-1.5 bg-[#C96442] text-white text-sm font-medium rounded-lg hover:opacity-90">
             <QrCode className="h-4 w-4" /> Invite Workers
           </button>
         </div>
       </div>
 
-      {/* QR Code Modal (existing logic, new component) */}
+      {/* QR Code Modal */}
       {showQrModal && currentCompany?.access_code && (
         <QRCodeModal
           joinCode={currentCompany.access_code}
@@ -736,50 +610,23 @@ export default function ManagerDashboard() {
       {/* ── Tab content ───────────────────────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
 
-        {/* Quick Stats + Language Badge */}
-        <QuickStats companyId={selectedCompany} />
-        <div className="flex items-center justify-between gap-4">
-          <LanguageBadge />
-          <DemoMode companyId={selectedCompany} />
-        </div>
-
-        {/* Upgrade banner for trial users */}
-        {trialInfo?.plan === "trial" && (
-          <UpgradeBanner companyId={selectedCompany} plan={trialInfo.plan} />  
-        )}
-
-        {/* Trial Banner */}
-        {trialInfo && trialInfo.plan === "trial" && (
-          <div style={{
-            maxWidth: 1200, margin: "0 auto 16px", padding: "14px 20px",
-            background: "rgba(201,100,66,0.08)", border: "1px solid rgba(201,100,66,0.15)",
-            borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "space-between",
-            flexWrap: "wrap", gap: 12,
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <span style={{ fontSize: 14, color: "#A74D30", fontWeight: 500 }}>
-                Free Trial — {Math.max(0, (trialInfo.questionsLimit || 50) - (trialInfo.questionsUsed || 0))} questions remaining
-                {trialInfo.trialEndsAt && (() => {
-                  const days = Math.max(0, Math.ceil((new Date(trialInfo.trialEndsAt).getTime() - Date.now()) / (1000*60*60*24)));
-                  return `, ${days} days left`;
-                })()}
-              </span>
-            </div>
-            <a href="https://textsidekick.com/#contact" style={{
-              padding: "8px 16px", background: "#C96442", color: "white",
-              borderRadius: 8, fontSize: 13, fontWeight: 600, textDecoration: "none",
-            }}>
-              Contact us to upgrade
-            </a>
-          </div>
-        )}
-
-{/* ANALYTICS TAB */}
+        {/* ANALYTICS TAB */}
         {activeTab === "analytics" && (
           <div className="space-y-6">
+            {/* Quick Stats + Language Badge + Demo Mode — analytics only */}
+            <QuickStats companyId={selectedCompany} />
+            <div className="flex items-center justify-between gap-4">
+              <LanguageBadge />
+              <DemoMode companyId={selectedCompany} />
+            </div>
+
+            {/* Upgrade banner for trial users — analytics only */}
+            {trialInfo?.plan === "trial" && (
+              <UpgradeBanner companyId={selectedCompany} plan={trialInfo.plan} />
+            )}
+
             {stats && stats.totalQuestions === 0 && (
               <div style={{ maxWidth: 600, margin: "20px auto", textAlign: "center", padding: "40px 24px", background: "white", borderRadius: 16, border: "1px solid rgba(28,26,22,0.08)" }}>
-                
                 <h2 style={{ fontSize: 22, fontWeight: 600, color: "#1C1A16", marginBottom: 8 }}>No questions yet</h2>
                 <p style={{ fontSize: 15, color: "rgba(28,26,22,0.5)", marginBottom: 24 }}>Share your access code with workers so they can start texting questions.</p>
                 <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 20px", background: "rgba(201,100,66,0.08)", borderRadius: 10, fontSize: 14, color: "#A74D30", fontWeight: 500 }}>
@@ -787,22 +634,32 @@ export default function ManagerDashboard() {
                 </div>
               </div>
             )}
+
+            {/* Hero row: 4 metric cards */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <MetricCard label="Questions Today" value={stats?.todayCount || 0} icon={MessageSquare} subtext={`${stats?.weekCount || 0} this week`} change={weekTrend || undefined} />
               <MetricCard label="Answer Accuracy" value={`${stats?.avgConfidence || 0}%`} icon={Target} subtext={`${stats?.answeredRate || 0}% answered`} />
               <MetricCard label="Open Issues" value={openIssuesCount} icon={AlertTriangle} iconClassName="h-5 w-5 text-amber-500" accentColor="amber" subtext={openHighPriorityCount > 0 ? `${openHighPriorityCount} urgent` : "View all →"} />
               <HealthScoreCard score={healthScore} />
             </div>
+
+            {/* Main chart: full width */}
             <QuestionsPerHourChart />
+
+            {/* Three-column row */}
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
               <CategorySummary />
               <AnswerSourcesChart />
               <TopGapsTable />
             </div>
+
+            {/* Two-column row: charts */}
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <QuestionsChart />
               <ResolutionChart />
             </div>
+
+            {/* Two-column row: feeds */}
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <FeedCard
                 title="Recent Questions"
@@ -821,12 +678,6 @@ export default function ManagerDashboard() {
                 emptyDescription="Team activity will show up here."
               />
             </div>
-
-            {/* Activity Feed + Knowledge Gaps side by side */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <ActivityFeed companyId={selectedCompany} />
-              <KnowledgeGapAlerts companyId={selectedCompany} />
-            </div>
           </div>
         )}
 
@@ -837,16 +688,15 @@ export default function ManagerDashboard() {
             <AlertCharts alerts={mappedAlerts} />
             <AlertsTable alerts={mappedAlerts} />
 
-            {/* Unanswered Questions — preserved from existing dashboard */}
             {unansweredQuestions.length > 0 && (
-              <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-white p-5">
+              <div className="rounded-xl border border-gray-200 bg-white p-5">
                 <SectionHeader title="Unanswered Questions" subtitle="Questions Sidekick could not answer — your response will be saved permanently" />
-                <div className="divide-y divide-gray-100 dark:divide-gray-800">
+                <div className="divide-y divide-gray-100">
                   {unansweredQuestions.map((q: any, i: number) => (
-                    <div key={q.id || i} onClick={() => { setSelectedUQ(q); setUqAnswer(""); }} className="p-4 flex items-center gap-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-white/50">
+                    <div key={q.id || i} onClick={() => { setSelectedUQ(q); setUqAnswer(""); }} className="p-4 flex items-center gap-4 cursor-pointer hover:bg-gray-50">
                       <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-100"><MessageSquare className="w-5 h-5 text-[#C96442]" /></div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm text-gray-900 dark:text-gray-900">{q.question}</p>
+                        <p className="font-medium text-sm text-gray-900">{q.question}</p>
                         <p className="text-xs mt-1 text-gray-400">Asked by {q.worker_name || "Worker"} · {q.created_at ? new Date(q.created_at).toLocaleDateString() : ""}</p>
                       </div>
                       <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700">Needs Answer</span>
@@ -861,20 +711,18 @@ export default function ManagerDashboard() {
         {/* DOCUMENTS TAB */}
         {activeTab === "documents" && (
           <div className="space-y-6">
-            {/* Upload zone wired to real upload handler */}
-            <div className="rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-200 bg-white dark:bg-white p-8 text-center hover:border-blue-400 transition-colors cursor-pointer">
+            <div className="rounded-xl border-2 border-dashed border-gray-200 bg-white p-8 text-center hover:border-blue-400 transition-colors cursor-pointer">
               <input type="file" id="upload" className="hidden" accept=".pdf,.txt,.doc,.docx,.xlsx,.csv" onChange={handleUpload} disabled={uploading} />
               <label htmlFor="upload" className="cursor-pointer flex flex-col items-center gap-3">
                 <Upload className="h-8 w-8 text-gray-400" />
                 <div>
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-600">{uploading ? "Uploading..." : "Drop files here or click to upload"}</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">PDF, Word, Excel, or text files</p>
+                  <p className="text-sm font-medium text-gray-700">{uploading ? "Uploading..." : "Drop files here or click to upload"}</p>
+                  <p className="text-xs text-gray-400 mt-1">PDF, Word, Excel, or text files</p>
                 </div>
               </label>
             </div>
 
-            {/* Real integrations preserved */}
-            <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-white p-5">
+            <div className="rounded-xl border border-gray-200 bg-white p-5">
               <SectionHeader title="Import from Integrations" />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <GoogleDriveIntegration companyId={selectedCompany} darkMode={false} onDocumentImported={(doc) => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title, confidence: 1 } }])} />
@@ -891,108 +739,127 @@ export default function ManagerDashboard() {
               </div>
             </div>
 
-            {/* Documents table wired to real data */}
             <DocumentsTable documents={mappedDocuments} />
-
-            {/* AI-Generated Reports */}
             <GeneratedReports companyId={selectedCompany} />
-
-            {/* Knowledge Base - see all imported data */}
             <KnowledgeBaseViewer companyId={selectedCompany} />
           </div>
         )}
 
-
         {/* WORKERS TAB */}
         {activeTab === "workers" && (
           <div className="space-y-6">
-            {/* Workers section */}
-            <WorkersTab joinCode={currentCompany?.access_code} />
-
-            {/* Certifications — real data */}
-            <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-white p-5">
-              <SectionHeader
-                title="Certifications"
-                subtitle="Worker certification status and expiry dates"
-                action={
-                  <button onClick={() => setShowAddCertModal(true)} className="flex items-center gap-2 px-3 py-1.5 bg-[#C96442] text-gray-900 rounded-lg text-sm font-medium hover:bg-blue-700">
-                    <Plus className="h-4 w-4" /> Add
-                  </button>
-                }
-              />
-              {mappedCerts.length === 0 ? (
-                <EmptyState icon={Award} title="No certifications tracked" description="Worker certifications will appear here once added." />
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead><tr className="border-b border-gray-100 dark:border-gray-200"><th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Worker</th><th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Certification</th><th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Expiry</th><th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Status</th><th className="pb-2"></th></tr></thead>
-                    <tbody className="divide-y divide-gray-50 dark:divide-gray-800/50">
-                      {mappedCerts.map(cert => {
-                        const valid = new Date(cert.expiryDate) > new Date();
-                        return (
-                          <tr key={cert.id}>
-                            <td className="py-2.5 pr-4 font-medium text-gray-900 dark:text-gray-900">{cert.workerName}</td>
-                            <td className="py-2.5 pr-4 text-gray-600 dark:text-gray-400">{cert.certName}</td>
-                            <td className="py-2.5 pr-4 text-gray-500 dark:text-gray-400">{new Date(cert.expiryDate).toLocaleDateString()}</td>
-                            <td className="py-2.5"><span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${valid ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}>{valid ? "Valid" : "Expired"}</span></td>
-                            <td className="py-2.5 text-right"><button onClick={() => deleteCertification(cert.id)} className="text-gray-400 hover:text-red-500"><Trash2 className="h-4 w-4" /></button></td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+            {/* Sub-navigation */}
+            <div className="flex gap-2">
+              {(["team", "certifications", "safety"] as const).map(sub => (
+                <button
+                  key={sub}
+                  onClick={() => setWorkersSubTab(sub)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    workersSubTab === sub
+                      ? "bg-[#C96442] text-white"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  {sub === "team" ? "Team" : sub === "certifications" ? "Certifications" : "Safety Checklists"}
+                </button>
+              ))}
             </div>
 
-            {/* Add Cert Modal */}
-            {showAddCertModal && (
-              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                <div className="bg-white dark:bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
-                  <div className="flex items-center justify-between mb-4"><h3 className="font-semibold text-gray-900 dark:text-gray-900">Add Certification</h3><button onClick={() => setShowAddCertModal(false)}><X className="w-5 h-5 text-gray-400" /></button></div>
-                  <div className="space-y-4">
-                    <div><label className="text-sm font-medium text-gray-700 dark:text-gray-600 mb-1 block">Worker</label><select value={newCert.workerPhone} onChange={e => setNewCert(p => ({...p, workerPhone: e.target.value}))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]"><option value="">Select worker...</option>{companyWorkers.map(w => <option key={w.phone} value={w.phone}>{w.name || w.phone}</option>)}</select></div>
-                    <div><label className="text-sm font-medium text-gray-700 dark:text-gray-600 mb-1 block">Certification Type</label><input type="text" value={newCert.certType} onChange={e => setNewCert(p => ({...p, certType: e.target.value}))} placeholder="e.g. Forklift Operator" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]" /></div>
-                    <div><label className="text-sm font-medium text-gray-700 dark:text-gray-600 mb-1 block">Expiry Date</label><input type="date" value={newCert.expiryDate} onChange={e => setNewCert(p => ({...p, expiryDate: e.target.value}))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]" /></div>
+            {/* Team sub-tab */}
+            {workersSubTab === "team" && (
+              <WorkersTab joinCode={currentCompany?.access_code} />
+            )}
+
+            {/* Certifications sub-tab */}
+            {workersSubTab === "certifications" && (
+              <div className="rounded-xl border border-gray-200 bg-white p-5">
+                <SectionHeader
+                  title="Certifications"
+                  subtitle="Worker certification status and expiry dates"
+                  action={
+                    <button onClick={() => setShowAddCertModal(true)} className="flex items-center gap-2 px-3 py-1.5 bg-[#C96442] text-white rounded-lg text-sm font-medium hover:opacity-90">
+                      <Plus className="h-4 w-4" /> Add
+                    </button>
+                  }
+                />
+                {mappedCerts.length === 0 ? (
+                  <EmptyState icon={Award} title="No certifications tracked" description="Worker certifications will appear here once added." />
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-gray-100">
+                          <th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Worker</th>
+                          <th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Certification</th>
+                          <th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Expiry</th>
+                          <th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Status</th>
+                          <th className="pb-2"></th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50">
+                        {mappedCerts.map(cert => {
+                          const valid = new Date(cert.expiryDate) > new Date();
+                          return (
+                            <tr key={cert.id}>
+                              <td className="py-2.5 pr-4 font-medium text-gray-900">{cert.workerName}</td>
+                              <td className="py-2.5 pr-4 text-gray-600">{cert.certName}</td>
+                              <td className="py-2.5 pr-4 text-gray-500">{new Date(cert.expiryDate).toLocaleDateString()}</td>
+                              <td className="py-2.5"><span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${valid ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}>{valid ? "Valid" : "Expired"}</span></td>
+                              <td className="py-2.5 text-right"><button onClick={() => deleteCertification(cert.id)} className="text-gray-400 hover:text-red-500"><Trash2 className="h-4 w-4" /></button></td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
                   </div>
-                  <div className="flex gap-3 mt-6"><button onClick={() => setShowAddCertModal(false)} className="flex-1 px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600">Cancel</button><button onClick={addCertification} className="flex-1 px-4 py-2 bg-[#C96442] text-gray-900 rounded-lg text-sm font-medium hover:bg-blue-700">Add Certification</button></div>
-                </div>
+                )}
               </div>
             )}
 
-            {/* Safety Checklists — real data */}
-            <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-white p-5">
-              <SectionHeader
-                title="Safety Checklists"
-                subtitle="Pre-shift safety compliance"
-                action={checklistStats ? <span className={`text-sm font-medium ${checklistStats.complianceRate === 100 ? "text-emerald-600" : "text-amber-600"}`}>{checklistStats.complianceRate}% compliant today</span> : undefined}
-              />
-              {mappedChecklists.length === 0 ? (
-                <EmptyState icon={ClipboardList} title="No checklists submitted" description="Pre-shift safety checklists submitted by workers will appear here." />
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead><tr className="border-b border-gray-100 dark:border-gray-200"><th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Worker</th><th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Date</th><th className="pb-2 text-center text-[11px] font-medium uppercase tracking-wide text-gray-500">PPE</th><th className="pb-2 text-center text-[11px] font-medium uppercase tracking-wide text-gray-500">LOTO</th><th className="pb-2 text-center text-[11px] font-medium uppercase tracking-wide text-gray-500">Equipment</th><th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Result</th></tr></thead>
-                    <tbody className="divide-y divide-gray-50 dark:divide-gray-800/50">
-                      {mappedChecklists.map(entry => {
-                        const passed = entry.ppeOk && entry.lotoOk && entry.equipmentOk;
-                        const icon = (v: boolean | null) => v === true ? <CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /> : v === false ? <XCircle className="h-4 w-4 text-red-500 mx-auto" /> : <Minus className="h-4 w-4 text-gray-600 mx-auto" />;
-                        return (
-                          <tr key={entry.id}>
-                            <td className="py-2.5 pr-4 font-medium text-gray-900 dark:text-gray-900">{entry.workerName}</td>
-                            <td className="py-2.5 pr-4 text-gray-500 dark:text-gray-400">{new Date(entry.shiftDate + 'T12:00:00').toLocaleDateString('en-US', {month:'short',day:'numeric'})}</td>
-                            <td className="py-2.5 text-center">{icon(entry.ppeOk)}</td>
-                            <td className="py-2.5 text-center">{icon(entry.lotoOk)}</td>
-                            <td className="py-2.5 text-center">{icon(entry.equipmentOk)}</td>
-                            <td className="py-2.5"><span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${passed ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}>{passed ? "Passed" : "Failed"}</span></td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
+            {/* Safety Checklists sub-tab */}
+            {workersSubTab === "safety" && (
+              <div className="rounded-xl border border-gray-200 bg-white p-5">
+                <SectionHeader
+                  title="Safety Checklists"
+                  subtitle="Pre-shift safety compliance"
+                  action={checklistStats ? <span className={`text-sm font-medium ${checklistStats.complianceRate === 100 ? "text-emerald-600" : "text-amber-600"}`}>{checklistStats.complianceRate}% compliant today</span> : undefined}
+                />
+                {mappedChecklists.length === 0 ? (
+                  <EmptyState icon={ClipboardList} title="No checklists submitted" description="Pre-shift safety checklists submitted by workers will appear here." />
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-gray-100">
+                          <th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Worker</th>
+                          <th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Date</th>
+                          <th className="pb-2 text-center text-[11px] font-medium uppercase tracking-wide text-gray-500">PPE</th>
+                          <th className="pb-2 text-center text-[11px] font-medium uppercase tracking-wide text-gray-500">LOTO</th>
+                          <th className="pb-2 text-center text-[11px] font-medium uppercase tracking-wide text-gray-500">Equipment</th>
+                          <th className="pb-2 text-left text-[11px] font-medium uppercase tracking-wide text-gray-500">Result</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50">
+                        {mappedChecklists.map(entry => {
+                          const passed = entry.ppeOk && entry.lotoOk && entry.equipmentOk;
+                          const icon = (v: boolean | null) => v === true ? <CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /> : v === false ? <XCircle className="h-4 w-4 text-red-500 mx-auto" /> : <Minus className="h-4 w-4 text-gray-400 mx-auto" />;
+                          return (
+                            <tr key={entry.id}>
+                              <td className="py-2.5 pr-4 font-medium text-gray-900">{entry.workerName}</td>
+                              <td className="py-2.5 pr-4 text-gray-500">{new Date(entry.shiftDate + 'T12:00:00').toLocaleDateString('en-US', {month:'short',day:'numeric'})}</td>
+                              <td className="py-2.5 text-center">{icon(entry.ppeOk)}</td>
+                              <td className="py-2.5 text-center">{icon(entry.lotoOk)}</td>
+                              <td className="py-2.5 text-center">{icon(entry.equipmentOk)}</td>
+                              <td className="py-2.5"><span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${passed ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}>{passed ? "Passed" : "Failed"}</span></td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
