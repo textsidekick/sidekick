@@ -1,4 +1,5 @@
 "use client";
+import { OpsNav } from "@/components/dashboard/layout/OpsNav";
 
 // ─── Existing integrations & utilities (unchanged) ────────────────────────────
 import WalkthroughUpload from "@/components/WalkthroughUpload";
@@ -249,7 +250,13 @@ export default function ManagerDashboard() {
         }
       } catch {}
       setCompanies(allCompanies);
-      if (allCompanies.length > 0 && !selectedCompany) setSelectedCompany(allCompanies[0].id);
+      // Sync company selection from localStorage (set by OpsNav)
+      const savedAuth = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
+      if (savedAuth.companyId && allCompanies.some((c: any) => c.id === savedAuth.companyId)) {
+        setSelectedCompany(savedAuth.companyId);
+      } else if (allCompanies.length > 0 && !selectedCompany) {
+        setSelectedCompany(allCompanies[0].id);
+      }
       if (d.workers) setWorkers(d.workers);
     });
   }, []);
@@ -544,77 +551,8 @@ export default function ManagerDashboard() {
         <TopBar />
       </div>
 
-      {/* SubHeader with real company selector */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between py-3">
-          <p className="text-sm text-gray-500">An overview of how your team is using Sidekick.</p>
-          <div className="flex items-center gap-2">
-            <Building2 className="h-4 w-4 text-gray-400" />
-            <select
-              value={selectedCompany}
-              onChange={(e) => setSelectedCompany(e.target.value)}
-              className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#C96442]"
-            >
-              {companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Unified navigation */}
-      <div className="border-b border-gray-200 bg-white">
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          <div className="flex gap-0 overflow-x-auto">
-            {/* Operations pages (URL-based) */}
-            {([
-              { id: "operations",   label: "Operations",   Icon: Activity, href: "/operations" },
-              { id: "work-orders",  label: "Work Orders",  Icon: ClipboardList, href: "/work-orders" },
-              { id: "assets",       label: "Assets",       Icon: Wrench, href: "/assets" },
-              { id: "knowledge",    label: "Knowledge",    Icon: BookOpen, href: "/knowledge" },
-              { id: "skill-gaps",   label: "Skill Gaps",   Icon: Target, href: "/skill-gaps" },
-            ] as const).map(tab => (
-              <a
-                key={tab.id}
-                href={tab.href}
-                className="flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap border-transparent text-gray-500 hover:text-gray-700"
-              >
-                <tab.Icon className="h-4 w-4" />
-                {tab.label}
-              </a>
-            ))}
-            {/* In-page tabs */}
-            {([
-              { id: "analytics",  label: "Analytics",  Icon: BarChart3 },
-              { id: "alerts",     label: "Alerts",     Icon: AlertTriangle },
-              { id: "documents",  label: "Documents",  Icon: FileText },
-              { id: "workers",    label: "Workers",    Icon: Users },
-              { id: "test",       label: "Test",       Icon: Phone },
-            ] as const).map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? "border-[#C96442] text-gray-900"
-                    : "border-transparent text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                <tab.Icon className="h-4 w-4" />
-                {tab.label}
-                {tab.id === "alerts" && openIssuesCount > 0 && (
-                  <span className={`text-xs px-1.5 py-0.5 rounded-full ${openHighPriorityCount > 0 ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}`}>{openIssuesCount}</span>
-                )}
-                {tab.id === "workers" && companyWorkers.length > 0 && (
-                  <span className="text-xs px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700">{companyWorkers.length}</span>
-                )}
-              </button>
-            ))}
-          </div>
-          <button onClick={() => setShowQrModal(true)} className="flex items-center gap-2 px-3 py-1.5 bg-[#C96442] text-white text-sm font-medium rounded-lg hover:opacity-90">
-            <QrCode className="h-4 w-4" /> Invite Workers
-          </button>
-        </div>
-      </div>
+      {/* Shared navigation — same OpsNav as all other pages */}
+      <OpsNav />
 
       {/* QR Code Modal */}
       {showQrModal && currentCompany?.access_code && (
