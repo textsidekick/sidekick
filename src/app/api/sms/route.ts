@@ -5,6 +5,13 @@ import twilio from "twilio";
 import { supabase } from "@/lib/supabase";
 import { createEmbedding } from "@/lib/embeddings";
 import { normalizePhoneNumber } from "@/lib/phone";
+import { triageIncomingMessage } from "@/lib/ai-triage";
+import {
+  assignWorkOrder,
+  createWorkOrderFromTriage,
+  findBestTechnician,
+} from "@/lib/work-order-manager";
+import type { Asset as OpsAsset, UUID } from "@/types/operations";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || 'placeholder' });
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || 'placeholder' });
@@ -48,30 +55,14 @@ function containsSafetyTopic(text: string): boolean {
 }
 
 // ============================================
-// Issue/Problem Detection
+// Image Analysis Types (shared with AI triage)
 // ============================================
-interface IssueAnalysis {
-  isIssue: boolean;
-  equipment: string | null;
-  severity: "low" | "medium" | "high";
+interface ImageAnalysis {
+  description: string;
+  searchQueries: string[];
+  isSafetyRelated: boolean;
+  identifiedItems: string[];
 }
-
-const ISSUE_PATTERNS = [
-  /\b(broken|broke|down|not working|stopped|failed|failure|malfunction|stuck|jammed|jam|leaking|leak|overheating|overheat|smoking|smoke|sparking|spark|noise|loud|grinding|vibrating|vibration|error|alarm|warning|damaged|damage|cracked|crack)\b/i,
-  /\b(won't start|won't turn on|won't run|doesn't work|isn't working|stopped working|quit working)\b/i,
-  /\b(needs repair|needs fix|needs maintenance|out of order|oo[o]?)\b/i,
-  /\b(problem with|issue with|trouble with|something wrong)\b/i,
-];
-
-const EQUIPMENT_PATTERNS = [
-  /\b(machine|line|press|conveyor|belt|pump|motor|compressor|valve|tank|forklift|crane|hoist|drill|saw|grinder|welder|robot|arm|station|cell)\s*#?\s*(\d+|[a-z])\b/i,
-  /\b(machine|line|press|conveyor|belt|pump|motor|compressor|valve|tank|forklift|crane|hoist|drill|saw|grinder|welder|robot|arm|station|cell)\b/i,
-];
-
-const HIGH_SEVERITY_KEYWORDS = [
-  "fire", "smoke", "smoking", "spark", "sparking", "explosion", "injury", "injured", "hurt",
-  "emergency", "dangerous", "hazard", "leak", "leaking", "gas", "chemical", "spill"
-];
 
 // ============================================
 // Safety Checklist Configuration
@@ -129,36 +120,6 @@ function formatChecklistResult(results: { ppe: boolean | null; loto: boolean | n
   return { message, hasFailures: failures.length > 0, failures };
 }
 
-function detectIssueReport(text: string): IssueAnalysis {
-  const lower = text.toLowerCase();
-  
-  // Check if this looks like an issue report
-  const isIssue = ISSUE_PATTERNS.some(pattern => pattern.test(text));
-  
-  if (!isIssue) {
-    return { isIssue: false, equipment: null, severity: "low" };
-  }
-  
-  // Try to extract equipment reference
-  let equipment: string | null = null;
-  for (const pattern of EQUIPMENT_PATTERNS) {
-    const match = text.match(pattern);
-    if (match) {
-      equipment = match[0];
-      break;
-    }
-  }
-  
-  // Determine severity
-  let severity: "low" | "medium" | "high" = "medium";
-  if (HIGH_SEVERITY_KEYWORDS.some(keyword => lower.includes(keyword))) {
-    severity = "high";
-  } else if (lower.includes("minor") || lower.includes("small") || lower.includes("little")) {
-    severity = "low";
-  }
-  
-  return { isIssue, equipment, severity };
-}
 
 async function searchDocuments(question: string, companyId: string) {
   const embedding = await createEmbedding(question);
@@ -196,13 +157,6 @@ async function searchDocuments(question: string, companyId: string) {
 // ============================================
 // NEW: Image Analysis Functions
 // ============================================
-
-interface ImageAnalysis {
-  description: string;
-  searchQueries: string[];
-  isSafetyRelated: boolean;
-  identifiedItems: string[];
-}
 
 async function fetchImageAsBase64(mediaUrl: string): Promise<{ base64: string; mediaType: string } | null> {
   try {
@@ -987,43 +941,42 @@ IF YOU DON'T KNOW:
 
     // NEW: Handle image messages
     // ============================================
+    let imageAnalysisForTriage: any | undefined;
     if (numMedia > 0 && mediaUrl && mediaType?.startsWith("image/")) {
       console.log("[SMS] Processing image from", worker.name, "MediaType:", mediaType);
-      
+
       // Fetch and analyze the image
       const imageData = await fetchImageAsBase64(mediaUrl);
-      
+
       if (!imageData) {
         return twimlResponse("Sorry, I couldn't load that image. Please try sending it again.");
       }
-      
+
       // Analyze the image with Claude Vision
       const imageAnalysis = await analyzeImage(imageData.base64, imageData.mediaType, body || undefined);
-      
+
       console.log("[SMS] Image analysis:", JSON.stringify(imageAnalysis, null, 2));
-      
+
       // Search documents using the generated queries
       let allRelevantChunks: any[] = [];
       for (const query of imageAnalysis.searchQueries) {
         const chunks = await searchDocuments(query, worker.company_id);
         allRelevantChunks = [...allRelevantChunks, ...chunks];
       }
-      
+
       // Also search with any identified items
       for (const item of imageAnalysis.identifiedItems) {
         const chunks = await searchDocuments(item, worker.company_id);
         allRelevantChunks = [...allRelevantChunks, ...chunks];
       }
-      
+
       // Deduplicate chunks by content
-      const uniqueChunks = allRelevantChunks.filter((chunk, index, self) =>
-        index === self.findIndex(c => c.content === chunk.content)
-      ).slice(0, 5); // Keep top 5
-      
-      const bestSimilarity = uniqueChunks.length > 0 
-        ? Math.round(Math.max(...uniqueChunks.map(c => c.similarity)) * 100)
-        : 0;
-      
+      const uniqueChunks = allRelevantChunks
+        .filter((chunk, index, self) => index === self.findIndex((c) => c.content === chunk.content))
+        .slice(0, 5); // Keep top 5
+
+      const bestSimilarity = uniqueChunks.length > 0 ? Math.round(Math.max(...uniqueChunks.map((c) => c.similarity)) * 100) : 0;
+
       // Generate response
       const answer = await generateImageResponse(
         imageAnalysis,
@@ -1032,90 +985,219 @@ IF YOU DON'T KNOW:
         company?.name || "your company",
         body || undefined
       );
-      
+
       const responseTime = Date.now() - startTime;
       const lowConfidence = isLowConfidenceAnswer(answer) || bestSimilarity < 40;
-      
+
       // Log the question (include image info)
-      const questionText = body 
-        ? `[IMAGE] ${body}` 
-        : `[IMAGE] ${imageAnalysis.description}`;
-      
-      const { data: questionRecord } = await supabase.from("questions").insert({
-        company_id: worker.company_id,
-        worker_phone: from,
-        worker_name: worker.name,
-        question: questionText,
-        answer: answer,
-        confidence: bestSimilarity,
-        response_time_ms: responseTime,
-        manager_notified: false,
-        // You could add: image_url: mediaUrl (if you want to store it)
-      }).select().single();
+      const questionText = body ? `[IMAGE] ${body}` : `[IMAGE] ${imageAnalysis.description}`;
+
+      const { data: questionRecord } = await supabase
+        .from("questions")
+        .insert({
+          company_id: worker.company_id,
+          worker_phone: from,
+          worker_name: worker.name,
+          question: questionText,
+          answer: answer,
+          confidence: bestSimilarity,
+          response_time_ms: responseTime,
+          manager_notified: false,
+          // You could add: image_url: mediaUrl (if you want to store it)
+        })
+        .select()
+        .single();
 
       // For safety-related images with low confidence, always offer escalation
       if ((imageAnalysis.isSafetyRelated || lowConfidence) && company?.manager_phone && questionRecord) {
-        await supabase
-          .from("workers")
-          .update({ pending_escalation_question_id: questionRecord.id })
-          .eq("phone", from);
-        
+        await supabase.from("workers").update({ pending_escalation_question_id: questionRecord.id }).eq("phone", from);
+
         const safetyPrefix = imageAnalysis.isSafetyRelated ? "️ SAFETY: " : "";
         return twimlResponse(`${safetyPrefix}${answer}\n\n---\nWant me to ask ${company.manager_name || "your manager"} about this?\n\nReply Y/N`);
       }
 
-      return twimlResponse(answer);
+      // NOTE: We now fall through to AI triage for ALL messages, including images.
+      // We still return the helpful image-based answer immediately if it seems like a pure ID/help question.
+      // For image-based issue reports, triage below will create a work order.
+      // We'll only short-circuit here if the image answer is high confidence and NOT safety related.
+      if (!imageAnalysis.isSafetyRelated && !lowConfidence) {
+        return twimlResponse(answer);
+      }
+
+      // else: continue and include imageAnalysis in triage context
+      // (do not return)
+
+      // attach to request-scoped variable
+      imageAnalysisForTriage = imageAnalysis;
     }
     // ============================================
     // END: Handle image messages
     // ============================================
 
     // ============================================
-    // NEW: Issue/Problem Detection and Logging
+    // AI TRIAGE (replaces regex issue detection)
     // ============================================
-    const issueAnalysis = detectIssueReport(body);
-    
-    if (issueAnalysis.isIssue) {
-      console.log("[SMS] Issue detected:", issueAnalysis);
-      
-      // Log the issue to the database
-      const { data: issueRecord, error: issueError } = await supabase
-        .from("issues")
-        .insert({
-          company_id: worker.company_id,
-          worker_phone: from,
-          worker_name: worker.name,
-          description: body,
-          equipment: issueAnalysis.equipment,
-          severity: issueAnalysis.severity,
-          status: "open",
-        })
-        .select()
-        .single();
-      
-      if (issueError) {
-        console.error("[SMS] Failed to log issue:", issueError);
-        return twimlResponse("Sorry, I couldn't log that issue. Please try again or contact your manager directly.");
+    const { data: assets } = await supabase
+      .from("assets")
+      .select("id, name, asset_tag")
+      .eq("company_id", worker.company_id)
+      .limit(200);
+
+    const { data: activeWorkOrders } = await supabase
+      .from("work_orders")
+      .select("id, status, assigned_to, assigned_to_phone, technician_id, worker_phone, created_at")
+      .eq("company_id", worker.company_id)
+      .eq("worker_phone", from)
+      .in("status", ["open", "assigned", "in_progress", "on_hold"])
+      .order("created_at", { ascending: false })
+      .limit(20);
+
+    const triage = await triageIncomingMessage({
+      message: body,
+      workerPhone: from,
+      companyId: worker.company_id,
+      imageAnalysis: imageAnalysisForTriage,
+      existingAssets: (assets || []) as any,
+      activeWorkOrders: (activeWorkOrders || []) as any,
+    });
+
+    // Branch based on messageType
+    if (triage.messageType === "issue_report") {
+      try {
+        const wo = await createWorkOrderFromTriage(triage as any, worker.company_id, from);
+
+        // Best-effort load WO for short_id + asset location
+        const woFull = (await supabase
+          .from("work_orders")
+          .select("id, short_id, asset_id, asset_name, asset_tag, priority")
+          .eq("id", wo.id)
+          .single()).data as unknown as {
+          id: UUID;
+          short_id: string | null;
+          asset_id: UUID | null;
+          asset_name: string | null;
+          asset_tag: string | null;
+          priority: string | null;
+        } | null;
+
+        const bestTech = await findBestTechnician(worker.company_id, triage.issue?.category || "other", triage.issue?.assetId || undefined);
+
+        let assignedToName: string | null = null;
+        let assignedToPhone: string | null = null;
+
+        if (bestTech?.id) {
+          await assignWorkOrder(wo.id, bestTech.id);
+          assignedToName = (bestTech as any).name || null;
+          assignedToPhone = (bestTech as any).phone || null;
+
+          if (assignedToPhone) {
+            const assetName = triage.issue?.assetName || woFull?.asset_name || "(unknown asset)";
+            const assetLoc = woFull?.asset_id
+              ? (await supabase.from("assets").select("location").eq("id", woFull.asset_id).single()).data?.location
+              : null;
+
+            const steps = (triage.issue?.suggestedActions || []).slice(0, 3).join("; ");
+            const techMsg = `NEW WO ${woFull?.short_id || wo.id.slice(0, 8)}\n${assetName}${assetLoc ? ` @ ${assetLoc}` : ""}\nIssue: ${triage.issue?.symptomSummary || "Reported issue"}${steps ? `\nTry: ${steps}` : ""}\nReply START when you begin.`.slice(
+              0,
+              480
+            );
+            await sendSMS(assignedToPhone, techMsg);
+          }
+        }
+
+        if (triage.escalate && company?.manager_phone) {
+          const assetName = triage.issue?.assetName || "(unknown asset)";
+          const assigned = assignedToName || "UNASSIGNED";
+          const mgrMsg = `ALERT WO ${woFull?.short_id || wo.id.slice(0, 8)}\nPriority: ${triage.issue?.priority || "unknown"} (${triage.issue?.priorityReasoning || ""})\nAsset: ${assetName}\nFrom: ${worker.name || from}\nAssigned: ${assigned}`.slice(
+            0,
+            480
+          );
+          await sendSMS(company.manager_phone, mgrMsg);
+        }
+
+        return twimlResponse((triage.workerResponse || "OK ").slice(0, 480));
+      } catch (e) {
+        console.error("[SMS] Work order create/assign failed:", e);
+        return twimlResponse("Sorry, I couldn't open a work order right now. Please notify your manager.");
       }
-      
-      // Notify manager
-      if (company?.manager_phone) {
-        const severityEmoji = issueAnalysis.severity === "high" ? "ALERT" : issueAnalysis.severity === "medium" ? "️" : "NOTE";
-        await sendSMS(
-          company.manager_phone,
-          `${severityEmoji} Issue Report #${issueRecord.id.slice(0, 8)}\n\nFrom: ${worker.name || "Worker"}\n${issueAnalysis.equipment ? `Equipment: ${issueAnalysis.equipment}\n` : ""}Issue: ${body}\n\nReply to this thread or check dashboard.`
-        );
-      }
-      
-      // Confirm to worker
-      const issueId = issueRecord.id.slice(0, 8).toUpperCase();
-      const equipmentAck = issueAnalysis.equipment ? ` for ${issueAnalysis.equipment}` : "";
-      return twimlResponse(`OK Logged issue #${issueId}${equipmentAck}. ${company?.manager_name || "Your manager"} has been notified. We'll follow up soon.`);
     }
-    // ============================================
-    // END: Issue Detection
-    // ============================================
-    
+
+    if (triage.messageType === "work_order_update") {
+      const woId = triage.workOrderUpdate?.workOrderId;
+      const action = triage.workOrderUpdate?.action;
+
+      if (!woId || !action) {
+        return twimlResponse((triage.workerResponse || "Got it.").slice(0, 480));
+      }
+
+      if (action === "start") {
+        await supabase.from("work_orders").update({ status: "in_progress", started_at: new Date().toISOString() }).eq("id", woId);
+        return twimlResponse("OK Marked started.");
+      }
+
+      if (action === "complete") {
+        // Pull WO for asset context
+        const { data: woFullForUpdate } = await supabase
+          .from("work_orders")
+          .select("id, asset_id")
+          .eq("id", woId)
+          .single();
+
+        await supabase
+          .from("work_orders")
+          .update({
+            status: "completed",
+            completed_at: new Date().toISOString(),
+            resolution_notes: triage.workOrderUpdate?.completionNotes || null,
+            parts_used: triage.workOrderUpdate?.partsUsed || [],
+          })
+          .eq("id", woId);
+
+        // Create follow-up WOs for any secondary issues
+        const secondary = (triage.workOrderUpdate?.secondaryIssues || []).slice(0, 3);
+        for (const s of secondary) {
+          await supabase.from("work_orders").insert({
+            company_id: worker.company_id,
+            asset_id: (woFullForUpdate as any)?.asset_id || null,
+            title: `Follow-up: ${s}`.slice(0, 120),
+            description: `Auto-created follow-up from completion of ${woId}: ${s}`,
+            status: "open",
+            reported_by: from,
+            priority: "medium",
+            category: "other",
+            source: "sms",
+            parent_wo_id: woId,
+          } as any);
+        }
+
+        return twimlResponse("OK Marked complete. Thanks!");
+      }
+
+      return twimlResponse((triage.workerResponse || "OK").slice(0, 480));
+    }
+
+    if (triage.messageType === "pm_result") {
+      // Minimal logging for now; follow-up work orders if flagged
+      // TEMP: best-effort insert until PM flow has proper pm_schedule_id/work_order_id wiring
+      try {
+        await supabase.from("pm_completions").insert({
+          pm_schedule_id: null,
+          work_order_id: null,
+          completed_by: (worker.id as any) || null,
+          checklist_results: [],
+          findings: body,
+          photos: [],
+          completed_at: new Date().toISOString(),
+        } as any);
+      } catch (e) {
+        console.warn("[SMS] pm_completions insert failed (best-effort):", e);
+      }
+
+      return twimlResponse((triage.workerResponse || "OK Logged.").slice(0, 480));
+    }
+
+    // question/general -> use existing RAG pipeline below
+
     // CASE 5: Regular text question (existing logic)
     const relevantChunks = await searchDocuments(body, worker.company_id);
     const context = relevantChunks.map((c: any) => c.content).join("\n\n");

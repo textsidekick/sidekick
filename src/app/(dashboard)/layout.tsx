@@ -1,5 +1,6 @@
 import { Inter, Instrument_Serif } from "next/font/google";
 import "../globals.css";
+import ManagerChat from "@/components/dashboard/ManagerChat";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -36,6 +37,7 @@ export default function DashboardLayout({
         }}
       >
         {children}
+        <ManagerChat />
       </body>
     </html>
   );

@@ -1,11 +1,11 @@
 'use client'
 
 import type { LucideIcon } from 'lucide-react'
-import { BarChart3, ShieldAlert, FileText, Users, LayoutGrid } from 'lucide-react'
+import { BarChart3, ShieldAlert, FileText, Users, LayoutGrid, Activity, ClipboardList, HardDrive } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
-type TabId = 'analytics' | 'alerts' | 'documents' | 'workers'
+type TabId = 'operations' | 'work-orders' | 'assets' | 'analytics' | 'alerts' | 'documents' | 'workers'
 
 interface TabNavProps {
   activeTab: TabId
@@ -19,6 +19,9 @@ interface TabDefinition {
 }
 
 const TABS: TabDefinition[] = [
+  { id: 'operations', label: 'Operations', icon: Activity },
+  { id: 'work-orders', label: 'Work Orders', icon: ClipboardList },
+  { id: 'assets', label: 'Assets', icon: HardDrive },
   { id: 'analytics', label: 'Analytics', icon: BarChart3 },
   { id: 'alerts', label: 'Alerts', icon: ShieldAlert },
   { id: 'documents', label: 'Documents', icon: FileText },
