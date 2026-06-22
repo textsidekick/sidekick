@@ -10,65 +10,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Phone and code required" }, { status: 400 });
     }
 
-    // Bypass phones — skip ALL verification, create session directly
-    const BYPASS_PHONES = ["+14088285979", "+14083049470"];
-    const isBypass = BYPASS_PHONES.some(p => phone.endsWith(p.slice(-10)));
+    // Auto-paid phone numbers
+    const PAID_PHONES = ["+14088285979", "+12243348775", "+14083049470"];
+    const isPaidUser = PAID_PHONES.some(p => phone.endsWith(p.slice(-10)));
 
-    if (isBypass) {
-      // Map bypass phones to their manager_users accounts
-      const usernameMap: Record<string, string> = {
-        "4088285979": "justin",
-        "4083049470": "azhan",
-      };
-      const last10 = phone.slice(-10);
-      const username = usernameMap[last10] || "justin";
-
-      // Get their manager_users account
-      const { data: user } = await supabase
-        .from("manager_users")
-        .select("id, company_id, username")
-        .eq("username", username)
-        .single();
-
-      const companyId = user?.company_id || "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
-      const accountId = user?.id || crypto.randomUUID();
-
-      // Generate session token
-      const token = crypto.randomBytes(32).toString("hex");
-      const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + 30);
-
-      await supabase.from("manager_sessions").upsert({
-        user_id: accountId,
-        company_id: companyId,
-        token,
-        expires_at: expiresAt.toISOString(),
-      });
-
-      const response = NextResponse.json({
-        success: true,
-        token,
-        accountId,
-        companyId,
-        username: username,
-        isNewUser: false,
-        plan: "paid",
-        trialExpired: false,
-        questionsExhausted: false,
-      });
-
-      response.cookies.set("sidekick_session", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 30 * 24 * 60 * 60,
-        path: "/",
-      });
-
-      return response;
-    }
-
-    // Normal flow: verify code
+    // Verify code from verification_codes table
     const { data: verification, error: verifyError } = await supabase
       .from("verification_codes")
       .select("*")
@@ -84,65 +30,102 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid or expired code" }, { status: 401 });
     }
 
+    // Mark code as used
     await supabase.from("verification_codes").update({ used: true }).eq("id", verification.id);
 
-    // Check if account exists in manager_users
-    let { data: account } = await supabase
-      .from("manager_users")
-      .select("*")
-      .eq("username", phone)
+    // Find the user's company — check manager_users by looking up via company manager_phone
+    let companyId: string | null = null;
+    let userId: string | null = null;
+    let username: string | null = null;
+
+    // Method 1: Check if there's a manager_users entry associated with this phone
+    // (via company's manager_phone)
+    const { data: company } = await supabase
+      .from("companies")
+      .select("id, name, manager_phone")
+      .eq("manager_phone", phone)
       .single();
 
-    if (!account) {
-      // Try to find by checking if we have a company for this phone
-      const { data: company } = await supabase
-        .from("companies")
-        .select("id")
-        .eq("manager_phone", phone)
+    if (company) {
+      companyId = company.id;
+      // Find or create manager_users entry
+      const { data: user } = await supabase
+        .from("manager_users")
+        .select("id, username")
+        .eq("company_id", companyId)
+        .limit(1)
         .single();
-
-      if (company) {
-        const { data: newUser } = await supabase
-          .from("manager_users")
-          .insert({
-            company_id: company.id,
-            username: phone,
-            password_hash: "sms_auth",
-          })
-          .select()
-          .single();
-        account = newUser;
+      
+      if (user) {
+        userId = user.id;
+        username = user.username;
       }
     }
 
-    const companyId = (account as any)?.company_id || null;
-    const accountId = (account as any)?.id || null;
+    // Method 2: If only one company exists, use it (demo/single-tenant mode)
+    if (!companyId) {
+      const { data: allCompanies } = await supabase.from("companies").select("id, name").limit(2);
+      if (allCompanies && allCompanies.length === 1) {
+        companyId = allCompanies[0].id;
+        // Find any manager user for this company
+        const { data: user } = await supabase
+          .from("manager_users")
+          .select("id, username")
+          .eq("company_id", companyId)
+          .limit(1)
+          .single();
+        if (user) {
+          userId = user.id;
+          username = user.username;
+        }
+      }
+    }
+
+    // Method 3: Check PAID_PHONES mapping
+    if (!companyId && isPaidUser) {
+      const { data: allCompanies } = await supabase.from("companies").select("id").limit(1);
+      if (allCompanies && allCompanies.length > 0) {
+        companyId = allCompanies[0].id;
+      }
+    }
 
     // Generate session token
     const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 30);
 
-    if (accountId) {
-      await supabase.from("manager_sessions").upsert({
-        user_id: accountId,
-        company_id: companyId,
-        token,
-        expires_at: expiresAt.toISOString(),
-      });
-    }
+    // Create session
+    const sessionData: any = {
+      token,
+      company_id: companyId,
+      expires_at: expiresAt.toISOString(),
+    };
+    if (userId) sessionData.user_id = userId;
+
+    await supabase.from("manager_sessions").insert(sessionData);
 
     const response = NextResponse.json({
       success: true,
       token,
-      accountId,
+      accountId: userId,
       companyId,
-      isNewUser: !account,
-      plan: "trial",
+      username: username || phone,
+      isNewUser: false,
+      plan: isPaidUser ? "paid" : "trial",
+      trialExpired: false,
+      questionsExhausted: false,
     });
 
+    // Set both cookies so middleware and APIs both work
     response.cookies.set("sidekick_session", token, {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 30 * 24 * 60 * 60,
+      path: "/",
+    });
+    response.cookies.set("sidekick_auth", "true", {
+      httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 30 * 24 * 60 * 60,
