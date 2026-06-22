@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, ClipboardList, HardDrive, BarChart3, ShieldAlert, FileText, Users, Phone } from "lucide-react";
+import { Activity, ClipboardList, HardDrive, BarChart3, ShieldAlert, FileText, Users, BookOpen, Target } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
@@ -8,6 +8,8 @@ const TABS = [
   { id: "operations", label: "Operations", icon: Activity, href: "/operations" },
   { id: "work-orders", label: "Work Orders", icon: ClipboardList, href: "/work-orders" },
   { id: "assets", label: "Assets", icon: HardDrive, href: "/assets" },
+  { id: "knowledge", label: "Knowledge", icon: BookOpen, href: "/knowledge" },
+  { id: "skill-gaps", label: "Skill Gaps", icon: Target, href: "/skill-gaps" },
   { id: "analytics", label: "Analytics", icon: BarChart3, href: "/manager?tab=analytics" },
   { id: "alerts", label: "Alerts", icon: ShieldAlert, href: "/manager?tab=alerts" },
   { id: "documents", label: "Documents", icon: FileText, href: "/manager?tab=documents" },

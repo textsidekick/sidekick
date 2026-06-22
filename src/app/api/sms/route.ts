@@ -1170,6 +1170,12 @@ IF YOU DON'T KNOW:
           } as any);
         }
 
+        // Auto-capture knowledge from completed work order
+        try {
+          const { captureKnowledge } = require("@/lib/knowledge-engine");
+          captureKnowledge(woId).catch((err: any) => console.error("[SMS] Knowledge capture error:", err));
+        } catch { /* knowledge engine not critical */ }
+
         return twimlResponse("OK Marked complete. Thanks!");
       }
 
@@ -1196,7 +1202,19 @@ IF YOU DON'T KNOW:
       return twimlResponse((triage.workerResponse || "OK Logged.").slice(0, 480));
     }
 
-    // question/general -> use existing RAG pipeline below
+    // question/general -> search knowledge base first, then fall through to RAG
+
+    // Search auto-generated knowledge articles first
+    let knowledgeContext = "";
+    try {
+      const { searchKnowledge } = require("@/lib/knowledge-engine");
+      const knowledgeResults = await searchKnowledge(body, worker.company_id, 3);
+      if (knowledgeResults.length > 0) {
+        knowledgeContext = "\n\nKNOWLEDGE FROM PAST REPAIRS:\n" + knowledgeResults.map((a: any) =>
+          `[${a.title}] Problem: ${a.problem || ""} Solution: ${a.solution || ""}`
+        ).join("\n");
+      }
+    } catch { /* knowledge engine not critical */ }
 
     // CASE 5: Regular text question (existing logic)
     const relevantChunks = await searchDocuments(body, worker.company_id);
@@ -1237,8 +1255,10 @@ HOW TO RESPOND:
 - If you can't answer well, offer to ask ${company?.manager_name || "the manager"}${sourcesText}`;
     
     const userMessage = context
-      ? `Context from company documents:\n${context}\n\nQuestion: ${body}`
-      : `Question: ${body}\n\nNote: No relevant documents found. Provide a helpful general response and mention they should check with their manager for specific policies.`;
+      ? `Context from company documents:\n${context}${knowledgeContext}\n\nQuestion: ${body}`
+      : knowledgeContext
+        ? `Context from past repairs and knowledge base:${knowledgeContext}\n\nQuestion: ${body}`
+        : `Question: ${body}\n\nNote: No relevant documents found. Provide a helpful general response and mention they should check with their manager for specific policies.`;
 
     const answer = await getAIResponse(systemPrompt, userMessage);
     

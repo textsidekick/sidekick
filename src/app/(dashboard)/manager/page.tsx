@@ -10,7 +10,7 @@ import React from "react";
 import { useState, useEffect, useRef } from "react";
 import {
   Upload, FileText, Trash2, BarChart3, Building2, Users, Phone,
-  TrendingUp, MessageSquare, AlertTriangle, Target,
+  TrendingUp, MessageSquare, AlertTriangle, Target, BookOpen,
   RefreshCw, Lightbulb, Sparkles, ArrowUp, ArrowDown, FileCheck, X,
   Filter, Download, Settings, CheckCircle, User, Search, Plus, QrCode,
   Bell, Activity, ChevronDown, ExternalLink, Copy, Check, Home,
@@ -570,6 +570,8 @@ export default function ManagerDashboard() {
               { id: "operations",   label: "Operations",   Icon: Activity, href: "/operations" },
               { id: "work-orders",  label: "Work Orders",  Icon: ClipboardList, href: "/work-orders" },
               { id: "assets",       label: "Assets",       Icon: Wrench, href: "/assets" },
+              { id: "knowledge",    label: "Knowledge",    Icon: BookOpen, href: "/knowledge" },
+              { id: "skill-gaps",   label: "Skill Gaps",   Icon: Target, href: "/skill-gaps" },
             ] as const).map(tab => (
               <a
                 key={tab.id}
