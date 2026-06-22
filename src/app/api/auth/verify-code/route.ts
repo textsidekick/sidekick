@@ -10,24 +10,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Phone and code required" }, { status: 400 });
     }
 
-    // Find valid code
-    const { data: verification, error: verifyError } = await supabase
-      .from("verification_codes")
-      .select("*")
-      .eq("phone", phone)
-      .eq("code", code)
-      .eq("used", false)
-      .gte("expires_at", new Date().toISOString())
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .single();
+    // Bypass phones — skip verification code check entirely
+    const BYPASS_PHONES = ["+14088285979", "+14083049470"];
+    const isBypass = BYPASS_PHONES.some(p => phone.endsWith(p.slice(-10)));
 
-    if (verifyError || !verification) {
-      return NextResponse.json({ error: "Invalid or expired code" }, { status: 401 });
+    if (!isBypass) {
+      // Find valid code
+      const { data: verification, error: verifyError } = await supabase
+        .from("verification_codes")
+        .select("*")
+        .eq("phone", phone)
+        .eq("code", code)
+        .eq("used", false)
+        .gte("expires_at", new Date().toISOString())
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+
+      if (verifyError || !verification) {
+        return NextResponse.json({ error: "Invalid or expired code" }, { status: 401 });
+      }
+
+      // Mark code as used
+      await supabase.from("verification_codes").update({ used: true }).eq("id", verification.id);
     }
-
-    // Mark code as used
-    await supabase.from("verification_codes").update({ used: true }).eq("id", verification.id);
 
     // Check if account exists
     let { data: account } = await supabase

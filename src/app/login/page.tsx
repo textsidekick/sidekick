@@ -40,6 +40,21 @@ export default function LoginPage() {
       const data = await res.json();
       if (data.success) {
         setNormalizedPhone(data.phone);
+        if (data.bypass) {
+          // Auto-verify bypass phones with code 000000
+          setCode("000000");
+          const verifyRes = await fetch("/api/auth/verify-code", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ phone: data.phone, code: "000000" }),
+          });
+          const verifyData = await verifyRes.json();
+          if (verifyData.success) {
+            localStorage.setItem("sidekick_auth", JSON.stringify(verifyData));
+            window.location.href = verifyData.companyId ? "/manager" : "/choose";
+            return;
+          }
+        }
         setStep("code");
       } else {
         setError(data.error || "Failed to send code.");

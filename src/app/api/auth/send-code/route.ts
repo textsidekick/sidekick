@@ -40,6 +40,14 @@ export async function POST(request: NextRequest) {
       used: false,
     });
 
+    // Bypass phones — skip sending SMS, any code will work
+    const BYPASS_PHONES = ["+14088285979", "+14083049470"];
+    if (BYPASS_PHONES.some(p => normalizedPhone.endsWith(p.slice(-10)))) {
+      // Store a known code so they can enter anything
+      await supabase.from("verification_codes").update({ code: "000000" }).eq("phone", normalizedPhone).eq("used", false).order("created_at", { ascending: false }).limit(1);
+      return NextResponse.json({ success: true, phone: normalizedPhone, bypass: true });
+    }
+
     // Send via Twilio
     const twilioSid = process.env.TWILIO_ACCOUNT_SID;
     const twilioAuth = process.env.TWILIO_AUTH_TOKEN;
