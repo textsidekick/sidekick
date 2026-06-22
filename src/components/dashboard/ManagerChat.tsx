@@ -73,7 +73,7 @@ export default function ManagerChat() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-105"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#C96442] hover:bg-[#a84f35] text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-105"
         title="Ask Sidekick"
       >
         <MessageSquare className="w-6 h-6" />
@@ -82,14 +82,14 @@ export default function ManagerChat() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-[400px] h-[520px] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden">
+    <div className="fixed bottom-6 right-6 z-50 w-[400px] h-[520px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-blue-600 text-white">
+      <div className="flex items-center justify-between px-4 py-3 bg-[#C96442] text-white">
         <div className="flex items-center gap-2">
           <MessageSquare className="w-5 h-5" />
           <span className="font-semibold">Ask Sidekick</span>
         </div>
-        <button onClick={() => setIsOpen(false)} className="hover:bg-blue-700 rounded p-1 transition">
+        <button onClick={() => setIsOpen(false)} className="hover:bg-[#a84f35] rounded p-1 transition">
           <X className="w-5 h-5" />
         </button>
       </div>
@@ -104,7 +104,7 @@ export default function ManagerChat() {
                 <button
                   key={s}
                   onClick={() => sendQuery(s)}
-                  className="text-xs px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/50 transition"
+                  className="text-xs px-3 py-1.5 bg-orange-50 text-[#C96442] rounded-full hover:bg-orange-100 transition"
                 >
                   {s}
                 </button>
@@ -118,18 +118,18 @@ export default function ManagerChat() {
             <div
               className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${
                 msg.role === "user"
-                  ? "bg-blue-600 text-white rounded-br-md"
-                  : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-bl-md"
+                  ? "bg-[#C96442] text-white rounded-br-md"
+                  : "bg-gray-100 text-gray-900 rounded-bl-md"
               }`}
             >
               <p className="whitespace-pre-wrap">{msg.content}</p>
               {msg.suggestions && msg.suggestions.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-gray-200">
                   {msg.suggestions.map((s) => (
                     <button
                       key={s}
                       onClick={() => sendQuery(s)}
-                      className="text-xs px-2 py-1 bg-white/20 dark:bg-white/10 rounded-full hover:bg-white/30 dark:hover:bg-white/20 transition"
+                      className="text-xs px-2 py-1 bg-white/20 rounded-full hover:bg-white/30 transition"
                     >
                       {s}
                     </button>
@@ -142,7 +142,7 @@ export default function ManagerChat() {
 
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-bl-md px-4 py-3">
+            <div className="bg-gray-100 rounded-2xl rounded-bl-md px-4 py-3">
               <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
             </div>
           </div>
@@ -152,7 +152,7 @@ export default function ManagerChat() {
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
+      <form onSubmit={handleSubmit} className="px-4 py-3 border-t border-gray-200">
         <div className="flex items-center gap-2">
           <input
             ref={inputRef}
@@ -160,13 +160,13 @@ export default function ManagerChat() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask about your operations..."
-            className="flex-1 text-sm px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 text-sm px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#C96442]"
             disabled={loading}
           />
           <button
             type="submit"
             disabled={!input.trim() || loading}
-            className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            className="p-2 bg-[#C96442] text-white rounded-lg hover:bg-[#a84f35] disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
             <Send className="w-4 h-4" />
           </button>
