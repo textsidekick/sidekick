@@ -105,7 +105,7 @@ export default function OperationsDashboardPage() {
       try {
         setLoading(true);
         setError(null);
-        const res = await fetch("/api/dashboard/operations", { cache: "no-store" });
+        const res = await fetch("/api/dashboard/operations?companyId=" + (JSON.parse(localStorage.getItem("sidekick_auth") || "{}").companyId || ""), { cache: "no-store" });
         if (!res.ok) throw new Error(`Request failed (${res.status})`);
         const json = (await res.json()) as OpsResponse;
         if (!ignore) setData(json);

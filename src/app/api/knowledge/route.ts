@@ -1,3 +1,4 @@
+import { getCompanyId } from "@/lib/dashboard-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { getCompanyId } from "@/lib/dashboard-auth";
 
 function startOfDayISO(d = new Date()) {
   const x = new Date(d);
@@ -19,22 +20,8 @@ function startOfWeekISO(d = new Date()) {
 
 export async function GET(request: NextRequest) {
   try {
-    const token = request.cookies.get("sidekick_session")?.value;
-    if (!token) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-
-    const { data: session, error: sessionError } = await supabase
-      .from("manager_sessions")
-      .select("company_id, expires_at")
-      .eq("token", token)
-      .single();
-
-    if (sessionError || !session) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    if (new Date(session.expires_at) < new Date()) {
-      await supabase.from("manager_sessions").delete().eq("token", token);
-      return NextResponse.json({ error: "session_expired" }, { status: 401 });
-    }
-
-    const companyId = session.company_id as string;
+    const companyId = await getCompanyId(request);
+    if (!companyId) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
     const weekStart = startOfWeekISO();
     const dayStart = startOfDayISO();
