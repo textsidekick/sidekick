@@ -142,8 +142,16 @@ function AnimatedNumber({ value, duration = 1000 }: { value: number; duration?: 
 
 // ─── Main component ────────────────────────────────────────────────────────────
 export default function ManagerDashboard() {
-  // All existing state (unchanged)
+  // Read tab from URL query param if present
   const [activeTab, setActiveTab] = useState<"analytics" | "alerts" | "documents" | "workers" | "test">("analytics");
+  
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab");
+    if (tab && ["analytics", "alerts", "documents", "workers", "test"].includes(tab)) {
+      setActiveTab(tab as any);
+    }
+  }, []);
   const [workersSubTab, setWorkersSubTab] = useState<"team" | "certifications" | "safety">("team");
   const [companies, setCompanies] = useState<Company[]>([]);
   const [workers, setWorkers] = useState<Worker[]>([]);
@@ -553,11 +561,11 @@ export default function ManagerDashboard() {
         </div>
       </div>
 
-      {/* TabNav wired to real tab state */}
+      {/* Unified navigation */}
       <div className="border-b border-gray-200 bg-white">
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <div className="flex gap-0 overflow-x-auto">
-            {/* New operations pages (URL-based navigation) */}
+            {/* Operations pages (URL-based) */}
             {([
               { id: "operations",   label: "Operations",   Icon: Activity, href: "/operations" },
               { id: "work-orders",  label: "Work Orders",  Icon: ClipboardList, href: "/work-orders" },
@@ -572,7 +580,7 @@ export default function ManagerDashboard() {
                 {tab.label}
               </a>
             ))}
-            {/* Existing in-page tabs */}
+            {/* In-page tabs */}
             {([
               { id: "analytics",  label: "Analytics",  Icon: BarChart3 },
               { id: "alerts",     label: "Alerts",     Icon: AlertTriangle },
