@@ -17,9 +17,7 @@ export async function GET(request: NextRequest) {
     if (companies && companies.length > 0) {
       companyId = companies[0].id;
     } else {
-      const { data: newCo, error } = await supabase.from("companies").insert({ name: "Acme Manufacturing" }).select("id").single();
-      if (error) return NextResponse.json({ error: "failed to create company", detail: error.message });
-      companyId = newCo.id;
+      return NextResponse.json({ error: "no company found — create one in the dashboard first" });
     }
 
     // Create assets
