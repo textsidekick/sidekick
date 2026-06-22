@@ -24,11 +24,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check for auth cookie/token
+  // Check for auth cookie/token (support both cookie names)
   const authCookie = request.cookies.get("sidekick_auth");
+  const sessionCookie = request.cookies.get("sidekick_session");
   
   // If no auth, redirect to login
-  if (!authCookie) {
+  if (!authCookie && !sessionCookie) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 

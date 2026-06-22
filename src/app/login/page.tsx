@@ -50,6 +50,7 @@ export default function LoginPage() {
           });
           const verifyData = await verifyRes.json();
           if (verifyData.success) {
+            document.cookie = "sidekick_auth=true; path=/; max-age=604800";
             localStorage.setItem("sidekick_auth", JSON.stringify(verifyData));
             window.location.href = verifyData.companyId ? "/manager" : "/choose";
             return;
