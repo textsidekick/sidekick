@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const { Pool } = require("pg");
-    const pool = new Pool({ connectionString: dbUrl, ssl: { rejectUnauthorized: false } });
+    const pool = new Pool({ connectionString: dbUrl, ssl: true });
     const client = await pool.connect();
     
     const results: any[] = [];
