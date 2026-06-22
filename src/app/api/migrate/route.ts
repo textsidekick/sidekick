@@ -9,17 +9,30 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const dbUrl = process.env.DATABASE_URL;
+  let dbUrl = process.env.DATABASE_URL;
   if (!dbUrl) {
-    return NextResponse.json({ error: "no DATABASE_URL", env: Object.keys(process.env).filter(k => k.includes('SUPA') || k.includes('DATA')) });
+    return NextResponse.json({ error: "no DATABASE_URL" });
   }
 
+  // Remove sslmode from URL if present, we'll handle it in config
+  dbUrl = dbUrl.replace(/[?&]sslmode=[^&]*/g, '');
+
   try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { Pool } = require("pg");
-    const pool = new Pool({ connectionString: dbUrl, ssl: true });
-    const client = await pool.connect();
+    const pool = new Pool({ 
+      connectionString: dbUrl,
+      ssl: { rejectUnauthorized: false }
+    });
     
-    const results: any[] = [];
+    // Test connection first
+    const testClient = await pool.connect();
+    const testResult = await testClient.query("SELECT current_database() as db");
+    testClient.release();
+    
+    const client = await pool.connect();
+    const results: { i: number; ok: boolean; err?: string }[] = [];
+    
     const statements = [
       "CREATE OR REPLACE FUNCTION set_updated_at() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now(); RETURN NEW; END; $$ LANGUAGE plpgsql",
       "CREATE TABLE IF NOT EXISTS work_order_counters (company_id uuid PRIMARY KEY REFERENCES companies(id) ON DELETE CASCADE, counter bigint NOT NULL DEFAULT 0)",
@@ -60,10 +73,10 @@ export async function GET(request: NextRequest) {
     client.release();
     await pool.end();
 
-    const ok = results.filter(r => r.ok).length;
-    const fail = results.filter(r => !r.ok);
-    return NextResponse.json({ total: results.length, ok, failures: fail });
+    const okCount = results.filter(r => r.ok).length;
+    const failures = results.filter(r => !r.ok);
+    return NextResponse.json({ db: testResult.rows[0]?.db, total: results.length, ok: okCount, failures });
   } catch (e: any) {
-    return NextResponse.json({ error: "connection_failed", message: e.message?.slice(0, 200), dbUrlPrefix: dbUrl.slice(0, 40) + "..." });
+    return NextResponse.json({ error: "connection_failed", message: e.message?.slice(0, 300), stack: e.stack?.slice(0, 200) });
   }
 }
