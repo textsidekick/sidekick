@@ -10,98 +10,135 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Phone and code required" }, { status: 400 });
     }
 
-    // Bypass phones — skip verification code check entirely
+    // Bypass phones — skip ALL verification, create session directly
     const BYPASS_PHONES = ["+14088285979", "+14083049470"];
     const isBypass = BYPASS_PHONES.some(p => phone.endsWith(p.slice(-10)));
 
-    if (!isBypass) {
-      // Find valid code
-      const { data: verification, error: verifyError } = await supabase
-        .from("verification_codes")
-        .select("*")
-        .eq("phone", phone)
-        .eq("code", code)
-        .eq("used", false)
-        .gte("expires_at", new Date().toISOString())
-        .order("created_at", { ascending: false })
-        .limit(1)
+    if (isBypass) {
+      // Map bypass phones to their manager_users accounts
+      const usernameMap: Record<string, string> = {
+        "4088285979": "justin",
+        "4083049470": "azhan",
+      };
+      const last10 = phone.slice(-10);
+      const username = usernameMap[last10] || "justin";
+
+      // Get their manager_users account
+      const { data: user } = await supabase
+        .from("manager_users")
+        .select("id, company_id, username")
+        .eq("username", username)
         .single();
 
-      if (verifyError || !verification) {
-        return NextResponse.json({ error: "Invalid or expired code" }, { status: 401 });
-      }
+      const companyId = user?.company_id || "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
+      const accountId = user?.id || crypto.randomUUID();
 
-      // Mark code as used
-      await supabase.from("verification_codes").update({ used: true }).eq("id", verification.id);
+      // Generate session token
+      const token = crypto.randomBytes(32).toString("hex");
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 30);
+
+      await supabase.from("manager_sessions").upsert({
+        user_id: accountId,
+        company_id: companyId,
+        token,
+        expires_at: expiresAt.toISOString(),
+      });
+
+      const response = NextResponse.json({
+        success: true,
+        token,
+        accountId,
+        companyId,
+        username: username,
+        isNewUser: false,
+        plan: "paid",
+        trialExpired: false,
+        questionsExhausted: false,
+      });
+
+      response.cookies.set("sidekick_session", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 30 * 24 * 60 * 60,
+        path: "/",
+      });
+
+      return response;
     }
 
-    // Check if account exists
-    let { data: account } = await supabase
-      .from("manager_accounts")
+    // Normal flow: verify code
+    const { data: verification, error: verifyError } = await supabase
+      .from("verification_codes")
       .select("*")
       .eq("phone", phone)
+      .eq("code", code)
+      .eq("used", false)
+      .gte("expires_at", new Date().toISOString())
+      .order("created_at", { ascending: false })
+      .limit(1)
       .single();
 
-    let isNewUser = false;
-
-    // Auto-paid phone numbers (no trial limits, but only see their own data)
-    const PAID_PHONES = ["+14088285979", "+12243348775", "+14083049470"];
-    const isPaidUser = PAID_PHONES.some(p => phone.endsWith(p.slice(-10)));
-
-    if (!account) {
-      // Create new account
-      isNewUser = true;
-      const trialEnds = new Date();
-      trialEnds.setDate(trialEnds.getDate() + 7);
-
-      const { data: newAccount, error: createError } = await supabase
-        .from("manager_accounts")
-        .insert({
-          phone,
-          trial_ends_at: trialEnds.toISOString(),
-          questions_used: 0,
-          questions_limit: 50,
-          documents_limit: 3,
-          plan: isPaidUser ? "paid" : "trial",
-          created_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
-
-      if (createError) {
-        console.error("[Auth] Account creation error:", createError);
-        return NextResponse.json({ error: "Failed to create account" }, { status: 500 });
-      }
-      account = newAccount;
+    if (verifyError || !verification) {
+      return NextResponse.json({ error: "Invalid or expired code" }, { status: 401 });
     }
 
-    // Check trial status
-    const trialExpired = account.plan === "trial" && new Date(account.trial_ends_at) < new Date();
-    const questionsExhausted = account.plan === "trial" && account.questions_used >= account.questions_limit;
+    await supabase.from("verification_codes").update({ used: true }).eq("id", verification.id);
+
+    // Check if account exists in manager_users
+    let { data: account } = await supabase
+      .from("manager_users")
+      .select("*")
+      .eq("username", phone)
+      .single();
+
+    if (!account) {
+      // Try to find by checking if we have a company for this phone
+      const { data: company } = await supabase
+        .from("companies")
+        .select("id")
+        .eq("manager_phone", phone)
+        .single();
+
+      if (company) {
+        const { data: newUser } = await supabase
+          .from("manager_users")
+          .insert({
+            company_id: company.id,
+            username: phone,
+            password_hash: "sms_auth",
+          })
+          .select()
+          .single();
+        account = newUser;
+      }
+    }
+
+    const companyId = (account as any)?.company_id || null;
+    const accountId = (account as any)?.id || null;
 
     // Generate session token
     const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 30);
 
-    await supabase.from("manager_sessions").upsert({
-      account_id: account.id,
-      token,
-      expires_at: expiresAt.toISOString(),
-    });
+    if (accountId) {
+      await supabase.from("manager_sessions").upsert({
+        user_id: accountId,
+        company_id: companyId,
+        token,
+        expires_at: expiresAt.toISOString(),
+      });
+    }
 
     const response = NextResponse.json({
       success: true,
       token,
-      accountId: account.id,
-      companyId: account.company_id || null,
-      isNewUser,
-      plan: account.plan,
-      trialExpired,
-      questionsExhausted,
-      trialEndsAt: account.trial_ends_at,
-      questionsUsed: account.questions_used,
-      questionsLimit: account.questions_limit,
+      accountId,
+      companyId,
+      isNewUser: !account,
+      plan: "trial",
     });
 
     response.cookies.set("sidekick_session", token, {
