@@ -1108,7 +1108,20 @@ IF YOU DON'T KNOW:
         if (triage.escalate && company?.manager_phone) {
           const assetName = triage.issue?.assetName || "(unknown asset)";
           const assigned = assignedToName || "UNASSIGNED";
-          const mgrMsg = `ALERT WO ${woFull?.short_id || wo.id.slice(0, 8)}\nPriority: ${triage.issue?.priority || "unknown"} (${triage.issue?.priorityReasoning || ""})\nAsset: ${assetName}\nFrom: ${worker.name || from}\nAssigned: ${assigned}`.slice(
+
+          // Calculate downtime cost estimate
+          let costLine = "";
+          try {
+            const { calculateDowntimeCost, formatCost } = require("@/lib/downtime-cost-engine");
+            const costEst = await calculateDowntimeCost(wo.id);
+            if (costEst && costEst.totalEstimatedCost > 0) {
+              costLine = `\n💰 Est. cost: ${formatCost(costEst.totalEstimatedCost)} (${formatCost(costEst.costPerMinute)}/min)`;
+              // Store on work order
+              await supabase.from("work_orders").update({ downtime_cost_estimate: costEst.totalEstimatedCost }).eq("id", wo.id);
+            }
+          } catch { /* cost engine not critical */ }
+
+          const mgrMsg = `⚠️ ALERT WO ${woFull?.short_id || wo.id.slice(0, 8)}\nPriority: ${triage.issue?.priority || "unknown"}\n${triage.issue?.priorityReasoning || ""}\nAsset: ${assetName}\nFrom: ${worker.name || from}\nAssigned: ${assigned}${costLine}`.slice(
             0,
             480
           );
