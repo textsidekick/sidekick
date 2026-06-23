@@ -242,7 +242,7 @@ export default function ManagerDashboard() {
       try {
         const authData = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
         const userPhone = authData.phone || "";
-        const isAdmin = userPhone.includes("4088285979");
+        const isAdmin = ["4088285979", "7813252655", "2243348775"].some(p => userPhone.includes(p));
         if (!isAdmin && userPhone) {
           allCompanies = allCompanies.filter((c: any) => c.manager_phone === userPhone || c.manager_phone === userPhone.replace("+1", "+"));
         } else if (authData.companyId && !isAdmin) {

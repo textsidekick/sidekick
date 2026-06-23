@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     const normalizedPhone = cleanPhone.startsWith("+") ? cleanPhone : "+1" + cleanPhone;
 
     // Rate limit: max 3 codes per hour per phone (bypass for test numbers)
-    const RATE_LIMIT_BYPASS = ["+14088285979"];
+    const RATE_LIMIT_BYPASS = ["+14088285979", "+17813252655", "+12243348775"];
     if (!RATE_LIMIT_BYPASS.includes(normalizedPhone)) {
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
       const { count } = await supabase

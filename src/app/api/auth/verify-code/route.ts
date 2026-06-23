@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Auto-paid phone numbers
-    const PAID_PHONES = ["+14088285979", "+12243348775", "+14083049470"];
+    const PAID_PHONES = ["+14088285979", "+12243348775", "+14083049470", "+17813252655"];
     const isPaidUser = PAID_PHONES.some(p => phone.endsWith(p.slice(-10)));
 
     // Verify code from verification_codes table
