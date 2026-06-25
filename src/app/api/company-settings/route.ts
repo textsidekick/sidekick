@@ -26,11 +26,15 @@ export async function PUT(req: NextRequest) {
   const { settings, company: companyUpdate } = body as { settings?: Record<string, unknown>; company?: Record<string, unknown> };
 
   if (settings) {
-    await supabase.from("company_settings").upsert({
+    const { error: settingsErr } = await supabase.from("company_settings").upsert({
       company_id: companyId,
       ...settings,
       updated_at: new Date().toISOString(),
     }, { onConflict: "company_id" });
+    if (settingsErr) {
+      console.error("[Settings] Upsert error:", settingsErr);
+      return NextResponse.json({ error: "Failed to save settings", details: settingsErr.message }, { status: 500 });
+    }
   }
 
   if (companyUpdate) {

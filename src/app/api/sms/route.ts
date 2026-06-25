@@ -1104,7 +1104,8 @@ IF YOU DON'T KNOW:
     }
 
     // Handle pending asset confirmation response
-    if ((worker as any).pending_asset_id) {
+    // Skip asset confirmation if this is a work order update (e.g. worker texting START/COMPLETE)
+    if ((worker as any).pending_asset_id && triage.messageType !== "work_order_update") {
       const upperBody = body.toUpperCase().trim();
       if (upperBody === "SKIP") {
         await supabase.from("workers").update({ pending_asset_id: null } as any).eq("phone", from);
@@ -1216,7 +1217,11 @@ IF YOU DON'T KNOW:
         : query.eq("id", woId);
 
       if (action === "start") {
-        await woFilter(supabase.from("work_orders").update({ status: "in_progress", started_at: new Date().toISOString() }));
+        const { error: startErr } = await woFilter(supabase.from("work_orders").update({ status: "in_progress", started_at: new Date().toISOString() }));
+        if (startErr) {
+          console.error("[SMS] WO start update error:", startErr);
+          return twimlResponse("Sorry, couldn't update that work order. Please try again.");
+        }
         return twimlResponse("OK Marked started.");
       }
 
@@ -1226,7 +1231,7 @@ IF YOU DON'T KNOW:
           supabase.from("work_orders").select("id, asset_id")
         ).single();
 
-        await woFilter(
+        const { error: completeErr } = await woFilter(
           supabase.from("work_orders").update({
             status: "completed",
             completed_at: new Date().toISOString(),
@@ -1234,6 +1239,10 @@ IF YOU DON'T KNOW:
             parts_used: triage.workOrderUpdate?.partsUsed || [],
           })
         );
+        if (completeErr) {
+          console.error("[SMS] WO complete update error:", completeErr);
+          return twimlResponse("Sorry, couldn't update that work order. Please try again.");
+        }
 
         // Create follow-up WOs for any secondary issues
         const secondary = (triage.workOrderUpdate?.secondaryIssues || []).slice(0, 3);
