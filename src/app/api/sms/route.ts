@@ -646,7 +646,7 @@ export async function POST(request: NextRequest) {
       
       await supabase
         .from("workers")
-        .update({ name: name, verified: true })
+        .update({ name: name, verified: true, pending_profile_step: 'role' })
         .eq("phone", from);
 
       // Ask for role next
@@ -658,15 +658,15 @@ export async function POST(request: NextRequest) {
       return twimlResponse(`Thanks ${name}! 👋 Welcome to ${companyForRole?.name || "Sidekick"}!\n\nWhat's your role? (e.g. Mechanic, Electrician, Operator, Supervisor)`);
     }
 
-    // CASE 3b: Worker has name but no role set — collect role
-    if (worker && worker.name && worker.role === "operator" && body.trim().length >= 2 && body.trim().length <= 50 && !/^(hi|hello|hey|help|status|JOIN)/i.test(body.trim())) {
+    // CASE 3b: Worker has name but pending role collection
+    if (worker && worker.name && worker.pending_profile_step === 'role' && body.trim().length >= 2 && body.trim().length <= 50) {
       const roleInput = body.trim().toLowerCase();
       const roleMap: Record<string, string> = {
         mechanic: "technician", tech: "technician", technician: "technician",
         supervisor: "supervisor", manager: "manager", operator: "operator", electrician: "technician"
       };
       const mappedRole = roleMap[roleInput] || "operator";
-      await supabase.from("workers").update({ role: mappedRole }).eq("phone", from);
+      await supabase.from("workers").update({ role: mappedRole, pending_profile_step: null }).eq("phone", from);
       return twimlResponse(`Got it — ${body.trim()}! You're all set. 🔧\n\nText me any maintenance issue, question, or "HELP" to see what I can do!`);
     }
 
