@@ -1047,6 +1047,45 @@ IF YOU DON'T KNOW:
       .order("created_at", { ascending: false })
       .limit(20);
 
+    // ============================================
+    // DIRECT WO STATUS COMMANDS (bypass AI triage)
+    // Handle START and COMPLETE directly to avoid AI classification errors
+    // ============================================
+    const upperBodyTrim = body.toUpperCase().trim();
+    const isDirectStart = upperBodyTrim === "START" || upperBodyTrim === "STARTED" || upperBodyTrim === "ON IT";
+    const isDirectComplete = upperBodyTrim === "COMPLETE" || upperBodyTrim === "DONE" || upperBodyTrim === "FIXED"
+      || upperBodyTrim === "COMPLETED" || upperBodyTrim === "FINISHED";
+
+    if ((isDirectStart || isDirectComplete) && activeWorkOrders && activeWorkOrders.length > 0) {
+      // Clear any stale pending_asset_id
+      if ((worker as any).pending_asset_id) {
+        await supabase.from("workers").update({ pending_asset_id: null } as any).eq("phone", from);
+      }
+      const targetWo = activeWorkOrders[0];
+      if (isDirectStart) {
+        const { error } = await supabase.from("work_orders")
+          .update({ status: "in_progress", started_at: new Date().toISOString() })
+          .eq("id", targetWo.id);
+        if (error) {
+          console.error("[SMS] Direct START update error:", error);
+          return twimlResponse("Sorry, couldn't update the work order. Please try again.");
+        }
+        return twimlResponse("OK Work order started. Good luck out there!");
+      } else {
+        const { error } = await supabase.from("work_orders")
+          .update({ status: "completed", completed_at: new Date().toISOString() })
+          .eq("id", targetWo.id);
+        if (error) {
+          console.error("[SMS] Direct COMPLETE update error:", error);
+          return twimlResponse("Sorry, couldn't update the work order. Please try again.");
+        }
+        return twimlResponse("OK Work order marked complete. Nice work!");
+      }
+    }
+    // ============================================
+    // END: DIRECT WO STATUS COMMANDS
+    // ============================================
+
     const triage = await triageIncomingMessage({
       message: body,
       workerPhone: from,
