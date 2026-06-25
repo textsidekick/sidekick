@@ -238,7 +238,7 @@ OUTPUT JSON SCHEMA:
   try {
     const resp = await anthropic.messages.create({
       // Use Haiku for speed; fallback would be handled by caller if needed.
-      model: "claude-3-5-haiku-latest",
+      model: "claude-sonnet-4-5",
       max_tokens: 900,
       system,
       messages: [{ role: "user", content: JSON.stringify(userPayload) }],

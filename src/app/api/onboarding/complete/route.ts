@@ -81,7 +81,7 @@ Return ONLY valid JSON, no markdown. Include all fields that have data.`;
     console.log("[Complete] Calling Anthropic for extraction...");
 
     const response = await anthropic.messages.create({
-      model: "claude-haiku-4-5",
+      model: "claude-sonnet-4-5",
       max_tokens: 256,
       messages: [{ role: "user", content: extractionPrompt }],
     });

@@ -88,7 +88,7 @@ Include:
 Return plain text only.`;
 
   const resp = await anthropic.messages.create({
-    model: process.env.ANTHROPIC_MODEL || "claude-3-5-sonnet-latest",
+    model: process.env.ANTHROPIC_MODEL || "claude-sonnet-4-5",
     max_tokens: 900,
     messages: [{ role: "user", content: prompt }],
   });

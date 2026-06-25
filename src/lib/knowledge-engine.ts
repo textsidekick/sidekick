@@ -33,7 +33,7 @@ export async function captureKnowledge(workOrderId: string): Promise<string | nu
 
   // Use Claude to generate a clean knowledge article
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-sonnet-4-5",
     max_tokens: 600,
     messages: [{
       role: "user",

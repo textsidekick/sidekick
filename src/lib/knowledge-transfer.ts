@@ -60,7 +60,7 @@ Recent work orders: ${(wos || []).map((w: any) => w.title).join("; ")}`;
   const existingTopics = (existingArticles || []).map((a: any) => a.title).join("; ");
 
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-sonnet-4-5",
     max_tokens: 800,
     messages: [{
       role: "user",
@@ -120,7 +120,7 @@ export async function processTransferAnswer(
   }
 
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-sonnet-4-5",
     max_tokens: 500,
     messages: [{
       role: "user",

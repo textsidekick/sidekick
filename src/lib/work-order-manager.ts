@@ -153,7 +153,7 @@ Return plain text (no markdown).`;
   const prompt = `Work order context:\n${JSON.stringify(wo, null, 2)}\n\nGenerate the guide.`;
 
   const resp = await anthropic.messages.create({
-    model: "claude-3-5-haiku-latest",
+    model: "claude-sonnet-4-5",
     max_tokens: 500,
     system,
     messages: [{ role: "user", content: prompt }],

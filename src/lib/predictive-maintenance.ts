@@ -87,7 +87,7 @@ export async function analyzeAssetHealth(assetId: string, companyId: string): Pr
   }));
 
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-sonnet-4-5",
     max_tokens: 800,
     messages: [{
       role: "user",
@@ -245,7 +245,7 @@ export async function detectRecurringIssues(companyId: string): Promise<Recurrin
   }));
 
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-sonnet-4-5",
     max_tokens: 1000,
     messages: [{
       role: "user",

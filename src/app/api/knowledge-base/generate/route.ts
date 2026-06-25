@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       : (REPORT_PROMPTS[reportType] || REPORT_PROMPTS["company-overview"]);
 
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-5",
       max_tokens: 4096,
       system: "You are a professional report generator for Sidekick, a B2B knowledge base platform. Generate well-structured, professional reports based on the company data provided. Use markdown formatting with ## for section headings, bullet points, and **bold** text. Be specific and actionable. If data is limited, note what additional information would improve the report.",
       messages: [{ role: "user", content: `Company data:\n${context || "No data imported yet."}\n\nTask: ${prompt}` }],

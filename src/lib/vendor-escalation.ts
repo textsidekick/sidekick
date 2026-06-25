@@ -110,7 +110,7 @@ export async function buildEscalationPackage(workOrderId: string): Promise<Escal
 
   // Generate vendor summary using AI
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-sonnet-4-5",
     max_tokens: 400,
     messages: [{
       role: "user",

@@ -115,7 +115,7 @@ export async function handleManagerQuery(query: string, companyId: string): Prom
 
   // Step 2: Ask Claude to answer the question using the data
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-sonnet-4-5",
     max_tokens: 1000,
     messages: [
       {
