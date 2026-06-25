@@ -130,6 +130,7 @@ async function sendSMS(to: string, body: string, mediaUrl?: string) {
 }
 
 export async function POST(request: NextRequest) {
+  try {
   const formData = await request.formData();
   const from = formData.get("From") as string;
   const body = (formData.get("Body") as string || "").trim();
@@ -183,4 +184,11 @@ export async function POST(request: NextRequest) {
   return new NextResponse('<?xml version="1.0"?><Response></Response>', {
     headers: { "Content-Type": "text/xml" },
   });
+  } catch (error) {
+    console.error("[SMS Webhook] Unhandled error:", error);
+    return new NextResponse(
+      '<?xml version="1.0" encoding="UTF-8"?><Response><Message>Something went wrong. Please try again.</Message></Response>',
+      { headers: { "Content-Type": "text/xml" } }
+    );
+  }
 }
