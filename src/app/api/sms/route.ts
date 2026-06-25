@@ -1056,6 +1056,78 @@ IF YOU DON'T KNOW:
       activeWorkOrders: (activeWorkOrders || []) as any,
     });
 
+    // ============================================
+    // ASSET LEARNING: auto-create draft assets
+    // ============================================
+    if (triage.issue?.assetName && !triage.issue?.assetId) {
+      // Check if this asset name already exists (fuzzy match)
+      const mentionedName = triage.issue.assetName.toLowerCase().trim();
+      const existingMatch = (assets || []).find((a: any) =>
+        (a.name || "").toLowerCase().includes(mentionedName) ||
+        mentionedName.includes((a.name || "").toLowerCase())
+      );
+
+      if (!existingMatch && mentionedName.length > 2) {
+        try {
+          // Auto-create draft asset
+          const { data: newAsset } = await supabase
+            .from("assets")
+            .insert({
+              company_id: worker.company_id,
+              name: triage.issue.assetName,
+              status: "unverified",
+              health_score: null,
+            } as any)
+            .select()
+            .single();
+
+          if (newAsset) {
+            // Store pending asset question on the worker
+            await supabase
+              .from("workers")
+              .update({ pending_asset_id: (newAsset as any).id } as any)
+              .eq("phone", from);
+
+            // Send follow-up SMS AFTER the main response (non-blocking)
+            const followUpMsg =
+              `I noticed you mentioned "${triage.issue.assetName}". Is that a piece of equipment here? ` +
+              `Reply with its type and location (e.g. "CNC lathe, Building A") or SKIP to ignore.`;
+            // Send asynchronously so it doesn't delay the main response
+            sendSMS(from, followUpMsg).catch((e: any) =>
+              console.error("[SMS] Asset learning follow-up failed:", e)
+            );
+            console.log("[SMS] Created draft asset:", triage.issue.assetName);
+          }
+        } catch (e) {
+          console.error("[SMS] Asset learning error:", e);
+        }
+      }
+    }
+
+    // Handle pending asset confirmation response
+    if ((worker as any).pending_asset_id) {
+      const upperBody = body.toUpperCase().trim();
+      if (upperBody === "SKIP") {
+        await supabase.from("workers").update({ pending_asset_id: null } as any).eq("phone", from);
+        return twimlResponse("Got it, skipped.");
+      }
+      // Check if this looks like an asset description (not a maintenance issue)
+      if (body.length < 120 && !body.match(/(broken|not working|leak|noise|fail|error|down|problem)/i)) {
+        // Parse type and location from response
+        const parts = body.split(",").map((p: string) => p.trim());
+        const assetType = parts[0] || null;
+        const assetLocation = parts[1] || null;
+        await supabase
+          .from("assets")
+          .update({ make: assetType, location: assetLocation, status: "active" } as any)
+          .eq("id", (worker as any).pending_asset_id);
+        await supabase.from("workers").update({ pending_asset_id: null } as any).eq("phone", from);
+        return twimlResponse(`Thanks! I've added "${assetType || "the asset"}"${assetLocation ? ` at ${assetLocation}` : ""} to the equipment list.`);
+      }
+      // Clear the pending asset question and fall through to process the message normally
+      await supabase.from("workers").update({ pending_asset_id: null } as any).eq("phone", from);
+    }
+
     // Branch based on messageType
     if (triage.messageType === "issue_report") {
       try {

@@ -1,109 +1,129 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import fs from "fs";
-import path from "path";
-import { nanoid } from "nanoid";
-import { classifyDocument, extractStructuredData, saveDocumentMetadata, DocumentMetadata } from "@/lib/documentClassifier";
+import { createEmbedding } from "@/lib/embeddings";
+import { getCompanyId } from "@/lib/dashboard-auth";
 
 export const runtime = "nodejs";
 
-const STORAGE_DIR = "/tmp/sidekick-documents";
-
-function ensureDir(p: string) {
-  if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
+function chunkTextWithOverlap(text: string, maxSize = 800, overlap = 100): string[] {
+  const chunks: string[] = [];
+  let start = 0;
+  while (start < text.length) {
+    const end = Math.min(start + maxSize, text.length);
+    chunks.push(text.slice(start, end).trim());
+    if (end === text.length) break;
+    start += maxSize - overlap;
+  }
+  return chunks.filter((c) => c.length > 20);
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const pdfParse = require("pdf-parse");
-
     const form = await req.formData();
     const file = form.get("file");
-    const companyId = String(form.get("companyId") ?? "demo");
-    const userProvidedType = form.get("type") as string | null;
+    const assetIdParam = form.get("asset_id") as string | null;
 
-    // Check document upload limit for trial accounts
-    if (companyId && companyId !== "demo") {
-      const { data: account } = await supabase
-        .from("manager_accounts")
-        .select("plan, documents_limit")
-        .eq("company_id", companyId)
-        .single();
-
-      if (account && account.plan === "trial") {
-        const { count } = await supabase
-          .from("documents")
-          .select("*", { count: "exact", head: true })
-          .eq("company_id", companyId);
-
-        if ((count || 0) >= (account.documents_limit || 3)) {
-          return NextResponse.json({
-            error: "Document limit reached. Upgrade your plan to upload more documents.",
-            upgrade: true,
-            limit: account.documents_limit,
-            current: count,
-          }, { status: 403 });
-        }
-      }
+    // Auth: prefer session, fall back to form companyId
+    let companyId = await getCompanyId(req);
+    if (!companyId) {
+      companyId = form.get("companyId") as string | null;
+    }
+    if (!companyId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     if (!file || !(file instanceof File)) {
-      return NextResponse.json({ error: "Missing PDF file" }, { status: 400 });
+      return NextResponse.json({ error: "Missing file" }, { status: 400 });
     }
 
-    const buf = Buffer.from(await file.arrayBuffer());
-    const parsed = await pdfParse(buf);
-    const text = String(parsed?.text ?? "").replace(/\u0000/g, "").trim();
+    // Check document upload limit for trial accounts
+    const { data: account } = await supabase
+      .from("manager_accounts")
+      .select("plan, documents_limit")
+      .eq("company_id", companyId)
+      .single();
+
+    if (account?.plan === "trial") {
+      const { count } = await supabase
+        .from("documents")
+        .select("*", { count: "exact", head: true })
+        .eq("company_id", companyId);
+
+      if ((count || 0) >= (account.documents_limit || 3)) {
+        return NextResponse.json({
+          error: "Document limit reached. Upgrade your plan to upload more documents.",
+          upgrade: true,
+        }, { status: 403 });
+      }
+    }
+
+    // Extract text from file
+    let text = "";
+    const isPdf = file.name.endsWith(".pdf") || file.type === "application/pdf";
+
+    if (isPdf) {
+      const pdfParse = require("pdf-parse");
+      const buf = Buffer.from(await file.arrayBuffer());
+      const parsed = await pdfParse(buf);
+      text = String(parsed?.text ?? "").replace(/\u0000/g, "").trim();
+    } else {
+      // Plain text / markdown / other text files
+      text = await file.text();
+    }
 
     if (text.length < 50) {
       return NextResponse.json(
-        { error: "Could not extract enough text from PDF (only " + text.length + " chars)" },
+        { error: "Could not extract enough text from file (only " + text.length + " chars)" },
         { status: 400 }
       );
     }
 
-    // PHASE 1: Classify
-    console.log("Classifying document...");
-    const classification = await classifyDocument(text);
-    console.log("Classification result:", classification);
+    // Save document to Supabase
+    const { data: doc, error: docError } = await supabase
+      .from("documents")
+      .insert({
+        company_id: companyId,
+        name: file.name,
+        content: text.slice(0, 50000), // cap at 50k for storage
+        asset_id: assetIdParam || null,
+      })
+      .select()
+      .single();
 
-    // PHASE 2: Extract structured data
-    console.log("Extracting structured data...");
-    const extractedData = await extractStructuredData(text, classification.type);
-    console.log("Extracted data:", JSON.stringify(extractedData).slice(0, 200));
+    if (docError) {
+      console.error("[Upload] Document insert error:", docError);
+      return NextResponse.json({ error: "Failed to save document" }, { status: 500 });
+    }
 
-    const documentId = nanoid(10);
+    // Chunk text and create embeddings
+    const chunks = chunkTextWithOverlap(text, 800, 100);
+    console.log(`[Upload] Creating embeddings for ${chunks.length} chunks of ${file.name}`);
 
-    const docDir = path.join(STORAGE_DIR, companyId);
-    ensureDir(docDir);
-    const textPath = path.join(docDir, `${documentId}.txt`);
-    fs.writeFileSync(textPath, text, "utf-8");
-
-    const metadata: DocumentMetadata = {
-      id: documentId,
-      companyId,
-      filename: file.name,
-      type: (userProvidedType as any) || classification.type,
-      title: classification.title,
-      uploadedAt: Date.now(),
-      pageCount: parsed.numpages,
-      extractedData: extractedData, // Store structured data!
-    };
-
-    saveDocumentMetadata(companyId, metadata);
+    let embeddedCount = 0;
+    for (const chunk of chunks) {
+      try {
+        const embedding = await createEmbedding(chunk);
+        await supabase.from("document_chunks").insert({
+          document_id: doc.id,
+          company_id: companyId,
+          content: chunk,
+          embedding: embedding,
+        });
+        embeddedCount++;
+      } catch (e) {
+        console.error("[Upload] Embedding error for chunk:", e);
+      }
+    }
 
     return NextResponse.json({
       ok: true,
-      document: metadata,
-      classification,
-      extractedData,
+      document: { id: doc.id, name: file.name },
+      chunksCreated: embeddedCount,
+      totalChunks: chunks.length,
       chars: text.length,
     });
   } catch (e: any) {
-    console.error("Upload error:", e);
-    return NextResponse.json(
-      { error: "Upload failed: " + e.message },
-      { status: 500 }
-    );
+    console.error("[Upload] Error:", e);
+    return NextResponse.json({ error: "Upload failed: " + e.message }, { status: 500 });
   }
 }

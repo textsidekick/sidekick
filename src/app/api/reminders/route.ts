@@ -3,7 +3,7 @@ import { supabase } from "@/lib/supabase";
 import twilio from "twilio";
 
 const twilioClient = twilio(
-  process.env.TWILIO_ACCOUNT_SID || "placeholder",
+  process.env.TWILIO_ACCOUNT_SID || 'AC00000000000000000000000000000001',
   process.env.TWILIO_AUTH_TOKEN || "placeholder"
 );
 
