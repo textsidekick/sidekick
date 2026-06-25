@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { TopBar } from "@/components/dashboard/layout/TopBar";
 import { OpsNav } from "@/components/dashboard/layout/OpsNav";
 import { SectionHeader } from "@/components/dashboard/shared/SectionHeader";
 import { Badge } from "@/components/ui/badge";
-import { Search, BookOpen, Wrench, Clock, Hash, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, BookOpen, Wrench, Clock, Hash, ChevronDown, ChevronUp, Upload } from "lucide-react";
 
 interface KnowledgeArticle {
   id: string;
@@ -27,6 +27,29 @@ export default function KnowledgePage() {
   const [articles, setArticles] = useState<KnowledgeArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [uploadMsg, setUploadMsg] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  async function handleDocUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setUploadMsg(null);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/documents/upload", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Upload failed");
+      setUploadMsg(`Uploaded: ${file.name}`);
+    } catch (err: unknown) {
+      setUploadMsg(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  }
   const [expanded, setExpanded] = useState<string | null>(null);
 
   useEffect(() => {
@@ -53,7 +76,16 @@ export default function KnowledgePage() {
       <OpsNav />
       <div style={{ background: "#F7F3EC", minHeight: "100vh" }}>
         <div className="max-w-7xl mx-auto px-6 py-8">
-          <SectionHeader title="Knowledge Base" subtitle="Auto-captured operational intelligence from resolved work orders" />
+          <div className="flex items-start justify-between">
+            <SectionHeader title="Knowledge Base" subtitle="Auto-captured operational intelligence from resolved work orders" />
+            <div className="flex-shrink-0">
+              <input ref={fileRef} type="file" accept=".pdf,.txt,.doc,.docx" className="hidden" onChange={handleDocUpload} />
+              <button onClick={() => fileRef.current?.click()} disabled={uploading} className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[#C96442] text-white rounded-lg hover:bg-[#a8532f] disabled:opacity-50">
+                <Upload className="h-4 w-4" />{uploading ? "Uploading…" : "Upload Document"}
+              </button>
+              {uploadMsg && <p className="text-xs mt-1 text-right text-gray-500">{uploadMsg}</p>}
+            </div>
+          </div>
 
           {/* Hero stat */}
           <div className="mt-6 flex items-center gap-6">

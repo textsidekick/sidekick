@@ -5,6 +5,9 @@ import twilio from "twilio";
 import { supabase } from "@/lib/supabase";
 import { createEmbedding } from "@/lib/embeddings";
 import { normalizePhoneNumber } from "@/lib/phone";
+import { checkRateLimit } from "@/lib/rate-limit";
+import { auditLog } from "@/lib/audit";
+import { fireWebhooks } from "@/lib/webhooks";
 import { triageIncomingMessage } from "@/lib/ai-triage";
 import {
   assignWorkOrder,
@@ -448,6 +451,11 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const body = formData.get("Body")?.toString()?.trim() || "";
     const from = normalizePhoneNumber(formData.get("From")?.toString() || "");
+
+    // Rate limiting: max 60 SMS per minute per phone number
+    if (!checkRateLimit(`sms:${from}`, 60, 60_000)) {
+      return twimlResponse("Too many messages. Please wait a moment and try again.");
+    }
     
     // NEW: Check for media attachments (images)
     const numMedia = parseInt(formData.get("NumMedia")?.toString() || "0", 10);
@@ -640,39 +648,26 @@ export async function POST(request: NextRequest) {
         .from("workers")
         .update({ name: name, verified: true })
         .eq("phone", from);
-      
-      const { data: company } = await supabase
+
+      // Ask for role next
+      const { data: companyForRole } = await supabase
         .from("companies")
-        .select("name, metadata, industry")
+        .select("name")
         .eq("id", worker.company_id)
         .single();
-      
-      // Proactive welcome based on event type
-      let welcomeMsg = `Thanks ${name}! \u{1F64C} Welcome to ${company?.name || "Sidekick"}.\nAsk me anything — schedule, location, details, whatever you need!`;
-      try {
-        const meta = typeof company?.metadata === "string" ? JSON.parse(company.metadata) : company?.metadata;
-        const t = (meta?.type || company?.industry || "").toLowerCase();
-        if (t.includes("market") || t.includes("fair"))
-          welcomeMsg = `Thanks ${name}! \u{1F64C} Welcome to ${company?.name}.\n\nQuick question \u2014 are you coming as a shopper or a vendor? This helps me give you the right info!`;
-        else if (t.includes("concert") || t.includes("performance") || t.includes("album"))
-          welcomeMsg = `Thanks ${name}! \u{1F3A4} Welcome to ${company?.name}.\n\nWant me to RSVP you? I can also send you a reminder before the show. Or ask me anything \u2014 lineup, parking, merch.`;
-        else if (t.includes("casting") || t.includes("audition"))
-          welcomeMsg = `Thanks ${name}! \u{1F3AC} Welcome to ${company?.name}.\n\nDo you have any acting experience? No worries either way \u2014 I'll help you prep. I can also sign you up for a time slot!`;
-        else if (t.includes("rally") || t.includes("political") || t.includes("speaker"))
-          welcomeMsg = `Thanks ${name}! \u{1F3A4} Welcome to ${company?.name}.\n\nWant me to RSVP you? Spots are limited. I can also tell you what to bring and walk you through security info.`;
-        else if (t.includes("party") || t.includes("social"))
-          welcomeMsg = `Thanks ${name}! \u{1F389} Welcome to ${company?.name}.\n\nHow many people are you bringing? I can add your crew to the guest list. Also \u2014 the theme is NEON \u{1F525}`;
-        else if (t.includes("blood") || t.includes("charity") || t.includes("drive"))
-          welcomeMsg = `Thanks ${name}! \u{2764} Welcome to ${company?.name}.\n\nHave you donated blood before? I can walk you through what to expect. Want me to save you a time slot so you skip the line?`;
-        else if (t.includes("meet") || t.includes("greet") || t.includes("autograph"))
-          welcomeMsg = `Thanks ${name}! \u{270D} Welcome to ${company?.name}.\n\nBringing anything to get signed? I can tell you the autograph rules so you're ready. Want a reminder before doors open?`;
-        else if (t.includes("kickbox") || t.includes("fitness") || t.includes("workshop"))
-          welcomeMsg = `Thanks ${name}! \u{1F94A} Welcome to ${company?.name}.\n\nWhat's your experience level \u2014 beginner, intermediate, or advanced? I'll tell you exactly what to bring.`;
-        else if (t.includes("restaurant") || t.includes("food"))
-          welcomeMsg = `Thanks ${name}! \u{1F37D} Welcome to ${company?.name}.\n\nLooking to make a reservation, check the menu, or something else? I know this place inside and out.`;
-      } catch {}
-      
-      return twimlResponse(welcomeMsg);
+      return twimlResponse(`Thanks ${name}! 👋 Welcome to ${companyForRole?.name || "Sidekick"}!\n\nWhat's your role? (e.g. Mechanic, Electrician, Operator, Supervisor)`);
+    }
+
+    // CASE 3b: Worker has name but no role set — collect role
+    if (worker && worker.name && worker.role === "operator" && body.trim().length >= 2 && body.trim().length <= 50 && !/^(hi|hello|hey|help|status|JOIN)/i.test(body.trim())) {
+      const roleInput = body.trim().toLowerCase();
+      const roleMap: Record<string, string> = {
+        mechanic: "technician", tech: "technician", technician: "technician",
+        supervisor: "supervisor", manager: "manager", operator: "operator", electrician: "technician"
+      };
+      const mappedRole = roleMap[roleInput] || "operator";
+      await supabase.from("workers").update({ role: mappedRole }).eq("phone", from);
+      return twimlResponse(`Got it — ${body.trim()}! You're all set. 🔧\n\nText me any maintenance issue, question, or "HELP" to see what I can do!`);
     }
 
     // CASE 4: Registered worker - get company info

@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, ClipboardList, HardDrive, BarChart3, ShieldAlert, FileText, Users, BookOpen, Target, Brain, Building2 } from "lucide-react";
+import { Activity, ClipboardList, HardDrive, BarChart3, ShieldAlert, FileText, Users, BookOpen, Target, Brain, Building2, Settings } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
@@ -15,12 +15,13 @@ const TABS = [
   { id: "work-orders", label: "Work Orders", icon: ClipboardList, href: "/work-orders" },
   { id: "assets", label: "Assets", icon: HardDrive, href: "/assets" },
   { id: "knowledge", label: "Knowledge", icon: BookOpen, href: "/knowledge" },
+  { id: "team", label: "Team", icon: Users, href: "/team" },
+  { id: "analytics", label: "Analytics", icon: BarChart3, href: "/analytics" },
   { id: "skill-gaps", label: "Skill Gaps", icon: Target, href: "/skill-gaps" },
   { id: "knowledge-transfer", label: "Transfer", icon: Brain, href: "/knowledge-transfer" },
-  { id: "analytics", label: "Analytics", icon: BarChart3, href: "/manager?tab=analytics" },
   { id: "alerts", label: "Alerts", icon: ShieldAlert, href: "/manager?tab=alerts" },
   { id: "documents", label: "Documents", icon: FileText, href: "/manager?tab=documents" },
-  { id: "workers", label: "Workers", icon: Users, href: "/manager?tab=workers" },
+  { id: "settings", label: "Settings", icon: Settings, href: "/settings" },
 ];
 
 export function OpsNav() {
