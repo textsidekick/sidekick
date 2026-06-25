@@ -8,13 +8,13 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await supabase
     .from("work_orders")
-    .select("short_id,title,description,status,priority,created_at,resolved_at,asset_id,assigned_to")
+    .select("short_id,title,description,status,priority,created_at,completed_at,asset_id,assigned_to")
     .eq("company_id", companyId)
     .order("created_at", { ascending: false });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  const headers = ["id", "title", "description", "status", "priority", "created_at", "resolved_at", "asset_id", "assigned_to"];
+  const headers = ["id", "title", "description", "status", "priority", "created_at", "completed_at", "asset_id", "assigned_to"];
   const rows = (data || []).map((r: Record<string, unknown>) =>
     headers.map((h) => JSON.stringify(r[h] ?? "")).join(",")
   );

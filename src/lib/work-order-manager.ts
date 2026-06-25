@@ -71,6 +71,7 @@ export async function createWorkOrderFromTriage(
       description: descriptionLines.join("\n"),
       status: "open",
       reported_by: reportedBy,
+      worker_phone: reportedBy,
     })
     .select()
     .single();

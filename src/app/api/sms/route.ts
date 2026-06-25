@@ -1076,7 +1076,6 @@ IF YOU DON'T KNOW:
               company_id: worker.company_id,
               name: triage.issue.assetName,
               status: "unverified",
-              health_score: null,
             } as any)
             .select()
             .single();
@@ -1210,28 +1209,31 @@ IF YOU DON'T KNOW:
         return twimlResponse((triage.workerResponse || "Got it.").slice(0, 480));
       }
 
+      // Bug 3 fix: support both short_id (WO-XXXX) and UUID
+      const isShortId = /^WO-\d+$/i.test(woId);
+      const woFilter = (query: any) => isShortId
+        ? query.eq("short_id", woId)
+        : query.eq("id", woId);
+
       if (action === "start") {
-        await supabase.from("work_orders").update({ status: "in_progress", started_at: new Date().toISOString() }).eq("id", woId);
+        await woFilter(supabase.from("work_orders").update({ status: "in_progress", started_at: new Date().toISOString() }));
         return twimlResponse("OK Marked started.");
       }
 
       if (action === "complete") {
         // Pull WO for asset context
-        const { data: woFullForUpdate } = await supabase
-          .from("work_orders")
-          .select("id, asset_id")
-          .eq("id", woId)
-          .single();
+        const { data: woFullForUpdate } = await woFilter(
+          supabase.from("work_orders").select("id, asset_id")
+        ).single();
 
-        await supabase
-          .from("work_orders")
-          .update({
+        await woFilter(
+          supabase.from("work_orders").update({
             status: "completed",
             completed_at: new Date().toISOString(),
             resolution_notes: triage.workOrderUpdate?.completionNotes || null,
             parts_used: triage.workOrderUpdate?.partsUsed || [],
           })
-          .eq("id", woId);
+        );
 
         // Create follow-up WOs for any secondary issues
         const secondary = (triage.workOrderUpdate?.secondaryIssues || []).slice(0, 3);
