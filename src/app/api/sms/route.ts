@@ -1206,17 +1206,29 @@ IF YOU DON'T KNOW:
       const woId = triage.workOrderUpdate?.workOrderId;
       const action = triage.workOrderUpdate?.action;
 
-      if (!woId || !action) {
+      // Fallback: if AI didn't identify WO, use most recent active WO for this worker
+      let resolvedWoId = woId;
+      let resolvedAction = action;
+      if (!resolvedWoId && activeWorkOrders && activeWorkOrders.length > 0) {
+        resolvedWoId = activeWorkOrders[0].id;
+      }
+      if (!resolvedAction) {
+        const upperBody = body.toUpperCase().trim();
+        if (upperBody === "START" || upperBody === "STARTED" || upperBody === "ON IT") resolvedAction = "start";
+        else if (upperBody.startsWith("COMPLETE") || upperBody === "DONE" || upperBody === "FIXED") resolvedAction = "complete";
+      }
+
+      if (!resolvedWoId || !resolvedAction) {
         return twimlResponse((triage.workerResponse || "Got it.").slice(0, 480));
       }
 
       // Bug 3 fix: support both short_id (WO-XXXX) and UUID
-      const isShortId = /^WO-\d+$/i.test(woId);
+      const isShortId = /^WO-\d+$/i.test(resolvedWoId);
       const woFilter = (query: any) => isShortId
-        ? query.eq("short_id", woId)
-        : query.eq("id", woId);
+        ? query.eq("short_id", resolvedWoId)
+        : query.eq("id", resolvedWoId);
 
-      if (action === "start") {
+      if (resolvedAction === "start") {
         const { error: startErr } = await woFilter(supabase.from("work_orders").update({ status: "in_progress", started_at: new Date().toISOString() }));
         if (startErr) {
           console.error("[SMS] WO start update error:", startErr);
@@ -1225,7 +1237,7 @@ IF YOU DON'T KNOW:
         return twimlResponse("OK Marked started.");
       }
 
-      if (action === "complete") {
+      if (resolvedAction === "complete") {
         // Pull WO for asset context
         const { data: woFullForUpdate } = await woFilter(
           supabase.from("work_orders").select("id, asset_id")
@@ -1251,20 +1263,20 @@ IF YOU DON'T KNOW:
             company_id: worker.company_id,
             asset_id: (woFullForUpdate as any)?.asset_id || null,
             title: `Follow-up: ${s}`.slice(0, 120),
-            description: `Auto-created follow-up from completion of ${woId}: ${s}`,
+            description: `Auto-created follow-up from completion of ${resolvedWoId}: ${s}`,
             status: "open",
             reported_by: from,
             priority: "medium",
             category: "other",
             source: "sms",
-            parent_wo_id: woId,
+            parent_wo_id: resolvedWoId,
           } as any);
         }
 
         // Auto-capture knowledge from completed work order
         try {
           const { captureKnowledge } = require("@/lib/knowledge-engine");
-          captureKnowledge(woId).catch((err: any) => console.error("[SMS] Knowledge capture error:", err));
+          captureKnowledge(resolvedWoId).catch((err: any) => console.error("[SMS] Knowledge capture error:", err));
         } catch { /* knowledge engine not critical */ }
 
         return twimlResponse("OK Marked complete. Thanks!");

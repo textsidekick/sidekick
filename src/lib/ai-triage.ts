@@ -295,12 +295,25 @@ OUTPUT JSON SCHEMA:
     result.issue.isRecurring = Boolean(result.issue.isRecurring);
   }
 
-  if (result.messageType === "work_order_update" && result.workOrderUpdate) {
+  if (result.messageType === "work_order_update") {
+    // Ensure workOrderUpdate object exists
+    if (!result.workOrderUpdate) {
+      // Infer action from raw message text
+      const upperMsg = message.toUpperCase().trim();
+      let inferredAction: "start" | "complete" | "pause" | "resume" | "add_note" = "add_note";
+      if (upperMsg === "START" || upperMsg === "STARTED" || upperMsg === "ON IT" || upperMsg === "STARTING") {
+        inferredAction = "start";
+      } else if (upperMsg.startsWith("COMPLETE") || upperMsg === "DONE" || upperMsg === "FIXED" || upperMsg === "FINISHED") {
+        inferredAction = "complete";
+      }
+      result.workOrderUpdate = { action: inferredAction, workOrderId: null, completionNotes: null, partsUsed: [], secondaryIssues: [] } as any;
+    }
     // If model didn't pick workOrderId, try to map to most recent active WO for this worker.
     if (!result.workOrderUpdate.workOrderId && activeWorkOrders && activeWorkOrders.length > 0) {
       const recent = [...activeWorkOrders]
-        .filter((wo) => (wo.worker_phone || "") === workerPhone)
-        .sort((a, b) => (new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()))[0];
+        .filter((wo) => (wo.worker_phone || "") === workerPhone || (wo.assigned_to_phone || "") === workerPhone)
+        .sort((a, b) => (new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()))[0]
+        || activeWorkOrders[0]; // fallback to most recent WO for this company/worker
       if (recent) result.workOrderUpdate.workOrderId = recent.id;
     }
   }
