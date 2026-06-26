@@ -1,3 +1,4 @@
+export const maxDuration = 60;
 import { NextResponse } from "next/server";
 
 type ChatMessage = { role: "user" | "assistant" | "system"; content: string };

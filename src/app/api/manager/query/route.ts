@@ -2,6 +2,8 @@ import { getCompanyId } from "@/lib/dashboard-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { handleManagerQuery } from "@/lib/manager-query";
 
+export const maxDuration = 60;
+
 export async function POST(request: NextRequest) {
   try {
     const companyId = await getCompanyId(request);
