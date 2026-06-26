@@ -20,6 +20,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error: any) {
     console.error("[manager/query] Error:", error);
-    return NextResponse.json({ error: "internal_error", debug: error?.message?.slice(0, 300) || String(error).slice(0, 300) }, { status: 500 });
+    return NextResponse.json({ error: "internal_error" }, { status: 500 });
   }
 }
