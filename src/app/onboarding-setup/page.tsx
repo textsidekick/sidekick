@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Building2, Package, Users, Clock, FileText, CheckCircle, ChevronRight, ChevronLeft, Upload, Plus, Trash2 } from "lucide-react";
+import { Building2, Package, Users, Clock, FileText, CheckCircle, ChevronRight, ChevronLeft, Upload, Plus, Trash2, Camera, Mic, Zap, Send } from "lucide-react";
+import { INDUSTRY_TEMPLATES } from "@/lib/industry-templates";
 
 const STEPS = [
   { id: 1, title: "Company Details", icon: Building2 },
@@ -46,6 +47,188 @@ export default function OnboardingSetupPage() {
   // Step 5: Docs
   const [docFiles, setDocFiles] = useState<File[]>([]);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+
+  // Quick start
+  const [quickStartMode, setQuickStartMode] = useState(false);
+  const [quickStarting, setQuickStarting] = useState(false);
+
+  // Photo/voice import
+  const [photoImporting, setPhotoImporting] = useState(false);
+  const [voiceRecording, setVoiceRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const sopPhotoRef = useRef<HTMLInputElement>(null);
+  const [sopRecording, setSopRecording] = useState(false);
+  const [sopMediaRecorder, setSopMediaRecorder] = useState<MediaRecorder | null>(null);
+  const sopAudioChunksRef = useRef<Blob[]>([]);
+  const [bulkInviting, setBulkInviting] = useState(false);
+  const [bulkInviteResult, setBulkInviteResult] = useState<string | null>(null);
+
+  async function handleQuickStart() {
+    if (!companyName.trim()) return alert("Enter a company name first.");
+    setQuickStarting(true);
+    try {
+      const res = await fetch("/api/onboarding/quick-start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: companyName, industry }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error);
+      setCompanyId(json.companyId);
+      setJoinCode(json.joinCode);
+      setStep(6);
+    } catch (e: any) {
+      alert(e.message);
+    } finally {
+      setQuickStarting(false);
+    }
+  }
+
+  async function handlePhotoAssetImport(file: File) {
+    setPhotoImporting(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/onboarding/photo-asset", { method: "POST", body: fd });
+      const json = await res.json();
+      if (json.assets?.length > 0) {
+        const newAssets = json.assets.map((a: any) => ({
+          name: a.name || "", type: a.type || "", location: a.location || "", tag: a.tag || "",
+        }));
+        setAssets((prev) => [...prev.filter((a) => a.name.trim()), ...newAssets]);
+      } else {
+        alert("No equipment detected in photo. Try a clearer image.");
+      }
+    } catch (e: any) {
+      alert("Photo import failed: " + e.message);
+    } finally {
+      setPhotoImporting(false);
+    }
+  }
+
+  async function startVoiceAssetRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      audioChunksRef.current = [];
+      recorder.ondataavailable = (e) => audioChunksRef.current.push(e.data);
+      recorder.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        const fd = new FormData();
+        fd.append("file", blob, "recording.webm");
+        setPhotoImporting(true);
+        try {
+          const res = await fetch("/api/onboarding/voice-asset", { method: "POST", body: fd });
+          const json = await res.json();
+          if (json.assets?.length > 0) {
+            const newAssets = json.assets.map((a: any) => ({
+              name: a.name || "", type: a.type || "", location: a.location || "", tag: a.tag || "",
+            }));
+            setAssets((prev) => [...prev.filter((a) => a.name.trim()), ...newAssets]);
+          } else {
+            alert("No equipment detected in recording. Try describing your machines more clearly.");
+          }
+        } catch (e: any) {
+          alert("Voice import failed: " + e.message);
+        } finally {
+          setPhotoImporting(false);
+        }
+      };
+      recorder.start();
+      setMediaRecorder(recorder);
+      setVoiceRecording(true);
+    } catch {
+      alert("Microphone access denied.");
+    }
+  }
+
+  function stopVoiceAssetRecording() {
+    mediaRecorder?.stop();
+    setVoiceRecording(false);
+    setMediaRecorder(null);
+  }
+
+  async function handleSopPhoto(file: File) {
+    if (!companyId) return alert("Complete Step 1 first.");
+    setUploadStatus("Extracting text from photo...");
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("companyId", companyId);
+      const res = await fetch("/api/onboarding/photo-sop", { method: "POST", body: fd });
+      const json = await res.json();
+      if (json.ok) {
+        setUploadStatus(`✅ Extracted and saved: ${json.document.name} (${json.chunksCreated} sections indexed)`);
+      } else {
+        setUploadStatus("❌ " + (json.error || "Failed to extract text"));
+      }
+    } catch (e: any) {
+      setUploadStatus("❌ " + e.message);
+    }
+  }
+
+  async function startSopRecording() {
+    if (!companyId) return alert("Complete Step 1 first.");
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      sopAudioChunksRef.current = [];
+      recorder.ondataavailable = (e) => sopAudioChunksRef.current.push(e.data);
+      recorder.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(sopAudioChunksRef.current, { type: "audio/webm" });
+        const fd = new FormData();
+        fd.append("file", blob, "sop-recording.webm");
+        fd.append("companyId", companyId!);
+        setUploadStatus("Transcribing and formatting SOP...");
+        try {
+          const res = await fetch("/api/onboarding/voice-sop", { method: "POST", body: fd });
+          const json = await res.json();
+          if (json.ok) {
+            setUploadStatus(`✅ Created SOP: ${json.document.name} (${json.chunksCreated} sections indexed)`);
+          } else {
+            setUploadStatus("❌ " + (json.error || "Failed"));
+          }
+        } catch (e: any) {
+          setUploadStatus("❌ " + e.message);
+        }
+      };
+      recorder.start();
+      setSopMediaRecorder(recorder);
+      setSopRecording(true);
+    } catch {
+      alert("Microphone access denied.");
+    }
+  }
+
+  function stopSopRecording() {
+    sopMediaRecorder?.stop();
+    setSopRecording(false);
+    setSopMediaRecorder(null);
+  }
+
+  async function handleBulkInvite() {
+    if (!companyId) return;
+    const phones = team.filter((m) => m.phone.trim()).map((m) => m.phone.trim());
+    if (phones.length === 0) return alert("Add phone numbers first.");
+    setBulkInviting(true);
+    try {
+      const res = await fetch("/api/onboarding/bulk-invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ companyId, phones }),
+      });
+      const json = await res.json();
+      setBulkInviteResult(`✅ Sent invite to ${json.sent} workers`);
+    } catch (e: any) {
+      setBulkInviteResult("❌ " + e.message);
+    } finally {
+      setBulkInviting(false);
+    }
+  }
 
   // Load saved progress from localStorage
   useEffect(() => {
@@ -226,6 +409,24 @@ export default function OnboardingSetupPage() {
           })}
         </div>
 
+        {/* Quick Start Banner */}
+        {step === 1 && (
+          <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-4 mb-4 flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-orange-400">⚡ Just want to get started?</p>
+              <p className="text-xs text-gray-400">Enter your company name above and go live in 30 seconds</p>
+            </div>
+            <button
+              onClick={handleQuickStart}
+              disabled={quickStarting || !companyName.trim()}
+              className="flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-400 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+            >
+              <Zap className="w-4 h-4" />
+              {quickStarting ? "Setting up..." : "Quick Start"}
+            </button>
+          </div>
+        )}
+
         {/* Step content */}
         <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 mb-6">
           {/* STEP 1 */}
@@ -276,6 +477,63 @@ export default function OnboardingSetupPage() {
             <div className="space-y-4">
               <h2 className="text-lg font-bold">Add your equipment</h2>
               <p className="text-sm text-gray-400">Add key machines, tools, or assets your team maintains.</p>
+
+              {/* Import options */}
+              <div className="flex flex-wrap gap-2">
+                <select
+                  className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-orange-500 outline-none"
+                  defaultValue=""
+                  onChange={(e) => {
+                    const tmpl = INDUSTRY_TEMPLATES.find((t) => t.id === e.target.value);
+                    if (tmpl) {
+                      setAssets(tmpl.assets.map((a) => ({ ...a })));
+                      e.target.value = "";
+                    }
+                  }}
+                >
+                  <option value="" disabled>📋 Use Industry Template...</option>
+                  {INDUSTRY_TEMPLATES.map((t) => (
+                    <option key={t.id} value={t.id}>{t.label}</option>
+                  ))}
+                </select>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handlePhotoAssetImport(f);
+                    e.target.value = "";
+                  }}
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={photoImporting}
+                  className="flex items-center gap-1.5 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white hover:border-orange-500 disabled:opacity-50"
+                >
+                  <Camera className="w-4 h-4" /> {photoImporting ? "Processing..." : "📸 Photo Import"}
+                </button>
+
+                {!voiceRecording ? (
+                  <button
+                    onClick={startVoiceAssetRecording}
+                    disabled={photoImporting}
+                    className="flex items-center gap-1.5 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white hover:border-orange-500 disabled:opacity-50"
+                  >
+                    <Mic className="w-4 h-4" /> 🎤 Voice Import
+                  </button>
+                ) : (
+                  <button
+                    onClick={stopVoiceAssetRecording}
+                    className="flex items-center gap-1.5 px-3 py-2 bg-red-600 border border-red-500 rounded-lg text-sm text-white animate-pulse"
+                  >
+                    <Mic className="w-4 h-4" /> ⏹ Stop Recording
+                  </button>
+                )}
+              </div>
               {assets.map((a, i) => (
                 <div key={i} className="flex gap-2 items-start">
                   <div className="flex-1 grid grid-cols-2 gap-2">
@@ -318,9 +576,21 @@ export default function OnboardingSetupPage() {
                   <button onClick={() => setTeam(team.filter((_, j) => j !== i))} className="text-gray-500 hover:text-red-400 mt-2"><Trash2 className="w-4 h-4" /></button>
                 </div>
               ))}
-              <button onClick={() => setTeam([...team, { name: "", phone: "", role: "operator" }])} className="flex items-center gap-1 text-orange-400 text-sm hover:text-orange-300">
-                <Plus className="w-4 h-4" /> Add team member
-              </button>
+              <div className="flex items-center gap-3">
+                <button onClick={() => setTeam([...team, { name: "", phone: "", role: "operator" }])} className="flex items-center gap-1 text-orange-400 text-sm hover:text-orange-300">
+                  <Plus className="w-4 h-4" /> Add team member
+                </button>
+                {companyId && team.some((m) => m.phone.trim()) && (
+                  <button
+                    onClick={handleBulkInvite}
+                    disabled={bulkInviting}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-500/20 border border-orange-500/30 rounded-lg text-orange-400 text-sm hover:bg-orange-500/30 disabled:opacity-50"
+                  >
+                    <Send className="w-3.5 h-3.5" /> {bulkInviting ? "Sending..." : "Send Bulk Invite via SMS"}
+                  </button>
+                )}
+              </div>
+              {bulkInviteResult && <p className="text-sm text-green-400">{bulkInviteResult}</p>}
             </div>
           )}
 
@@ -349,6 +619,36 @@ export default function OnboardingSetupPage() {
             <div className="space-y-4">
               <h2 className="text-lg font-bold">Upload documents (optional)</h2>
               <p className="text-sm text-gray-400">Upload manuals, SOPs, safety procedures — Sidekick will use them to answer worker questions.</p>
+              <p className="text-xs text-gray-500 bg-gray-800 rounded-lg p-3">💡 No documents? No problem — Sidekick learns from every question your workers ask and every answer you give. You can always add docs later.</p>
+
+              {/* Photo/Voice SOP options */}
+              <div className="flex flex-wrap gap-2">
+                <input ref={sopPhotoRef} type="file" accept="image/*" capture="environment" className="hidden"
+                  onChange={(e) => { const f = e.target.files?.[0]; if (f) handleSopPhoto(f); e.target.value = ""; }}
+                />
+                <button
+                  onClick={() => sopPhotoRef.current?.click()}
+                  className="flex items-center gap-1.5 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white hover:border-orange-500"
+                >
+                  <Camera className="w-4 h-4" /> 📸 Snap a Photo of a Procedure
+                </button>
+
+                {!sopRecording ? (
+                  <button
+                    onClick={startSopRecording}
+                    className="flex items-center gap-1.5 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white hover:border-orange-500"
+                  >
+                    <Mic className="w-4 h-4" /> 🎤 Record a Procedure
+                  </button>
+                ) : (
+                  <button
+                    onClick={stopSopRecording}
+                    className="flex items-center gap-1.5 px-3 py-2 bg-red-600 border border-red-500 rounded-lg text-sm text-white animate-pulse"
+                  >
+                    <Mic className="w-4 h-4" /> ⏹ Stop Recording
+                  </button>
+                )}
+              </div>
               <div
                 className="border-2 border-dashed border-gray-700 rounded-xl p-8 text-center hover:border-orange-500 transition-colors cursor-pointer"
                 onClick={() => document.getElementById("doc-upload-input")?.click()}
