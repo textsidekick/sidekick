@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 
 import type { WorkOrder, WorkOrderPriority, WorkOrderStatus } from "@/types/operations";
+import { SkeletonTable } from "@/components/dashboard/shared/Skeleton";
 
 type OpsResponse = {
   companyId: string;
@@ -416,7 +417,7 @@ export default function WorkOrdersPage() {
             </div>
           </div>
 
-          <div className="mt-4">
+          <div className="mt-4 overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -426,8 +427,8 @@ export default function WorkOrdersPage() {
                   <TableHead>Title</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Assigned to</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead>Time Open</TableHead>
+                  <TableHead className="hidden md:table-cell">Created</TableHead>
+                  <TableHead className="hidden md:table-cell">Time Open</TableHead>
                   <TableHead></TableHead>
                 </TableRow>
               </TableHeader>
@@ -449,8 +450,8 @@ export default function WorkOrdersPage() {
                         <TableCell className="max-w-[340px] truncate">{wo.title}</TableCell>
                         <TableCell><StatusBadge status={wo.status} /></TableCell>
                         <TableCell className="text-sm text-black/60">{techName(wo.assigned_to)}</TableCell>
-                        <TableCell className="text-sm text-black/60">{formatTimeAgo(wo.created_at)} ago</TableCell>
-                        <TableCell className="text-sm text-black/60">{Math.round(minutes / 60)}h</TableCell>
+                        <TableCell className="hidden md:table-cell text-sm text-black/60">{formatTimeAgo(wo.created_at)} ago</TableCell>
+                        <TableCell className="hidden md:table-cell text-sm text-black/60">{Math.round(minutes / 60)}h</TableCell>
                         <TableCell>
                           <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); openActions(wo); }}>
                             Quick actions
@@ -513,6 +514,13 @@ export default function WorkOrdersPage() {
                   );
                 })}
 
+                {loading && (
+                  <TableRow>
+                    <TableCell colSpan={9} className="p-0">
+                      <SkeletonTable rows={6} />
+                    </TableCell>
+                  </TableRow>
+                )}
                 {!loading && sorted.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={9} className="text-sm text-black/50">

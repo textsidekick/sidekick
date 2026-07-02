@@ -189,7 +189,7 @@ export default function OnboardingChat() {
       mediaRecorder.start();
       setIsRecording(true);
     } catch {
-      alert("Microphone access is required for voice input.");
+      setMessages((prev) => [...prev, { role: "assistant", content: "⚠️ Microphone access is required for voice input. Please allow microphone permissions and try again." }]);
     }
   };
 
@@ -209,7 +209,7 @@ export default function OnboardingChat() {
       const data = await res.json();
       if (data.text) setInput(data.text);
     } catch {
-      alert("Failed to transcribe audio. Please type your answer instead.");
+      setMessages((prev) => [...prev, { role: "assistant", content: "⚠️ Failed to transcribe audio. Please type your answer instead." }]);
     } finally {
       setLoading(false);
     }
@@ -268,7 +268,7 @@ export default function OnboardingChat() {
           return updated;
         });
       }
-      const isDone =
+      const isDone = data.done ||
         data.message.includes("All set! Setting up your account now") ||
         (data.message.includes("All set") && data.message.includes("setting up")) ||
         data.message.includes("Perfect! I have everything I need");

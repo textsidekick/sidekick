@@ -74,11 +74,11 @@ export default function LoginPage() {
           loggedIn: true,
         }));
         if (data.isNewUser) {
-          router.push("/choose");
+          router.push("/onboarding-chat");
         } else if (data.trialExpired || data.questionsExhausted) {
           router.push("/choose");
         } else {
-          router.push("/choose");
+          router.push("/operations");
         }
       } else {
         setError(data.error || "Invalid code.");

@@ -38,7 +38,7 @@ export default function DashboardLayout({
         }}
       >
         <Sidebar />
-        <div style={{ marginLeft: 220 }}>
+        <div className="lg:ml-[220px]">
           {children}
         </div>
         <ManagerChat />

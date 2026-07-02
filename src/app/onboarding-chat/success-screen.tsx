@@ -28,6 +28,8 @@ export default function SuccessScreen({
   const [customCode, setCustomCode] = useState(onboardingResult.accessCode);
   const [savingCode, setSavingCode] = useState(false);
   const [codeError, setCodeError] = useState<string | null>(null);
+  const [currentAccessCode, setCurrentAccessCode] = useState(onboardingResult.accessCode);
+  const [currentJoinCommand, setCurrentJoinCommand] = useState(onboardingResult.joinCommand);
 
   const handleCopy = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
@@ -48,8 +50,8 @@ export default function SuccessScreen({
       const data = await res.json();
       if (data.success) {
         setEditingCode(false);
-        onboardingResult.accessCode = data.accessCode;
-        onboardingResult.joinCommand = data.joinCommand;
+        setCurrentAccessCode(data.accessCode);
+        setCurrentJoinCommand(data.joinCommand);
       } else {
         setCodeError(data.error || "Failed to update code");
       }
@@ -59,7 +61,7 @@ export default function SuccessScreen({
     setSavingCode(false);
   };
 
-  const smsLink = `sms:${onboardingResult.twilioNumber.replace(/[^0-9]/g, "")}?body=${encodeURIComponent("JOIN " + customCode)}`;
+  const smsLink = `sms:${onboardingResult.twilioNumber.replace(/[^0-9]/g, "")}?body=${encodeURIComponent("JOIN " + currentAccessCode)}`;
 
   return (
     <div style={{ minHeight: "100vh", background: "#F7F3EC", display: "flex", flexDirection: "column" }}>
@@ -130,7 +132,7 @@ export default function SuccessScreen({
                 <button
                   onClick={() => {
                     setEditingCode(true);
-                    setCustomCode(onboardingResult.accessCode);
+                    setCustomCode(currentAccessCode);
                   }}
                   style={{
                     background: "#F0EBE3",
@@ -163,10 +165,10 @@ export default function SuccessScreen({
                 }}
               >
                 <div style={{ fontSize: "36px", fontWeight: "bold", color: "#1C1A16", fontFamily: "monospace", letterSpacing: "4px", marginBottom: "16px" }}>
-                  {customCode}
+                  {currentAccessCode}
                 </div>
                 <button
-                  onClick={() => handleCopy(customCode, "code")}
+                  onClick={() => handleCopy(currentAccessCode, "code")}
                   style={{
                     background: "rgba(201,100,66,0.12)",
                     border: "1px solid rgba(201,100,66,0.25)",
@@ -211,7 +213,7 @@ export default function SuccessScreen({
                 />
                 <div style={{ display: "flex", gap: "8px" }}>
                   <button
-                    onClick={() => handleCopy(customCode, "custom")}
+                    onClick={handleSaveCode}
                     style={{
                       flex: 1,
                       padding: "8px",
@@ -224,7 +226,7 @@ export default function SuccessScreen({
                       fontWeight: "500",
                     }}
                   >
-                    Save
+                    {savingCode ? "Saving…" : "Save"}
                   </button>
                   <button
                     onClick={() => {
@@ -288,7 +290,7 @@ export default function SuccessScreen({
               }}
             >
               <div style={{ fontFamily: "monospace", fontSize: "16px", fontWeight: "bold", color: "#1C1A16", textAlign: "center" }}>
-                {onboardingResult.joinCommand}
+                {currentJoinCommand}
               </div>
             </div>
 

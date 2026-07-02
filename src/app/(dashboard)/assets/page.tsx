@@ -15,6 +15,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { Activity, Plus, TrendingDown, Wrench } from "lucide-react";
+import { SkeletonGrid } from "@/components/dashboard/shared/Skeleton";
 import { AssetPhotoGallery } from "@/components/dashboard/assets/AssetPhotoGallery";
 
 import type { Asset, AssetStatus, WorkOrder } from "@/types/operations";
@@ -279,6 +280,7 @@ export default function AssetsPage() {
         </div>
 
         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {loading && <SkeletonGrid cols={3} rows={2} />}
           {filteredEnriched.map((a) => {
             const isOpen = expanded === a.id;
             return (

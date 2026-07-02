@@ -121,11 +121,18 @@ export async function POST(request: NextRequest) {
       console.error("[Extraction] Non-critical error:", e);
     }
 
+    // Detect completion: the system prompt requires this exact phrase when done
+    const isDone =
+      fullResponse.includes("All set! Setting up your account now") ||
+      (fullResponse.includes("All set") && fullResponse.includes("setting up")) ||
+      fullResponse.includes("Perfect! I have everything I need");
+
     return NextResponse.json({
       success: true,
       message: fullResponse,
       extractedData,
       sessionId,
+      done: isDone,
     });
   } catch (error) {
     console.error("[Onboarding Chat] Error:", error);

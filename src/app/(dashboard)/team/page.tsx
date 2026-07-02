@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Users, Plus, Trash2, Edit2, CheckCircle, Clock } from "lucide-react";
 
 type Worker = {
@@ -53,6 +53,7 @@ export default function TeamPage() {
   const [form, setForm] = useState({ name: "", phone: "", role: "operator" });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   async function load() {
     setLoading(true);
@@ -107,8 +108,13 @@ export default function TeamPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Remove this worker?")) return;
-    await fetch(`/api/team/${id}`, { method: "DELETE" });
+    setDeleteConfirmId(id);
+  }
+
+  async function confirmDelete() {
+    if (!deleteConfirmId) return;
+    await fetch(`/api/team/${deleteConfirmId}`, { method: "DELETE" });
+    setDeleteConfirmId(null);
     await load();
   }
 
@@ -141,14 +147,14 @@ export default function TeamPage() {
             <p>No workers yet. Add one or have them text JOIN to your number.</p>
           </div>
         ) : (
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="border-b border-gray-100 bg-gray-50">
                 <tr>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Name</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Phone</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Role</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Skills</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600 hidden md:table-cell">Skills</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">WOs Completed</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Status</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Joined</th>
@@ -166,7 +172,7 @@ export default function TeamPage() {
                     <td className="px-4 py-3 font-medium text-gray-900">{w.name || <span className="text-gray-400 italic">Unnamed</span>}</td>
                     <td className="px-4 py-3 text-gray-600 font-mono text-xs">{w.phone}</td>
                     <td className="px-4 py-3">{roleBadge(w.role)}</td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 hidden md:table-cell">
                       <div className="flex flex-wrap gap-1">
                         {skills.map((s) => (
                           <span key={s} className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">{s}</span>
@@ -194,6 +200,20 @@ export default function TeamPage() {
           </div>
         )}
       </div>
+
+      {/* Delete confirmation dialog */}
+      <Dialog open={!!deleteConfirmId} onOpenChange={(o) => { if (!o) setDeleteConfirmId(null); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Remove worker?</DialogTitle>
+            <DialogDescription>This action cannot be undone.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 pt-2">
+            <Button variant="outline" onClick={() => setDeleteConfirmId(null)}>Cancel</Button>
+            <Button variant="destructive" onClick={confirmDelete}>Remove</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={showAdd} onOpenChange={(o) => { if (!o) { setShowAdd(false); setEditWorker(null); } }}>
         <DialogContent className="max-w-md">
