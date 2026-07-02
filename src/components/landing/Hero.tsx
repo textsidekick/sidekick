@@ -40,7 +40,9 @@ export default function Hero() {
               Get Started <ArrowIcon size={14} />
             </a>
             <a
-              href="/contact"
+              href="https://calendly.com/justin-textsidekick"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center border border-ink/15 bg-transparent text-ink px-[22px] py-[15px] rounded-full text-[15px] font-medium"
             >
               Book a walkthrough
