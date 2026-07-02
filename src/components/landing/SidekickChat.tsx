@@ -12,10 +12,12 @@ type Msg = {
 const ALL_MESSAGES: Msg[] = [
   { id: 0, text: "Conveyor 3 making a grinding noise", sender: "user" },
   { id: 1, text: "Logged. Conveyor 3 — likely bearing wear. Priority: HIGH. Work order #4521 created, assigned to Mike T. Parts: 6205-2RS bearing (2 in stock).", sender: "sidekick" },
-  { id: 2, text: "Wet floor near dock 2, slip hazard", sender: "user" },
-  { id: 3, text: "Safety hazard flagged. Priority: CRITICAL. Alert sent to shift supervisor. Cleanup work order #4522 created.", sender: "sidekick" },
-  { id: 4, text: "When does second shift start?", sender: "user" },
-  { id: 5, text: "Second shift starts at 3:00 PM. Shift lead today is Carlos R. Need anything else?", sender: "sidekick" },
+  { id: 2, text: "Where's the 6205 bearing?", sender: "user" },
+  { id: 3, text: "6205-2RS bearing is in Parts Cage B, Shelf 3. 2 in stock. Need help with anything else?", sender: "sidekick" },
+  { id: 4, isVoice: true, sender: "user" },
+  { id: 5, text: "El segundo turno comienza a las 3:00 PM. El lider de turno hoy es Carlos R. Llegas a Almacen B.", sender: "sidekick" },
+  { id: 6, text: "Wet floor near dock 2, slip hazard", sender: "user" },
+  { id: 7, text: "Safety hazard flagged. Priority: CRITICAL. Alert sent to shift supervisor. Cleanup work order #4522 created for immediate response.", sender: "sidekick" },
 ];
 
 const WAVEFORM = [4,3,5,4,6,5,4,5,7,9,12,10,14,12,16,14,12,14,10,12,14,12,10,8,10,8,6,7,6,5,6,5,4,5,4,3,4,3,4];
@@ -29,15 +31,11 @@ export default function SidekickChat() {
   const messagesRef = useRef<HTMLDivElement | null>(null);
   const timeoutsRef = useRef<number[]>([]);
 
-  const scrollToBottom = () => {
-    requestAnimationFrame(() => {
-      if (messagesRef.current) {
-        messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
-      }
-    });
-  };
-
-  useEffect(scrollToBottom, [messages, showTypingIndicator, recording, typingText, isTyping]);
+  useEffect(() => {
+    if (messagesRef.current) {
+      messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
+    }
+  }, [messages, showTypingIndicator, recording, typingText]);
 
   useEffect(() => {
     const typeText = (text: string, duration: number) => {
@@ -46,7 +44,6 @@ export default function SidekickChat() {
       const interval = window.setInterval(() => {
         if (idx <= text.length) {
           setTypingText(text.slice(0, idx));
-          scrollToBottom();
           idx++;
         } else {
           window.clearInterval(interval);
@@ -115,19 +112,28 @@ export default function SidekickChat() {
         d += 1200;
       };
 
-      pushType(ALL_MESSAGES[0].text!, 2000);
+      // 1. Equipment issue
+      pushType(ALL_MESSAGES[0].text!, 1800);
       pushSend(ALL_MESSAGES[0]);
-      pushReply(ALL_MESSAGES[1], 2800);
-      d += 1200;
+      pushReply(ALL_MESSAGES[1], 2400);
+      d += 800;
 
-      pushType(ALL_MESSAGES[2].text!, 1600);
+      // 2. Parts location
+      pushType(ALL_MESSAGES[2].text!, 1400);
       pushSend(ALL_MESSAGES[2]);
-      pushReply(ALL_MESSAGES[3], 2000);
-      d += 1200;
+      pushReply(ALL_MESSAGES[3], 1800);
+      d += 1000;
 
-      pushType(ALL_MESSAGES[4].text!, 1400);
-      pushSend(ALL_MESSAGES[4]);
-      pushReply(ALL_MESSAGES[5], 1800);
+      // 3. Shift question in Spanish (voice memo)
+      pushRecord(4500);
+      pushVoice(ALL_MESSAGES[4]);
+      pushReply(ALL_MESSAGES[5], 2000);
+      d += 800;
+
+      // 4. Safety hazard
+      pushType(ALL_MESSAGES[6].text!, 1600);
+      pushSend(ALL_MESSAGES[6]);
+      pushReply(ALL_MESSAGES[7], 2200);
 
       const totalDuration = d + 3500;
 
@@ -161,7 +167,7 @@ export default function SidekickChat() {
         <span className="text-[15px] font-semibold text-black">Text Sidekick</span>
       </div>
       <div ref={messagesRef} className="sk-chat-messages flex-1 overflow-y-auto px-3.5 py-3.5 flex flex-col gap-1.5">
-        <div className="flex-1" />
+        <div className="mt-auto" />
         {messages.map((msg, i) => (
           <div key={`${msg.id}-${i}`} className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"}`}>
             {msg.isVoice ? (
@@ -196,7 +202,7 @@ export default function SidekickChat() {
           </div>
         )}
       </div>
-      <div className="px-3 pt-2.5 pb-5 border-t border-[#E5E5EA]/50 bg-[#F9F9F9] flex-shrink-0">
+      <div className="px-3 pt-2.5 pb-3 border-t border-[#E5E5EA]/50 bg-[#F9F9F9] flex-shrink-0">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-full bg-[#E5E5EA] flex items-center justify-center text-[#8E8E93] text-lg flex-shrink-0">+</div>
           {recording ? (
@@ -215,12 +221,12 @@ export default function SidekickChat() {
               <div className="flex-1" />
             </>
           ) : (
-            <div className={`flex-1 bg-white rounded-[18px] px-[13px] py-2 text-[13px] border border-[#E5E5EA] min-h-[30px] ${isTyping ? "text-black" : "text-[#8E8E93] flex items-center"}`}>
+            <div className={`flex-1 bg-white rounded-[18px] px-[13px] py-2 text-[13px] border border-[#E5E5EA] min-h-[30px] flex items-center ${isTyping ? "text-black" : "text-[#8E8E93]"}`}>
               {isTyping ? (
-                <span style={{ wordBreak: "break-word" }}>
+                <>
                   {typingText}
-                  <span style={{ display: "inline", borderRight: "2px solid #007AFF", marginLeft: 1, animation: "sk-blink 1s step-end infinite" }} />
-                </span>
+                  <span style={{ display: "inline-block", width: 2, height: 14, background: "#007AFF", marginLeft: 1, animation: "sk-blink 1s step-end infinite" }} />
+                </>
               ) : (
                 "Text Message"
               )}
