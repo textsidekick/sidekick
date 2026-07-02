@@ -28,8 +28,8 @@ const staggerContainer = {
 // ============ SMS DEMO COMPONENT ============
 const SMSDemo = () => {
   const [messages, setMessages] = useState([
-    { type: 'outgoing', text: "Hello, today is my first day on the job at EDS Manufacturing in Santa Clara" },
-    { type: 'incoming', text: "Welcome to EDS Manufacturing, Santa Clara! ! I'm Sidekick, your workplace assistant. Ask me anything!" },
+    { type: 'outgoing', text: "Hello, today is my first day on the job at EDS Manufacturing in San Francisco" },
+    { type: 'incoming', text: "Welcome to EDS Manufacturing, San Francisco! ! I'm Sidekick, your workplace assistant. Ask me anything!" },
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const messagesContainerRef = useRef(null);
@@ -53,8 +53,8 @@ const SMSDemo = () => {
     if (flowIndex >= conversationFlow.length) {
       const resetTimer = setTimeout(() => {
         setMessages([
-          { type: 'outgoing', text: "Hello, today is my first day on the job at EDS Manufacturing in Santa Clara" },
-          { type: 'incoming', text: "Welcome to EDS Manufacturing, Santa Clara! ! I'm Sidekick, your workplace assistant. Ask me anything!" },
+          { type: 'outgoing', text: "Hello, today is my first day on the job at EDS Manufacturing in San Francisco" },
+          { type: 'incoming', text: "Welcome to EDS Manufacturing, San Francisco! ! I'm Sidekick, your workplace assistant. Ask me anything!" },
         ]);
         setFlowIndex(0);
       }, 3000);

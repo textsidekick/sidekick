@@ -106,7 +106,7 @@ const MobileMenu = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
 								<div className="contact-item">
 									<span className="subtitle">Location</span>
 									<span className="contact-link">
-										Santa Clara, CA
+										San Francisco, CA
 									</span>
 								</div>
 							</div>

@@ -11,8 +11,8 @@ interface Message {
 
 const conversations: Message[][] = [
   [
-    { id: 1, text: "Hello, today is my first day on the job at EDS Manufacturing in Santa Clara", sender: "worker", delay: 0 },
-    { id: 2, text: "Welcome to EDS Manufacturing, Santa Clara! ! I'm Sidekick, your workplace assistant. Ask me anything!", sender: "sidekick", delay: 2000 },
+    { id: 1, text: "Hello, today is my first day on the job at EDS Manufacturing in San Francisco", sender: "worker", delay: 0 },
+    { id: 2, text: "Welcome to EDS Manufacturing, San Francisco! ! I'm Sidekick, your workplace assistant. Ask me anything!", sender: "sidekick", delay: 2000 },
     { id: 3, text: "Where do I park?", sender: "worker", delay: 4500 },
     { id: 4, text: "Employee parking is in Lot B behind the main building. Visitor parking is in front. ️", sender: "sidekick", delay: 6000 },
     { id: 5, text: "¿A qué hora es el almuerzo?", sender: "worker", delay: 8500 },

@@ -161,8 +161,8 @@ const FeatureMarquee = () => {
 // ============================================
 const SMSDemo = () => {
   const [messages, setMessages] = useState<Array<{type: string, text?: string, isVoice?: boolean, duration?: string}>>([
-    { type: 'outgoing', text: "Hello, today is my first day on the job at EDS Manufacturing in Santa Clara" },
-    { type: 'incoming', text: "Welcome to EDS Manufacturing, Santa Clara! ! I'm Sidekick, your workplace assistant. Ask me anything!" },
+    { type: 'outgoing', text: "Hello, today is my first day on the job at EDS Manufacturing in San Francisco" },
+    { type: 'incoming', text: "Welcome to EDS Manufacturing, San Francisco! ! I'm Sidekick, your workplace assistant. Ask me anything!" },
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -192,8 +192,8 @@ const SMSDemo = () => {
       // Reset after a pause
       const resetTimer = setTimeout(() => {
         setMessages([
-          { type: 'outgoing', text: "Hello, today is my first day on the job at EDS Manufacturing in Santa Clara" },
-          { type: 'incoming', text: "Welcome to EDS Manufacturing, Santa Clara! ! I'm Sidekick, your workplace assistant. Ask me anything!" },
+          { type: 'outgoing', text: "Hello, today is my first day on the job at EDS Manufacturing in San Francisco" },
+          { type: 'incoming', text: "Welcome to EDS Manufacturing, San Francisco! ! I'm Sidekick, your workplace assistant. Ask me anything!" },
         ]);
         setFlowIndex(0);
       }, 3000);
@@ -1178,7 +1178,7 @@ export default function PreviewPage() {
           
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-zinc-600 text-xs">© 2026 Sidekick AI Inc. All rights reserved.</p>
-            <p className="text-zinc-700 text-xs">Santa Clara, CA</p>
+            <p className="text-zinc-700 text-xs">San Francisco, CA</p>
           </div>
         </div>
       </footer>
