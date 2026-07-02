@@ -10,20 +10,10 @@ type Msg = {
 };
 
 const ALL_MESSAGES: Msg[] = [
-  { id: 0, text: "JOIN EDS", sender: "user" },
-  { id: 1, text: "Welcome to EDS Manufacturing Hi I'm Sidekick, your text-based assistant. To get you set up, what's your name and role?", sender: "sidekick" },
-  { id: 2, text: "Marcus Reyes — forklift operator, swing shift", sender: "user" },
-  { id: 3, text: "Got it, Marcus. You're all set — text me anytime, in any language. Try asking about your shift, parking, uniforms, or anything in the SOPs.", sender: "sidekick" },
-  { id: 4, text: "What time does my shift start tomorrow?", sender: "user" },
-  { id: 5, text: "Your shift starts at 7:00 AM in Warehouse B. You're scheduled with Maria and Devin.", sender: "sidekick" },
-  { id: 6, isVoice: true, sender: "user" },
-  { id: 7, text: "Employee parking is in Lot C behind the main building. Use the south entrance after 6 AM.", sender: "sidekick" },
-  { id: 8, text: "¿Dónde recojo mi uniforme?", sender: "user" },
-  { id: 9, text: "Recoge tu uniforme en Recursos Humanos, Edificio A, sala 102. Abierto de 7 AM a 4 PM.", sender: "sidekick" },
-  { id: 10, text: "휴가는 어떻게 신청하나요?", sender: "user" },
-  { id: 11, text: "직원 포털에서 휴가를 신청하거나 상사에게 문자를 보내세요. 보통 48시간 이내에 승인됩니다.", sender: "sidekick" },
-  { id: 12, text: "Who do I call if a forklift is damaged?", sender: "user" },
-  { id: 13, text: "Tag it out of service and text Mike (maintenance lead) at (555) 412-9087. I've also opened ticket #M-2041 for you.", sender: "sidekick" },
+  { id: 0, text: "Conveyor 3 making a grinding noise, getting worse", sender: "user" },
+  { id: 1, text: "Logged. Conveyor 3 (Asset #CVR-003). AI Assessment: Likely bearing failure. Priority: HIGH. Work order #4521 created and assigned to Mike T. (on shift, closest). Parts needed: 6205-2RS bearing (2 in stock, Cage B Shelf 3). Mike has been notified.", sender: "sidekick" },
+  { id: 2, text: "Also the belt looks worn, maybe 70%", sender: "user" },
+  { id: 3, text: "Noted. Follow-up PM work order #4522 created for belt replacement, scheduled for next planned downtime. Parts check: belt not in stock — purchase request sent to procurement.", sender: "sidekick" },
 ];
 
 const WAVEFORM = [4,3,5,4,6,5,4,5,7,9,12,10,14,12,16,14,12,14,10,12,14,12,10,8,10,8,6,7,6,5,6,5,4,5,4,3,4,3,4];
@@ -118,38 +108,14 @@ export default function SidekickChat() {
         d += 1200;
       };
 
-      pushType(ALL_MESSAGES[0].text!, 1100);
+      pushType(ALL_MESSAGES[0].text!, 2000);
       pushSend(ALL_MESSAGES[0]);
-      pushReply(ALL_MESSAGES[1], 1800);
-      d += 600;
-      pushType(ALL_MESSAGES[2].text!, 2200);
+      pushReply(ALL_MESSAGES[1], 2800);
+      d += 1200;
+
+      pushType(ALL_MESSAGES[2].text!, 1800);
       pushSend(ALL_MESSAGES[2]);
-      pushReply(ALL_MESSAGES[3], 2000);
-      d += 1000;
-
-      pushType(ALL_MESSAGES[4].text!, 2400);
-      pushSend(ALL_MESSAGES[4]);
-      pushReply(ALL_MESSAGES[5], 2000);
-      d += 800;
-
-      pushRecord(4500);
-      pushVoice(ALL_MESSAGES[6]);
-      pushReply(ALL_MESSAGES[7], 2000);
-      d += 800;
-
-      pushType(ALL_MESSAGES[8].text!, 2200);
-      pushSend(ALL_MESSAGES[8]);
-      pushReply(ALL_MESSAGES[9], 1800);
-      d += 800;
-
-      pushType(ALL_MESSAGES[10].text!, 2200);
-      pushSend(ALL_MESSAGES[10]);
-      pushReply(ALL_MESSAGES[11], 1800);
-      d += 800;
-
-      pushType(ALL_MESSAGES[12].text!, 2400);
-      pushSend(ALL_MESSAGES[12]);
-      pushReply(ALL_MESSAGES[13], 2200);
+      pushReply(ALL_MESSAGES[3], 2400);
 
       const totalDuration = d + 3500;
 

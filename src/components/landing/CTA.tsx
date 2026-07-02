@@ -31,10 +31,10 @@ export default function CTA() {
               color: "#F7F3EC",
             }}
           >
-            Try Sidekick on <em style={{ fontStyle: "italic" }}>your</em> floor.
+            Give your plant a <em style={{ fontStyle: "italic" }}>Sidekick.</em>
           </h2>
           <p style={{ fontSize: 17, lineHeight: 1.5, margin: "0 auto 36px", maxWidth: 520, color: "rgba(247,243,236,0.9)" }}>
-            Set up in under 5 minutes. Upload your documents, get a phone number, and your workers can start texting questions right away. Free trial — no credit card needed.
+            Set up in 90 seconds. No app, no training, no per-seat pricing.
           </p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
             <a
@@ -52,24 +52,7 @@ export default function CTA() {
                 textDecoration: "none",
               }}
             >
-              Try Sidekick free <ArrowIcon size={14} />
-            </a>
-            <a
-              href="/login"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                border: "1px solid rgba(247,243,236,0.3)",
-                background: "transparent",
-                color: "#F7F3EC",
-                padding: "15px 24px",
-                borderRadius: 9999,
-                fontSize: 15,
-                fontWeight: 500,
-                textDecoration: "none",
-              }}
-            >
-              Log in to your dashboard
+              Get Started <ArrowIcon size={14} />
             </a>
           </div>
         </div>

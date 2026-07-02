@@ -3,9 +3,9 @@ import SidekickChat from "@/components/landing/SidekickChat";
 import { YCBadge, HeadlineWithSidekick } from "@/components/landing/Brand";
 import { ArrowIcon, CheckIcon } from "@/components/landing/icons";
 
-const HEADLINE = "Sidekick: frontline answers, by text.";
+const HEADLINE = "Your workers text. Sidekick handles the rest.";
 const SUBHEAD =
-  "Sidekick is the texting assistant for your frontline. Workers ask it anything — shift times, SOPs, safety steps, HR — and get instant answers from your own documents. Every conversation makes Sidekick smarter, turning the knowledge in your head and your binders into a living knowledge base your business actually owns.";
+  "When a machine acts up, your operator texts Sidekick. Five seconds later there's a prioritized work order, an assigned technician, and a parts check — no app, no forms, no training.";
 
 export default function Hero() {
   return (
@@ -37,20 +37,20 @@ export default function Hero() {
               href="/login"
               className="inline-flex items-center gap-2.5 bg-ink text-cream px-[26px] py-4 rounded-full text-[15px] font-medium"
             >
-              Try Sidekick <ArrowIcon size={14} />
+              Get Started <ArrowIcon size={14} />
             </a>
             <a
-              href="#contact"
+              href="/contact"
               className="inline-flex items-center border border-ink/15 bg-transparent text-ink px-[22px] py-[15px] rounded-full text-[15px] font-medium"
             >
-              Contact us
+              Book a walkthrough
             </a>
           </div>
           <div className="flex items-center gap-2 mt-7 text-[13px] text-ink/55">
             <span className="text-accent">
               <CheckIcon size={14} w={2.4} />
             </span>
-            No app download · Works on any phone · Live in under 5 minutes
+            No app download · Works on any phone · Set up in 90 seconds
           </div>
         </div>
         <div className="flex justify-center relative">
@@ -79,9 +79,9 @@ export default function Hero() {
             }}
           >
             <div className="font-semibold text-ink mb-0.5">
-              Type, talk, any language.
+              Any phone, any language.
             </div>
-            Workers reach Sidekick how they already text.
+            Workers text issues just like they text a coworker.
           </div>
         </div>
       </div>

@@ -1,19 +1,19 @@
 import { Eyebrow } from "@/components/landing/Brand";
 
 const PAYOFFS = [
-  { h: "Succession-ready", b: "Sell, retire, or step back without the operation seizing up." },
-  { h: "Audit-ready", b: "Every answer cites the source SOP, page, and revision." },
-  { h: "Vacation-proof", b: "Your floor keeps running when you take a real week off." },
-  { h: "Onboarding-ready", b: "New managers inherit a documented business, not tribal knowledge." },
+  { h: "Self-improving", b: "Every repair adds a verified article to your plant's knowledge base." },
+  { h: "Searchable", b: "Anyone can ask 'what worked last time?' and get a cited answer." },
+  { h: "Audit-ready", b: "Every resolution is timestamped, attributed, and traceable." },
+  { h: "Compounds over time", b: "The more your team works, the smarter Sidekick gets." },
 ];
 
 const ENTRIES = [
-  { q: "CNC-3 coolant PSI", a: "85 PSI · cited SOP-CNC-07 p3", d: "Apr 14" },
-  { q: "Forklift battery rotation", a: "Bank A → C every Tues · per Mike", d: "Apr 11" },
-  { q: "Spanish onboarding flow", a: "Auto-translated from Onboarding-EN", d: "Apr 09" },
+  { q: "Conveyor 3 bearing failure", a: "Replace 6205-2RS · resolved by Mike T.", d: "Today" },
+  { q: "CNC-3 coolant PSI drop", a: "Check pump seal · cited SOP-CNC-07 p3", d: "Apr 14" },
   { q: "Allen-Bradley fault E-04", a: "Reset sequence + photo · per Devin", d: "Apr 06" },
-  { q: "Vendor: Granger order code", a: "Use account #41-9087 for net-30", d: "Apr 02" },
-  { q: "Heat-stress protocol > 88°F", a: "Mandatory water break q.45min", d: "Mar 28" },
+  { q: "Forklift battery rotation", a: "Bank A → C every Tues · per Mike", d: "Apr 11" },
+  { q: "Hydraulic press oil change", a: "ISO 46 · every 500hrs · Cage D", d: "Apr 02" },
+  { q: "Compressor E-stop trigger", a: "Check relief valve first · per SOP-COMP-03", d: "Mar 28" },
 ];
 
 export default function KnowledgeLayer() {
@@ -31,13 +31,10 @@ export default function KnowledgeLayer() {
               textWrap: "balance" as React.CSSProperties["textWrap"],
             }}
           >
-            The knowledge in <em className="italic text-accent">your head</em> is the business. Sidekick writes it down.
+            Every repair makes your plant <em className="italic text-accent">smarter.</em>
           </h2>
-          <p className="text-[17px] leading-[1.55] text-ink/70 m-0 mb-4 max-w-[540px]">
-            Most operators are the single point of failure for their own company. The torque settings, the supplier quirks, the safety workarounds, the way you actually do payroll — it lives in one or two people&apos;s memory. When they take a vacation, the floor stalls. When they retire, the business is harder to sell.
-          </p>
           <p className="text-[17px] leading-[1.55] text-ink/70 m-0 mb-7 max-w-[540px]">
-            Sidekick captures every answer it gives, every SOP it cites, every workaround a supervisor texts back. The result is a centralized, searchable knowledge base that <em className="italic">compounds</em> with every shift — owned by your company, not your founder.
+            When a tech fixes a machine, Sidekick turns the resolution into a searchable knowledge article — automatically. Next time it breaks, anyone can ask &ldquo;what worked last time?&rdquo; and get a cited, verified answer. The more your team works, the smarter Sidekick gets.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-[540px]">
             {PAYOFFS.map((p) => (

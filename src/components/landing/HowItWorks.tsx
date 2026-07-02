@@ -3,18 +3,18 @@ import { Eyebrow } from "@/components/landing/Brand";
 const STEPS = [
   {
     n: "01",
-    title: "Upload your docs",
-    body: "SOPs, safety manuals, training decks, onboarding packets — PDF, Word, or a shared drive. Sidekick reads and organizes them.",
+    title: "Text it",
+    body: "Any worker texts a photo or description of an issue. Any language, any phone. No app needed.",
   },
   {
     n: "02",
-    title: "Assign a number",
-    body: "Your team gets one phone number. Workers save it as \"Sidekick\" in their contacts. No app, no login, no IT tickets.",
+    title: "AI triages & assigns",
+    body: "Sidekick identifies the asset, sets priority, creates a work order, and texts the right technician with troubleshooting steps.",
   },
   {
     n: "03",
-    title: "Text it like a coworker",
-    body: "Ask about procedures, log incidents, check certifications. Sidekick answers in seconds and escalates when it should.",
+    title: "It gets fixed and logged",
+    body: "Tech texts START and DONE. The fix becomes searchable knowledge. Patterns get flagged automatically.",
   },
 ];
 
@@ -27,7 +27,7 @@ export default function HowItWorks() {
           className="font-serif font-normal mt-5 mb-14 max-w-[720px]"
           style={{ fontSize: 56, lineHeight: 1, letterSpacing: "-0.02em" }}
         >
-          Set up once. Your whole team has an expert in their pocket.
+          An issue reported is an issue handled.
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {STEPS.map((s) => (

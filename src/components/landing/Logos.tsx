@@ -11,7 +11,7 @@ export default function Logos() {
   return (
     <section className="px-14 pt-8 pb-16">
       <div className="text-center text-xs uppercase tracking-[0.12em] text-ink/50 mb-8">
-        Trusted in manufacturing and industrial floors across North America
+        Trusted by teams across industries
       </div>
       <div className="flex items-center justify-between max-w-[1040px] mx-auto gap-6 opacity-90">
         {LOGOS.map((l) => (
