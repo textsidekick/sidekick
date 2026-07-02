@@ -1,11 +1,12 @@
 "use client";
 
-import { Activity, ClipboardList, HardDrive, BarChart3, ShieldAlert, FileText, Users, BookOpen, Target, Brain, Settings, Home, LogOut } from "lucide-react";
+import { Activity, ClipboardList, HardDrive, BarChart3, ShieldAlert, FileText, Users, BookOpen, Target, Brain, Settings, Home, LogOut, LayoutDashboard } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
 const NAV_ITEMS = [
+  { id: "overview", label: "Overview", icon: LayoutDashboard, href: "/manager" },
   { id: "operations", label: "Operations", icon: Activity, href: "/operations" },
   { id: "work-orders", label: "Work Orders", icon: ClipboardList, href: "/work-orders" },
   { id: "assets", label: "Assets", icon: HardDrive, href: "/assets" },
@@ -37,10 +38,12 @@ export function Sidebar() {
         <div className="space-y-0.5">
           {NAV_ITEMS.map((item) => {
             const isActive =
-              (item.href.startsWith("/manager") && pathname === "/manager")
-                ? false
-                : pathname === item.href ||
-                  (item.href !== "/manager" && !item.href.includes("?") && pathname?.startsWith(item.href));
+              item.id === "overview"
+                ? pathname === "/manager"
+                : (item.href.startsWith("/manager?"))
+                  ? false
+                  : pathname === item.href ||
+                    (!item.href.includes("?") && pathname?.startsWith(item.href));
             return (
               <a
                 key={item.id}
