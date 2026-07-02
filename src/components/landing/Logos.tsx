@@ -11,14 +11,14 @@ export default function Logos() {
       <div className="text-center text-xs uppercase tracking-[0.12em] text-ink/50 mb-8">
         Trusted by teams across industries
       </div>
-      <div className="flex items-center justify-between max-w-[1040px] mx-auto gap-6 opacity-90">
+      <div className="flex items-center justify-center flex-wrap max-w-[1040px] mx-auto gap-x-8 gap-y-4 opacity-90">
         {LOGOS.map((l) => (
           <div
             key={l.name}
             className={
               l.mono
-                ? "font-mono text-[22px] text-ink/55 tracking-wide"
-                : "font-serif italic text-[22px] text-ink/55 tracking-tight"
+                ? "font-mono text-[18px] md:text-[22px] text-ink/55 tracking-wide whitespace-nowrap"
+                : "font-serif italic text-[18px] md:text-[22px] text-ink/55 tracking-tight whitespace-nowrap"
             }
           >
             {l.name}
