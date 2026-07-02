@@ -31,7 +31,7 @@ export default function SidekickChat() {
     if (messagesRef.current) {
       messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
     }
-  }, [messages, showTypingIndicator, recording, typingText]);
+  }, [messages, showTypingIndicator, recording, typingText, isTyping]);
 
   useEffect(() => {
     const typeText = (text: string, duration: number) => {
@@ -148,8 +148,7 @@ export default function SidekickChat() {
       <div className="flex items-center justify-center px-4 py-3 border-b border-[#E5E5EA]/50 bg-[#F9F9F9] flex-shrink-0">
         <span className="text-[15px] font-semibold text-black">Text Sidekick</span>
       </div>
-      <div ref={messagesRef} className="sk-chat-messages flex-1 overflow-y-auto px-3.5 py-3.5 flex flex-col gap-1.5">
-        <div className="mt-auto" />
+      <div ref={messagesRef} className="sk-chat-messages flex-1 overflow-y-auto px-3.5 py-3.5 flex flex-col gap-1.5 justify-end">
         {messages.map((msg, i) => (
           <div key={`${msg.id}-${i}`} className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"}`}>
             {msg.isVoice ? (
