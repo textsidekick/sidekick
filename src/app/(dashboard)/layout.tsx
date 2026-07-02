@@ -2,7 +2,6 @@ import { Inter, Instrument_Serif } from "next/font/google";
 import "../globals.css";
 import ManagerChat from "@/components/dashboard/ManagerChat";
 import { Sidebar } from "@/components/dashboard/layout/Sidebar";
-import { TopBar } from "@/components/dashboard/layout/TopBar";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -39,8 +38,7 @@ export default function DashboardLayout({
         }}
       >
         <Sidebar />
-        <TopBar />
-        <div style={{ marginLeft: 220, marginTop: 56 }}>
+        <div style={{ marginLeft: 220 }}>
           {children}
         </div>
         <ManagerChat />

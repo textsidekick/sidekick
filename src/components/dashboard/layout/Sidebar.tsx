@@ -1,7 +1,7 @@
 "use client";
 
-import { Activity, ClipboardList, HardDrive, BarChart3, ShieldAlert, FileText, Users, BookOpen, Target, Brain, Settings } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { Activity, ClipboardList, HardDrive, BarChart3, ShieldAlert, FileText, Users, BookOpen, Target, Brain, Settings, Home, LogOut } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
@@ -60,6 +60,40 @@ export function Sidebar() {
           })}
         </div>
       </nav>
+
+      {/* Bottom actions */}
+      <BottomActions />
+    </div>
+  );
+}
+
+function BottomActions() {
+  const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.removeItem("sidekick_auth");
+    document.cookie = "sidekick_auth=; path=/; max-age=0";
+    router.push("/login");
+  };
+
+  return (
+    <div className="px-3 py-3 border-t border-[rgba(28,26,22,0.06)]">
+      <div className="flex gap-2">
+        <button
+          onClick={() => router.push("/choose")}
+          className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-[13px] font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors border border-[rgba(28,26,22,0.08)]"
+        >
+          <Home className="h-4 w-4" />
+          Home
+        </button>
+        <button
+          onClick={handleLogout}
+          className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-[13px] font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors border border-[rgba(28,26,22,0.08)]"
+        >
+          <LogOut className="h-4 w-4" />
+          Logout
+        </button>
+      </div>
     </div>
   );
 }
