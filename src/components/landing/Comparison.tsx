@@ -45,7 +45,7 @@ export default function Comparison() {
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold"
               style={{ background: "rgba(28,26,22,0.08)", color: "rgba(28,26,22,0.5)" }}
             >
-              ⏱ 3–5 minutes
+              3–5 minutes
             </div>
           </div>
 
@@ -85,7 +85,7 @@ export default function Comparison() {
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold text-white"
                 style={{ background: "#C96442" }}
               >
-                ⚡ 20 seconds
+                20 seconds
               </div>
             </div>
           </div>
