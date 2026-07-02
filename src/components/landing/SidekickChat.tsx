@@ -15,9 +15,11 @@ const ALL_MESSAGES: Msg[] = [
   { id: 2, text: "Where's the 6205 bearing?", sender: "user" },
   { id: 3, text: "6205-2RS bearing is in Parts Cage B, Shelf 3. 2 in stock. Need help with anything else?", sender: "sidekick" },
   { id: 4, isVoice: true, sender: "user" },
-  { id: 5, text: "El segundo turno comienza a las 3:00 PM. El lider de turno hoy es Carlos R. Llegas a Almacen B.", sender: "sidekick" },
-  { id: 6, text: "Wet floor near dock 2, slip hazard", sender: "user" },
-  { id: 7, text: "Safety hazard flagged. Priority: CRITICAL. Alert sent to shift supervisor. Cleanup work order #4522 created for immediate response.", sender: "sidekick" },
+  { id: 5, text: "Second shift starts at 3:00 PM. Shift lead today is Carlos R. You're in Warehouse B.", sender: "sidekick" },
+  { id: 6, text: "¿Dónde recojo mi uniforme?", sender: "user" },
+  { id: 7, text: "Recoge tu uniforme en Recursos Humanos, Edificio A, sala 102. Abierto de 7 AM a 4 PM.", sender: "sidekick" },
+  { id: 8, text: "Wet floor near dock 2, slip hazard", sender: "user" },
+  { id: 9, text: "Safety hazard flagged. Priority: CRITICAL. Alert sent to shift supervisor. Cleanup work order #4522 created for immediate response.", sender: "sidekick" },
 ];
 
 const WAVEFORM = [4,3,5,4,6,5,4,5,7,9,12,10,14,12,16,14,12,14,10,12,14,12,10,8,10,8,6,7,6,5,6,5,4,5,4,3,4,3,4];
@@ -130,10 +132,16 @@ export default function SidekickChat() {
       pushReply(ALL_MESSAGES[5], 2000);
       d += 800;
 
-      // 4. Safety hazard
+      // 4. Spanish question
       pushType(ALL_MESSAGES[6].text!, 1600);
       pushSend(ALL_MESSAGES[6]);
-      pushReply(ALL_MESSAGES[7], 2200);
+      pushReply(ALL_MESSAGES[7], 1800);
+      d += 800;
+
+      // 5. Safety hazard
+      pushType(ALL_MESSAGES[8].text!, 1600);
+      pushSend(ALL_MESSAGES[8]);
+      pushReply(ALL_MESSAGES[9], 2200);
 
       const totalDuration = d + 3500;
 
