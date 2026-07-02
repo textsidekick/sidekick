@@ -31,7 +31,7 @@ export default function CTA() {
               color: "#F7F3EC",
             }}
           >
-            Give your plant a <em style={{ fontStyle: "italic" }}>Sidekick.</em>
+            Give your team a <em style={{ fontStyle: "italic" }}>Sidekick.</em>
           </h2>
           <p style={{ fontSize: 17, lineHeight: 1.5, margin: "0 auto 36px", maxWidth: 520, color: "rgba(247,243,236,0.9)" }}>
             Set up in 90 seconds. No app, no training, no per-seat pricing.

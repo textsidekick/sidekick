@@ -63,8 +63,8 @@ export default function Contact() {
           <div className="flex flex-col gap-[18px]">
             {[
               { l: "Email", v: "hello@textsidekick.com" },
-              { l: "Phone", v: "+1 (628) 555-0119" },
-              { l: "Office", v: "San Francisco, CA · Mon–Fri 8a–6p PT" },
+              { l: "Phone", v: "+1 (408) 828-5979" },
+              { l: "Office", v: "San Francisco, CA" },
             ].map((c) => (
               <div key={c.l} className="flex gap-6 items-baseline">
                 <div className="text-[11px] uppercase tracking-widest text-ink/50 w-16 flex-shrink-0">

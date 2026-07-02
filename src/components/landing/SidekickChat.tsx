@@ -12,8 +12,10 @@ type Msg = {
 const ALL_MESSAGES: Msg[] = [
   { id: 0, text: "Conveyor 3 making a grinding noise", sender: "user" },
   { id: 1, text: "Logged. Conveyor 3 — likely bearing wear. Priority: HIGH. Work order #4521 created, assigned to Mike T. Parts: 6205-2RS bearing (2 in stock).", sender: "sidekick" },
-  { id: 2, text: "Wet floor near loading dock, someone could slip", sender: "user" },
-  { id: 3, text: "Safety hazard flagged. Priority: CRITICAL. Alert sent to shift supervisor. Work order #4522 created for immediate cleanup. Area marked for caution signage.", sender: "sidekick" },
+  { id: 2, text: "Wet floor near dock 2, slip hazard", sender: "user" },
+  { id: 3, text: "Safety hazard flagged. Priority: CRITICAL. Alert sent to shift supervisor. Cleanup work order #4522 created.", sender: "sidekick" },
+  { id: 4, text: "When does second shift start?", sender: "user" },
+  { id: 5, text: "Second shift starts at 3:00 PM. Shift lead today is Carlos R. Need anything else?", sender: "sidekick" },
 ];
 
 const WAVEFORM = [4,3,5,4,6,5,4,5,7,9,12,10,14,12,16,14,12,14,10,12,14,12,10,8,10,8,6,7,6,5,6,5,4,5,4,3,4,3,4];
@@ -118,9 +120,14 @@ export default function SidekickChat() {
       pushReply(ALL_MESSAGES[1], 2800);
       d += 1200;
 
-      pushType(ALL_MESSAGES[2].text!, 1800);
+      pushType(ALL_MESSAGES[2].text!, 1600);
       pushSend(ALL_MESSAGES[2]);
-      pushReply(ALL_MESSAGES[3], 2400);
+      pushReply(ALL_MESSAGES[3], 2000);
+      d += 1200;
+
+      pushType(ALL_MESSAGES[4].text!, 1400);
+      pushSend(ALL_MESSAGES[4]);
+      pushReply(ALL_MESSAGES[5], 1800);
 
       const totalDuration = d + 3500;
 
@@ -208,12 +215,12 @@ export default function SidekickChat() {
               <div className="flex-1" />
             </>
           ) : (
-            <div className={`flex-1 bg-white rounded-[18px] px-[13px] py-2 text-[13px] border border-[#E5E5EA] min-h-[30px] flex items-center ${isTyping ? "text-black" : "text-[#8E8E93]"}`}>
+            <div className={`flex-1 bg-white rounded-[18px] px-[13px] py-2 text-[13px] border border-[#E5E5EA] min-h-[30px] ${isTyping ? "text-black" : "text-[#8E8E93] flex items-center"}`}>
               {isTyping ? (
-                <>
+                <span style={{ wordBreak: "break-word" }}>
                   {typingText}
-                  <span style={{ display: "inline-block", width: 2, height: 14, background: "#007AFF", marginLeft: 1, animation: "sk-blink 1s step-end infinite" }} />
-                </>
+                  <span style={{ display: "inline", borderRight: "2px solid #007AFF", marginLeft: 1, animation: "sk-blink 1s step-end infinite" }} />
+                </span>
               ) : (
                 "Text Message"
               )}

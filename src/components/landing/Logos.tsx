@@ -3,8 +3,6 @@ const LOGOS = [
   { name: "IPI Plastics", mono: true },
   { name: "S&F Electropolishing", mono: false },
   { name: "3D Dynamics Manufacturing", mono: true },
-  { name: "LS Sheet Metal Fabrication", mono: false },
-  { name: "Finish Line Automotive Interiors", mono: true },
 ];
 
 export default function Logos() {
