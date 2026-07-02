@@ -27,11 +27,15 @@ export default function SidekickChat() {
   const messagesRef = useRef<HTMLDivElement | null>(null);
   const timeoutsRef = useRef<number[]>([]);
 
-  useEffect(() => {
-    if (messagesRef.current) {
-      messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
-    }
-  }, [messages, showTypingIndicator, recording, typingText, isTyping]);
+  const scrollToBottom = () => {
+    requestAnimationFrame(() => {
+      if (messagesRef.current) {
+        messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
+      }
+    });
+  };
+
+  useEffect(scrollToBottom, [messages, showTypingIndicator, recording, typingText, isTyping]);
 
   useEffect(() => {
     const typeText = (text: string, duration: number) => {
@@ -40,6 +44,7 @@ export default function SidekickChat() {
       const interval = window.setInterval(() => {
         if (idx <= text.length) {
           setTypingText(text.slice(0, idx));
+          scrollToBottom();
           idx++;
         } else {
           window.clearInterval(interval);
@@ -148,7 +153,8 @@ export default function SidekickChat() {
       <div className="flex items-center justify-center px-4 py-3 border-b border-[#E5E5EA]/50 bg-[#F9F9F9] flex-shrink-0">
         <span className="text-[15px] font-semibold text-black">Text Sidekick</span>
       </div>
-      <div ref={messagesRef} className="sk-chat-messages flex-1 overflow-y-auto px-3.5 py-3.5 flex flex-col gap-1.5 justify-end">
+      <div ref={messagesRef} className="sk-chat-messages flex-1 overflow-y-auto px-3.5 py-3.5 flex flex-col gap-1.5">
+        <div className="flex-1" />
         {messages.map((msg, i) => (
           <div key={`${msg.id}-${i}`} className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"}`}>
             {msg.isVoice ? (
@@ -183,7 +189,7 @@ export default function SidekickChat() {
           </div>
         )}
       </div>
-      <div className="px-3 pt-2.5 pb-3 border-t border-[#E5E5EA]/50 bg-[#F9F9F9] flex-shrink-0">
+      <div className="px-3 pt-2.5 pb-5 border-t border-[#E5E5EA]/50 bg-[#F9F9F9] flex-shrink-0">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-full bg-[#E5E5EA] flex items-center justify-center text-[#8E8E93] text-lg flex-shrink-0">+</div>
           {recording ? (
