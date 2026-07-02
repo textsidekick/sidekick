@@ -252,7 +252,10 @@ export default function SidekickChat() {
         }
         @keyframes sk-blink {
           0%, 100% { opacity: 1; }
-          50% { opacity: 0; }
+          70% { opacity: 1; }
+          71% { opacity: 0; }
+          90% { opacity: 0; }
+          91% { opacity: 1; }
         }
         @keyframes sk-msg-in {
           0% { opacity: 0; transform: scale(0.8) translateY(8px); }
