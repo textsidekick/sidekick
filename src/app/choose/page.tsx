@@ -11,7 +11,7 @@ export default function ChoosePage() {
   useEffect(() => {
     try {
       const auth = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
-      if (!auth.loggedIn) { router.push("/login"); return; }
+      if (!auth.loggedIn && !auth.username) { router.push("/login"); return; }
       setUsername(auth.phone || "");
     } catch { router.push("/login"); }
   }, [router]);

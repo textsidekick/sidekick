@@ -47,19 +47,18 @@ function TopBar({}: TopBarProps) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <button
             onClick={() => router.push('/choose')}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: 10, border: 'none', background: 'transparent', cursor: 'pointer', color: 'rgba(28,26,22,0.5)' }}
-            title="Home"
+            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', borderRadius: 10, border: '1px solid rgba(28,26,22,0.1)', background: 'white', cursor: 'pointer', color: 'rgba(28,26,22,0.6)', fontSize: 13, fontWeight: 500 }}
           >
-            <Home size={18} />
+            <Home size={15} />
+            Home
           </button>
-          {username && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', borderRadius: 10, background: 'rgba(28,26,22,0.04)' }}>
-              <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#C96442', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#F7F3EC', fontSize: 12, fontWeight: 600 }}>
-                {username.charAt(0).toUpperCase()}
-              </div>
-              <span style={{ fontSize: 13, fontWeight: 500, color: '#1C1A16' }}>{username}</span>
-            </div>
-          )}
+          <button
+            onClick={handleLogout}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', borderRadius: 10, border: '1px solid rgba(28,26,22,0.1)', background: 'white', cursor: 'pointer', color: 'rgba(28,26,22,0.6)', fontSize: 13, fontWeight: 500 }}
+          >
+            <LogOut size={15} />
+            Logout
+          </button>
         </div>
       </div>
     </div>
