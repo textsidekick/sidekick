@@ -35,8 +35,8 @@ function TopBar({}: TopBarProps) {
   }
 
   return (
-    <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(28,26,22,0.06)' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 56 }}>
+    <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(28,26,22,0.06)', position: 'relative', zIndex: 50 }}>
+      <div style={{ padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 56 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ width: 32, height: 32, background: '#C96442', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 5 }}>
             <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={22} height={22} style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
@@ -60,13 +60,6 @@ function TopBar({}: TopBarProps) {
               <span style={{ fontSize: 13, fontWeight: 500, color: '#1C1A16' }}>{username}</span>
             </div>
           )}
-          <button
-            onClick={handleLogout}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: 10, border: 'none', background: 'transparent', cursor: 'pointer', color: 'rgba(28,26,22,0.35)' }}
-            title="Sign out"
-          >
-            <LogOut size={16} />
-          </button>
         </div>
       </div>
     </div>

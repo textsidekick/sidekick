@@ -22,7 +22,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="fixed left-0 top-[57px] bottom-0 w-[220px] bg-white border-r border-gray-200 flex flex-col z-40">
+    <div className="fixed left-0 top-[57px] bottom-0 w-[220px] bg-white border-r border-[rgba(28,26,22,0.06)] flex flex-col z-40">
       {/* Nav items */}
       <nav className="flex-1 px-3 py-3 overflow-y-auto">
         <div className="space-y-0.5">
