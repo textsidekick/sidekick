@@ -25,12 +25,12 @@ export function Sidebar() {
 
   return (
     <div className="fixed left-0 top-0 bottom-0 w-[220px] bg-white border-r border-[rgba(28,26,22,0.06)] flex flex-col z-50">
-      {/* Logo area — matches TopBar height */}
-      <div style={{ height: 56, display: 'flex', alignItems: 'center', gap: 10, padding: '0 20px', borderBottom: '1px solid rgba(28,26,22,0.06)' }}>
-        <div style={{ width: 32, height: 32, background: '#C96442', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 5 }}>
-          <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={22} height={22} style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+      {/* Logo area */}
+      <div style={{ height: 64, display: 'flex', alignItems: 'center', gap: 12, padding: '0 20px', borderBottom: '1px solid rgba(28,26,22,0.06)' }}>
+        <div style={{ width: 36, height: 36, background: '#C96442', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 5 }}>
+          <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={26} height={26} style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
         </div>
-        <span style={{ fontSize: 16, fontWeight: 600, color: '#1C1A16', letterSpacing: '-0.02em' }}>Sidekick</span>
+        <span style={{ fontSize: 18, fontWeight: 700, color: '#1C1A16', letterSpacing: '-0.02em' }}>Sidekick</span>
       </div>
 
       {/* Nav items */}
@@ -49,7 +49,7 @@ export function Sidebar() {
                 key={item.id}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors",
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] font-medium transition-colors",
                   isActive
                     ? "bg-[#C96442]/10 text-[#C96442]"
                     : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
@@ -80,17 +80,17 @@ function BottomActions() {
 
   return (
     <div className="px-3 py-3 border-t border-[rgba(28,26,22,0.06)]">
-      <div className="flex gap-2">
+      <div className="flex flex-col gap-1.5">
         <button
           onClick={() => router.push("/choose")}
-          className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-[13px] font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors border border-[rgba(28,26,22,0.08)]"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors border border-[rgba(28,26,22,0.08)]"
         >
           <Home className="h-4 w-4" />
           Home
         </button>
         <button
           onClick={handleLogout}
-          className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-[13px] font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors border border-[rgba(28,26,22,0.08)]"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors border border-[rgba(28,26,22,0.08)]"
         >
           <LogOut className="h-4 w-4" />
           Logout
