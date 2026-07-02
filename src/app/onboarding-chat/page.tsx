@@ -332,29 +332,29 @@ export default function OnboardingChat() {
   return (
     <div style={{ minHeight: "100vh", display: "flex", fontFamily: "Inter, system-ui, sans-serif" }}>
       {/* ── Sidebar ─────────────────────────────────────────── */}
-      <div style={{ width: 320, background: "white", borderRight: "1px solid rgba(28,26,22,0.06)", display: "flex", flexDirection: "column", position: "fixed", top: 0, bottom: 0, zIndex: 50 }}>
+      <div style={{ width: 400, background: "white", borderRight: "1px solid rgba(28,26,22,0.06)", display: "flex", flexDirection: "column", position: "fixed", top: 0, bottom: 0, zIndex: 50 }}>
         {/* Logo */}
-        <div style={{ height: 56, display: "flex", alignItems: "center", gap: 10, padding: "0 20px", borderBottom: "1px solid rgba(28,26,22,0.06)" }}>
-          <div style={{ width: 32, height: 32, background: "#C96442", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", padding: 5 }}>
-            <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={22} height={22} style={{ objectFit: "contain", filter: "brightness(0) invert(1)" }} />
+        <div style={{ height: 72, display: "flex", alignItems: "center", gap: 14, padding: "0 24px", borderBottom: "1px solid rgba(28,26,22,0.06)" }}>
+          <div style={{ width: 40, height: 40, background: "#C96442", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", padding: 6 }}>
+            <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={28} height={28} style={{ objectFit: "contain", filter: "brightness(0) invert(1)" }} />
           </div>
-          <span style={{ fontSize: 16, fontWeight: 600, color: "#1C1A16", letterSpacing: "-0.02em" }}>Sidekick</span>
+          <span style={{ fontSize: 22, fontWeight: 700, color: "#1C1A16", letterSpacing: "-0.02em" }}>Sidekick</span>
         </div>
 
         {/* Progress */}
-        <div style={{ padding: "16px 16px 8px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(28,26,22,0.4)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Setup Progress</span>
-            <span style={{ fontSize: 12, fontWeight: 600, color: "#C96442" }}>{completedCount}/{sections.length}</span>
+        <div style={{ padding: "20px 24px 12px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(28,26,22,0.4)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Setup Progress</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: "#C96442" }}>{completedCount}/{sections.length}</span>
           </div>
-          <div style={{ height: 4, background: "rgba(28,26,22,0.06)", borderRadius: 2 }}>
-            <div style={{ height: 4, background: "#C96442", borderRadius: 2, width: `${progressPct}%`, transition: "width 0.3s" }} />
+          <div style={{ height: 6, background: "rgba(28,26,22,0.06)", borderRadius: 3 }}>
+            <div style={{ height: 6, background: "#C96442", borderRadius: 3, width: `${progressPct}%`, transition: "width 0.3s" }} />
           </div>
         </div>
 
         {/* Setup Sections */}
-        <nav style={{ flex: 1, padding: "8px 12px", overflowY: "auto" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <nav style={{ flex: 1, padding: "8px 16px", overflowY: "auto" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             {sections.map((section) => {
               const Icon = section.icon;
               const isActive = section.id === activeSectionId;
@@ -363,23 +363,23 @@ export default function OnboardingChat() {
                   key={section.id}
                   onClick={() => setActiveSectionId(section.id)}
                   style={{
-                    display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8,
+                    display: "flex", alignItems: "center", gap: 14, padding: "12px 16px", borderRadius: 10,
                     background: isActive ? "rgba(201,100,66,0.1)" : "transparent",
                     border: "none", cursor: "pointer", textAlign: "left", width: "100%",
                     transition: "background 0.15s",
                   }}
                 >
-                  <Icon size={16} style={{ color: isActive ? "#C96442" : "rgba(28,26,22,0.4)", flexShrink: 0 }} />
+                  <Icon size={20} style={{ color: isActive ? "#C96442" : "rgba(28,26,22,0.4)", flexShrink: 0 }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: isActive ? "#C96442" : "#1C1A16" }}>{section.label}</div>
-                    <div style={{ fontSize: 11, color: "rgba(28,26,22,0.35)", marginTop: 1 }}>{section.description}</div>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: isActive ? "#C96442" : "#1C1A16" }}>{section.label}</div>
+                    <div style={{ fontSize: 13, color: "rgba(28,26,22,0.35)", marginTop: 2 }}>{section.description}</div>
                   </div>
                   {section.status === "complete" ? (
-                    <CheckCircle2 size={14} style={{ color: "#22c55e", flexShrink: 0 }} />
+                    <CheckCircle2 size={18} style={{ color: "#22c55e", flexShrink: 0 }} />
                   ) : section.status === "in_progress" ? (
-                    <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#C96442", flexShrink: 0 }} />
+                    <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#C96442", flexShrink: 0 }} />
                   ) : (
-                    <Circle size={14} style={{ color: "rgba(28,26,22,0.15)", flexShrink: 0 }} />
+                    <Circle size={18} style={{ color: "rgba(28,26,22,0.15)", flexShrink: 0 }} />
                   )}
                 </button>
               );
@@ -388,75 +388,75 @@ export default function OnboardingChat() {
 
           {/* Action buttons */}
           <div style={{ marginTop: 16, padding: "12px 0", borderTop: "1px solid rgba(28,26,22,0.06)" }}>
-            <div style={{ fontSize: 11, fontWeight: 600, color: "rgba(28,26,22,0.35)", textTransform: "uppercase", letterSpacing: "0.05em", padding: "0 12px", marginBottom: 8 }}>Input Methods</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(28,26,22,0.35)", textTransform: "uppercase", letterSpacing: "0.05em", padding: "0 16px", marginBottom: 8 }}>Input Methods</div>
             <button
               onClick={isRecording ? stopRecording : startRecording}
               disabled={loading || isComplete}
               style={{
-                display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8,
+                display: "flex", alignItems: "center", gap: 14, padding: "10px 16px", borderRadius: 10,
                 background: isRecording ? "rgba(239,68,68,0.1)" : "transparent",
                 border: "none", cursor: "pointer", width: "100%", textAlign: "left",
-                color: isRecording ? "#ef4444" : "rgba(28,26,22,0.5)", fontSize: 13, fontWeight: 500,
+                color: isRecording ? "#ef4444" : "rgba(28,26,22,0.5)", fontSize: 15, fontWeight: 500,
               }}
             >
-              {isRecording ? <MicOff size={16} /> : <Mic size={16} />}
+              {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
               {isRecording ? "Stop Recording" : "Voice Input"}
             </button>
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={loading || isComplete}
               style={{
-                display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8,
+                display: "flex", alignItems: "center", gap: 14, padding: "10px 16px", borderRadius: 10,
                 background: "transparent", border: "none", cursor: "pointer", width: "100%", textAlign: "left",
-                color: "rgba(28,26,22,0.5)", fontSize: 13, fontWeight: 500,
+                color: "rgba(28,26,22,0.5)", fontSize: 15, fontWeight: 500,
               }}
             >
-              <Upload size={16} />
+              <Upload size={20} />
               Upload Files
             </button>
             <button
               onClick={() => setActiveSectionId("integrations")}
               style={{
-                display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8,
+                display: "flex", alignItems: "center", gap: 14, padding: "10px 16px", borderRadius: 10,
                 background: "transparent", border: "none", cursor: "pointer", width: "100%", textAlign: "left",
-                color: "rgba(28,26,22,0.5)", fontSize: 13, fontWeight: 500,
+                color: "rgba(28,26,22,0.5)", fontSize: 15, fontWeight: 500,
               }}
             >
-              <LinkIcon size={16} />
+              <LinkIcon size={20} />
               Connect Tools
             </button>
           </div>
         </nav>
 
         {/* Bottom: Home + Logout */}
-        <div style={{ padding: 12, borderTop: "1px solid rgba(28,26,22,0.06)", display: "flex", gap: 8 }}>
+        <div style={{ padding: "12px 16px", borderTop: "1px solid rgba(28,26,22,0.06)", display: "flex", flexDirection: "column", gap: 6 }}>
           <a
             href="/choose"
             style={{
-              flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-              padding: "8px 12px", borderRadius: 8, fontSize: 13, fontWeight: 500,
+              display: "flex", alignItems: "center", gap: 10,
+              padding: "10px 16px", borderRadius: 10, fontSize: 15, fontWeight: 500,
               color: "rgba(28,26,22,0.5)", border: "1px solid rgba(28,26,22,0.08)",
-              textDecoration: "none", background: "white",
+              textDecoration: "none", background: "white", width: "100%",
             }}
           >
-            <Home size={14} /> Home
+            <Home size={18} /> Home
           </a>
           <button
             onClick={handleLogout}
             style={{
-              flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-              padding: "8px 12px", borderRadius: 8, fontSize: 13, fontWeight: 500,
+              display: "flex", alignItems: "center", gap: 10,
+              padding: "10px 16px", borderRadius: 10, fontSize: 15, fontWeight: 500,
               color: "rgba(28,26,22,0.5)", border: "1px solid rgba(28,26,22,0.08)",
-              background: "white", cursor: "pointer",
+              background: "white", cursor: "pointer", width: "100%",
             }}
           >
-            <LogOut size={14} /> Logout
+            <LogOut size={18} /> Logout
           </button>
         </div>
       </div>
 
       {/* ── Main Content ────────────────────────────────────── */}
-      <div style={{ marginLeft: 320, flex: 1, background: "#F7F3EC", display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <div style={{ marginLeft: 400, flex: 1, background: "#F7F3EC", display: "flex", flexDirection: "column", minHeight: "100vh" }}>
 
         {/* Chat area */}
         <div style={{ flex: 1, overflow: "auto", padding: "32px 24px", display: "flex", flexDirection: "column" }}>
