@@ -177,7 +177,7 @@ export default function SidekickChat() {
       <div ref={messagesRef} className="sk-chat-messages flex-1 overflow-y-auto px-3.5 py-3.5 flex flex-col gap-1.5">
         <div className="mt-auto" />
         {messages.map((msg, i) => (
-          <div key={`${msg.id}-${i}`} className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"}`}>
+          <div key={`${msg.id}-${i}`} className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"}`} style={{ animation: "sk-msg-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) both" }}>
             {msg.isVoice ? (
               <div className="flex items-center gap-2 px-3 py-2 bg-[#007AFF] rounded-[18px_18px_4px_18px] min-w-[170px]">
                 <div className="w-[22px] h-[22px] rounded-full bg-white/95 flex items-center justify-center">
@@ -198,7 +198,7 @@ export default function SidekickChat() {
           </div>
         ))}
         {showTypingIndicator && (
-          <div className="flex flex-col items-start">
+          <div className="flex flex-col items-start" style={{ animation: "sk-msg-in 0.2s ease-out both" }}>
             <div className="px-[13px] py-[9px] rounded-[18px_18px_18px_4px] bg-[#E9E9EB] inline-flex gap-[3px] items-center">
               {[0, 0.2, 0.4].map((delay, i) => (
                 <div
@@ -229,12 +229,9 @@ export default function SidekickChat() {
               <div className="flex-1" />
             </>
           ) : (
-            <div className={`flex-1 bg-white rounded-[18px] px-[13px] py-2 text-[13px] border border-[#E5E5EA] min-h-[30px] flex items-center ${isTyping ? "text-black" : "text-[#8E8E93]"}`}>
+            <div className={`flex-1 bg-white rounded-[18px] px-[13px] py-2 text-[13px] border border-[#E5E5EA] min-h-[30px] ${isTyping ? "text-black" : "text-[#8E8E93] flex items-center"}`}>
               {isTyping ? (
-                <>
-                  {typingText}
-                  <span style={{ display: "inline-block", width: 2, height: 14, background: "#007AFF", marginLeft: 1, animation: "sk-blink 1s step-end infinite" }} />
-                </>
+                <span>{typingText}<span style={{ borderRight: "2px solid #007AFF", animation: "sk-blink 1s step-end infinite" }}>&zwnj;</span></span>
               ) : (
                 "Text Message"
               )}
@@ -248,6 +245,20 @@ export default function SidekickChat() {
           </div>
         </div>
       </div>
+      <style>{`
+        @keyframes sk-typing-bounce {
+          0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+          30% { transform: translateY(-4px); opacity: 1; }
+        }
+        @keyframes sk-blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+        @keyframes sk-msg-in {
+          0% { opacity: 0; transform: scale(0.8) translateY(8px); }
+          100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }
