@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TopBar } from "@/components/dashboard/layout/TopBar";
-import { OpsNav } from "@/components/dashboard/layout/OpsNav";
 import { Button } from "@/components/ui/button";
 import { Settings, Plus, Trash2, Save } from "lucide-react";
 
@@ -98,8 +96,6 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-[#F7F3EC]">
-      <TopBar />
-      <OpsNav />
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">

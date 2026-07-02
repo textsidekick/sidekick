@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { TopBar } from "@/components/dashboard/layout/TopBar";
-import { OpsNav } from "@/components/dashboard/layout/OpsNav";
 import { SectionHeader } from "@/components/dashboard/shared/SectionHeader";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -79,8 +77,6 @@ export default function KnowledgeTransferPage() {
 
   return (
     <>
-      <TopBar />
-      <OpsNav />
       <div style={{ background: "#F7F3EC", minHeight: "100vh" }}>
         <div className="max-w-3xl mx-auto px-6 py-8">
           {!started ? (

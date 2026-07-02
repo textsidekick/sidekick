@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TopBar } from "@/components/dashboard/layout/TopBar";
-import { OpsNav } from "@/components/dashboard/layout/OpsNav";
 import { BarChart3, TrendingUp, Clock, CheckCircle, AlertTriangle, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -82,8 +80,6 @@ export default function AnalyticsPage() {
 
   return (
     <div className="min-h-screen bg-[#F7F3EC]">
-      <TopBar />
-      <OpsNav />
       <div className="max-w-6xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>

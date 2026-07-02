@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { TopBar } from "@/components/dashboard/layout/TopBar";
-import { OpsNav } from "@/components/dashboard/layout/OpsNav";
 import { SectionHeader } from "@/components/dashboard/shared/SectionHeader";
 import { MetricCard } from "@/components/dashboard/shared/MetricCard";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +15,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { Activity, Plus, TrendingDown, Wrench } from "lucide-react";
+import { AssetPhotoGallery } from "@/components/dashboard/assets/AssetPhotoGallery";
 
 import type { Asset, AssetStatus, WorkOrder } from "@/types/operations";
 
@@ -197,8 +196,6 @@ export default function AssetsPage() {
 
   return (
     <div>
-      <TopBar />
-      <OpsNav />
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -299,6 +296,8 @@ export default function AssetsPage() {
                         ))}
                       </div>
                     </div>
+
+                    <AssetPhotoGallery assetId={a.id} />
 
                     <div className="rounded-xl border border-black/5 p-4">
                       <div className="text-sm font-medium">PM schedules</div>

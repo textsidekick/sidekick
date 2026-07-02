@@ -1,5 +1,4 @@
 "use client";
-import { OpsNav } from "@/components/dashboard/layout/OpsNav";
 
 // ─── Existing integrations & utilities (unchanged) ────────────────────────────
 import WalkthroughUpload from "@/components/WalkthroughUpload";
@@ -20,7 +19,6 @@ import {
 } from "lucide-react";
 
 // ─── New design components ────────────────────────────────────────────────────
-import { TopBar } from "@/components/dashboard/layout/TopBar";
 import { MetricCard } from "@/components/dashboard/shared/MetricCard";
 import { SectionHeader } from "@/components/dashboard/shared/SectionHeader";
 import { EmptyState } from "@/components/dashboard/shared/EmptyState";
@@ -548,11 +546,8 @@ export default function ManagerDashboard() {
 
       {/* ── New design layout ─────────────────────────────────────────────────── */}
       <div className="sticky top-0 z-30">
-        <TopBar />
       </div>
 
-      {/* Shared navigation — same OpsNav as all other pages */}
-      <OpsNav />
 
       {/* QR Code Modal */}
       {showQrModal && currentCompany?.access_code && (

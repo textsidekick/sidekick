@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { TopBar } from "@/components/dashboard/layout/TopBar";
-import { OpsNav } from "@/components/dashboard/layout/OpsNav";
 import { SectionHeader } from "@/components/dashboard/shared/SectionHeader";
 import { Badge } from "@/components/ui/badge";
 import { Target, AlertTriangle, GraduationCap, Lightbulb, Loader2 } from "lucide-react";
@@ -32,8 +30,6 @@ export default function SkillGapsPage() {
 
   return (
     <>
-      <TopBar />
-      <OpsNav />
       <div style={{ background: "#F7F3EC", minHeight: "100vh" }}>
         <div className="max-w-7xl mx-auto px-6 py-8">
           <SectionHeader title="Skill Gap Analysis" subtitle="AI-powered analysis of workforce knowledge gaps and training needs" />

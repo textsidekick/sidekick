@@ -16,6 +16,8 @@ import {
   findBestTechnician,
 } from "@/lib/work-order-manager";
 import type { Asset as OpsAsset, UUID } from "@/types/operations";
+import { detectLanguage, translateText } from "@/lib/language";
+import { isWhatsAppMessage, stripWhatsAppPrefix, sendMessage } from "@/lib/whatsapp";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || 'placeholder' });
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || 'placeholder' });
@@ -445,13 +447,21 @@ function twimlResponse(message: string): NextResponse {
   return new NextResponse(twiml, { headers: { "Content-Type": "text/xml" } });
 }
 
+/** Translate message if needed, then return TwiML response */
+async function translatedTwimlResponse(message: string, lang: string): Promise<NextResponse> {
+  const translated = lang !== "en" ? await translateText(message, lang) : message;
+  return twimlResponse(translated);
+}
+
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
   
   try {
     const formData = await request.formData();
     const body = formData.get("Body")?.toString()?.trim() || "";
-    const from = normalizePhoneNumber(formData.get("From")?.toString() || "");
+    const rawFrom = formData.get("From")?.toString() || "";
+    const incomingChannel: "sms" | "whatsapp" = isWhatsAppMessage(rawFrom) ? "whatsapp" : "sms";
+    const from = normalizePhoneNumber(stripWhatsAppPrefix(rawFrom));
 
     // Rate limiting: max 60 SMS per minute per phone number
     if (!checkRateLimit(`sms:${from}`, 60, 60_000)) {
@@ -463,7 +473,14 @@ export async function POST(request: NextRequest) {
     const mediaUrl = formData.get("MediaUrl0")?.toString();
     const mediaType = formData.get("MediaContentType0")?.toString();
     
-    console.log("[SMS] From:", from, "Body:", body, "NumMedia:", numMedia);
+    console.log(`[${incomingChannel.toUpperCase()}] From:`, from, "Body:", body, "NumMedia:", numMedia);
+
+    // Detect language from incoming message (non-blocking for short messages)
+    let detectedLang = "en";
+    if (body.length > 0) {
+      detectedLang = await detectLanguage(body);
+      console.log(`[${incomingChannel.toUpperCase()}] Detected language: ${detectedLang}`);
+    }
 
     // Check if this is a manager responding to a question
     const { data: pendingQuestion } = await supabase
@@ -580,7 +597,7 @@ export async function POST(request: NextRequest) {
       const normalized = body.replace(/\s+/g, " ").trim().toUpperCase();
       
       if (normalized === "JOIN") {
-        return twimlResponse("Please text JOIN followed by your company's code. Example: JOIN ABC123");
+        return await translatedTwimlResponse("Please text JOIN followed by your company's code. Example: JOIN ABC123", detectedLang);
       }
       
       if (normalized.startsWith("JOIN ")) {
@@ -588,7 +605,7 @@ export async function POST(request: NextRequest) {
         
         // Safety: ensure we didn't accidentally parse an empty code
         if (!accessCode) {
-          return twimlResponse("Please text JOIN followed by your company's code. Example: JOIN ABC123");
+          return await translatedTwimlResponse("Please text JOIN followed by your company's code. Example: JOIN ABC123", detectedLang);
         }
         
         const { data: company } = await supabase
@@ -608,7 +625,7 @@ export async function POST(request: NextRequest) {
             .single();
 
           if (!legacyCompany) {
-            return twimlResponse("Sorry, that access code wasn't recognized. Please check with your manager for the correct code.");
+            return await translatedTwimlResponse("Sorry, that access code wasn't recognized. Please check with your manager for the correct code.", detectedLang);
           }
 
           await supabase.from("workers").insert({
@@ -618,7 +635,11 @@ export async function POST(request: NextRequest) {
             verified: false,
           });
 
-          return twimlResponse(`Welcome to ${legacyCompany.name}! What's your first name?`);
+          // Store detected language on the new worker
+          if (detectedLang !== "en") {
+            await supabase.from("workers").update({ preferred_language: detectedLang }).eq("phone", from);
+          }
+          return await translatedTwimlResponse(`Welcome to ${legacyCompany.name}! What's your first name?`, detectedLang);
         }
 
         await supabase.from("workers").insert({
@@ -628,13 +649,17 @@ export async function POST(request: NextRequest) {
           verified: false,
         });
 
-        return twimlResponse(`Welcome to ${company.name}! ! What's your first name?`);
+        // Store detected language on the new worker
+        if (detectedLang !== "en") {
+          await supabase.from("workers").update({ preferred_language: detectedLang }).eq("phone", from);
+        }
+        return await translatedTwimlResponse(`Welcome to ${company.name}! What's your first name?`, detectedLang);
       }
     }
 
     // CASE 2: New user without JOIN command
     if (!worker) {
-      return twimlResponse("Welcome to Sidekick! Hi Text JOIN followed by your company's 6-letter code to get started.\n\nExample: JOIN ABC123");
+      return await translatedTwimlResponse("Welcome to Sidekick! Text JOIN followed by your company's 6-letter code to get started.\n\nExample: JOIN ABC123", detectedLang);
     }
 
     // CASE 3: Worker exists but hasn't provided name yet
@@ -642,7 +667,7 @@ export async function POST(request: NextRequest) {
       const name = body.trim().split(" ")[0];
       
       if (name.length < 2 || name.length > 30) {
-        return twimlResponse("Please reply with your first name to get started.");
+        return await translatedTwimlResponse("Please reply with your first name to get started.", detectedLang);
       }
       
       await supabase
@@ -656,7 +681,7 @@ export async function POST(request: NextRequest) {
         .select("name")
         .eq("id", worker.company_id)
         .single();
-      return twimlResponse(`Thanks ${name}! 👋 Welcome to ${companyForRole?.name || "Sidekick"}!\n\nWhat's your role? (e.g. Mechanic, Electrician, Operator, Supervisor)`);
+      return await translatedTwimlResponse(`Thanks ${name}! 👋 Welcome to ${companyForRole?.name || "Sidekick"}!\n\nWhat's your role? (e.g. Mechanic, Electrician, Operator, Supervisor)`, detectedLang);
     }
 
     // CASE 3b: Worker has name but pending role collection
@@ -668,7 +693,7 @@ export async function POST(request: NextRequest) {
       };
       const mappedRole = roleMap[roleInput] || "operator";
       await supabase.from("workers").update({ role: mappedRole, pending_profile_step: null }).eq("phone", from);
-      return twimlResponse(`Got it — ${body.trim()}! You're all set. 🔧\n\nText me any maintenance issue, question, or "HELP" to see what I can do!`);
+      return await translatedTwimlResponse(`Got it — ${body.trim()}! You're all set. 🔧\n\nText me any maintenance issue, question, or "HELP" to see what I can do!`, detectedLang);
     }
 
     // CASE 4: Registered worker - get company info
@@ -914,6 +939,8 @@ IF YOU DON'T KNOW:
           confidence: bestSimilarity,
           response_time_ms: responseTime,
           manager_notified: false,
+          language: detectedLang,
+          channel: incomingChannel,
         }).select().single();
         
         // Handle low confidence with escalation option
@@ -1394,7 +1421,7 @@ HOW TO RESPOND:
 - Keep it under 400 characters but be helpful and complete
 - If docs don't cover it, use general industry knowledge
 - Never say "I'm an AI" — you're Sidekick
-- If the worker texts in ANY language other than English, respond in THEIR language. Auto-detect and match. Spanish, Chinese, Vietnamese, Tagalog, Korean, etc
+- IMPORTANT: The worker's language has been detected as "${detectedLang}". ${detectedLang !== "en" ? `You MUST respond entirely in ${detectedLang}. Do NOT respond in English.` : "Respond in English."}
 - If you can't answer well, offer to ask ${company?.manager_name || "the manager"}${sourcesText}`;
     
     const userMessage = context
@@ -1417,6 +1444,8 @@ HOW TO RESPOND:
       confidence: similarityScore,
       response_time_ms: responseTime,
       manager_notified: false,
+      language: detectedLang,
+      channel: incomingChannel,
     }).select().single();
 
     if (lowConfidence && company?.manager_phone && questionRecord) {

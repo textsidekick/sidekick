@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { TopBar } from "@/components/dashboard/layout/TopBar";
-import { OpsNav } from "@/components/dashboard/layout/OpsNav";
 import { MetricCard } from "@/components/dashboard/shared/MetricCard";
 import { SectionHeader } from "@/components/dashboard/shared/SectionHeader";
 import { Badge } from "@/components/ui/badge";
@@ -271,8 +269,6 @@ export default function WorkOrdersPage() {
 
   return (
     <div>
-      <TopBar />
-      <OpsNav />
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="flex items-start justify-between gap-4 flex-wrap">

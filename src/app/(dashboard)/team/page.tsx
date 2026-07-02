@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TopBar } from "@/components/dashboard/layout/TopBar";
-import { OpsNav } from "@/components/dashboard/layout/OpsNav";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -94,8 +92,6 @@ export default function TeamPage() {
 
   return (
     <div className="min-h-screen bg-[#F7F3EC]">
-      <TopBar />
-      <OpsNav />
       <div className="max-w-5xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>

@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { TopBar } from "@/components/dashboard/layout/TopBar";
-import { OpsNav } from "@/components/dashboard/layout/OpsNav";
 import { Button } from "@/components/ui/button";
 import { Upload, FileText, CheckCircle, AlertCircle, ArrowLeft } from "lucide-react";
 
@@ -64,8 +62,6 @@ export default function AssetImportPage() {
 
   return (
     <div className="min-h-screen bg-[#F7F3EC]">
-      <TopBar />
-      <OpsNav />
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="mb-6">
           <a href="/assets" className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 mb-3">
