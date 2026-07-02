@@ -3,6 +3,7 @@
 import { Activity, ClipboardList, HardDrive, BarChart3, ShieldAlert, FileText, Users, BookOpen, Target, Brain, Settings } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 const NAV_ITEMS = [
   { id: "operations", label: "Operations", icon: Activity, href: "/operations" },
@@ -22,7 +23,16 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="fixed left-0 top-[57px] bottom-0 w-[220px] bg-white border-r border-[rgba(28,26,22,0.06)] flex flex-col z-40">
+    <div className="fixed left-0 top-0 bottom-0 w-[220px] bg-white border-r border-[rgba(28,26,22,0.06)] flex flex-col z-50">
+      {/* Logo area — matches TopBar height */}
+      <div style={{ height: 56, display: 'flex', alignItems: 'center', gap: 10, padding: '0 20px', borderBottom: '1px solid rgba(28,26,22,0.06)' }}>
+        <div style={{ width: 32, height: 32, background: '#C96442', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 5 }}>
+          <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={22} height={22} style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+        </div>
+        <span style={{ fontSize: 16, fontWeight: 600, color: '#1C1A16', letterSpacing: '-0.02em' }}>Sidekick</span>
+        <span style={{ fontSize: 13, color: 'rgba(28,26,22,0.35)', marginLeft: 2 }}>Dashboard</span>
+      </div>
+
       {/* Nav items */}
       <nav className="flex-1 px-3 py-3 overflow-y-auto">
         <div className="space-y-0.5">

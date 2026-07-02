@@ -38,12 +38,10 @@ export default function DashboardLayout({
           color: "#1C1A16",
         }}
       >
+        <Sidebar />
         <TopBar />
-        <div style={{ display: 'flex' }}>
-          <Sidebar />
-          <div style={{ marginLeft: 220, flex: 1 }}>
-            {children}
-          </div>
+        <div style={{ marginLeft: 220, marginTop: 56 }}>
+          {children}
         </div>
         <ManagerChat />
       </body>

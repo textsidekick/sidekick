@@ -35,15 +35,8 @@ function TopBar({}: TopBarProps) {
   }
 
   return (
-    <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(28,26,22,0.06)', position: 'relative', zIndex: 50 }}>
-      <div style={{ padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 56 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 32, height: 32, background: '#C96442', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 5 }}>
-            <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={22} height={22} style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
-          </div>
-          <span style={{ fontSize: 16, fontWeight: 600, color: '#1C1A16', letterSpacing: '-0.02em' }}>Sidekick</span>
-          <span style={{ fontSize: 13, color: 'rgba(28,26,22,0.35)', marginLeft: 4 }}>Dashboard</span>
-        </div>
+    <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(28,26,22,0.06)', position: 'fixed', top: 0, left: 220, right: 0, zIndex: 45 }}>
+      <div style={{ padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', height: 56 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <button
             onClick={() => router.push('/choose')}
