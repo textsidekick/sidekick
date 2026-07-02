@@ -37,7 +37,6 @@ import { DocumentsTable } from "@/components/dashboard/documents/DocumentsTable"
 import KnowledgeBaseViewer from "@/components/dashboard/documents/KnowledgeBaseViewer";
 import GeneratedReports from "@/components/dashboard/documents/GeneratedReports";
 import QuickStats from "@/components/dashboard/QuickStats";
-import SMSSimulator from "@/components/dashboard/SMSSimulator";
 import DemoMode from "@/components/dashboard/DemoMode";
 import UpgradeBanner from "@/components/dashboard/UpgradeBanner";
 import { WorkersTab } from "@/components/dashboard/workers/WorkersTab";
@@ -142,12 +141,12 @@ function AnimatedNumber({ value, duration = 1000 }: { value: number; duration?: 
 // ─── Main component ────────────────────────────────────────────────────────────
 export default function ManagerDashboard() {
   // Read tab from URL query param if present
-  const [activeTab, setActiveTab] = useState<"analytics" | "alerts" | "documents" | "workers" | "test">("analytics");
+  const [activeTab, setActiveTab] = useState<"analytics" | "alerts" | "documents" | "workers">("analytics");
   
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get("tab");
-    if (tab && ["analytics", "alerts", "documents", "workers", "test"].includes(tab)) {
+    if (tab && ["analytics", "alerts", "documents", "workers"].includes(tab)) {
       setActiveTab(tab as any);
     }
   }, []);
@@ -839,16 +838,7 @@ export default function ManagerDashboard() {
           </div>
         )}
 
-        {/* TEST TAB - SMS Simulator */}
-        {activeTab === "test" && (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-xl font-semibold text-gray-900">Test Your Knowledge Base</h2>
-              <p className="text-sm text-gray-500 mt-1">See how workers experience Sidekick via SMS. Ask a question below.</p>
-            </div>
-            <SMSSimulator companyId={selectedCompany} />
-          </div>
-        )}
+
       </div>
     </div>
   );

@@ -1,22 +1,17 @@
 "use client";
 
-import { Activity, ClipboardList, HardDrive, BarChart3, ShieldAlert, FileText, Users, BookOpen, Target, Brain, Settings, Home, LogOut, LayoutDashboard } from "lucide-react";
+import { ClipboardList, Wrench, Users, BookOpen, Settings, Home, LogOut, LayoutDashboard } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
 const NAV_ITEMS = [
   { id: "overview", label: "Overview", icon: LayoutDashboard, href: "/manager" },
-  { id: "operations", label: "Operations", icon: Activity, href: "/operations" },
   { id: "work-orders", label: "Work Orders", icon: ClipboardList, href: "/work-orders" },
-  { id: "assets", label: "Assets", icon: HardDrive, href: "/assets" },
-  { id: "knowledge", label: "Knowledge", icon: BookOpen, href: "/knowledge" },
+  { id: "assets", label: "Assets", icon: Wrench, href: "/assets" },
   { id: "team", label: "Team", icon: Users, href: "/team" },
-  { id: "analytics", label: "Analytics", icon: BarChart3, href: "/analytics" },
-  { id: "skill-gaps", label: "Skill Gaps", icon: Target, href: "/skill-gaps" },
-  { id: "knowledge-transfer", label: "Transfer", icon: Brain, href: "/knowledge-transfer" },
-  { id: "alerts", label: "Alerts", icon: ShieldAlert, href: "/manager?tab=alerts" },
-  { id: "documents", label: "Documents", icon: FileText, href: "/manager?tab=documents" },
+  { id: "knowledge", label: "Knowledge", icon: BookOpen, href: "/knowledge" },
   { id: "settings", label: "Settings", icon: Settings, href: "/settings" },
 ];
 
@@ -45,7 +40,7 @@ export function Sidebar() {
                   : pathname === item.href ||
                     (!item.href.includes("?") && pathname?.startsWith(item.href));
             return (
-              <a
+              <Link
                 key={item.id}
                 href={item.href}
                 className={cn(
@@ -57,7 +52,7 @@ export function Sidebar() {
               >
                 <item.icon className={cn("h-4 w-4 flex-shrink-0", isActive ? "text-[#C96442]" : "")} />
                 {item.label}
-              </a>
+              </Link>
             );
           })}
         </div>

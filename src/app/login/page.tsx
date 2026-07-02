@@ -249,7 +249,6 @@ export default function LoginPage() {
         }}>
           {step === "phone" && (
             <>
-              Free trial: 50 questions in 7 days.{" "}
               <a href="https://textsidekick.com/#contact" style={{ color: "#C96442", textDecoration: "none", fontWeight: 500 }}>
                 Book a demo
               </a>
