@@ -4,7 +4,7 @@ const STEPS = [
   {
     n: "01",
     title: "Text it",
-    body: "Any worker texts a photo or description of an issue. Any language, any phone. No app needed.",
+    body: "Equipment issues, safety hazards, quality problems, supply needs — any worker texts what they see. Any language, any phone. No app needed.",
   },
   {
     n: "02",

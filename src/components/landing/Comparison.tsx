@@ -1,13 +1,11 @@
 import { Eyebrow } from "@/components/landing/Brand";
 
 const OLD_STEPS = [
-  "Open app",
-  "Find asset in dropdown",
-  "Select category",
-  "Set priority",
-  "Type description",
-  "Submit",
-  "Wait for supervisor",
+  "See a problem on the floor",
+  "Find your supervisor",
+  "Radio the maintenance office",
+  "Fill out a form",
+  "Hope someone gets to it",
 ];
 
 export default function Comparison() {
@@ -77,11 +75,11 @@ export default function Comparison() {
                   className="text-[22px] font-serif font-normal"
                   style={{ color: "#1C1A16" }}
                 >
-                  Text a photo.
+                  Text what you see.
                 </span>
               </div>
               <p className="text-[15px] text-ink/65 leading-relaxed mb-8 max-w-[340px]">
-                Work order created, technician assigned, parts checked — before the worker puts their phone away.
+                Any issue, any language. Work order created, right person assigned, issue tracked — before the worker puts their phone away.
               </p>
               <div
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold text-white"

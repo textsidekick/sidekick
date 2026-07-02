@@ -5,7 +5,7 @@ import { ArrowIcon, CheckIcon } from "@/components/landing/icons";
 
 const HEADLINE = "Your workers text. Sidekick handles the rest.";
 const SUBHEAD =
-  "When a machine acts up, your operator texts Sidekick. Five seconds later there's a prioritized work order, an assigned technician, and a parts check — no app, no forms, no training.";
+  "A machine acting up. A safety hazard on the floor. A part running low. Your workers see it all — now they can report it in 20 seconds by text. Sidekick triages, assigns, and tracks every issue automatically.";
 
 export default function Hero() {
   return (

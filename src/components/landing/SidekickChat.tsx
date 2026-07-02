@@ -10,10 +10,10 @@ type Msg = {
 };
 
 const ALL_MESSAGES: Msg[] = [
-  { id: 0, text: "Conveyor 3 making a grinding noise, getting worse", sender: "user" },
-  { id: 1, text: "Logged. Conveyor 3 (Asset #CVR-003). AI Assessment: Likely bearing failure. Priority: HIGH. Work order #4521 created and assigned to Mike T. (on shift, closest). Parts needed: 6205-2RS bearing (2 in stock, Cage B Shelf 3). Mike has been notified.", sender: "sidekick" },
-  { id: 2, text: "Also the belt looks worn, maybe 70%", sender: "user" },
-  { id: 3, text: "Noted. Follow-up PM work order #4522 created for belt replacement, scheduled for next planned downtime. Parts check: belt not in stock — purchase request sent to procurement.", sender: "sidekick" },
+  { id: 0, text: "Conveyor 3 making a grinding noise", sender: "user" },
+  { id: 1, text: "Logged. Conveyor 3 — likely bearing wear. Priority: HIGH. Work order #4521 created, assigned to Mike T. Parts: 6205-2RS bearing (2 in stock).", sender: "sidekick" },
+  { id: 2, text: "Wet floor near loading dock, someone could slip", sender: "user" },
+  { id: 3, text: "⚠️ Safety hazard flagged. Priority: CRITICAL. Alert sent to shift supervisor. Work order #4522 created for immediate cleanup. Area marked for caution signage.", sender: "sidekick" },
 ];
 
 const WAVEFORM = [4,3,5,4,6,5,4,5,7,9,12,10,14,12,16,14,12,14,10,12,14,12,10,8,10,8,6,7,6,5,6,5,4,5,4,3,4,3,4];
