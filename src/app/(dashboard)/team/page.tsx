@@ -15,6 +15,19 @@ type Worker = {
   created_at: string;
 };
 
+type WorkOrder = {
+  id: string;
+  assigned_to: string | null;
+  status: string;
+};
+
+const ROLE_SKILLS: Record<string, string[]> = {
+  technician: ["Mechanical", "Electrical", "Conveyor Specialist"],
+  supervisor: ["Supervision", "Safety", "Scheduling"],
+  operator: ["Operations", "Quality Control"],
+  manager: ["Management", "Planning"],
+};
+
 const ROLES = ["operator", "technician", "supervisor", "manager"];
 
 function roleBadge(role: string) {
@@ -33,6 +46,7 @@ function roleBadge(role: string) {
 
 export default function TeamPage() {
   const [workers, setWorkers] = useState<Worker[]>([]);
+  const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [editWorker, setEditWorker] = useState<Worker | null>(null);
@@ -42,10 +56,24 @@ export default function TeamPage() {
 
   async function load() {
     setLoading(true);
-    const res = await fetch("/api/team", { cache: "no-store" });
-    if (res.ok) {
-      const json = await res.json();
+    const [teamRes, sessionRes] = await Promise.all([
+      fetch("/api/team", { cache: "no-store" }),
+      fetch("/api/auth/session", { cache: "no-store" }),
+    ]);
+    if (teamRes.ok) {
+      const json = await teamRes.json();
       setWorkers(json.workers || []);
+    }
+    if (sessionRes.ok) {
+      const session = await sessionRes.json();
+      const cid = session.companyId;
+      if (cid) {
+        const woRes = await fetch(`/api/operations/work-orders?companyId=${encodeURIComponent(cid)}`, { cache: "no-store" });
+        if (woRes.ok) {
+          const woJson = await woRes.json();
+          setWorkOrders(woJson.workOrders || []);
+        }
+      }
     }
     setLoading(false);
   }
@@ -120,17 +148,32 @@ export default function TeamPage() {
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Name</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Phone</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Role</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">Skills</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">WOs Completed</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Status</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Joined</th>
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {workers.map((w) => (
+                {workers.map((w) => {
+                  const skills = ROLE_SKILLS[w.role] || ["General"];
+                  const wosCompleted = workOrders.filter(
+                    (wo) => wo.assigned_to === w.id && wo.status === "completed"
+                  ).length;
+                  return (
                   <tr key={w.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3 font-medium text-gray-900">{w.name || <span className="text-gray-400 italic">Unnamed</span>}</td>
                     <td className="px-4 py-3 text-gray-600 font-mono text-xs">{w.phone}</td>
                     <td className="px-4 py-3">{roleBadge(w.role)}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-1">
+                        {skills.map((s) => (
+                          <span key={s} className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">{s}</span>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-700 font-medium">{wosCompleted || <span className="text-gray-400">—</span>}</td>
                     <td className="px-4 py-3">
                       {w.verified
                         ? <span className="flex items-center gap-1 text-green-600 text-xs"><CheckCircle className="h-3.5 w-3.5" /> Active</span>
@@ -144,7 +187,8 @@ export default function TeamPage() {
                       </div>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

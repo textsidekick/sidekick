@@ -157,7 +157,8 @@ export default function SettingsPage() {
 
             {/* WO Categories */}
             <section className="bg-white rounded-xl border border-gray-200 p-5">
-              <h2 className="text-sm font-semibold text-gray-700 mb-4">Work Order Categories</h2>
+              <h2 className="text-sm font-semibold text-gray-700 mb-1">Work Order Categories</h2>
+              <p className="text-xs text-gray-400 mb-4">These categories are used by Sidekick’s AI to classify incoming issues and route work orders automatically.</p>
               <div className="space-y-2 mb-4">
                 {categories.map((cat) => (
                   <div key={cat.id} className="flex items-center gap-3">
@@ -176,7 +177,8 @@ export default function SettingsPage() {
 
             {/* WO Priorities */}
             <section className="bg-white rounded-xl border border-gray-200 p-5">
-              <h2 className="text-sm font-semibold text-gray-700 mb-4">Work Order Priorities</h2>
+              <h2 className="text-sm font-semibold text-gray-700 mb-1">Work Order Priorities</h2>
+              <p className="text-xs text-gray-400 mb-4">Priority levels and SLA hours are used by the AI triage system to determine urgency and escalation timing.</p>
               <div className="space-y-2 mb-4">
                 {priorities.map((p) => (
                   <div key={p.id} className="flex items-center gap-3">

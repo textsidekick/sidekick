@@ -59,6 +59,7 @@ export default function AssetsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState<string | null>(null);
 
   const [showAdd, setShowAdd] = useState(false);
@@ -141,6 +142,16 @@ export default function AssetsPage() {
     });
   }, [assets, workOrders]);
 
+  const searchLower = search.toLowerCase();
+  const filteredEnriched = search.trim()
+    ? enriched.filter(
+        (a) =>
+          a.name?.toLowerCase().includes(searchLower) ||
+          a.type?.toLowerCase().includes(searchLower) ||
+          a.location?.toLowerCase().includes(searchLower)
+      )
+    : enriched;
+
   const declining = enriched
     .filter((a) => a.health_score < 70)
     .sort((a, b) => a.health_score - b.health_score)
@@ -201,7 +212,7 @@ export default function AssetsPage() {
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Assets</h1>
-            <p className="text-sm text-black/50 mt-1">Asset health, history, PMs, parts, and downtime.</p>
+            <p className="text-sm text-black/50 mt-1">Asset health, history, repair time, and more.</p>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={() => (window.location.href = "/operations")}>Operations</Button>
@@ -254,8 +265,21 @@ export default function AssetsPage() {
           </div>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {enriched.map((a) => {
+        <div className="mt-6">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search assets by name, type, or location…"
+            className="w-full px-4 py-2.5 rounded-xl border border-black/10 bg-white text-sm outline-none focus:border-black/20"
+          />
+          {search && (
+            <div className="mt-1 text-xs text-black/40">{filteredEnriched.length} result{filteredEnriched.length !== 1 ? "s" : ""}</div>
+          )}
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {filteredEnriched.map((a) => {
             const isOpen = expanded === a.id;
             return (
               <div
@@ -300,17 +324,7 @@ export default function AssetsPage() {
                     <AssetPhotoGallery assetId={a.id} />
 
                     <div className="rounded-xl border border-black/5 p-4">
-                      <div className="text-sm font-medium">PM schedules</div>
-                      <div className="mt-2 text-sm text-black/50">Coming soon (schedule list + next due).</div>
-                    </div>
-
-                    <div className="rounded-xl border border-black/5 p-4">
-                      <div className="text-sm font-medium">Parts used</div>
-                      <div className="mt-2 text-sm text-black/50">Coming soon (parts rollup by asset).</div>
-                    </div>
-
-                    <div className="rounded-xl border border-black/5 p-4">
-                      <div className="text-sm font-medium">Downtime (30d)</div>
+                      <div className="text-sm font-medium">Repair Time (30d)</div>
                       <div className="mt-2 text-sm text-black/60">{a.downtimeHours30d.toFixed(1)}h</div>
                     </div>
                   </div>

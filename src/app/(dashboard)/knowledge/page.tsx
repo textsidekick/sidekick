@@ -58,15 +58,17 @@ export default function KnowledgePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const filtered = search.trim()
-    ? articles.filter(
-        (a) =>
-          a.title?.toLowerCase().includes(search.toLowerCase()) ||
-          a.problem?.toLowerCase().includes(search.toLowerCase()) ||
-          a.solution?.toLowerCase().includes(search.toLowerCase()) ||
-          a.tags?.some((t) => t.toLowerCase().includes(search.toLowerCase()))
-      )
-    : articles;
+  const [showReviewOnly, setShowReviewOnly] = useState(false);
+  const needsReview = articles.filter((a) => !!a.source_work_order_id);
+
+  const filtered = (showReviewOnly ? needsReview : articles).filter((a) =>
+    search.trim()
+      ? a.title?.toLowerCase().includes(search.toLowerCase()) ||
+        a.problem?.toLowerCase().includes(search.toLowerCase()) ||
+        a.solution?.toLowerCase().includes(search.toLowerCase()) ||
+        a.tags?.some((t) => t.toLowerCase().includes(search.toLowerCase()))
+      : true
+  );
 
   return (
     <>
@@ -83,8 +85,8 @@ export default function KnowledgePage() {
             </div>
           </div>
 
-          {/* Hero stat */}
-          <div className="mt-6 flex items-center gap-6">
+          {/* Hero stats */}
+          <div className="mt-6 flex items-center gap-4 flex-wrap">
             <div className="bg-white rounded-xl border border-gray-200 px-6 py-4 flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-[#C96442]/10 flex items-center justify-center">
                 <BookOpen className="w-6 h-6 text-[#C96442]" />
@@ -94,6 +96,24 @@ export default function KnowledgePage() {
                 <div className="text-sm text-gray-500">Knowledge articles captured</div>
               </div>
             </div>
+            {needsReview.length > 0 && (
+              <button
+                onClick={() => setShowReviewOnly((v) => !v)}
+                className={`rounded-xl border px-6 py-4 flex items-center gap-4 transition text-left ${
+                  showReviewOnly
+                    ? "border-[#C96442] bg-[#C96442]/10"
+                    : "border-amber-200 bg-amber-50 hover:bg-amber-100"
+                }`}
+              >
+                <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
+                  <BookOpen className="w-6 h-6 text-amber-600" />
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-amber-700">{needsReview.length}</div>
+                  <div className="text-sm text-amber-600">Needs Review (auto-generated)</div>
+                </div>
+              </button>
+            )}
           </div>
 
           {/* Search */}
@@ -144,7 +164,14 @@ export default function KnowledgePage() {
                         )}
                         <span className="flex items-center gap-1"><Hash className="w-3 h-3" />Referenced {article.times_referenced || 0}x</span>
                         {article.source_work_order_id && (
-                          <span className="text-[#C96442]">Auto-captured</span>
+                          <>
+                            <span className="inline-flex items-center gap-1 text-amber-600 font-medium">⚠ Needs Review</span>
+                            <a
+                              href={`/work-orders?id=${article.source_work_order_id}`}
+                              className="text-[#C96442] underline hover:text-[#a8532f]"
+                              onClick={(e) => e.stopPropagation()}
+                            >View source WO</a>
+                          </>
                         )}
                       </div>
                       {article.tags?.length > 0 && (

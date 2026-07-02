@@ -3,7 +3,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { MetricCard } from "@/components/dashboard/shared/MetricCard";
 import { SectionHeader } from "@/components/dashboard/shared/SectionHeader";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/dashboard/shared/StatusBadge";
+import { PriorityBadge } from "@/components/dashboard/shared/PriorityBadge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -36,43 +37,7 @@ type OpsResponse = {
   };
 };
 
-type Technician = { id: string; name: string };
-
-const TECHS: Technician[] = [
-  { id: "t1", name: "Mike T." },
-  { id: "t2", name: "Carlos R." },
-  { id: "t3", name: "Ayesha K." },
-  { id: "t4", name: "Sam P." },
-];
-
-function priorityBadge(priority: WorkOrderPriority) {
-  const cls =
-    priority === "critical"
-      ? "bg-red-100 text-red-800"
-      : priority === "high"
-        ? "bg-orange-100 text-orange-800"
-        : priority === "medium"
-          ? "bg-yellow-100 text-yellow-900"
-          : "bg-gray-100 text-gray-700";
-  return <span className={cn("text-xs font-medium px-2 py-1 rounded-full", cls)}>{priority.toUpperCase()}</span>;
-}
-
-function statusBadge(status: WorkOrderStatus) {
-  const cls =
-    status === "open"
-      ? "bg-blue-100 text-blue-800"
-      : status === "assigned"
-        ? "bg-purple-100 text-purple-800"
-        : status === "in_progress"
-          ? "bg-yellow-100 text-yellow-900"
-          : status === "completed"
-            ? "bg-green-100 text-green-800"
-            : status === "on_hold"
-              ? "bg-gray-100 text-gray-700"
-              : "bg-gray-100 text-gray-700";
-
-  return <span className={cn("text-xs font-medium px-2 py-1 rounded-full", cls)}>{status.replaceAll("_", " ").toUpperCase()}</span>;
-}
+type Technician = { id: string; name: string | null; phone?: string; role?: string };
 
 function formatTimeAgo(iso: string) {
   const ms = Date.now() - new Date(iso).getTime();
@@ -82,8 +47,58 @@ function formatTimeAgo(iso: string) {
   return `${Math.floor(ms / 86400_000)}d`;
 }
 
-function minutesOpen(iso: string) {
-  return Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 60_000));
+function timeOpenMinutes(wo: WorkOrder): number {
+  const start = new Date(wo.created_at).getTime();
+  const end = wo.status === "completed" && wo.completed_at
+    ? new Date(wo.completed_at).getTime()
+    : Date.now();
+  return Math.max(0, Math.floor((end - start) / 60_000));
+}
+
+type AITriage = {
+  priority?: string;
+  reason?: string;
+  suspected_cause?: string;
+  suggested_parts?: string[];
+  confidence?: number;
+  [key: string]: unknown;
+};
+
+function AITriageCard({ triage }: { triage: AITriage | null | undefined }) {
+  if (!triage || Object.keys(triage).length === 0) return <div className="text-sm text-black/50">No AI triage data.</div>;
+  return (
+    <div className="rounded-xl border border-black/5 bg-white p-4 space-y-2 text-sm">
+      {triage.priority && (
+        <div className="flex items-center gap-2">
+          <span className="text-xs uppercase tracking-wide text-black/40 w-28">Priority</span>
+          <PriorityBadge priority={triage.priority} />
+          {triage.reason && <span className="text-black/60 text-xs">— {triage.reason}</span>}
+        </div>
+      )}
+      {triage.suspected_cause && (
+        <div className="flex items-start gap-2">
+          <span className="text-xs uppercase tracking-wide text-black/40 w-28 shrink-0">Suspected cause</span>
+          <span className="text-black/70">{triage.suspected_cause}</span>
+        </div>
+      )}
+      {triage.suggested_parts && triage.suggested_parts.length > 0 && (
+        <div className="flex items-start gap-2">
+          <span className="text-xs uppercase tracking-wide text-black/40 w-28 shrink-0">Suggested parts</span>
+          <div className="flex flex-wrap gap-1">
+            {triage.suggested_parts.map((p) => (
+              <span key={p} className="text-xs px-2 py-0.5 bg-orange-50 text-orange-700 rounded-full">{p}</span>
+            ))}
+          </div>
+        </div>
+      )}
+      {triage.confidence !== undefined && (
+        <div className="flex items-center gap-2">
+          <span className="text-xs uppercase tracking-wide text-black/40 w-28">Confidence</span>
+          <span className="text-black/60">{Math.round(Number(triage.confidence) * 100)}%</span>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function WorkOrdersPage() {
@@ -91,6 +106,7 @@ export default function WorkOrdersPage() {
   const [stats, setStats] = useState<OpsResponse | null>(null);
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [assetsById, setAssetsById] = useState<Record<string, { name: string }>>({});
+  const [techs, setTechs] = useState<Technician[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -129,10 +145,11 @@ export default function WorkOrdersPage() {
         const cid = await loadSession();
         if (!ignore) setCompanyId(cid);
 
-        const [statsRes, woRes, assetRes] = await Promise.all([
+        const [statsRes, woRes, assetRes, teamRes] = await Promise.all([
           fetch("/api/dashboard/operations", { cache: "no-store" }),
           fetch(`/api/operations/work-orders?companyId=${encodeURIComponent(cid)}`, { cache: "no-store" }),
           fetch(`/api/operations/assets?companyId=${encodeURIComponent(cid)}`, { cache: "no-store" }),
+          fetch("/api/team", { cache: "no-store" }),
         ]);
 
         if (!statsRes.ok) throw new Error(`Stats failed (${statsRes.status})`);
@@ -149,8 +166,13 @@ export default function WorkOrdersPage() {
         const map: Record<string, { name: string }> = {};
         for (const a of assetJson.assets || []) map[a.id] = { name: a.name };
         setAssetsById(map);
-      } catch (e: any) {
-        if (!ignore) setError(e?.message || "Failed to load");
+
+        if (teamRes.ok) {
+          const teamJson = (await teamRes.json()) as { workers: Technician[] };
+          setTechs(teamJson.workers || []);
+        }
+      } catch (e: unknown) {
+        if (!ignore) setError((e as Error)?.message || "Failed to load");
       } finally {
         if (!ignore) setLoading(false);
       }
@@ -161,6 +183,12 @@ export default function WorkOrdersPage() {
       ignore = true;
     };
   }, []);
+
+  const techName = (id: string | null | undefined) => {
+    if (!id) return "Unassigned";
+    const t = techs.find((t) => t.id === id);
+    return t?.name || "Tech";
+  };
 
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -227,7 +255,7 @@ export default function WorkOrdersPage() {
     try {
       setSaving(true);
 
-      const patch: any = {
+      const patch: Record<string, unknown> = {
         assigned_to: actionAssignTo === "unassigned" ? null : actionAssignTo,
         priority: actionPriority,
         status: actionStatus,
@@ -242,11 +270,14 @@ export default function WorkOrdersPage() {
       if (!res.ok) throw new Error(`Update failed (${res.status})`);
 
       if (actionNote.trim()) {
-        // Notes are not modeled yet; store it in resolution_notes as an append for now.
+        const timestamp = new Date().toLocaleString();
+        const existing = activeWO.resolution_notes?.trim() || "";
+        const newNote = `[${timestamp}] ${actionNote.trim()}`;
+        const combined = existing ? `${existing}\n\n${newNote}` : newNote;
         await fetch(`/api/operations/work-orders/${activeWO.id}`, {
           method: "PATCH",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ patch: { resolution_notes: `${activeWO.resolution_notes || ""}\n\n[Manager note] ${actionNote}`.trim() } }),
+          body: JSON.stringify({ patch: { resolution_notes: combined } }),
         });
       }
 
@@ -260,8 +291,8 @@ export default function WorkOrdersPage() {
       }
 
       setActiveWO(null);
-    } catch (e: any) {
-      setError(e?.message || "Failed to save");
+    } catch (e: unknown) {
+      setError((e as Error)?.message || "Failed to save");
     } finally {
       setSaving(false);
     }
@@ -303,7 +334,7 @@ export default function WorkOrdersPage() {
           <SectionHeader title="All work orders" subtitle="Filter, sort, and take quick actions" />
 
           <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-3">
-            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
+            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as WorkOrderStatus | "all")}>
               <SelectTrigger className="bg-white">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
@@ -317,7 +348,7 @@ export default function WorkOrdersPage() {
               </SelectContent>
             </Select>
 
-            <Select value={priorityFilter} onValueChange={(v) => setPriorityFilter(v as any)}>
+            <Select value={priorityFilter} onValueChange={(v) => setPriorityFilter(v as WorkOrderPriority | "all")}>
               <SelectTrigger className="bg-white">
                 <SelectValue placeholder="Priority" />
               </SelectTrigger>
@@ -330,7 +361,7 @@ export default function WorkOrdersPage() {
               </SelectContent>
             </Select>
 
-            <Select value={categoryFilter} onValueChange={(v) => setCategoryFilter(v as any)}>
+            <Select value={categoryFilter} onValueChange={(v) => setCategoryFilter(v)}>
               <SelectTrigger className="bg-white">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
@@ -344,16 +375,16 @@ export default function WorkOrdersPage() {
               </SelectContent>
             </Select>
 
-            <Select value={techFilter} onValueChange={(v) => setTechFilter(v as any)}>
+            <Select value={techFilter} onValueChange={(v) => setTechFilter(v)}>
               <SelectTrigger className="bg-white">
                 <SelectValue placeholder="Assigned" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All techs</SelectItem>
                 <SelectItem value="unassigned">Unassigned</SelectItem>
-                {TECHS.map((t) => (
+                {techs.map((t) => (
                   <SelectItem key={t.id} value={t.id}>
-                    {t.name}
+                    {t.name || t.phone || t.id}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -365,7 +396,7 @@ export default function WorkOrdersPage() {
               <span>{sorted.length} results</span>
             </div>
             <div className="flex items-center gap-2">
-              <Select value={sortKey} onValueChange={(v) => setSortKey(v as any)}>
+              <Select value={sortKey} onValueChange={(v) => setSortKey(v as "priority" | "status" | "created_at")}>
                 <SelectTrigger className="bg-white w-[200px]">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
@@ -404,9 +435,7 @@ export default function WorkOrdersPage() {
                 {sorted.map((wo) => {
                   const expanded = expandedId === wo.id;
                   const assetName = wo.asset_id ? assetsById[wo.asset_id]?.name || "—" : "—";
-                  const assignedName = wo.assigned_to
-                    ? TECHS.find((t) => t.id === wo.assigned_to)?.name || "Tech"
-                    : "Unassigned";
+                  const minutes = timeOpenMinutes(wo);
 
                   return (
                     <React.Fragment key={wo.id}>
@@ -415,15 +444,15 @@ export default function WorkOrdersPage() {
                         onClick={() => setExpandedId((cur) => (cur === wo.id ? null : wo.id))}
                       >
                         <TableCell className="font-medium">{wo.short_id}</TableCell>
-                        <TableCell>{priorityBadge(wo.priority)}</TableCell>
+                        <TableCell><PriorityBadge priority={wo.priority} /></TableCell>
                         <TableCell>{assetName}</TableCell>
                         <TableCell className="max-w-[340px] truncate">{wo.title}</TableCell>
-                        <TableCell>{statusBadge(wo.status)}</TableCell>
-                        <TableCell className="text-sm text-black/60">{assignedName}</TableCell>
+                        <TableCell><StatusBadge status={wo.status} /></TableCell>
+                        <TableCell className="text-sm text-black/60">{techName(wo.assigned_to)}</TableCell>
                         <TableCell className="text-sm text-black/60">{formatTimeAgo(wo.created_at)} ago</TableCell>
-                        <TableCell className="text-sm text-black/60">{Math.round(minutesOpen(wo.created_at) / 60)}h</TableCell>
+                        <TableCell className="text-sm text-black/60">{Math.round(minutes / 60)}h</TableCell>
                         <TableCell>
-                          <Button size="sm" variant="outline" onClick={(e) => (e.stopPropagation(), openActions(wo))}>
+                          <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); openActions(wo); }}>
                             Quick actions
                           </Button>
                         </TableCell>
@@ -438,10 +467,12 @@ export default function WorkOrdersPage() {
                                 <div className="mt-1 text-sm text-black/60">{wo.description || "—"}</div>
 
                                 <div className="mt-4 text-sm font-medium">AI triage</div>
-                                <pre className="mt-1 text-xs bg-white border border-black/5 rounded-xl p-3 overflow-x-auto">{JSON.stringify(wo.ai_triage || {}, null, 2)}</pre>
+                                <div className="mt-1">
+                                  <AITriageCard triage={wo.ai_triage as AITriage} />
+                                </div>
 
                                 <div className="mt-4 text-sm font-medium">Resolution notes</div>
-                                <div className="mt-1 text-sm text-black/60">{wo.resolution_notes || "—"}</div>
+                                <div className="mt-1 text-sm text-black/60 whitespace-pre-wrap">{wo.resolution_notes || "—"}</div>
                               </div>
 
                               <div>
@@ -507,15 +538,15 @@ export default function WorkOrdersPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <div className="text-xs uppercase tracking-wide text-black/40 mb-2">Assign</div>
-              <Select value={actionAssignTo} onValueChange={(v) => setActionAssignTo(v as any)}>
+              <Select value={actionAssignTo} onValueChange={(v) => setActionAssignTo(v)}>
                 <SelectTrigger className="bg-white">
                   <SelectValue placeholder="Technician" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="unassigned">Unassigned</SelectItem>
-                  {TECHS.map((t) => (
+                  {techs.map((t) => (
                     <SelectItem key={t.id} value={t.id}>
-                      {t.name}
+                      {t.name || t.phone || t.id}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -524,7 +555,7 @@ export default function WorkOrdersPage() {
 
             <div>
               <div className="text-xs uppercase tracking-wide text-black/40 mb-2">Priority</div>
-              <Select value={actionPriority} onValueChange={(v) => setActionPriority(v as any)}>
+              <Select value={actionPriority} onValueChange={(v) => setActionPriority(v as WorkOrderPriority)}>
                 <SelectTrigger className="bg-white">
                   <SelectValue placeholder="Priority" />
                 </SelectTrigger>
@@ -539,7 +570,7 @@ export default function WorkOrdersPage() {
 
             <div>
               <div className="text-xs uppercase tracking-wide text-black/40 mb-2">Status</div>
-              <Select value={actionStatus} onValueChange={(v) => setActionStatus(v as any)}>
+              <Select value={actionStatus} onValueChange={(v) => setActionStatus(v as WorkOrderStatus)}>
                 <SelectTrigger className="bg-white">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>

@@ -3,6 +3,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { MetricCard } from "@/components/dashboard/shared/MetricCard";
 import { SectionHeader } from "@/components/dashboard/shared/SectionHeader";
+import { StatusBadge } from "@/components/dashboard/shared/StatusBadge";
+import { PriorityBadge } from "@/components/dashboard/shared/PriorityBadge";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -15,6 +17,7 @@ import {
   Wrench,
   Eye,
   X,
+  Info,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -74,6 +77,7 @@ export default function OperationsDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [showHealthBreakdown, setShowHealthBreakdown] = useState(false);
   const [alerts, setAlerts] = useState<AIAlert[]>([
     {
       id: "a1",
@@ -121,16 +125,20 @@ export default function OperationsDashboardPage() {
     };
   }, []);
 
-  const plantHealthScore = useMemo(() => {
-    if (!data) return 0;
-    // simple composite: weighted asset health + WO pressure
+  const plantHealthBreakdown = useMemo(() => {
+    if (!data) return null;
+    const assetAvg = Math.round(data.assets.avgHealthScore);
     const open =
       (data.workOrders.countsByStatus.open || 0) +
       (data.workOrders.countsByStatus.assigned || 0) +
       (data.workOrders.countsByStatus.in_progress || 0);
-    const penalty = Math.min(25, open * 1.5 + data.workOrders.overdueCount * 2.5);
-    return Math.max(0, Math.min(100, Math.round(data.assets.avgHealthScore - penalty)));
+    const woPenalty = Math.round(Math.min(15, open * 1.5));
+    const overduePenalty = Math.round(Math.min(10, data.workOrders.overdueCount * 2.5));
+    const total = Math.max(0, Math.min(100, assetAvg - woPenalty - overduePenalty));
+    return { assetAvg, woPenalty, overduePenalty, openWOs: open, overdueCount: data.workOrders.overdueCount, total };
   }, [data]);
+
+  const plantHealthScore = plantHealthBreakdown?.total ?? 0;
 
   const mttrTrend = useMemo(() => {
     if (!data) return 0;
@@ -174,7 +182,24 @@ export default function OperationsDashboardPage() {
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <div className="text-xs uppercase tracking-wide text-black/40">Plant Health Score</div>
+              <div className="flex items-end gap-2">
               <div className={cn("mt-1 text-4xl font-semibold", healthColor(plantHealthScore))}>{plantHealthScore}/100</div>
+              <button
+                onClick={() => setShowHealthBreakdown((v) => !v)}
+                className="mb-1 text-black/30 hover:text-black/60 transition"
+                title="Show breakdown"
+              >
+                <Info className="h-4 w-4" />
+              </button>
+            </div>
+            {showHealthBreakdown && plantHealthBreakdown && (
+              <div className="mt-2 text-xs text-black/50 bg-black/[0.03] rounded-xl p-3 space-y-1 max-w-xs">
+                <div>Asset health avg: <span className="font-medium text-black/70">{plantHealthBreakdown.assetAvg}</span></div>
+                <div>− Open WO penalty ({plantHealthBreakdown.openWOs} open): <span className="font-medium text-amber-700">−{plantHealthBreakdown.woPenalty}</span></div>
+                <div>− Overdue PM penalty ({plantHealthBreakdown.overdueCount} overdue): <span className="font-medium text-red-700">−{plantHealthBreakdown.overduePenalty}</span></div>
+                <div className="border-t border-black/10 pt-1 font-medium text-black/70">= {plantHealthBreakdown.total}/100</div>
+              </div>
+            )}
             </div>
             <div className="flex items-center gap-2">
               <Badge className="bg-black/5 text-black hover:bg-black/5">Live</Badge>
@@ -297,8 +322,10 @@ export default function OperationsDashboardPage() {
                       <div className="text-sm font-medium">
                         {ev.short_id} · {ev.title}
                       </div>
-                      <div className="mt-1 text-xs text-black/50">
-                        {new Date(ev.created_at).toLocaleString()} · {ev.priority.toUpperCase()} · {ev.status.replaceAll("_", " ")}
+                      <div className="mt-1 flex items-center gap-2 flex-wrap">
+                        <span className="text-xs text-black/50">{new Date(ev.created_at).toLocaleString()}</span>
+                        <PriorityBadge priority={ev.priority} />
+                        <StatusBadge status={ev.status} />
                       </div>
                     </div>
                     <div className={cn("text-xs px-2 py-1 rounded-full", isCompleted ? "bg-green-100 text-green-800" : "bg-black/5 text-black/70")}>
