@@ -30,7 +30,6 @@ export function Sidebar() {
           <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={22} height={22} style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
         </div>
         <span style={{ fontSize: 16, fontWeight: 600, color: '#1C1A16', letterSpacing: '-0.02em' }}>Sidekick</span>
-        <span style={{ fontSize: 13, color: 'rgba(28,26,22,0.35)', marginLeft: 2 }}>Dashboard</span>
       </div>
 
       {/* Nav items */}
