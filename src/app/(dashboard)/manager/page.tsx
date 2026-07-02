@@ -495,7 +495,7 @@ export default function ManagerDashboard() {
 
   // ─── Render ───────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-[var(--page-bg,#f9fafb)]">
+    <div className="min-h-screen bg-[#F7F3EC]">
 
       {/* ── Modals ─────────────────────────────────────────────────────────────── */}
       <IssueDetailModal
