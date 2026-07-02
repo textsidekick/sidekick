@@ -47,13 +47,32 @@ const INITIAL_SECTIONS: SetupSection[] = [
   { id: "integrations", label: "Integrations", description: "Google Drive, Slack & more", icon: Plug, status: "not_started" },
 ];
 
+const SECTION_INTRO: Record<SectionId, string> = {
+  company: "Hey! Let's get Sidekick set up for your team. What's your company name?",
+  assets: "Let's talk about your equipment. What machines or production lines do you have? You can describe them, upload an asset list, or just tell me about the main ones.",
+  team: "Tell me about your team. How many workers do you have? What roles or departments — operators, technicians, supervisors? You can also upload a roster if you have one.",
+  knowledge: "Now let's capture your knowledge base. Do you have SOPs, equipment manuals, or safety docs? You can upload them directly, or describe your key procedures and I'll help draft them.",
+  workorders: "Do you have existing work orders or maintenance history you'd like to import? You can upload a CSV, describe your workflow, or we can set this up from scratch.",
+  integrations: "Let's connect the tools you already use. I can pull documents from Google Drive, sync with Slack, and more. Click 'Connect Tools' in the sidebar to get started.",
+};
+
 export default function OnboardingChat() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content: "Hey! Let's get Sidekick set up for your team. What's your company name?",
-    },
-  ]);
+  const [sections, setSections] = useState<SetupSection[]>(INITIAL_SECTIONS);
+  const [activeSectionId, setActiveSectionId] = useState<SectionId>("company");
+  const [sectionMessages, setSectionMessages] = useState<Record<SectionId, Message[]>>(() => {
+    const initial: Record<string, Message[]> = {};
+    for (const key of Object.keys(SECTION_INTRO) as SectionId[]) {
+      initial[key] = [{ role: "assistant", content: SECTION_INTRO[key] }];
+    }
+    return initial as Record<SectionId, Message[]>;
+  });
+  const messages = sectionMessages[activeSectionId] || [];
+  const setMessages = (msgs: Message[] | ((prev: Message[]) => Message[])) => {
+    setSectionMessages((prev) => ({
+      ...prev,
+      [activeSectionId]: typeof msgs === "function" ? msgs(prev[activeSectionId] || []) : msgs,
+    }));
+  };
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [sessionId] = useState(() => Math.random().toString(36).slice(2));
@@ -70,8 +89,6 @@ export default function OnboardingChat() {
   const [isRecording, setIsRecording] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [showIntegrations, setShowIntegrations] = useState(false);
-  const [sections, setSections] = useState<SetupSection[]>(INITIAL_SECTIONS);
-  const [activeSectionId, setActiveSectionId] = useState<SectionId>("company");
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -218,7 +235,7 @@ export default function OnboardingChat() {
       const response = await fetch("/api/onboarding/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: newMessages, sessionId }),
+        body: JSON.stringify({ messages: newMessages, sessionId, section: activeSectionId }),
       });
       if (!response.ok) throw new Error("Failed to get response");
       const data = await response.json();
@@ -361,7 +378,12 @@ export default function OnboardingChat() {
               return (
                 <button
                   key={section.id}
-                  onClick={() => setActiveSectionId(section.id)}
+                  onClick={() => {
+                    setActiveSectionId(section.id);
+                    if (section.status === "not_started") {
+                      setSections((prev) => prev.map((s) => s.id === section.id ? { ...s, status: "in_progress" } : s));
+                    }
+                  }}
                   style={{
                     display: "flex", alignItems: "center", gap: 14, padding: "12px 16px", borderRadius: 10,
                     background: isActive ? "rgba(201,100,66,0.1)" : "transparent",
