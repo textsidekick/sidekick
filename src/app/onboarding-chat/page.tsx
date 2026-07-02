@@ -1,5 +1,6 @@
 "use client";
 import IntegrationSelector from "@/components/IntegrationSelector";
+import DataPanel, { SectionData } from "@/components/onboarding/DataPanel";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -93,6 +94,16 @@ export default function OnboardingChat() {
   const audioChunksRef = useRef<Blob[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Right panel data state
+  const [sectionData, setSectionData] = useState<SectionData>({
+    company: {},
+    assets: [],
+    team: [],
+    knowledge: [],
+    workorders: [],
+    integrations: [],
+  });
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -241,6 +252,22 @@ export default function OnboardingChat() {
       const data = await response.json();
       const assistantMessage: Message = { role: "assistant", content: data.message };
       setMessages([...newMessages, assistantMessage]);
+
+      // Extract structured data from response if provided
+      // The extraction sees the full conversation, so replace (not append) arrays
+      if (data.extractedData) {
+        setSectionData((prev) => {
+          const updated = { ...prev };
+          const ed = data.extractedData;
+          if (ed.company) updated.company = { ...prev.company, ...ed.company };
+          if (ed.assets && ed.assets.length > 0) updated.assets = ed.assets;
+          if (ed.team && ed.team.length > 0) updated.team = ed.team;
+          if (ed.knowledge && ed.knowledge.length > 0) updated.knowledge = ed.knowledge;
+          if (ed.workorders && ed.workorders.length > 0) updated.workorders = ed.workorders;
+          if (ed.integrations && ed.integrations.length > 0) updated.integrations = ed.integrations;
+          return updated;
+        });
+      }
       const isDone =
         data.message.includes("All set! Setting up your account now") ||
         (data.message.includes("All set") && data.message.includes("setting up")) ||
@@ -478,19 +505,11 @@ export default function OnboardingChat() {
       </div>
 
       {/* ── Main Content ────────────────────────────────────── */}
-      <div style={{ marginLeft: 400, flex: 1, background: "#F7F3EC", display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <div style={{ marginLeft: 400, marginRight: 340, flex: 1, background: "#F7F3EC", display: "flex", flexDirection: "column", minHeight: "100vh" }}>
 
         {/* Chat area */}
         <div style={{ flex: 1, overflow: "auto", padding: "32px 24px", display: "flex", flexDirection: "column" }}>
           <div style={{ maxWidth: 672, margin: "0 auto", width: "100%" }}>
-            {/* Integrations panel for integrations section */}
-            {activeSectionId === "integrations" && (
-              <div style={{ marginBottom: 24, background: "white", borderRadius: 12, border: "1px solid rgba(28,26,22,0.08)", padding: 16 }}>
-                <h3 style={{ fontSize: 15, fontWeight: 600, color: "#1C1A16", marginBottom: 12 }}>Connect Your Tools</h3>
-                <IntegrationSelector companyId={sessionId} />
-              </div>
-            )}
-
             {messages.map((msg, idx) => (
               <div
                 key={idx}
@@ -587,6 +606,13 @@ export default function OnboardingChat() {
           </div>
         </div>
       </div>
+
+      {/* ── Right Panel ──────────────────────────────────── */}
+      <DataPanel
+        activeSectionId={activeSectionId}
+        data={sectionData}
+        integrationSelector={<IntegrationSelector companyId={sessionId} />}
+      />
 
       <style>{`
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }

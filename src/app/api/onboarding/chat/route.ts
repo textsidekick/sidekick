@@ -53,9 +53,23 @@ RULES:
 - When done: "All set! Setting up your account now."
 - CRITICAL: completion message must be word-for-word: "All set! Setting up your account now."`;
 
+const extractionPrompt = `Extract any structured data from this onboarding conversation. Return a JSON object with ONLY the fields that have been explicitly mentioned. Do not guess or infer.
+
+Possible fields:
+{
+  "company": { "name": "", "industry": "", "location": "", "phone": "", "email": "", "employeeCount": "", "shifts": "" },
+  "assets": [{ "name": "", "type": "", "location": "" }],
+  "team": [{ "name": "", "role": "", "phone": "" }],
+  "knowledge": [{ "name": "", "type": "sop|manual|safety|other" }],
+  "workorders": [{ "title": "", "status": "open|in_progress|complete", "priority": "low|medium|high" }],
+  "integrations": [{ "name": "", "status": "connected|pending" }]
+}
+
+Only include sections where data was explicitly provided. Return {} if nothing extractable yet. Return ONLY valid JSON, no explanation.`;
+
 export async function POST(request: NextRequest) {
   try {
-    const { messages, sessionId } = await request.json();
+    const { messages, sessionId, section } = await request.json();
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json(
@@ -86,9 +100,31 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Extract structured data from conversation (lightweight call)
+    let extractedData = null;
+    try {
+      const extractionRes = await anthropic.messages.create({
+        model: "claude-haiku-4-5",
+        max_tokens: 512,
+        system: extractionPrompt,
+        messages: [
+          ...messages.map((msg: any) => ({ role: msg.role, content: msg.content })),
+          { role: "assistant", content: fullResponse },
+        ].map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
+      });
+      const extractionText = extractionRes.content[0].type === "text" ? extractionRes.content[0].text : "";
+      const jsonMatch = extractionText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        extractedData = JSON.parse(jsonMatch[0]);
+      }
+    } catch (e) {
+      console.error("[Extraction] Non-critical error:", e);
+    }
+
     return NextResponse.json({
       success: true,
       message: fullResponse,
+      extractedData,
       sessionId,
     });
   } catch (error) {
