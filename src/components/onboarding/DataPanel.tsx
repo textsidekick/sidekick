@@ -298,7 +298,7 @@ export default function DataPanel({ activeSectionId, data, integrationSelector }
 
   return (
     <div style={{
-      width: 340, background: "white",
+      width: 400, background: "white",
       borderLeft: "1px solid rgba(28,26,22,0.06)",
       display: "flex", flexDirection: "column",
       position: "fixed", top: 0, bottom: 0, right: 0, zIndex: 50,

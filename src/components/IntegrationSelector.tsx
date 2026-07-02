@@ -28,9 +28,10 @@ const INTEGRATIONS: Integration[] = [
 interface IntegrationSelectorProps {
   companyId: string;
   onConnect?: (integrationId: string) => void;
+  compact?: boolean;
 }
 
-export default function IntegrationSelector({ companyId, onConnect }: IntegrationSelectorProps) {
+export default function IntegrationSelector({ companyId, onConnect, compact }: IntegrationSelectorProps) {
   const [connected, setConnected] = useState<Set<string>>(new Set());
   const [filter, setFilter] = useState<"all" | "connected">("all");
 
@@ -103,7 +104,7 @@ export default function IntegrationSelector({ companyId, onConnect }: Integratio
         </div>
       </div>
       <div style={{ padding: "12px 16px", maxHeight: 500, overflowY: "auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+        <div style={{ display: "grid", gridTemplateColumns: compact ? "1fr" : "1fr 1fr", gap: 8 }}>
           {filtered.map(integration => (
             <button
               key={integration.id}

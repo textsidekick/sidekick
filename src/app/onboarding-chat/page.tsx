@@ -376,7 +376,7 @@ export default function OnboardingChat() {
   return (
     <div style={{ minHeight: "100vh", display: "flex", fontFamily: "Inter, system-ui, sans-serif" }}>
       {/* ── Sidebar ─────────────────────────────────────────── */}
-      <div style={{ width: 400, background: "white", borderRight: "1px solid rgba(28,26,22,0.06)", display: "flex", flexDirection: "column", position: "fixed", top: 0, bottom: 0, zIndex: 50 }}>
+      <div style={{ width: 320, background: "white", borderRight: "1px solid rgba(28,26,22,0.06)", display: "flex", flexDirection: "column", position: "fixed", top: 0, bottom: 0, zIndex: 50 }}>
         {/* Logo */}
         <div style={{ height: 72, display: "flex", alignItems: "center", gap: 14, padding: "0 24px", borderBottom: "1px solid rgba(28,26,22,0.06)" }}>
           <div style={{ width: 40, height: 40, background: "#C96442", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", padding: 6 }}>
@@ -505,7 +505,7 @@ export default function OnboardingChat() {
       </div>
 
       {/* ── Main Content ────────────────────────────────────── */}
-      <div style={{ marginLeft: 400, marginRight: 340, flex: 1, background: "#F7F3EC", display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <div style={{ marginLeft: 320, marginRight: 400, flex: 1, background: "#F7F3EC", display: "flex", flexDirection: "column", minHeight: "100vh" }}>
 
         {/* Chat area */}
         <div style={{ flex: 1, overflow: "auto", padding: "32px 24px", display: "flex", flexDirection: "column" }}>
@@ -611,7 +611,7 @@ export default function OnboardingChat() {
       <DataPanel
         activeSectionId={activeSectionId}
         data={sectionData}
-        integrationSelector={<IntegrationSelector companyId={sessionId} />}
+        integrationSelector={<IntegrationSelector companyId={sessionId} compact />}
       />
 
       <style>{`
