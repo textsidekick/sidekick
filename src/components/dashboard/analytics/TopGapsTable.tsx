@@ -12,9 +12,9 @@ export interface GapItem {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Safety: 'bg-gray-100 text-gray-600',
-  HR: 'bg-gray-100 text-gray-600',
-  Training: 'bg-gray-100 text-gray-600',
+  Safety: 'bg-red-100 text-red-700',
+  HR: 'bg-blue-100 text-blue-700',
+  Training: 'bg-amber-100 text-amber-700',
   General: 'bg-gray-100 text-gray-700',
 }
 

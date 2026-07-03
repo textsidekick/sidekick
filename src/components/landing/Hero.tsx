@@ -60,7 +60,7 @@ export default function Hero() {
             className="absolute -inset-5 rounded-[64px] z-0"
             style={{
               background:
-                "radial-gradient(60% 60% at 50% 40%, rgba(0,96,240,0.08), transparent 70%)",
+                "radial-gradient(60% 60% at 50% 40%, rgba(201,100,66,0.08), transparent 70%)",
               filter: "blur(20px)",
             }}
           />

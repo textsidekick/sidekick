@@ -2,20 +2,22 @@
 
 import { cn } from "@/lib/utils";
 
-const STATUS_STYLES: Record<string, string> = {
-  new: "bg-blue-600 text-white",
-  open: "bg-blue-600 text-white",
-  assigned: "bg-indigo-600 text-white",
-  in_progress: "bg-amber-600 text-white",
-  completed: "bg-emerald-600 text-white",
-  cancelled: "bg-gray-400 text-white",
-  on_hold: "bg-gray-500 text-white",
+type WorkOrderStatus = "open" | "new" | "assigned" | "in_progress" | "completed" | "cancelled" | "on_hold";
+
+const STATUS_CLASSES: Record<string, string> = {
+  new: "bg-blue-100 text-blue-800",
+  open: "bg-blue-100 text-blue-800",
+  assigned: "bg-purple-100 text-purple-800",
+  in_progress: "bg-yellow-100 text-yellow-900",
+  completed: "bg-green-100 text-green-800",
+  cancelled: "bg-gray-100 text-gray-600",
+  on_hold: "bg-gray-100 text-gray-700",
 };
 
 export function StatusBadge({ status }: { status: string }) {
-  const cls = STATUS_STYLES[status] ?? "bg-gray-500 text-white";
+  const cls = STATUS_CLASSES[status] ?? "bg-gray-100 text-gray-700";
   return (
-    <span className={cn("text-[11px] font-semibold tracking-wide px-2.5 py-1 rounded-md", cls)}>
+    <span className={cn("text-xs font-medium px-2 py-1 rounded-full", cls)}>
       {status.replaceAll("_", " ").toUpperCase()}
     </span>
   );

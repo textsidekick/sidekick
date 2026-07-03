@@ -104,7 +104,7 @@ export default function ManagerChat() {
                 <button
                   key={s}
                   onClick={() => sendQuery(s)}
-                  className="text-xs px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full hover:bg-orange-100 transition"
+                  className="text-xs px-3 py-1.5 bg-orange-50 text-[#C96442] rounded-full hover:bg-orange-100 transition"
                 >
                   {s}
                 </button>

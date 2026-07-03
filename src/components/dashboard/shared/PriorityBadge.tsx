@@ -2,17 +2,17 @@
 
 import { cn } from "@/lib/utils";
 
-const PRIORITY_STYLES: Record<string, string> = {
-  critical: "bg-red-600 text-white",
-  high: "bg-amber-600 text-white",
-  medium: "bg-yellow-500 text-white",
-  low: "bg-gray-500 text-white",
+const PRIORITY_CLASSES: Record<string, string> = {
+  critical: "bg-red-100 text-red-800",
+  high: "bg-orange-100 text-orange-800",
+  medium: "bg-yellow-100 text-yellow-900",
+  low: "bg-green-100 text-green-800",
 };
 
 export function PriorityBadge({ priority }: { priority: string }) {
-  const cls = PRIORITY_STYLES[priority] ?? "bg-gray-500 text-white";
+  const cls = PRIORITY_CLASSES[priority] ?? "bg-gray-100 text-gray-700";
   return (
-    <span className={cn("text-[11px] font-semibold tracking-wide px-2.5 py-1 rounded-md", cls)}>
+    <span className={cn("text-xs font-medium px-2 py-1 rounded-full", cls)}>
       {priority.toUpperCase()}
     </span>
   );

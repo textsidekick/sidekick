@@ -32,9 +32,9 @@ const ROLES = ["operator", "technician", "supervisor", "manager"];
 
 function roleBadge(role: string) {
   const cls: Record<string, string> = {
-    manager: "bg-gray-100 text-gray-600",
-    supervisor: "bg-gray-100 text-gray-600",
-    technician: "bg-gray-100 text-gray-600",
+    manager: "bg-purple-100 text-purple-800",
+    supervisor: "bg-blue-100 text-blue-800",
+    technician: "bg-amber-100 text-amber-800",
     operator: "bg-gray-100 text-gray-700",
   };
   return (
@@ -130,7 +130,7 @@ export default function TeamPage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
-              <Users className="h-6 w-6 text-gray-500" /> Team
+              <Users className="h-6 w-6 text-[#C96442]" /> Team
             </h1>
             <p className="text-sm text-gray-500 mt-1">{workers.length} worker{workers.length !== 1 ? "s" : ""} enrolled</p>
           </div>
@@ -175,7 +175,7 @@ export default function TeamPage() {
                     <td className="px-4 py-3 hidden md:table-cell">
                       <div className="flex flex-wrap gap-1">
                         {skills.map((s) => (
-                          <span key={s} className="text-xs px-2 py-0.5 bg-slate-700 text-white rounded-full">{s}</span>
+                          <span key={s} className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">{s}</span>
                         ))}
                       </div>
                     </td>

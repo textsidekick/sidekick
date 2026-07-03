@@ -94,7 +94,7 @@ function WorkersTable({ workers }: WorkersTableProps) {
                   {worker.status === 'verified' ? (
                     <Badge
                       variant="secondary"
-                      className="bg-gray-100 text-gray-600 dark:bg-emerald-950 dark:text-emerald-400 border-transparent"
+                      className="bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400 border-transparent"
                     >
                       <BadgeCheck className="h-3 w-3 mr-1" />
                       Verified

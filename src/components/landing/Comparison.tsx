@@ -52,13 +52,13 @@ export default function Comparison() {
           {/* Sidekick way */}
           <div
             className="rounded-[24px] p-8 border border-accent/30 relative overflow-hidden"
-            style={{ background: "rgba(0,96,240,0.06)" }}
+            style={{ background: "rgba(201,100,66,0.06)" }}
           >
             <div
               className="absolute inset-0 rounded-[24px] pointer-events-none"
               style={{
                 background:
-                  "radial-gradient(60% 60% at 30% 30%, rgba(0,96,240,0.12), transparent 70%)",
+                  "radial-gradient(60% 60% at 30% 30%, rgba(201,100,66,0.12), transparent 70%)",
               }}
             />
             <div className="relative">
@@ -83,7 +83,7 @@ export default function Comparison() {
               </p>
               <div
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold text-white"
-                style={{ background: "#0060F0" }}
+                style={{ background: "#C96442" }}
               >
                 20 seconds
               </div>
