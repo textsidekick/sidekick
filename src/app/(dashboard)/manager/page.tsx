@@ -15,20 +15,15 @@ import {
   Filter, Download, Settings, CheckCircle, User, Search, Plus, QrCode,
   Bell, Activity, ChevronDown, ExternalLink, Copy, Check, Home,
   Calendar, Hash, Globe, Award, TrendingDown, Minus, Car, CalendarDays, Shield, DollarSign, HeartPulse, GraduationCap, Coffee, Shirt, Palmtree,
-  Wrench, AlertCircle, CheckCircle2, CircleDot, ClipboardList, Send, Edit2, XCircle
+  Wrench, AlertCircle, CheckCircle2, CircleDot, ClipboardList, Send, Edit2, XCircle, Info, Clock
 } from "lucide-react";
 
 // ─── New design components ────────────────────────────────────────────────────
 import { MetricCard } from "@/components/dashboard/shared/MetricCard";
 import { SectionHeader } from "@/components/dashboard/shared/SectionHeader";
 import { EmptyState } from "@/components/dashboard/shared/EmptyState";
-import { HealthScoreCard } from "@/components/dashboard/analytics/HealthScoreCard";
-import { QuestionsPerHourChart } from "@/components/dashboard/analytics/QuestionsPerHourChart";
-import { QuestionsChart } from "@/components/dashboard/analytics/QuestionsChart";
-import { ResolutionChart } from "@/components/dashboard/analytics/ResolutionChart";
-import { CategorySummary } from "@/components/dashboard/analytics/CategorySummary";
-import { AnswerSourcesChart } from "@/components/dashboard/analytics/AnswerSourcesChart";
-import { TopGapsTable } from "@/components/dashboard/analytics/TopGapsTable";
+import { StatusBadge } from "@/components/dashboard/shared/StatusBadge";
+import { PriorityBadge } from "@/components/dashboard/shared/PriorityBadge";
 import { FeedCard } from "@/components/dashboard/analytics/FeedCard";
 import { AlertMetrics } from "@/components/dashboard/alerts/AlertMetrics";
 import { AlertCharts } from "@/components/dashboard/alerts/AlertCharts";
@@ -49,6 +44,7 @@ import {
   UnansweredQuestionModal,
   AddCertificationModal,
 } from "@/components/dashboard/modals";
+import { cn } from "@/lib/utils";
 
 // ─── Existing interfaces (unchanged) ─────────────────────────────────────────
 interface Document { id: string; name: string; uploadedAt: string; chunksCount?: number; classification?: { type: string; title: string; confidence: number }; }
@@ -89,23 +85,19 @@ interface ActivityItem {
   id: string; type: "join" | "question" | "gap" | "document" | "issue";
   message: string; time: string; icon: any; color: string;
 }
+interface WorkOrder {
+  id: string;
+  short_id: string;
+  title: string;
+  status: string;
+  priority: string;
+  created_at: string;
+  completed_at?: string | null;
+  assigned_to?: string | null;
+  description?: string;
+}
 
 // ─── Existing helpers (unchanged) ─────────────────────────────────────────────
-const ICON_MAP: Record<string, any> = { Car, CalendarDays, Shield, DollarSign, HeartPulse, Coffee, Shirt, Phone, GraduationCap, Palmtree, MessageSquare };
-const TOPIC_LABELS: Record<string, { label: string; icon: string; color: string; bgColor: string }> = {
-  parking:      { label: "Parking",   icon: "Car",          color: "text-blue-700",   bgColor: "bg-blue-100" },
-  schedule:     { label: "Schedule",  icon: "CalendarDays", color: "text-purple-700", bgColor: "bg-purple-100" },
-  safety:       { label: "Safety",    icon: "Shield",       color: "text-orange-700", bgColor: "bg-orange-100" },
-  compensation: { label: "Pay",       icon: "DollarSign",   color: "text-green-700",  bgColor: "bg-green-100" },
-  benefits:     { label: "Benefits",  icon: "HeartPulse",   color: "text-pink-700",   bgColor: "bg-pink-100" },
-  breaks:       { label: "Breaks",    icon: "Coffee",       color: "text-amber-700",  bgColor: "bg-amber-100" },
-  dress_code:   { label: "Dress Code",icon: "Shirt",        color: "text-indigo-700", bgColor: "bg-indigo-100" },
-  contacts:     { label: "Contacts",  icon: "Phone",        color: "text-cyan-700",   bgColor: "bg-cyan-100" },
-  training:     { label: "Training",  icon: "GraduationCap",color: "text-violet-700", bgColor: "bg-violet-100" },
-  pto:          { label: "Time Off",  icon: "Palmtree",     color: "text-teal-700",   bgColor: "bg-teal-100" },
-  general:      { label: "General",   icon: "MessageSquare",color: "text-slate-700",  bgColor: "bg-slate-100" },
-};
-
 function getAvatarColor(name: string): string {
   const colors = ["bg-[#C96442]","bg-green-500","bg-purple-500","bg-pink-500","bg-indigo-500","bg-cyan-500","bg-orange-500","bg-teal-500"];
   return colors[name ? name.charCodeAt(0) % colors.length : 0];
@@ -121,21 +113,10 @@ function formatTimeAgo(date: string): string {
   if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
   return `${Math.floor(seconds / 86400)}d ago`;
 }
-function AnimatedNumber({ value, duration = 1000 }: { value: number; duration?: number }) {
-  const [displayed, setDisplayed] = useState(0);
-  const ref = useRef<number>(0);
-  useEffect(() => {
-    const start = ref.current; const end = value; const startTime = Date.now();
-    const animate = () => {
-      const progress = Math.min((Date.now() - startTime) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      const current = Math.round(start + (end - start) * eased);
-      setDisplayed(current); ref.current = current;
-      if (progress < 1) requestAnimationFrame(animate);
-    };
-    requestAnimationFrame(animate);
-  }, [value, duration]);
-  return <>{displayed}</>;
+function healthColor(score: number) {
+  if (score >= 85) return "text-green-700";
+  if (score >= 70) return "text-amber-700";
+  return "text-red-700";
 }
 
 // ─── Main component ────────────────────────────────────────────────────────────
@@ -191,6 +172,17 @@ export default function ManagerDashboard() {
   const [showAllQuestions, setShowAllQuestions] = useState(false);
   const [checklistDate, setChecklistDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [trialInfo, setTrialInfo] = useState<{plan: string; questionsUsed: number; questionsLimit: number; trialEndsAt: string} | null>(null);
+  const [showDemoMode, setShowDemoMode] = useState(false);
+
+  // Work orders state
+  const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
+  const [loadingWorkOrders, setLoadingWorkOrders] = useState(false);
+  const [showHealthBreakdown, setShowHealthBreakdown] = useState(false);
+
+  // Check demo mode flag
+  useEffect(() => {
+    setShowDemoMode(localStorage.getItem("sidekick_demo_mode") === "true");
+  }, []);
 
   // All existing derived values (unchanged)
   const currentCompany = companies.find(c => c.id === selectedCompany);
@@ -200,23 +192,15 @@ export default function ManagerDashboard() {
   const openHighPriorityCount = issues.filter(i => i.status === "open" && i.severity === "high").length;
   const weekTrend = stats?.lastWeekCount ? Math.round(((stats.weekCount - stats.lastWeekCount) / Math.max(stats.lastWeekCount, 1)) * 100) : 0;
 
-  const activityFeed: ActivityItem[] = [
-    ...(stats?.recentQuestions || []).slice(0, 3).map(q => ({
-      id: `q-${q.id}`, type: "question" as const,
-      message: `${q.worker_name || "A worker"} asked about ${q.question.slice(0, 30)}...`,
-      time: q.created_at, icon: MessageSquare, color: "text-[#C96442]"
-    })),
-    ...issues.filter(i => i.status === "open").slice(0, 2).map(i => ({
-      id: `i-${i.id}`, type: "issue" as const,
-      message: `${i.worker_name || "Worker"} reported: ${i.description.slice(0, 30)}...`,
-      time: i.created_at, icon: AlertTriangle, color: i.severity === "high" ? "text-red-500" : "text-amber-500"
-    })),
-    ...companyWorkers.slice(0, 2).map(w => ({
-      id: `w-${w.phone}`, type: "join" as const,
-      message: `${w.name || "New worker"} joined the team`,
-      time: w.registered_at || new Date().toISOString(), icon: Users, color: "text-green-500"
-    })),
-  ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 5);
+  // Work order derived values
+  const openWOs = workOrders.filter(wo => ["open", "assigned", "in_progress", "on_hold"].includes(wo.status));
+  const criticalHighWOs = openWOs.filter(wo => wo.priority === "critical" || wo.priority === "high");
+  const overdueWOs = openWOs.filter(wo => {
+    const created = new Date(wo.created_at);
+    const daysSince = (Date.now() - created.getTime()) / (1000 * 60 * 60 * 24);
+    return daysSince > 7;
+  });
+  const recentWOs = [...workOrders].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 8);
 
   // All existing API calls (unchanged)
   useEffect(() => {
@@ -247,7 +231,7 @@ export default function ManagerDashboard() {
         }
       } catch {}
       setCompanies(allCompanies);
-      // Sync company selection from localStorage (set by OpsNav)
+      // Sync company selection from localStorage
       const savedAuth = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
       if (savedAuth.companyId && allCompanies.some((c: any) => c.id === savedAuth.companyId)) {
         setSelectedCompany(savedAuth.companyId);
@@ -264,6 +248,17 @@ export default function ManagerDashboard() {
       fetch(`/api/walkthroughs?companyId=${selectedCompany}`).then(r => r.json()).then(d => setWalkthroughs(d.walkthroughs || []));
     }
   }, [selectedCompany]);
+
+  const loadWorkOrders = async () => {
+    if (!selectedCompany) return;
+    setLoadingWorkOrders(true);
+    try {
+      const res = await fetch(`/api/operations/work-orders?companyId=${selectedCompany}`);
+      const data = await res.json();
+      setWorkOrders(data.workOrders || []);
+    } catch (error) { console.error("Failed to load work orders:", error); }
+    setLoadingWorkOrders(false);
+  };
 
   const loadStats = async () => {
     if (!selectedCompany) return;
@@ -350,18 +345,6 @@ export default function ManagerDashboard() {
     } catch (error) { console.error("Failed to delete certification:", error); }
   };
 
-  const analyzeGaps = async () => {
-    if (!stats?.knowledgeGaps?.length) return;
-    setAnalyzingGaps(true);
-    const res = await fetch("/api/analytics/gaps", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ unansweredQuestions: stats.knowledgeGaps.map(g => ({ question: g.question, count: g.count, topic: "general" })), companyId: selectedCompany })
-    });
-    const data = await res.json();
-    setGaps(data.gaps || []);
-    setAnalyzingGaps(false);
-  };
-
   const generateDraft = async (gap: KnowledgeGapItem) => {
     setGeneratingDraft(gap.id);
     const res = await fetch("/api/analytics/gaps/draft", {
@@ -383,7 +366,7 @@ export default function ManagerDashboard() {
 
   useEffect(() => {
     if (selectedCompany) {
-      if (activeTab === "analytics") { loadStats(); loadGaps(); }
+      if (activeTab === "analytics") { loadStats(); loadGaps(); loadWorkOrders(); }
       if (activeTab === "alerts" || activeTab === "analytics") { loadIssues(); }
       if (activeTab === "workers" || activeTab === "analytics") { loadChecklists(); }
       if (activeTab === "workers") { loadCertifications(); }
@@ -424,9 +407,6 @@ export default function ManagerDashboard() {
 
   const filteredIssues = issues.filter(i => issueFilter === "all" || i.status === issueFilter);
   const workerQuestions = selectedWorker ? (stats?.recentQuestions || []).filter(q => q.worker_phone === selectedWorker.phone) : [];
-  const byHour = stats?.byHour || {};
-  const hours = Array.from({ length: 24 }, (_, i) => i);
-  const maxHourCount = Math.max(...hours.map(h => byHour[h] || 0), 1);
 
   // ─── Adapters: map real data shapes to new component prop shapes ─────────────
 
@@ -472,24 +452,11 @@ export default function ManagerDashboard() {
     uploadDate: d.uploadedAt ? d.uploadedAt.split("T")[0] : new Date().toISOString().split("T")[0],
   }));
 
-  const recentQuestionItems = (stats?.recentQuestions || []).slice(0, 7).map(q => ({
-    id: q.id,
-    text: q.question,
-    timestamp: formatTimeAgo(q.created_at),
-    category: q.topic || "General",
-  }));
-
-  const activityItems = activityFeed.map(a => ({
-    id: a.id,
-    text: a.message,
-    timestamp: formatTimeAgo(a.time),
-  }));
-
-  const mappedGaps = gaps.map(g => ({
-    id: g.id,
-    question: g.suggestedPolicy || g.cluster?.[0] || "Unknown gap",
-    frequency: g.frequency,
-    category: TOPIC_LABELS[g.topic]?.label || g.topic,
+  const activityFeedItems = recentWOs.map(wo => ({
+    id: wo.id,
+    text: `${wo.short_id} · ${wo.title}`,
+    timestamp: formatTimeAgo(wo.created_at),
+    category: wo.status,
   }));
 
   // ─── Render ───────────────────────────────────────────────────────────────────
@@ -543,11 +510,6 @@ export default function ManagerDashboard() {
         onAdd={addCertification}
       />
 
-      {/* ── New design layout ─────────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-30">
-      </div>
-
-
       {/* QR Code Modal */}
       {showQrModal && currentCompany?.access_code && (
         <QRCodeModal
@@ -560,105 +522,165 @@ export default function ManagerDashboard() {
       {/* ── Tab content ───────────────────────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
 
-        {/* ANALYTICS TAB */}
+        {/* ANALYTICS / OVERVIEW TAB */}
         {activeTab === "analytics" && (
           <div className="space-y-6">
-            {/* Quick Stats + Language Badge + Demo Mode — analytics only */}
-            <QuickStats companyId={selectedCompany} />
-            <div className="flex items-center justify-end gap-4">
-              <DemoMode companyId={selectedCompany} />
-            </div>
+            {/* Demo Mode — hidden unless sidekick_demo_mode=true */}
+            {showDemoMode && (
+              <div className="flex items-center justify-end gap-4">
+                <DemoMode companyId={selectedCompany} />
+              </div>
+            )}
 
-            {/* Upgrade banner for trial users — analytics only */}
+            {/* Upgrade banner for trial users */}
             {trialInfo?.plan === "trial" && (
               <UpgradeBanner companyId={selectedCompany} plan={trialInfo.plan} />
             )}
 
-            {stats && stats.totalQuestions === 0 && (
-              <div style={{ maxWidth: 600, margin: "20px auto", textAlign: "center", padding: "40px 24px", background: "white", borderRadius: 16, border: "1px solid rgba(28,26,22,0.08)" }}>
-                <h2 style={{ fontSize: 22, fontWeight: 600, color: "#1C1A16", marginBottom: 8 }}>No questions yet</h2>
-                <p style={{ fontSize: 15, color: "rgba(28,26,22,0.5)", marginBottom: 24 }}>Share your access code with workers so they can start texting questions.</p>
-                <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 20px", background: "rgba(201,100,66,0.08)", borderRadius: 10, fontSize: 14, color: "#A74D30", fontWeight: 500 }}>
-                  Workers text <strong style={{ marginLeft: 4 }}>JOIN {currentCompany?.access_code || "CODE"}</strong> <span style={{ marginLeft: 4 }}>to +1 (888) 707-4659</span>
+            {/* ── Plant Health Score banner ─────────────────────────────────── */}
+            <div className="rounded-2xl bg-white border border-[rgba(28,26,22,0.06)] p-6">
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div>
+                  <div className="text-xs uppercase tracking-wide text-black/40 font-medium">Plant Health Score</div>
+                  <div className="flex items-end gap-2 mt-1">
+                    <div className={cn("text-4xl font-semibold", healthColor(healthScore))}>{healthScore}/100</div>
+                    <button
+                      onClick={() => setShowHealthBreakdown(v => !v)}
+                      className="mb-1 text-black/30 hover:text-black/60 transition"
+                      title="Show breakdown"
+                    >
+                      <Info className="h-4 w-4" />
+                    </button>
+                  </div>
+                  {showHealthBreakdown && stats && (
+                    <div className="mt-2 text-xs text-black/50 bg-black/[0.03] rounded-xl p-3 space-y-1 max-w-xs">
+                      <div>Answer rate: <span className="font-medium text-black/70">{stats.answeredRate}%</span></div>
+                      <div>Avg confidence: <span className="font-medium text-black/70">{stats.avgConfidence}%</span></div>
+                      <div>Question volume: <span className="font-medium text-black/70">{stats.totalQuestions} total</span></div>
+                    </div>
+                  )}
+                </div>
+                <div className="text-sm text-black/50">
+                  {currentCompany?.name && <span className="font-medium text-black/70">{currentCompany.name}</span>}
                 </div>
               </div>
-            )}
 
-            {/* Hero row: 4 metric cards */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <MetricCard label="Questions Today" value={stats?.todayCount || 0} icon={MessageSquare} subtext={`${stats?.weekCount || 0} this week`} change={weekTrend || undefined} />
-              <MetricCard label="Answer Accuracy" value={`${stats?.avgConfidence || 0}%`} icon={Target} subtext={`${stats?.answeredRate || 0}% answered`} />
-              <MetricCard label="Open Issues" value={openIssuesCount} icon={AlertTriangle} iconClassName="h-5 w-5 text-amber-500" accentColor="amber" subtext={openHighPriorityCount > 0 ? `${openHighPriorityCount} urgent` : "View all →"} />
-              <HealthScoreCard score={healthScore} />
+              {/* ── Metric cards row ─────────────────────────────────────────── */}
+              <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <MetricCard
+                  label="Questions Answered"
+                  value={stats?.totalQuestions || 0}
+                  icon={MessageSquare}
+                  subtext={`${stats?.answeredRate || 0}% answer rate`}
+                  change={weekTrend || undefined}
+                />
+                <MetricCard
+                  label="Active Workers"
+                  value={companyWorkers.length}
+                  icon={Users}
+                  accentColor="emerald"
+                  subtext={companyWorkers.filter(w => w.name).length + " verified"}
+                />
+                <MetricCard
+                  label="Open Issues"
+                  value={openIssuesCount}
+                  icon={AlertTriangle}
+                  iconClassName="h-5 w-5 text-amber-500"
+                  accentColor="amber"
+                  subtext={openHighPriorityCount > 0 ? `${openHighPriorityCount} high priority` : "No urgent issues"}
+                />
+                <MetricCard
+                  label="Avg Response Time"
+                  value={stats?.avgResponseTime ? `${stats.avgResponseTime}s` : "—"}
+                  icon={Clock}
+                  subtext="per question"
+                />
+              </div>
             </div>
 
-            {/* Main chart: full width */}
-            <QuestionsPerHourChart data={
-              Array.from({ length: 24 }, (_, i) => ({
-                hour: i === 0 ? '12a' : i < 12 ? `${i}a` : i === 12 ? '12p' : `${i - 12}p`,
-                questions: byHour[i] || 0,
-              }))
-            } />
+            {/* ── Two-column row: Recent Activity + Needs Attention ─────────── */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              {/* Recent Activity Feed */}
+              <div className="rounded-2xl bg-white border border-[rgba(28,26,22,0.06)] p-6">
+                <SectionHeader
+                  title="Recent Activity"
+                  subtitle="Latest work orders"
+                  action={
+                    <a href="/work-orders" className="text-xs text-[#C96442] hover:underline font-medium">View all →</a>
+                  }
+                />
+                <div className="mt-4 space-y-2">
+                  {loadingWorkOrders && (
+                    <div className="text-sm text-black/40 py-4 text-center">Loading…</div>
+                  )}
+                  {!loadingWorkOrders && recentWOs.length === 0 && (
+                    <EmptyState icon={ClipboardList} title="No work orders yet" description="Work orders will appear here once created." />
+                  )}
+                  {!loadingWorkOrders && recentWOs.map(wo => (
+                    <div key={wo.id} className="flex items-start justify-between gap-3 rounded-xl border border-black/5 p-3 hover:bg-[#F7F3EC] transition-colors">
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-medium text-[#1C1A16] truncate">{wo.short_id} · {wo.title}</div>
+                        <div className="mt-1 flex items-center gap-2 flex-wrap">
+                          <span className="text-xs text-black/40">{formatTimeAgo(wo.created_at)}</span>
+                          <PriorityBadge priority={wo.priority} />
+                          <StatusBadge status={wo.status} />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-            {/* Three-column row */}
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-              <CategorySummary data={Object.entries(stats?.byTopic || {}).map(([topic, count]) => {
-                const topicColors: Record<string, string> = {
-                  parking: 'bg-blue-400', schedule: 'bg-purple-400', safety: 'bg-red-400',
-                  compensation: 'bg-green-400', benefits: 'bg-pink-400', breaks: 'bg-amber-400',
-                  dress_code: 'bg-indigo-400', contacts: 'bg-cyan-400', training: 'bg-violet-400',
-                  pto: 'bg-teal-400', general: 'bg-slate-400',
-                };
-                return { name: TOPIC_LABELS[topic]?.label || topic, count: count as number, color: topicColors[topic] || 'bg-gray-400' };
-              })} />
-              <AnswerSourcesChart data={stats ? [
-                { name: 'Answered', value: Math.round((stats.totalQuestions * stats.answeredRate) / 100), color: '#10b981', darkColor: '#34d399' },
-                { name: 'Unanswered', value: Math.round((stats.totalQuestions * (100 - stats.answeredRate)) / 100), color: '#e2e8f0', darkColor: '#475569' },
-              ].filter(d => d.value > 0) : []} />
-              <TopGapsTable gaps={mappedGaps} />
-            </div>
-
-            {/* Two-column row: charts */}
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              <QuestionsChart data={(() => {
-                const byDate: Record<string, number> = {};
-                (stats?.recentQuestions || []).forEach(q => {
-                  const d = q.created_at.split('T')[0];
-                  byDate[d] = (byDate[d] || 0) + 1;
-                });
-                return Object.entries(byDate)
-                  .sort(([a], [b]) => a.localeCompare(b))
-                  .slice(-14)
-                  .map(([date, count]) => ({
-                    label: new Date(date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                    count,
-                  }));
-              })()} />
-              <ResolutionChart data={stats ? [{
-                label: 'Overall',
-                resolved: Math.round((stats.totalQuestions * stats.answeredRate) / 100),
-                unanswered: Math.round((stats.totalQuestions * (100 - stats.answeredRate)) / 100),
-              }] : []} />
-            </div>
-
-            {/* Two-column row: feeds */}
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              <FeedCard
-                title="Recent Questions"
-                icon={MessageSquare}
-                items={recentQuestionItems}
-                emptyTitle="No questions yet"
-                emptyDescription="Questions from workers will appear here."
-                showSeeAll
-                onSeeAll={() => setShowAllQuestions(true)}
-              />
-              <FeedCard
-                title="Activity"
-                icon={Activity}
-                items={activityItems}
-                emptyTitle="No recent activity"
-                emptyDescription="Team activity will show up here."
-              />
+              {/* Needs Attention */}
+              <div className="rounded-2xl bg-white border border-[rgba(28,26,22,0.06)] p-6">
+                <SectionHeader
+                  title="Needs Attention"
+                  subtitle="Critical, high-priority, and overdue items"
+                />
+                <div className="mt-4 space-y-2">
+                  {criticalHighWOs.length === 0 && overdueWOs.length === 0 && (
+                    <div className="text-sm text-black/40 border border-dashed border-black/10 rounded-xl p-6 text-center">
+                      ✅ Nothing urgent right now
+                    </div>
+                  )}
+                  {criticalHighWOs.slice(0, 5).map(wo => (
+                    <div key={wo.id} className="flex items-start gap-3 rounded-xl border border-red-100 bg-red-50/50 p-3">
+                      <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-medium text-[#1C1A16] truncate">{wo.short_id} · {wo.title}</div>
+                        <div className="mt-1 flex items-center gap-2">
+                          <PriorityBadge priority={wo.priority} />
+                          <StatusBadge status={wo.status} />
+                          <span className="text-xs text-black/40">{formatTimeAgo(wo.created_at)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {overdueWOs.filter(wo => !criticalHighWOs.includes(wo)).slice(0, 3).map(wo => (
+                    <div key={wo.id} className="flex items-start gap-3 rounded-xl border border-amber-100 bg-amber-50/50 p-3">
+                      <Clock className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-medium text-[#1C1A16] truncate">{wo.short_id} · {wo.title} <span className="text-xs font-normal text-amber-600 ml-1">overdue</span></div>
+                        <div className="mt-1 flex items-center gap-2">
+                          <PriorityBadge priority={wo.priority} />
+                          <StatusBadge status={wo.status} />
+                          <span className="text-xs text-black/40">{formatTimeAgo(wo.created_at)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {/* Also show open issues */}
+                  {issues.filter(i => i.status === "open" && i.severity === "high").slice(0, 3).map(i => (
+                    <div key={i.id} className="flex items-start gap-3 rounded-xl border border-orange-100 bg-orange-50/50 p-3 cursor-pointer hover:border-orange-200 transition-colors" onClick={() => setSelectedIssue(i)}>
+                      <AlertCircle className="h-4 w-4 text-orange-500 flex-shrink-0 mt-0.5" />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-medium text-[#1C1A16] truncate">{i.description}</div>
+                        <div className="mt-1 text-xs text-black/40">{i.worker_name || "Worker"} · {formatTimeAgo(i.created_at)}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -837,7 +859,6 @@ export default function ManagerDashboard() {
             )}
           </div>
         )}
-
 
       </div>
     </div>

@@ -1,11 +1,11 @@
 "use client";
 
-import { ClipboardList, Wrench, Users, BookOpen, Settings, Home, LogOut, LayoutDashboard, Menu, X } from "lucide-react";
+import { ClipboardList, Wrench, Users, BookOpen, Settings, Home, LogOut, LayoutDashboard, Menu, X, ChevronDown, Building2 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const NAV_ITEMS = [
   { id: "overview", label: "Overview", icon: LayoutDashboard, href: "/manager" },
@@ -16,9 +16,49 @@ const NAV_ITEMS = [
   { id: "settings", label: "Settings", icon: Settings, href: "/settings" },
 ];
 
+interface Company { id: string; name: string; }
+
 export function Sidebar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>("");
+  const [companyDropdownOpen, setCompanyDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    // Load saved company from localStorage
+    try {
+      const authData = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
+      if (authData.companyId) setSelectedCompanyId(authData.companyId);
+    } catch {}
+
+    fetch("/api/companies")
+      .then(r => r.json())
+      .then(d => {
+        const list: Company[] = (d.companies || []).map((c: any) => ({ id: c.id, name: c.name }));
+        setCompanies(list);
+        // Set first company if none selected
+        const saved = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
+        if (!saved.companyId && list.length > 0) {
+          selectCompany(list[0].id);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const selectCompany = (companyId: string) => {
+    setSelectedCompanyId(companyId);
+    setCompanyDropdownOpen(false);
+    try {
+      const authData = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
+      authData.companyId = companyId;
+      localStorage.setItem("sidekick_auth", JSON.stringify(authData));
+      // Dispatch storage event so manager page can react
+      window.dispatchEvent(new StorageEvent("storage", { key: "sidekick_auth" }));
+    } catch {}
+  };
+
+  const selectedCompany = companies.find(c => c.id === selectedCompanyId);
 
   const sidebarContent = (
     <div className="fixed left-0 top-0 bottom-0 w-[220px] bg-white border-r border-[rgba(28,26,22,0.06)] flex flex-col z-50">
@@ -37,6 +77,40 @@ export function Sidebar() {
           <X className="h-5 w-5" />
         </button>
       </div>
+
+      {/* Company Switcher */}
+      {companies.length > 0 && (
+        <div className="relative px-3 pt-3 pb-2 border-b border-[rgba(28,26,22,0.06)]">
+          <button
+            onClick={() => setCompanyDropdownOpen(v => !v)}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-[#F7F3EC] hover:bg-[#ede9e1] transition-colors text-left"
+          >
+            <Building2 className="h-4 w-4 text-[#C96442] flex-shrink-0" />
+            <span className="flex-1 min-w-0 text-xs font-medium text-[#1C1A16] truncate">
+              {selectedCompany?.name || "Select company"}
+            </span>
+            {companies.length > 1 && <ChevronDown className="h-3 w-3 text-black/40 flex-shrink-0" />}
+          </button>
+          {companyDropdownOpen && companies.length > 1 && (
+            <div className="absolute left-3 right-3 top-full mt-1 z-50 bg-white rounded-xl shadow-lg border border-[rgba(28,26,22,0.08)] overflow-hidden">
+              {companies.map(c => (
+                <button
+                  key={c.id}
+                  onClick={() => selectCompany(c.id)}
+                  className={cn(
+                    "w-full text-left px-3 py-2.5 text-xs font-medium transition-colors",
+                    c.id === selectedCompanyId
+                      ? "bg-[#C96442]/10 text-[#C96442]"
+                      : "text-[#1C1A16] hover:bg-[#F7F3EC]"
+                  )}
+                >
+                  {c.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Nav items */}
       <nav className="flex-1 px-3 py-3 overflow-y-auto">
