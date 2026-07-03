@@ -23,9 +23,9 @@ interface AlertsTableProps {
 }
 
 const SEVERITY_STYLES: Record<Severity, string> = {
-  high: 'bg-[#C0392B] text-white dark:bg-red-950 dark:text-red-400 border-transparent',
+  high: 'bg-[#DC2626] text-white dark:bg-red-950 dark:text-red-400 border-transparent',
   medium:
-    'bg-[#D4781C] text-white dark:bg-amber-950 dark:text-amber-400 border-transparent',
+    'bg-[#DB2777] text-white dark:bg-amber-950 dark:text-amber-400 border-transparent',
   low: 'bg-gray-100 text-gray-600 dark:bg-white dark:text-gray-400 border-transparent',
 }
 

@@ -39,9 +39,9 @@ function statusPill(status: AssetStatus) {
     status === "operational"
       ? "bg-[#27AE60] text-white"
       : status === "degraded"
-        ? "bg-[#D4781C] text-white"
+        ? "bg-[#DB2777] text-white"
         : status === "down"
-          ? "bg-[#C0392B] text-white"
+          ? "bg-[#DC2626] text-white"
           : "bg-gray-100 text-gray-700";
   return <span className={cn("text-xs font-medium px-2 py-1 rounded-full", cls)}>{status.toUpperCase()}</span>;
 }
