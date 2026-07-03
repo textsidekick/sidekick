@@ -202,7 +202,7 @@ export default function KnowledgePage() {
                           <div className="text-xs font-semibold text-gray-500 uppercase mb-1">Parts Used</div>
                           <div className="flex gap-2 flex-wrap">
                             {article.parts_used.map((p) => (
-                              <span key={p} className="text-xs px-2 py-1 bg-orange-50 text-[#C96442] rounded">{p}</span>
+                              <span key={p} className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">{p}</span>
                             ))}
                           </div>
                         </div>

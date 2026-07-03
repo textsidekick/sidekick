@@ -85,7 +85,7 @@ export function Sidebar() {
             onClick={() => setCompanyDropdownOpen(v => !v)}
             className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-[#F7F3EC] hover:bg-[#ede9e1] transition-colors text-left"
           >
-            <Building2 className="h-4 w-4 text-[#C96442] flex-shrink-0" />
+            <Building2 className="h-4 w-4 text-gray-500 flex-shrink-0" />
             <span className="flex-1 min-w-0 text-xs font-medium text-[#1C1A16] truncate">
               {selectedCompany?.name || "Select company"}
             </span>
@@ -100,7 +100,7 @@ export function Sidebar() {
                   className={cn(
                     "w-full text-left px-3 py-2.5 text-xs font-medium transition-colors",
                     c.id === selectedCompanyId
-                      ? "bg-[#C96442]/10 text-[#C96442]"
+                      ? "bg-gray-100 text-gray-900 font-semibold"
                       : "text-[#1C1A16] hover:bg-[#F7F3EC]"
                   )}
                 >
@@ -131,11 +131,11 @@ export function Sidebar() {
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] font-medium transition-colors",
                   isActive
-                    ? "bg-[#C96442]/10 text-[#C96442]"
+                    ? "bg-gray-100 text-gray-900 font-semibold"
                     : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
                 )}
               >
-                <item.icon className={cn("h-4 w-4 flex-shrink-0", isActive ? "text-[#C96442]" : "")} />
+                <item.icon className={cn("h-4 w-4 flex-shrink-0", isActive ? "text-gray-900" : "")} />
                 {item.label}
               </Link>
             );

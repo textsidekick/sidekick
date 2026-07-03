@@ -657,7 +657,7 @@ export default function ManagerDashboard() {
                     </div>
                   ))}
                   {overdueWOs.filter(wo => !criticalHighWOs.includes(wo)).slice(0, 3).map(wo => (
-                    <div key={wo.id} className="flex items-start gap-3 rounded-xl border border-amber-100 bg-amber-50/50 p-3">
+                    <div key={wo.id} className="flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3">
                       <Clock className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
                       <div className="min-w-0 flex-1">
                         <div className="text-sm font-medium text-[#1C1A16] truncate">{wo.short_id} · {wo.title} <span className="text-xs font-normal text-amber-600 ml-1">overdue</span></div>
@@ -671,7 +671,7 @@ export default function ManagerDashboard() {
                   ))}
                   {/* Also show open issues */}
                   {issues.filter(i => i.status === "open" && i.severity === "high").slice(0, 3).map(i => (
-                    <div key={i.id} className="flex items-start gap-3 rounded-xl border border-orange-100 bg-orange-50/50 p-3 cursor-pointer hover:border-orange-200 transition-colors" onClick={() => setSelectedIssue(i)}>
+                    <div key={i.id} className="flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3 cursor-pointer hover:border-gray-300 transition-colors" onClick={() => setSelectedIssue(i)}>
                       <AlertCircle className="h-4 w-4 text-orange-500 flex-shrink-0 mt-0.5" />
                       <div className="min-w-0 flex-1">
                         <div className="text-sm font-medium text-[#1C1A16] truncate">{i.description}</div>
@@ -713,7 +713,7 @@ export default function ManagerDashboard() {
                       onClick={() => { if (!answered) { setSelectedUQ(q); setUqAnswer(""); } }}
                     >
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        answered ? "bg-emerald-100" : "bg-amber-100"
+                        answered ? "bg-gray-100" : "bg-gray-100"
                       }`}>
                         <MessageSquare className={`h-4 w-4 ${
                           answered ? "text-emerald-600" : "text-amber-600"
@@ -753,7 +753,7 @@ export default function ManagerDashboard() {
                 <div className="divide-y divide-gray-100">
                   {unansweredQuestions.map((q: any, i: number) => (
                     <div key={q.id || i} onClick={() => { setSelectedUQ(q); setUqAnswer(""); }} className="p-4 flex items-center gap-4 cursor-pointer hover:bg-gray-50">
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-100"><MessageSquare className="w-5 h-5 text-[#C96442]" /></div>
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100"><MessageSquare className="w-5 h-5 text-gray-500" /></div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm text-gray-900">{q.question}</p>
                         <p className="text-xs mt-1 text-gray-400">Asked by {q.worker_name || "Worker"} · {q.created_at ? new Date(q.created_at).toLocaleDateString() : ""}</p>

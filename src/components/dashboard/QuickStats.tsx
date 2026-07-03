@@ -16,10 +16,10 @@ export default function QuickStats({ companyId }: Props) {
   }, [companyId]);
 
   const cards = [
-    { label: "Questions Answered", value: stats?.questions?.toLocaleString() ?? "—", icon: <MessageSquare className="h-5 w-5" />, color: "text-blue-500" },
-    { label: "Avg Response Time", value: stats?.avgTime ?? "—", icon: <Clock className="h-5 w-5" />, color: "text-green-500" },
-    { label: "Languages Detected", value: stats?.languages ?? "—", icon: <Globe className="h-5 w-5" />, color: "text-purple-500" },
-    { label: "Active Workers", value: stats?.workers ?? "—", icon: <Users className="h-5 w-5" />, color: "text-[#C96442]" },
+    { label: "Questions Answered", value: stats?.questions?.toLocaleString() ?? "—", icon: <MessageSquare className="h-5 w-5" />, color: "text-gray-400" },
+    { label: "Avg Response Time", value: stats?.avgTime ?? "—", icon: <Clock className="h-5 w-5" />, color: "text-gray-400" },
+    { label: "Languages Detected", value: stats?.languages ?? "—", icon: <Globe className="h-5 w-5" />, color: "text-gray-400" },
+    { label: "Active Workers", value: stats?.workers ?? "—", icon: <Users className="h-5 w-5" />, color: "text-gray-400" },
   ];
 
   return (

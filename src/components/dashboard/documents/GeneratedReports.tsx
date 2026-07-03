@@ -85,7 +85,7 @@ export default function GeneratedReports({ companyId }: Props) {
     <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
       <div className="p-5 border-b border-gray-100">
         <div className="flex items-center gap-2 mb-1">
-          <FileText className="h-5 w-5 text-[#C96442]" />
+          <FileText className="h-5 w-5 text-gray-500" />
           <h3 className="text-base font-semibold text-gray-900">Generated Reports</h3>
         </div>
         <p className="text-sm text-gray-500">AI-generated documents based on your company knowledge base</p>
