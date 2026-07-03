@@ -73,7 +73,7 @@ export default function Comparison() {
                 </div>
                 <span
                   className="text-[22px] font-serif font-normal"
-                  style={{ color: "#1C1A16" }}
+                  style={{ color: "#111827" }}
                 >
                   Text what you see.
                 </span>

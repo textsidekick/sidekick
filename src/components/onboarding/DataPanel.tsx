@@ -128,7 +128,7 @@ function CompanyPanel({ data }: { data: CompanyData }) {
         }}>
           <f.icon size={16} style={{ color: "rgba(28,26,22,0.3)", flexShrink: 0 }} />
           <span style={{ fontSize: 13, color: "rgba(28,26,22,0.45)", width: 72, flexShrink: 0 }}>{f.label}</span>
-          <span style={{ fontSize: 14, color: "#1C1A16", fontWeight: 500 }}>{f.value}</span>
+          <span style={{ fontSize: 14, color: "#111827", fontWeight: 500 }}>{f.value}</span>
         </div>
       ))}
     </div>
@@ -150,10 +150,10 @@ function AssetPanel({ data }: { data: Asset[] }) {
             background: "rgba(201,100,66,0.08)",
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>
-            <Wrench size={16} style={{ color: "#C96442" }} />
+            <Wrench size={16} style={{ color: "#0060F0" }} />
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: "#1C1A16" }}>{asset.name}</div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: "#111827" }}>{asset.name}</div>
             {(asset.type || asset.location) && (
               <div style={{ fontSize: 12, color: "rgba(28,26,22,0.4)", marginTop: 2 }}>
                 {[asset.type, asset.location].filter(Boolean).join(" · ")}
@@ -188,7 +188,7 @@ function TeamPanel({ data }: { data: TeamMember[] }) {
             {member.name.charAt(0).toUpperCase()}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: "#1C1A16" }}>{member.name}</div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: "#111827" }}>{member.name}</div>
             {member.role && (
               <div style={{ fontSize: 12, color: "rgba(28,26,22,0.4)", marginTop: 2 }}>{member.role}</div>
             )}
@@ -208,7 +208,7 @@ function TeamPanel({ data }: { data: TeamMember[] }) {
 function KnowledgePanel({ data }: { data: KnowledgeDoc[] }) {
   if (data.length === 0) return <EmptyState sectionId="knowledge" />;
   const typeColors: Record<string, string> = {
-    sop: "#C96442", manual: "#2563eb", safety: "#dc2626", other: "#6b7280",
+    sop: "#0060F0", manual: "#2563eb", safety: "#dc2626", other: "#6b7280",
   };
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -219,7 +219,7 @@ function KnowledgePanel({ data }: { data: KnowledgeDoc[] }) {
           display: "flex", alignItems: "center", gap: 12,
         }}>
           <FileText size={18} style={{ color: typeColors[doc.type] || "#6b7280", flexShrink: 0 }} />
-          <span style={{ fontSize: 14, fontWeight: 500, color: "#1C1A16", flex: 1 }}>{doc.name}</span>
+          <span style={{ fontSize: 14, fontWeight: 500, color: "#111827", flex: 1 }}>{doc.name}</span>
           <span style={{
             fontSize: 11, fontWeight: 600, textTransform: "uppercase",
             color: typeColors[doc.type] || "#6b7280",
@@ -250,7 +250,7 @@ function WorkOrderPanel({ data }: { data: WorkOrder[] }) {
           display: "flex", alignItems: "center", gap: 12,
         }}>
           {statusIcons[wo.status]}
-          <span style={{ fontSize: 14, fontWeight: 500, color: "#1C1A16", flex: 1 }}>{wo.title}</span>
+          <span style={{ fontSize: 14, fontWeight: 500, color: "#111827", flex: 1 }}>{wo.title}</span>
           {wo.priority && (
             <span style={{
               fontSize: 11, fontWeight: 600,
@@ -277,7 +277,7 @@ function IntegrationsPanel({ data }: { data: ConnectedIntegration[] }) {
           display: "flex", alignItems: "center", gap: 12,
         }}>
           <Plug size={16} style={{ color: int.status === "connected" ? "#22c55e" : "#f59e0b" }} />
-          <span style={{ fontSize: 14, fontWeight: 500, color: "#1C1A16", flex: 1 }}>{int.name}</span>
+          <span style={{ fontSize: 14, fontWeight: 500, color: "#111827", flex: 1 }}>{int.name}</span>
           <span style={{
             fontSize: 11, fontWeight: 600, textTransform: "uppercase",
             color: int.status === "connected" ? "#22c55e" : "#f59e0b",
@@ -313,10 +313,10 @@ export default function DataPanel({ activeSectionId, data, integrationSelector }
           background: "rgba(201,100,66,0.08)",
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>
-          <Icon size={18} style={{ color: "#C96442" }} />
+          <Icon size={18} style={{ color: "#0060F0" }} />
         </div>
         <div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: "#1C1A16" }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: "#111827" }}>
             {SECTION_TITLES[activeSectionId]}
           </div>
           {itemCount > 0 && (

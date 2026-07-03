@@ -99,7 +99,7 @@ interface WorkOrder {
 
 // ─── Existing helpers (unchanged) ─────────────────────────────────────────────
 function getAvatarColor(name: string): string {
-  const colors = ["bg-[#C96442]","bg-green-500","bg-purple-500","bg-pink-500","bg-indigo-500","bg-cyan-500","bg-orange-500","bg-teal-500"];
+  const colors = ["bg-[#0060F0]","bg-green-500","bg-purple-500","bg-pink-500","bg-indigo-500","bg-cyan-500","bg-blue-500","bg-teal-500"];
   return colors[name ? name.charCodeAt(0) % colors.length : 0];
 }
 function getInitials(name: string): string {
@@ -461,7 +461,7 @@ export default function ManagerDashboard() {
 
   // ─── Render ───────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-[#F7F3EC]">
+    <div className="min-h-screen bg-[#F8F9FC]">
 
       {/* ── Modals ─────────────────────────────────────────────────────────────── */}
       <IssueDetailModal
@@ -606,7 +606,7 @@ export default function ManagerDashboard() {
                   title="Recent Activity"
                   subtitle="Latest work orders"
                   action={
-                    <a href="/work-orders" className="text-xs text-[#C96442] hover:underline font-medium">View all →</a>
+                    <a href="/work-orders" className="text-xs text-[#0060F0] hover:underline font-medium">View all →</a>
                   }
                 />
                 <div className="mt-4 space-y-2">
@@ -617,9 +617,9 @@ export default function ManagerDashboard() {
                     <EmptyState icon={ClipboardList} title="No work orders yet" description="Work orders will appear here once created." />
                   )}
                   {!loadingWorkOrders && recentWOs.map(wo => (
-                    <div key={wo.id} className="flex items-start justify-between gap-3 rounded-xl border border-black/5 p-3 hover:bg-[#F7F3EC] transition-colors">
+                    <div key={wo.id} className="flex items-start justify-between gap-3 rounded-xl border border-black/5 p-3 hover:bg-[#F8F9FC] transition-colors">
                       <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium text-[#1C1A16] truncate">{wo.short_id} · {wo.title}</div>
+                        <div className="text-sm font-medium text-[#111827] truncate">{wo.short_id} · {wo.title}</div>
                         <div className="mt-1 flex items-center gap-2 flex-wrap">
                           <span className="text-xs text-black/40">{formatTimeAgo(wo.created_at)}</span>
                           <PriorityBadge priority={wo.priority} />
@@ -647,7 +647,7 @@ export default function ManagerDashboard() {
                     <div key={wo.id} className="flex items-start gap-3 rounded-xl border border-red-100 bg-red-50/50 p-3">
                       <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
                       <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium text-[#1C1A16] truncate">{wo.short_id} · {wo.title}</div>
+                        <div className="text-sm font-medium text-[#111827] truncate">{wo.short_id} · {wo.title}</div>
                         <div className="mt-1 flex items-center gap-2">
                           <PriorityBadge priority={wo.priority} />
                           <StatusBadge status={wo.status} />
@@ -660,7 +660,7 @@ export default function ManagerDashboard() {
                     <div key={wo.id} className="flex items-start gap-3 rounded-xl border border-amber-100 bg-amber-50/50 p-3">
                       <Clock className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
                       <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium text-[#1C1A16] truncate">{wo.short_id} · {wo.title} <span className="text-xs font-normal text-amber-600 ml-1">overdue</span></div>
+                        <div className="text-sm font-medium text-[#111827] truncate">{wo.short_id} · {wo.title} <span className="text-xs font-normal text-amber-600 ml-1">overdue</span></div>
                         <div className="mt-1 flex items-center gap-2">
                           <PriorityBadge priority={wo.priority} />
                           <StatusBadge status={wo.status} />
@@ -671,10 +671,10 @@ export default function ManagerDashboard() {
                   ))}
                   {/* Also show open issues */}
                   {issues.filter(i => i.status === "open" && i.severity === "high").slice(0, 3).map(i => (
-                    <div key={i.id} className="flex items-start gap-3 rounded-xl border border-orange-100 bg-orange-50/50 p-3 cursor-pointer hover:border-orange-200 transition-colors" onClick={() => setSelectedIssue(i)}>
-                      <AlertCircle className="h-4 w-4 text-orange-500 flex-shrink-0 mt-0.5" />
+                    <div key={i.id} className="flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50/50 p-3 cursor-pointer hover:border-orange-200 transition-colors" onClick={() => setSelectedIssue(i)}>
+                      <AlertCircle className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
                       <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium text-[#1C1A16] truncate">{i.description}</div>
+                        <div className="text-sm font-medium text-[#111827] truncate">{i.description}</div>
                         <div className="mt-1 text-xs text-black/40">{i.worker_name || "Worker"} · {formatTimeAgo(i.created_at)}</div>
                       </div>
                     </div>
@@ -691,7 +691,7 @@ export default function ManagerDashboard() {
                 action={
                   <button
                     onClick={() => setShowAllQuestions(true)}
-                    className="text-xs text-[#C96442] hover:underline font-medium"
+                    className="text-xs text-[#0060F0] hover:underline font-medium"
                   >
                     View all →
                   </button>
@@ -709,7 +709,7 @@ export default function ManagerDashboard() {
                   return (
                     <div
                       key={q.id || i}
-                      className="py-3 flex items-start gap-3 hover:bg-[#F7F3EC] -mx-6 px-6 transition-colors cursor-pointer"
+                      className="py-3 flex items-start gap-3 hover:bg-[#F8F9FC] -mx-6 px-6 transition-colors cursor-pointer"
                       onClick={() => { if (!answered) { setSelectedUQ(q); setUqAnswer(""); } }}
                     >
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
@@ -720,7 +720,7 @@ export default function ManagerDashboard() {
                         }`} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[#1C1A16] line-clamp-2">{q.question}</p>
+                        <p className="text-sm font-medium text-[#111827] line-clamp-2">{q.question}</p>
                         <p className="text-xs text-black/40 mt-0.5">
                           {q.worker_name || "Worker"} · {formatTimeAgo(q.created_at)}
                         </p>
@@ -753,7 +753,7 @@ export default function ManagerDashboard() {
                 <div className="divide-y divide-gray-100">
                   {unansweredQuestions.map((q: any, i: number) => (
                     <div key={q.id || i} onClick={() => { setSelectedUQ(q); setUqAnswer(""); }} className="p-4 flex items-center gap-4 cursor-pointer hover:bg-gray-50">
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-100"><MessageSquare className="w-5 h-5 text-[#C96442]" /></div>
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-100"><MessageSquare className="w-5 h-5 text-[#0060F0]" /></div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm text-gray-900">{q.question}</p>
                         <p className="text-xs mt-1 text-gray-400">Asked by {q.worker_name || "Worker"} · {q.created_at ? new Date(q.created_at).toLocaleDateString() : ""}</p>
@@ -808,7 +808,7 @@ export default function ManagerDashboard() {
                   onClick={() => setWorkersSubTab(sub)}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     workersSubTab === sub
-                      ? "bg-[#C96442] text-white"
+                      ? "bg-[#0060F0] text-white"
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
                 >
@@ -829,7 +829,7 @@ export default function ManagerDashboard() {
                   title="Certifications"
                   subtitle="Worker certification status and expiry dates"
                   action={
-                    <button onClick={() => setShowAddCertModal(true)} className="flex items-center gap-2 px-3 py-1.5 bg-[#C96442] text-white rounded-lg text-sm font-medium hover:opacity-90">
+                    <button onClick={() => setShowAddCertModal(true)} className="flex items-center gap-2 px-3 py-1.5 bg-[#0060F0] text-white rounded-lg text-sm font-medium hover:opacity-90">
                       <Plus className="h-4 w-4" /> Add
                     </button>
                   }

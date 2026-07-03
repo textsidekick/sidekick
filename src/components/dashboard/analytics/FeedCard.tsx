@@ -40,7 +40,7 @@ function FeedCard({
             <button
               type="button"
               onClick={onSeeAll}
-              className="flex items-center gap-0.5 text-xs font-medium text-[#C96442] dark:text-[#C96442] hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+              className="flex items-center gap-0.5 text-xs font-medium text-[#0060F0] dark:text-[#0060F0] hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
             >
               See All
               <ChevronRight className="h-3.5 w-3.5" />

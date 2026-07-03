@@ -7,7 +7,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-export default function PhoneFrame({ scale = 1, time = "9:41", color = "#1C1A16", children }: Props) {
+export default function PhoneFrame({ scale = 1, time = "9:41", color = "#111827", children }: Props) {
   const w = 340;
   const h = 720;
   const px = (n: number) => `${n * scale}px`;

@@ -11,7 +11,7 @@ import Footer from "@/components/landing/Footer";
 
 export default function Page() {
   return (
-    <main className="overflow-hidden" style={{ background: "#F7F3EC", color: "#1C1A16" }}>
+    <main className="overflow-hidden" style={{ background: "#F8F9FC", color: "#111827" }}>
       <Nav />
       <Hero />
       <Logos />

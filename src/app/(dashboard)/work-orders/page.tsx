@@ -87,7 +87,7 @@ function AITriageCard({ triage }: { triage: AITriage | null | undefined }) {
           <span className="text-xs uppercase tracking-wide text-black/40 w-28 shrink-0">Suggested parts</span>
           <div className="flex flex-wrap gap-1">
             {triage.suggested_parts.map((p) => (
-              <span key={p} className="text-xs px-2 py-0.5 bg-orange-50 text-orange-700 rounded-full">{p}</span>
+              <span key={p} className="text-xs px-2 py-0.5 bg-blue-50 text-orange-700 rounded-full">{p}</span>
             ))}
           </div>
         </div>

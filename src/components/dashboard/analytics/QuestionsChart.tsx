@@ -79,8 +79,8 @@ function QuestionsChart({ data = [] }: QuestionsChartProps) {
             <AreaChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="gradient-questions" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#C96442" stopOpacity={0.15} />
-                  <stop offset="100%" stopColor="#C96442" stopOpacity={0} />
+                  <stop offset="0%" stopColor="#0060F0" stopOpacity={0.15} />
+                  <stop offset="100%" stopColor="#0060F0" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid
@@ -104,7 +104,7 @@ function QuestionsChart({ data = [] }: QuestionsChartProps) {
                 type="monotone"
                 dataKey="count"
                 name="Questions"
-                stroke="#C96442"
+                stroke="#0060F0"
                 strokeWidth={2}
                 fill="url(#gradient-questions)"
                 dot={false}

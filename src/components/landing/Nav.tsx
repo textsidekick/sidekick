@@ -30,7 +30,7 @@ export default function Nav() {
       >
         <button onClick={scrollToTop} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", background: "none", border: "none", padding: 0 }}>
           <SidekickLogo size={28} />
-          <span style={{ fontSize: 16, fontWeight: 600, letterSpacing: "-0.02em", color: "#1C1A16", whiteSpace: "nowrap" }}>
+          <span style={{ fontSize: 16, fontWeight: 600, letterSpacing: "-0.02em", color: "#111827", whiteSpace: "nowrap" }}>
             Sidekick
           </span>
         </button>
@@ -45,13 +45,13 @@ export default function Nav() {
         <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: 8 }}>
           <a
             href="/login"
-            style={{ color: "#1C1A16", padding: "8px 14px", borderRadius: 9999, fontSize: 13, fontWeight: 500, textDecoration: "none", whiteSpace: "nowrap" }}
+            style={{ color: "#111827", padding: "8px 14px", borderRadius: 9999, fontSize: 13, fontWeight: 500, textDecoration: "none", whiteSpace: "nowrap" }}
           >
             Login
           </a>
           <a
             href="/login"
-            style={{ background: "#1C1A16", color: "#F7F3EC", padding: "8px 14px", borderRadius: 9999, fontSize: 13, fontWeight: 500, textDecoration: "none", whiteSpace: "nowrap" }}
+            style={{ background: "#111827", color: "#F8F9FC", padding: "8px 14px", borderRadius: 9999, fontSize: 13, fontWeight: 500, textDecoration: "none", whiteSpace: "nowrap" }}
           >
             Try Sidekick
           </a>

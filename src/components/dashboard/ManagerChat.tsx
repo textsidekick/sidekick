@@ -73,7 +73,7 @@ export default function ManagerChat() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#C96442] hover:bg-[#a84f35] text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-105"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#0060F0] hover:bg-[#0052CC] text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-105"
         title="Ask Sidekick"
       >
         <MessageSquare className="w-6 h-6" />
@@ -84,12 +84,12 @@ export default function ManagerChat() {
   return (
     <div className="fixed bottom-6 right-6 z-50 w-[400px] h-[520px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-[#C96442] text-white">
+      <div className="flex items-center justify-between px-4 py-3 bg-[#0060F0] text-white">
         <div className="flex items-center gap-2">
           <MessageSquare className="w-5 h-5" />
           <span className="font-semibold">Ask Sidekick</span>
         </div>
-        <button onClick={() => setIsOpen(false)} className="hover:bg-[#a84f35] rounded p-1 transition">
+        <button onClick={() => setIsOpen(false)} className="hover:bg-[#0052CC] rounded p-1 transition">
           <X className="w-5 h-5" />
         </button>
       </div>
@@ -104,7 +104,7 @@ export default function ManagerChat() {
                 <button
                   key={s}
                   onClick={() => sendQuery(s)}
-                  className="text-xs px-3 py-1.5 bg-orange-50 text-[#C96442] rounded-full hover:bg-orange-100 transition"
+                  className="text-xs px-3 py-1.5 bg-blue-50 text-[#0060F0] rounded-full hover:bg-blue-100 transition"
                 >
                   {s}
                 </button>
@@ -118,7 +118,7 @@ export default function ManagerChat() {
             <div
               className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${
                 msg.role === "user"
-                  ? "bg-[#C96442] text-white rounded-br-md"
+                  ? "bg-[#0060F0] text-white rounded-br-md"
                   : "bg-gray-100 text-gray-900 rounded-bl-md"
               }`}
             >
@@ -160,13 +160,13 @@ export default function ManagerChat() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask about your operations..."
-            className="flex-1 text-sm px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#C96442]"
+            className="flex-1 text-sm px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0060F0]"
             disabled={loading}
           />
           <button
             type="submit"
             disabled={!input.trim() || loading}
-            className="p-2 bg-[#C96442] text-white rounded-lg hover:bg-[#a84f35] disabled:opacity-50 disabled:cursor-not-allowed transition"
+            className="p-2 bg-[#0060F0] text-white rounded-lg hover:bg-[#0052CC] disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
             <Send className="w-4 h-4" />
           </button>

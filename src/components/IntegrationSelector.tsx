@@ -89,14 +89,14 @@ export default function IntegrationSelector({ companyId, onConnect, compact }: I
   return (
     <div style={{ background: "white", border: "1px solid rgba(28,26,22,0.08)", borderRadius: 16, overflow: "hidden", height: "100%" }}>
       <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(28,26,22,0.06)" }}>
-        <h3 style={{ fontSize: 16, fontWeight: 600, color: "#1C1A16", margin: "0 0 4px" }}>Connect Your Tools</h3>
+        <h3 style={{ fontSize: 16, fontWeight: 600, color: "#111827", margin: "0 0 4px" }}>Connect Your Tools</h3>
         <p style={{ fontSize: 13, color: "rgba(28,26,22,0.5)", margin: 0 }}>Pull your company knowledge from anywhere</p>
         <div style={{ display: "flex", gap: 6, marginTop: 12 }}>
           {(["all", "connected"] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)} style={{
               padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 500,
               border: "1px solid rgba(28,26,22,0.1)",
-              background: filter === f ? "#C96442" : "transparent",
+              background: filter === f ? "#0060F0" : "transparent",
               color: filter === f ? "white" : "rgba(28,26,22,0.6)",
               cursor: "pointer", textTransform: "capitalize",
             }}>{f}</button>
@@ -127,7 +127,7 @@ export default function IntegrationSelector({ companyId, onConnect, compact }: I
                 {integration.icon}
               </div>
               <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: "#1C1A16", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "#111827", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   {integration.name}
                   {connected.has(integration.id) && " "}
                 </div>

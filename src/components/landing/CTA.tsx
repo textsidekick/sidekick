@@ -7,7 +7,7 @@ export default function CTA() {
         style={{
           maxWidth: 1180,
           margin: "0 auto",
-          color: "#F7F3EC",
+          color: "#F8F9FC",
           borderRadius: 32,
           padding: "80px 64px",
           background: "linear-gradient(135deg, #0060F0 0%, #004BB8 100%)",
@@ -28,7 +28,7 @@ export default function CTA() {
               lineHeight: 0.98,
               letterSpacing: "-0.025em",
               margin: "0 0 20px",
-              color: "#F7F3EC",
+              color: "#F8F9FC",
             }}
           >
             Give your team a <em style={{ fontStyle: "italic" }}>Sidekick.</em>
@@ -43,8 +43,8 @@ export default function CTA() {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 10,
-                background: "#F7F3EC",
-                color: "#1C1A16",
+                background: "#F8F9FC",
+                color: "#111827",
                 padding: "16px 28px",
                 borderRadius: 9999,
                 fontSize: 15,
