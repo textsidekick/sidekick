@@ -223,7 +223,8 @@ export default function ManagerDashboard() {
       try {
         const authData = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
         const userPhone = authData.phone || "";
-        const isAdmin = ["4088285979", "7813252655", "2243348775"].some(p => userPhone.includes(p));
+        const adminList = process.env.NEXT_PUBLIC_ADMIN_PHONES?.split(",") || [];
+        const isAdmin = adminList.some(p => userPhone.includes(p.trim()));
         if (!isAdmin && userPhone) {
           allCompanies = allCompanies.filter((c: any) => c.manager_phone === userPhone || c.manager_phone === userPhone.replace("+1", "+"));
         } else if (authData.companyId && !isAdmin) {
@@ -713,9 +714,9 @@ export default function ManagerDashboard() {
                       onClick={() => { if (!answered) { setSelectedUQ(q); setUqAnswer(""); } }}
                     >
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        answered ? "bg-emerald-600" : "bg-[#F59E0B]"
+                        answered ? "bg-green-100" : "bg-amber-100"
                       }`}>
-                        <MessageSquare className="h-4 w-4 text-white" />
+                        <MessageSquare className={`h-4 w-4 ${answered ? "text-green-600" : "text-amber-600"}`} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-[#1C1A16] line-clamp-2">{q.question}</p>
@@ -725,8 +726,8 @@ export default function ManagerDashboard() {
                       </div>
                       <span className={`flex-shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${
                         answered
-                          ? "bg-[#27AE60] text-white"
-                          : "bg-[#F59E0B] text-white"
+                          ? "bg-green-100 text-green-700 ring-1 ring-green-200"
+                          : "bg-amber-100 text-amber-700 ring-1 ring-amber-200"
                       }`}>
                         {answered ? "Answered" : "Needs answer"}
                       </span>
@@ -751,12 +752,12 @@ export default function ManagerDashboard() {
                 <div className="divide-y divide-gray-100">
                   {unansweredQuestions.map((q: any, i: number) => (
                     <div key={q.id || i} onClick={() => { setSelectedUQ(q); setUqAnswer(""); }} className="p-4 flex items-center gap-4 cursor-pointer hover:bg-gray-50">
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[#0891B2]"><MessageSquare className="w-5 h-5 text-white" /></div>
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-100"><MessageSquare className="w-5 h-5 text-blue-600" /></div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm text-gray-900">{q.question}</p>
                         <p className="text-xs mt-1 text-gray-400">Asked by {q.worker_name || "Worker"} · {q.created_at ? new Date(q.created_at).toLocaleDateString() : ""}</p>
                       </div>
-                      <span className="text-xs px-2 py-1 rounded-full bg-[#F59E0B] text-white">Needs Answer</span>
+                      <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 ring-1 ring-amber-200">Needs Answer</span>
                     </div>
                   ))}
                 </div>
@@ -854,7 +855,7 @@ export default function ManagerDashboard() {
                               <td className="py-2.5 pr-4 font-medium text-gray-900">{cert.workerName}</td>
                               <td className="py-2.5 pr-4 text-gray-600">{cert.certName}</td>
                               <td className="py-2.5 pr-4 text-gray-500">{new Date(cert.expiryDate).toLocaleDateString()}</td>
-                              <td className="py-2.5"><span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${valid ? "bg-[#27AE60] text-white" : "bg-[#DC2626] text-white"}`}>{valid ? "Valid" : "Expired"}</span></td>
+                              <td className="py-2.5"><span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${valid ? "bg-green-100 text-green-700 ring-1 ring-green-200" : "bg-red-100 text-red-700 ring-1 ring-red-200"}`}>{valid ? "Valid" : "Expired"}</span></td>
                               <td className="py-2.5 text-right"><button onClick={() => deleteCertification(cert.id)} className="text-gray-400 hover:text-red-500"><Trash2 className="h-4 w-4" /></button></td>
                             </tr>
                           );
@@ -900,7 +901,7 @@ export default function ManagerDashboard() {
                               <td className="py-2.5 text-center">{icon(entry.ppeOk)}</td>
                               <td className="py-2.5 text-center">{icon(entry.lotoOk)}</td>
                               <td className="py-2.5 text-center">{icon(entry.equipmentOk)}</td>
-                              <td className="py-2.5"><span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${passed ? "bg-[#27AE60] text-white" : "bg-[#DC2626] text-white"}`}>{passed ? "Passed" : "Failed"}</span></td>
+                              <td className="py-2.5"><span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${passed ? "bg-green-100 text-green-700 ring-1 ring-green-200" : "bg-red-100 text-red-700 ring-1 ring-red-200"}`}>{passed ? "Passed" : "Failed"}</span></td>
                             </tr>
                           );
                         })}

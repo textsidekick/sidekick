@@ -23,10 +23,9 @@ interface AlertsTableProps {
 }
 
 const SEVERITY_STYLES: Record<Severity, string> = {
-  high: 'bg-[#DC2626] text-white dark:bg-red-950 dark:text-red-400 border-transparent',
-  medium:
-    'bg-[#F59E0B] text-white dark:bg-amber-950 dark:text-amber-400 border-transparent',
-  low: 'bg-gray-100 text-gray-600 dark:bg-white dark:text-gray-400 border-transparent',
+  high: 'bg-red-100 text-red-700 ring-1 ring-red-200',
+  medium: 'bg-amber-100 text-amber-700 ring-1 ring-amber-200',
+  low: 'bg-slate-100 text-slate-600 ring-1 ring-slate-200',
 }
 
 const STATUS_DOT_COLORS: Record<AlertStatus, string> = {
@@ -86,7 +85,7 @@ function AlertsTable({ alerts }: AlertsTableProps) {
   const isEmpty = alerts.length === 0
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
+    <div className="rounded-xl border border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
       <SectionHeader
         title="Issues"
         action={
@@ -106,7 +105,7 @@ function AlertsTable({ alerts }: AlertsTableProps) {
         <>
           {/* Filter bar: segmented control + search */}
           <div className="mt-3 mb-4 flex flex-wrap items-center gap-3">
-            <div className="inline-flex rounded-lg bg-gray-100 p-1 dark:bg-white">
+            <div className="inline-flex rounded-lg bg-gray-100 p-1">
               {FILTER_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
@@ -114,8 +113,8 @@ function AlertsTable({ alerts }: AlertsTableProps) {
                   onClick={() => setFilter(opt.value)}
                   className={
                     filter === opt.value
-                      ? 'rounded-md bg-white px-3 py-1.5 text-sm font-medium text-gray-900 transition-all dark:bg-gray-700 dark:text-gray-900 [box-shadow:var(--card-shadow)]'
-                      : 'rounded-md px-3 py-1.5 text-sm font-medium text-gray-500 transition-all hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-600'
+                      ? 'rounded-md bg-white px-3 py-1.5 text-sm font-medium text-gray-900 transition-all dark:bg-gray-700 [box-shadow:var(--card-shadow)]'
+                      : 'rounded-md px-3 py-1.5 text-sm font-medium text-gray-500 transition-all hover:text-gray-700 dark:hover:text-gray-600'
                   }
                 >
                   {opt.label} ({filterCounts[opt.value]})
@@ -123,13 +122,13 @@ function AlertsTable({ alerts }: AlertsTableProps) {
               ))}
             </div>
             <div className="relative ml-auto">
-              <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+              <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search issues..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="h-8 w-48 rounded-lg border border-gray-200 bg-transparent pl-8 pr-3 text-sm text-gray-900 placeholder-gray-400 outline-none transition-colors focus:border-blue-300 focus:ring-1 focus:ring-blue-200 dark:border-gray-200 dark:text-gray-900 dark:placeholder-gray-500 dark:focus:border-blue-700 dark:focus:ring-blue-900"
+                className="h-8 w-48 rounded-lg border border-gray-200 bg-transparent pl-8 pr-3 text-sm text-gray-900 placeholder-gray-400 outline-none transition-colors focus:border-blue-300 focus:ring-1 focus:ring-blue-200 dark:placeholder-gray-500 dark:focus:border-blue-700 dark:focus:ring-blue-900"
               />
             </div>
           </div>
@@ -138,23 +137,23 @@ function AlertsTable({ alerts }: AlertsTableProps) {
           <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="border-b border-gray-100 hover:bg-transparent dark:border-gray-200">
-                <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              <TableRow className="border-b border-gray-100 hover:bg-transparent">
+                <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500">
                   Issue
                 </TableHead>
-                <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500">
                   Worker
                 </TableHead>
-                <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500">
                   Severity
                 </TableHead>
-                <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500">
                   Status
                 </TableHead>
-                <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500">
                   Date
                 </TableHead>
-                <TableHead className="text-right text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                <TableHead className="text-right text-xs font-medium uppercase tracking-wide text-gray-500">
                   Actions
                 </TableHead>
               </TableRow>
@@ -163,12 +162,12 @@ function AlertsTable({ alerts }: AlertsTableProps) {
               {filteredAlerts.map((alert) => (
                 <TableRow
                   key={alert.id}
-                  className="group/row border-b border-gray-100 hover:bg-gray-50 dark:border-gray-200 dark:hover:bg-white/50"
+                  className="group/row border-b border-gray-100 hover:bg-gray-50 dark:hover:bg-white/50"
                 >
-                  <TableCell className="text-sm font-medium text-gray-900 dark:text-gray-900">
+                  <TableCell className="text-sm font-medium text-gray-900">
                     {alert.issue}
                   </TableCell>
-                  <TableCell className="text-sm text-gray-500 dark:text-gray-400">
+                  <TableCell className="text-sm text-gray-500">
                     {alert.worker}
                   </TableCell>
                   <TableCell>
@@ -184,12 +183,12 @@ function AlertsTable({ alerts }: AlertsTableProps) {
                       <span
                         className={`inline-block h-2 w-2 rounded-full ${STATUS_DOT_COLORS[alert.status]}`}
                       />
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                      <span className="text-sm text-gray-500">
                         {capitalize(alert.status)}
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-sm text-gray-500 dark:text-gray-400">
+                  <TableCell className="text-sm text-gray-500">
                     {formatDate(alert.date)}
                   </TableCell>
                   <TableCell>
@@ -198,7 +197,7 @@ function AlertsTable({ alerts }: AlertsTableProps) {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-7 w-7 rounded-md text-gray-400 hover:text-emerald-600 dark:text-gray-500 dark:hover:text-emerald-400"
+                          className="h-7 w-7 rounded-md text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400"
                           title="Mark resolved"
                         >
                           <CheckCircle2 className="h-3.5 w-3.5" />
@@ -207,7 +206,7 @@ function AlertsTable({ alerts }: AlertsTableProps) {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 rounded-md text-gray-400 hover:text-[#C96442] dark:text-gray-500 dark:hover:text-[#C96442]"
+                        className="h-7 w-7 rounded-md text-gray-400 hover:text-[#C96442] dark:hover:text-[#C96442]"
                         title="View details"
                       >
                         <Eye className="h-3.5 w-3.5" />
@@ -215,7 +214,7 @@ function AlertsTable({ alerts }: AlertsTableProps) {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 rounded-md text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-600"
+                        className="h-7 w-7 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-600"
                         title="Dismiss"
                       >
                         <BellOff className="h-3.5 w-3.5" />

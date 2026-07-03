@@ -186,16 +186,7 @@ html, html.dark, [data-theme="dark"] {
   .font-sans { font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif; }
 }
 
-/* Button hover/click effects */
-a, button {
-  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
-}
-a:hover, button:hover {
-  transform: translateY(-1px);
-}
-a:active, button:active {
-  transform: translateY(1px) scale(0.97);
-}
+/* Button hover/click effects — scoped to landing CTAs only */
 
 /* Mobile responsive fixes */
 @media (max-width: 768px) {

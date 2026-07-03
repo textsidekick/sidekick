@@ -27,7 +27,7 @@ function RegistrationCard({ joinCode, smsNumber = '+1 (888) 707-4659' }: Registr
   }
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
+    <div className="rounded-xl border border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
       <SectionHeader
         title="Worker Registration"
         action={
@@ -40,7 +40,7 @@ function RegistrationCard({ joinCode, smsNumber = '+1 (888) 707-4659' }: Registr
 
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <p className="text-xs text-gray-400 dark:text-gray-500">
+          <p className="text-xs text-gray-400">
             Workers text this to join:
           </p>
           {joinCode ? (
@@ -50,7 +50,7 @@ function RegistrationCard({ joinCode, smsNumber = '+1 (888) 707-4659' }: Registr
           ) : (
             <div className="h-8 w-32 bg-gray-100 animate-pulse rounded" />
           )}
-          <p className="text-xs text-gray-400 dark:text-gray-500">
+          <p className="text-xs text-gray-400">
             Send to: {smsNumber}
           </p>
         </div>

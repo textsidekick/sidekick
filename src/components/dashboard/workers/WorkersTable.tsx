@@ -40,7 +40,7 @@ function WorkersTable({ workers }: WorkersTableProps) {
   const verifiedCount = workers.filter((w) => w.status === 'verified').length
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
+    <div className="rounded-xl border border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
       <SectionHeader
         title={`${workers.length} Workers`}
         action={
@@ -60,17 +60,17 @@ function WorkersTable({ workers }: WorkersTableProps) {
         <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="border-b border-gray-100 hover:bg-transparent dark:border-gray-200">
-              <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+            <TableRow className="border-b border-gray-100 hover:bg-transparent">
+              <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500">
                 Name
               </TableHead>
-              <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500">
                 Phone
               </TableHead>
-              <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500">
                 Joined
               </TableHead>
-              <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500">
                 Status
               </TableHead>
             </TableRow>
@@ -79,15 +79,15 @@ function WorkersTable({ workers }: WorkersTableProps) {
             {workers.map((worker) => (
               <TableRow
                 key={worker.id}
-                className="border-b border-gray-100 hover:bg-gray-50 dark:border-gray-200 dark:hover:bg-white/50"
+                className="border-b border-gray-100 hover:bg-gray-50 dark:hover:bg-white/50"
               >
-                <TableCell className="text-sm font-medium text-gray-900 dark:text-gray-900">
+                <TableCell className="text-sm font-medium text-gray-900">
                   {worker.name}
                 </TableCell>
-                <TableCell className="font-mono text-sm text-gray-500 dark:text-gray-400">
+                <TableCell className="font-mono text-sm text-gray-500">
                   {worker.phone}
                 </TableCell>
-                <TableCell className="text-sm text-gray-500 dark:text-gray-400">
+                <TableCell className="text-sm text-gray-500">
                   {formatJoinDate(worker.joinDate)}
                 </TableCell>
                 <TableCell>
@@ -102,7 +102,7 @@ function WorkersTable({ workers }: WorkersTableProps) {
                   ) : (
                     <Badge
                       variant="secondary"
-                      className="bg-gray-100 text-gray-600 dark:bg-white dark:text-gray-400 border-transparent"
+                      className="bg-gray-100 text-gray-600 border-transparent"
                     >
                       Pending
                     </Badge>

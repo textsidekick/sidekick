@@ -39,12 +39,12 @@ const TYPE_BADGE_CLASSES: Record<string, string> = {
   PDF: 'bg-[#DC2626] text-white dark:bg-red-950 dark:text-red-400 border-transparent',
   Word: 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-[#C96442] border-transparent',
   Excel: 'bg-[#27AE60] text-white dark:bg-green-950 dark:text-green-400 border-transparent',
-  Text: 'bg-gray-100 text-gray-600 dark:bg-white dark:text-gray-400 border-transparent',
+  Text: 'bg-gray-100 text-gray-600 border-transparent',
 }
 
 function DocumentsTable({ documents }: DocumentsTableProps) {
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
+    <div className="rounded-xl border border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
       <SectionHeader
         title={`${documents.length} Documents`}
         action={
@@ -64,17 +64,17 @@ function DocumentsTable({ documents }: DocumentsTableProps) {
         <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="border-b border-gray-100 hover:bg-transparent dark:border-gray-200">
-              <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+            <TableRow className="border-b border-gray-100 hover:bg-transparent">
+              <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500">
                 Name
               </TableHead>
-              <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500">
                 Type
               </TableHead>
-              <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500">
                 Size
               </TableHead>
-              <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              <TableHead className="text-xs font-medium uppercase tracking-wide text-gray-500">
                 Uploaded
               </TableHead>
             </TableRow>
@@ -83,9 +83,9 @@ function DocumentsTable({ documents }: DocumentsTableProps) {
             {documents.map((doc) => (
               <TableRow
                 key={doc.id}
-                className="border-b border-gray-100 hover:bg-gray-50 dark:border-gray-200 dark:hover:bg-white/50"
+                className="border-b border-gray-100 hover:bg-gray-50 dark:hover:bg-white/50"
               >
-                <TableCell className="text-sm font-medium text-gray-900 dark:text-gray-900">
+                <TableCell className="text-sm font-medium text-gray-900">
                   {doc.name}
                 </TableCell>
                 <TableCell>
@@ -96,10 +96,10 @@ function DocumentsTable({ documents }: DocumentsTableProps) {
                     {doc.type}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-sm text-gray-500 dark:text-gray-400">
+                <TableCell className="text-sm text-gray-500">
                   {doc.size}
                 </TableCell>
-                <TableCell className="text-sm text-gray-500 dark:text-gray-400">
+                <TableCell className="text-sm text-gray-500">
                   {formatDate(doc.uploadDate)}
                 </TableCell>
               </TableRow>

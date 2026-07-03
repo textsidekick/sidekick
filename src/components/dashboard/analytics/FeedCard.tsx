@@ -32,7 +32,7 @@ function FeedCard({
   onSeeAll,
 }: FeedCardProps) {
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
+    <div className="rounded-xl border border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
       <SectionHeader
         title={title}
         action={
@@ -61,19 +61,19 @@ function FeedCard({
               key={item.id}
               className="flex items-start gap-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-white/50 transition-colors"
             >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-white">
-                <Icon className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100">
+                <Icon className="h-4 w-4 text-gray-400" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm text-gray-900 dark:text-gray-900 truncate">
+                <p className="text-sm text-gray-900 truncate">
                   {item.text}
                 </p>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-xs text-gray-400 dark:text-gray-500">
+                  <span className="text-xs text-gray-400">
                     {item.timestamp}
                   </span>
                   {item.category && (
-                    <span className="text-xs text-gray-400 dark:text-gray-500">
+                    <span className="text-xs text-gray-400">
                       · {item.category}
                     </span>
                   )}
