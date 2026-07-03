@@ -1,14 +1,14 @@
 export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { supabase } from "@/lib/supabase";
 import { createEmbedding } from "@/lib/embeddings";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 async function detectAndTranslate(query: string): Promise<{ language: string; englishQuery: string; isEnglish: boolean }> {
-  const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-6",
+  const response = await openai.chat.completions.create({
+    model: "gpt-4.1",
     max_tokens: 300,
     messages: [{
       role: "user",
@@ -17,7 +17,7 @@ async function detectAndTranslate(query: string): Promise<{ language: string; en
 {"language":"detected language","englishQuery":"English translation","isEnglish":true/false}`
     }]
   });
-  const text = response.content[0].type === "text" ? response.content[0].text : "{}";
+  const text = response.choices[0]?.message?.content || "{}";
   try {
     const cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
     const result = JSON.parse(cleaned);
@@ -33,15 +33,15 @@ async function detectAndTranslate(query: string): Promise<{ language: string; en
 
 async function translateResponse(answer: string, targetLanguage: string): Promise<string> {
   if (targetLanguage.toLowerCase() === "english") return answer;
-  const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-6",
+  const response = await openai.chat.completions.create({
+    model: "gpt-4.1",
     max_tokens: 500,
     messages: [{
       role: "user",
       content: `Translate to ${targetLanguage}. Output ONLY the translation:\n\n${answer}`
     }]
   });
-  return response.content[0].type === "text" ? response.content[0].text : answer;
+  return response.choices[0]?.message?.content || answer;
 }
 
 async function searchDocuments(question: string, companyId: string) {
@@ -78,18 +78,20 @@ export async function POST(request: NextRequest) {
   const sources = relevantChunks.length;
 
   // Step 3: Generate answer in English
-  if (relevantChunks.length > 0 && process.env.ANTHROPIC_API_KEY) {
+  if (relevantChunks.length > 0 && process.env.OPENAI_API_KEY) {
     const context = relevantChunks.map((c: any) => c.content).join("\n\n---\n\n");
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
+    const response = await openai.chat.completions.create({
+      model: "gpt-4.1",
       max_tokens: 500,
-      system: "You're a helpful workplace assistant. Answer based on the documents provided. Be concise and direct.",
-      messages: [{
-        role: "user",
-        content: `Documents:\n${context}\n\nQuestion: ${englishQuery}\n\nAnswer concisely:`
-      }]
+      messages: [
+        { role: "system", content: "You're a helpful workplace assistant. Answer based on the documents provided. Be concise and direct." },
+        {
+          role: "user",
+          content: `Documents:\n${context}\n\nQuestion: ${englishQuery}\n\nAnswer concisely:`
+        }
+      ]
     });
-    answer = response.content[0].type === "text" ? response.content[0].text : "Sorry, I couldn't generate a response.";
+    answer = response.choices[0]?.message?.content || "Sorry, I couldn't generate a response.";
     confidence = relevantChunks.length > 0 ? Math.round(relevantChunks[0].similarity * 100) : 0;
   } else {
     answer = "I don't have information about that. Please ask your manager to upload relevant documents.";

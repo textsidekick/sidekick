@@ -1,9 +1,9 @@
 export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 const systemPrompt = `You are Sidekick's onboarding assistant. You're sharp, intuitive, and efficient.
@@ -79,40 +79,38 @@ export async function POST(request: NextRequest) {
     }
 
     // Stream the response
-    const stream = await anthropic.messages.stream({
-      model: "claude-opus-4-8",
+    const stream = await openai.chat.completions.create({
+      model: "gpt-4.1",
       max_tokens: 256,
-      system: systemPrompt,
-      messages: messages.map((msg: any) => ({
-        role: msg.role,
-        content: msg.content,
-      })),
+      stream: true,
+      messages: [
+        { role: "system", content: systemPrompt },
+        ...messages.map((msg: any) => ({
+          role: msg.role as "user" | "assistant",
+          content: msg.content,
+        })),
+      ],
     });
 
-    // Convert to a readable format
+    // Collect streamed response
     let fullResponse = "";
     for await (const chunk of stream) {
-      if (
-        chunk.type === "content_block_delta" &&
-        chunk.delta.type === "text_delta"
-      ) {
-        fullResponse += chunk.delta.text;
-      }
+      fullResponse += chunk.choices[0]?.delta?.content || "";
     }
 
     // Extract structured data from conversation (lightweight call)
     let extractedData = null;
     try {
-      const extractionRes = await anthropic.messages.create({
-        model: "claude-haiku-4-5-20251001",
+      const extractionRes = await openai.chat.completions.create({
+        model: "gpt-4.1-mini",
         max_tokens: 512,
-        system: extractionPrompt,
         messages: [
-          ...messages.map((msg: any) => ({ role: msg.role, content: msg.content })),
+          { role: "system", content: extractionPrompt },
+          ...messages.map((msg: any) => ({ role: msg.role as "user" | "assistant", content: msg.content })),
           { role: "assistant", content: fullResponse },
-        ].map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
+        ],
       });
-      const extractionText = extractionRes.content[0].type === "text" ? extractionRes.content[0].text : "";
+      const extractionText = extractionRes.choices[0]?.message?.content || "";
       const jsonMatch = extractionText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         extractedData = JSON.parse(jsonMatch[0]);

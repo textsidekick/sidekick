@@ -1,11 +1,11 @@
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { supabase } from "@/lib/supabase";
 import { createEmbedding } from "@/lib/embeddings";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 function chunkText(text: string, maxSize = 800, overlap = 100): string[] {
   const chunks: string[] = [];
@@ -34,15 +34,15 @@ export async function POST(req: NextRequest) {
     if (file.type === "image/png") mediaType = "image/png";
     else if (file.type === "image/webp") mediaType = "image/webp";
 
-    // Extract text from photo via Claude Vision
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
+    // Extract text from photo via Vision
+    const response = await openai.chat.completions.create({
+      model: "gpt-4.1",
       max_tokens: 4000,
       messages: [
         {
           role: "user",
           content: [
-            { type: "image", source: { type: "base64", media_type: mediaType, data: imageData } },
+            { type: "image_url", image_url: { url: `data:${mediaType};base64,${imageData}` } },
             {
               type: "text",
               text: `Extract ALL text from this photo of a standard operating procedure, safety document, work instruction, or similar workplace document. 
@@ -60,7 +60,7 @@ If this is not a document/procedure, describe what you see and note it may not b
       ],
     });
 
-    const extractedText = response.content[0].type === "text" ? response.content[0].text : "";
+    const extractedText = response.choices[0]?.message?.content || "";
 
     if (extractedText.length < 30) {
       return NextResponse.json({ error: "Could not extract meaningful text from image" }, { status: 400 });

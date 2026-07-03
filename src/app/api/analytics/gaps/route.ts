@@ -1,9 +1,9 @@
 export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { supabase } from "@/lib/supabase";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function GET(request: NextRequest) {
   const companyId = request.nextUrl.searchParams.get("companyId") || "default";
@@ -34,8 +34,8 @@ export async function POST(request: NextRequest) {
       .map((q: any) => "- " + q.question + " (asked " + q.count + " times)")
       .join("\n");
 
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
+    const response = await openai.chat.completions.create({
+      model: "gpt-4.1",
       max_tokens: 2000,
       messages: [{
         role: "user",
@@ -57,7 +57,7 @@ Only return the JSON array, no other text.`
       }]
     });
 
-    const text = response.content[0].type === "text" ? response.content[0].text : "[]";
+    const text = response.choices[0]?.message?.content || "[]";
     const cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
     
     let gaps = [];

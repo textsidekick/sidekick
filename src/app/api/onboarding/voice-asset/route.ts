@@ -1,10 +1,8 @@
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
 import OpenAI from "openai";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function POST(req: NextRequest) {
@@ -28,8 +26,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Parse equipment from transcript
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
+    const response = await openai.chat.completions.create({
+      model: "gpt-4.1",
       max_tokens: 1000,
       messages: [
         {
@@ -50,7 +48,7 @@ Respond ONLY with valid JSON array.`,
       ],
     });
 
-    const text = response.content[0].type === "text" ? response.content[0].text : "[]";
+    const text = response.choices[0]?.message?.content || "[]";
     const match = text.match(/\[[\s\S]*\]/);
     const assets = match ? JSON.parse(match[0]) : [];
 

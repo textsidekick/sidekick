@@ -1,10 +1,10 @@
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { supabase } from "@/lib/supabase";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
@@ -71,9 +71,9 @@ export async function GET(req: NextRequest) {
 
       if (unansweredQuestions.length < 2) continue; // Not enough to report
 
-      // Use Claude to categorize the unanswered questions
-      const response = await anthropic.messages.create({
-        model: "claude-sonnet-4-6",
+      // Use OpenAI to categorize the unanswered questions
+      const response = await openai.chat.completions.create({
+        model: "gpt-4.1",
         max_tokens: 300,
         messages: [
           {
@@ -89,7 +89,7 @@ Respond with ONLY the comma-separated topics.`,
         ],
       });
 
-      const topics = response.content[0].type === "text" ? response.content[0].text.trim() : "various topics";
+      const topics = response.choices[0]?.message?.content?.trim() || "various topics";
 
       // Get manager phone
       const { data: manager } = await supabase

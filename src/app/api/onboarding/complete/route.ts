@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { supabase } from "@/lib/supabase";
 import { normalizePhoneNumber } from "@/lib/phone";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || "sk-placeholder",
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || "sk-placeholder",
 });
 
 function generateAccessCode(): string {
@@ -78,16 +78,15 @@ ${conversationText}
 
 Return ONLY valid JSON, no markdown. Include all fields that have data.`;
 
-    console.log("[Complete] Calling Anthropic for extraction...");
+    console.log("[Complete] Calling OpenAI for extraction...");
 
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
+    const response = await openai.chat.completions.create({
+      model: "gpt-4.1",
       max_tokens: 256,
       messages: [{ role: "user", content: extractionPrompt }],
     });
 
-    const rawText =
-      response.content[0]?.type === "text" ? response.content[0].text : "";
+    const rawText = response.choices[0]?.message?.content || "";
     console.log("[Complete] Raw response:", rawText);
 
     // Parse JSON (handle markdown wrapping)

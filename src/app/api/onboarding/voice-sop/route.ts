@@ -1,12 +1,10 @@
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
 import OpenAI from "openai";
 import { supabase } from "@/lib/supabase";
 import { createEmbedding } from "@/lib/embeddings";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 function chunkText(text: string, maxSize = 800, overlap = 100): string[] {
@@ -43,8 +41,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Format as SOP
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
+    const response = await openai.chat.completions.create({
+      model: "gpt-4.1",
       max_tokens: 4000,
       messages: [
         {
@@ -65,7 +63,7 @@ Write it as if it's going in a company manual. Keep the original knowledge but m
       ],
     });
 
-    const sopText = response.content[0].type === "text" ? response.content[0].text : "";
+    const sopText = response.choices[0]?.message?.content || "";
 
     if (sopText.length < 30) {
       return NextResponse.json({ error: "Could not generate SOP from audio" }, { status: 400 });

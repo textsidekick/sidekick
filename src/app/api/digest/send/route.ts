@@ -1,9 +1,9 @@
 export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function POST(request: NextRequest) {
   try {
@@ -63,17 +63,19 @@ export async function POST(request: NextRequest) {
       topCategories: Object.entries(categories).sort((a, b) => b[1] - a[1]).slice(0, 5),
     };
 
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
+    const response = await openai.chat.completions.create({
+      model: "gpt-4.1",
       max_tokens: 1024,
-      system: "Generate a concise, professional weekly email digest for a company manager. Use plain text, no markdown. Keep it under 200 words. Be specific with numbers. End with 1-2 actionable suggestions.",
-      messages: [{
-        role: "user",
-        content: `Weekly digest data for ${context.companyName}:\n- Total questions from workers: ${context.totalQuestions}\n- Unanswered questions: ${context.gapCount}\n- Top unanswered: ${context.topGaps.join(", ") || "None"}\n- Languages used: ${JSON.stringify(context.languages)}\n- Top categories: ${JSON.stringify(context.topCategories)}\n\nGenerate the email digest.`,
-      }],
+      messages: [
+        { role: "system", content: "Generate a concise, professional weekly email digest for a company manager. Use plain text, no markdown. Keep it under 200 words. Be specific with numbers. End with 1-2 actionable suggestions." },
+        {
+          role: "user",
+          content: `Weekly digest data for ${context.companyName}:\n- Total questions from workers: ${context.totalQuestions}\n- Unanswered questions: ${context.gapCount}\n- Top unanswered: ${context.topGaps.join(", ") || "None"}\n- Languages used: ${JSON.stringify(context.languages)}\n- Top categories: ${JSON.stringify(context.topCategories)}\n\nGenerate the email digest.`,
+        }
+      ],
     });
 
-    const digestContent = response.content[0].type === "text" ? response.content[0].text : "";
+    const digestContent = response.choices[0]?.message?.content || "";
 
     // Send via email if manager has email
     const managerEmail = company.manager_email || company.email;

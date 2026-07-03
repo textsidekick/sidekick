@@ -1,9 +1,9 @@
 export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const REPORT_PROMPTS: Record<string, string> = {
   "company-overview": "Generate a comprehensive company overview including company name, industry, size, key policies, and contact information. Format as structured sections with ## headings.",
@@ -34,14 +34,16 @@ export async function POST(request: NextRequest) {
       ? (customPrompt || "Generate a general company report.")
       : (REPORT_PROMPTS[reportType] || REPORT_PROMPTS["company-overview"]);
 
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
+    const response = await openai.chat.completions.create({
+      model: "gpt-4.1",
       max_tokens: 4096,
-      system: "You are a professional report generator for Sidekick, a B2B knowledge base platform. Generate well-structured, professional reports based on the company data provided. Use markdown formatting with ## for section headings, bullet points, and **bold** text. Be specific and actionable. If data is limited, note what additional information would improve the report.",
-      messages: [{ role: "user", content: `Company data:\n${context || "No data imported yet."}\n\nTask: ${prompt}` }],
+      messages: [
+        { role: "system", content: "You are a professional report generator for Sidekick, a B2B knowledge base platform. Generate well-structured, professional reports based on the company data provided. Use markdown formatting with ## for section headings, bullet points, and **bold** text. Be specific and actionable. If data is limited, note what additional information would improve the report." },
+        { role: "user", content: `Company data:\n${context || "No data imported yet."}\n\nTask: ${prompt}` }
+      ],
     });
 
-    const content = response.content[0].type === "text" ? response.content[0].text : "Could not generate report.";
+    const content = response.choices[0]?.message?.content || "Could not generate report.";
 
     return NextResponse.json({
       success: true,

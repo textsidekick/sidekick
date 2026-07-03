@@ -3,15 +3,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import { SectionHeader } from "@/components/dashboard/shared/SectionHeader";
 import { Badge } from "@/components/ui/badge";
-import { Search, BookOpen, Wrench, Clock, Hash, ChevronDown, ChevronUp, Upload } from "lucide-react";
+import { Search, BookOpen, Wrench, Clock, Hash, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { DocumentsTable } from "@/components/dashboard/documents/DocumentsTable";
 import KnowledgeBaseViewer from "@/components/dashboard/documents/KnowledgeBaseViewer";
 import GeneratedReports from "@/components/dashboard/documents/GeneratedReports";
-import GoogleDriveIntegration from "@/components/GoogleDriveIntegration";
-import DropboxIntegration from "@/components/DropboxIntegration";
-import GustoIntegration from "@/components/GustoIntegration";
-import MicrosoftTeamsIntegration from "@/components/MicrosoftTeamsIntegration";
 
 interface KnowledgeArticle {
   id: string;
@@ -37,16 +32,7 @@ interface Document {
   classification?: { type: string; title: string; confidence: number };
 }
 
-type TabId = "articles" | "documents" | "integrations";
-
-const TABS: { id: TabId; label: string }[] = [
-  { id: "articles", label: "Articles" },
-  { id: "documents", label: "Documents" },
-  { id: "integrations", label: "Integrations" },
-];
-
 export default function KnowledgePage() {
-  const [activeTab, setActiveTab] = useState<TabId>("articles");
 
   // Articles state
   const [articles, setArticles] = useState<KnowledgeArticle[]>([]);
@@ -57,10 +43,6 @@ export default function KnowledgePage() {
 
   // Documents state
   const [companyId, setCompanyId] = useState<string>("");
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [uploading, setUploading] = useState(false);
-  const [uploadMsg, setUploadMsg] = useState<string | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
 
   // Load company from localStorage
   useEffect(() => {
@@ -87,42 +69,6 @@ export default function KnowledgePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Load documents when company is known
-  useEffect(() => {
-    if (companyId) {
-      fetch(`/api/documents?companyId=${companyId}`)
-        .then(r => r.json())
-        .then(d => setDocuments(d.documents || []))
-        .catch(() => {});
-    }
-  }, [companyId]);
-
-  async function handleDocUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    setUploadMsg(null);
-    try {
-      const fd = new FormData();
-      fd.append("file", file);
-      if (companyId) fd.append("companyId", companyId);
-      const res = await fetch("/api/documents", { method: "POST", body: fd });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "Upload failed");
-      setDocuments(prev => [...prev, { ...json.document, chunksCount: json.chunksCount, classification: json.classification }]);
-      setUploadMsg(`Uploaded: ${file.name}`);
-    } catch (err: unknown) {
-      setUploadMsg(err instanceof Error ? err.message : "Upload failed");
-    } finally {
-      setUploading(false);
-      if (fileRef.current) fileRef.current.value = "";
-    }
-  }
-
-  async function handleDeleteDocument(id: string) {
-    await fetch(`/api/documents?id=${id}&companyId=${companyId}`, { method: "DELETE" });
-    setDocuments(prev => prev.filter(d => d.id !== id));
-  }
 
   const needsReview = articles.filter(a => !!a.source_work_order_id);
   const filtered = (showReviewOnly ? needsReview : articles).filter(a =>
@@ -134,39 +80,11 @@ export default function KnowledgePage() {
       : true
   );
 
-  const mappedDocuments = documents.map(d => ({
-    id: d.id,
-    name: d.name,
-    type: d.classification?.type || "PDF",
-    size: d.chunksCount ? `${d.chunksCount} chunks` : "—",
-    uploadDate: d.uploadedAt ? d.uploadedAt.split("T")[0] : new Date().toISOString().split("T")[0],
-  }));
-
   return (
     <>
       <div className="min-h-screen">
         <div className="max-w-7xl mx-auto px-6 py-8">
-          {/* Tab bar */}
-          <div className="flex gap-1 border-b border-gray-200 mb-6">
-            {TABS.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={cn(
-                  "px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px",
-                  activeTab === tab.id
-                    ? "border-[#C96442] text-[#C96442]"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
 
-          {/* ── ARTICLES TAB ─────────────────────────────────────────────────── */}
-          {activeTab === "articles" && (
-            <>
               <div className="flex items-start justify-between">
                 <SectionHeader title="Knowledge Base" subtitle="Auto-captured operational intelligence from resolved work orders" />
               </div>
@@ -278,60 +196,9 @@ export default function KnowledgePage() {
                   ))
                 )}
               </div>
-            </>
-          )}
 
-          {/* ── DOCUMENTS TAB ────────────────────────────────────────────────── */}
-          {activeTab === "documents" && (
-            <div className="space-y-6">
-              <SectionHeader title="Documents" subtitle="Upload and manage company documents for Sidekick's knowledge base" />
-
-              <div
-                className="rounded-xl border-2 border-dashed border-gray-200 bg-white p-8 text-center hover:border-[#C96442] transition-colors cursor-pointer"
-                onClick={() => fileRef.current?.click()}
-              >
-                <input ref={fileRef} type="file" className="hidden" accept=".pdf,.txt,.doc,.docx,.xlsx,.csv" onChange={handleDocUpload} disabled={uploading} />
-                <div className="flex flex-col items-center gap-3">
-                  <Upload className="h-8 w-8 text-gray-400" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">{uploading ? "Uploading..." : "Drop files here or click to upload"}</p>
-                    <p className="text-xs text-gray-400 mt-1">PDF, Word, Excel, or text files</p>
-                  </div>
-                </div>
-                {uploadMsg && <p className="text-xs mt-3 text-gray-500">{uploadMsg}</p>}
-              </div>
-
-              <DocumentsTable documents={mappedDocuments} />
               <GeneratedReports companyId={companyId} />
               <KnowledgeBaseViewer companyId={companyId} />
-            </div>
-          )}
-
-          {/* ── INTEGRATIONS TAB ─────────────────────────────────────────────── */}
-          {activeTab === "integrations" && (
-            <div className="space-y-6">
-              <SectionHeader title="Integrations" subtitle="Connect external services to import documents and employee data" />
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <GoogleDriveIntegration
-                  companyId={companyId}
-                  darkMode={false}
-                  onDocumentImported={doc => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title, confidence: 1 } }])}
-                />
-                <DropboxIntegration
-                  companyId={companyId}
-                  darkMode={false}
-                  onDocumentImported={doc => setDocuments(prev => [...prev, { ...doc, name: doc.filename, classification: { type: doc.type, title: doc.title, confidence: 1 } }])}
-                />
-                <MicrosoftTeamsIntegration companyId={companyId} darkMode={false} />
-                <GustoIntegration
-                  companyId={companyId}
-                  darkMode={false}
-                  onEmployeesImported={count => console.log("Imported employees:", count)}
-                />
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </>

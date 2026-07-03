@@ -1,6 +1,6 @@
 export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { supabase } from "@/lib/supabase";
 import { createEmbedding } from "@/lib/embeddings";
 import { normalizePhoneNumber } from "@/lib/phone";
@@ -8,28 +8,28 @@ import { isWhatsAppMessage, stripWhatsAppPrefix } from "@/lib/whatsapp";
 import { detectLanguage as detectLangCode, translateText } from "@/lib/language";
 import { handleSmsOnboarding } from "@/app/api/onboarding/sms-setup/route";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
 const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER;
 
 async function detectLanguage(text: string): Promise<string> {
-  const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-6",
+  const response = await openai.chat.completions.create({
+    model: "gpt-4.1-mini",
     max_tokens: 50,
     messages: [{ role: "user", content: `What language is this? Reply with just the language name: "${text}"` }],
   });
-  return response.content[0].type === "text" ? response.content[0].text.trim() : "English";
+  return response.choices[0]?.message?.content?.trim() || "English";
 }
 
 async function translate(text: string, lang: string): Promise<string> {
   if (lang === "English") return text;
-  const r = await anthropic.messages.create({
-    model: "claude-sonnet-4-6",
+  const r = await openai.chat.completions.create({
+    model: "gpt-4.1-mini",
     max_tokens: 300,
     messages: [{ role: "user", content: `Translate to ${lang}. Only return translation: "${text}"` }],
   });
-  return r.content[0].type === "text" ? r.content[0].text : text;
+  return r.choices[0]?.message?.content || text;
 }
 
 async function findRelevantChunks(companyId: string, question: string): Promise<{ content: string; metadata: any }[]> {
@@ -82,8 +82,8 @@ async function generateResponse(
 
   const context = chunks.map((c) => c.content).join("\n\n---\n\n");
 
-  const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-6",
+  const response = await openai.chat.completions.create({
+    model: "gpt-4.1",
     max_tokens: 300,
     messages: [
       {
@@ -100,7 +100,7 @@ Give a direct, helpful answer. If it's a location question, be specific.`,
     ],
   });
 
-  let text = response.content[0].type === "text" ? response.content[0].text : "";
+  let text = response.choices[0]?.message?.content || "";
   if (lang !== "English") text = await translate(text, lang);
 
   return { response: text, frameUrl };

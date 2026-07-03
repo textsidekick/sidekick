@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function POST(request: NextRequest) {
   const { gap, companyName } = await request.json();
@@ -16,12 +16,12 @@ Suggestion: ${gap.suggestedPolicy}
 Write a clear policy document with: title, purpose, rules, procedures, contact info. Under 400 words. Professional but accessible for blue-collar workers.`;
 
   try {
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
+    const response = await openai.chat.completions.create({
+      model: "gpt-4.1",
       max_tokens: 1500,
       messages: [{ role: "user", content: prompt }]
     });
-    const draft = response.content[0].type === "text" ? response.content[0].text : "";
+    const draft = response.choices[0]?.message?.content || "";
     return NextResponse.json({ draft, topic: gap.topic });
   } catch (error) {
     return NextResponse.json({ error: "Draft generation failed" }, { status: 500 });

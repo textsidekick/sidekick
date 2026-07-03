@@ -1,6 +1,5 @@
 export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
 import OpenAI from "openai";
 import twilio from "twilio";
 import { supabase } from "@/lib/supabase";
@@ -19,7 +18,6 @@ import type { Asset as OpsAsset, UUID } from "@/types/operations";
 import { detectLanguage, translateText } from "@/lib/language";
 import { isWhatsAppMessage, stripWhatsAppPrefix, sendMessage } from "@/lib/whatsapp";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || 'placeholder' });
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || 'placeholder' });
 const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID || 'AC00000000000000000000000000000000', process.env.TWILIO_AUTH_TOKEN || 'placeholder');
 
@@ -208,20 +206,16 @@ If you see warning labels, part numbers, or equipment names, include them.
 Respond ONLY with valid JSON, no markdown or explanation.`;
 
   try {
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
+    const response = await openai.chat.completions.create({
+      model: "gpt-4.1",
       max_tokens: 500,
       messages: [
         {
           role: "user",
           content: [
             {
-              type: "image",
-              source: {
-                type: "base64",
-                media_type: mediaType as "image/jpeg" | "image/png" | "image/gif" | "image/webp",
-                data: base64,
-              },
+              type: "image_url",
+              image_url: { url: `data:${mediaType};base64,${base64}` },
             },
             {
               type: "text",
@@ -232,7 +226,7 @@ Respond ONLY with valid JSON, no markdown or explanation.`;
       ],
     });
 
-    const text = response.content[0].type === "text" ? response.content[0].text : "";
+    const text = response.choices[0]?.message?.content || "";
     
     // Parse JSON response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -300,22 +294,22 @@ DO NOT ask clarifying questions - just answer based on what you see.${sourcesHin
 ${context ? `\nCompany docs that might help:\n${context}` : ""}`;
 
   try {
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
+    const response = await openai.chat.completions.create({
+      model: "gpt-4.1",
       max_tokens: 300,
       messages: [{ role: "user", content: systemPrompt }],
     });
 
-    if (response.content[0].type === "text") {
-      let answer = response.content[0].text;
-      // If Claude still hedges, use our fallback
+    const answer = response.choices[0]?.message?.content || "";
+    if (answer) {
+      // If model still hedges, use our fallback
       if (answer.toLowerCase().includes("don't have") || answer.toLowerCase().includes("cannot identify")) {
         return buildDirectResponse(imageAnalysis, workerQuestion);
       }
       return answer;
     }
   } catch (error) {
-    console.error("[SMS] Claude error for image response:", error);
+    console.error("[SMS] OpenAI error for image response:", error);
   }
 
   return buildDirectResponse(imageAnalysis, workerQuestion);
@@ -355,23 +349,8 @@ function buildDirectResponse(imageAnalysis: ImageAnalysis, workerQuestion?: stri
 
 async function getAIResponse(systemPrompt: string, userMessage: string): Promise<string> {
   try {
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 300,
-      system: systemPrompt,
-      messages: [{ role: "user", content: userMessage }],
-    });
-    
-    if (response.content[0].type === "text") {
-      return response.content[0].text;
-    }
-  } catch (error) {
-    console.error("[SMS] Claude error, falling back to GPT:", error);
-  }
-  
-  try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4.1",
       max_tokens: 300,
       messages: [
         { role: "system", content: systemPrompt },
@@ -381,7 +360,7 @@ async function getAIResponse(systemPrompt: string, userMessage: string): Promise
     
     return response.choices[0]?.message?.content || "Sorry, I couldn't generate a response.";
   } catch (error) {
-    console.error("[SMS] GPT error:", error);
+    console.error("[SMS] OpenAI error:", error);
     return "Sorry, I'm having trouble right now. Please try again in a moment.";
   }
 }

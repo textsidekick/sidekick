@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { createEmbedding } from "@/lib/embeddings";
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Generate a random 6-character access code
 function generateAccessCode(): string {
@@ -204,13 +204,13 @@ export async function POST(request: NextRequest) {
               const transcription = whisperData.text || "";
               
               if (transcription) {
-                const claudeRes = await anthropic.messages.create({
-                  model: "claude-sonnet-4-6",
+                const claudeRes = await openai.chat.completions.create({
+                  model: "gpt-4.1",
                   max_tokens: 1500,
                   messages: [{ role: "user", content: 'Extract Q&A pairs from this voice note about workplace policies:\n\n"' + transcription + '"\n\nReturn ONLY a JSON array like: [{"question":"...","answer":"..."}]' }]
                 });
                 
-                const claudeText = claudeRes.content[0].type === "text" ? claudeRes.content[0].text : "[]";
+                const claudeText = claudeRes.choices[0]?.message?.content || "[]";
                 const cleaned = claudeText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
                 
                 try {
