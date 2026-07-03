@@ -103,7 +103,7 @@ export default function GeneratedReports({ companyId }: Props) {
                 key={report.id}
                 className={`rounded-xl border p-4 transition-all ${
                   isGenerated
-                    ? "border-[#C96442]/30 bg-[#C96442]/5"
+                    ? "border-gray-300 bg-gray-50"
                     : "border-gray-200 bg-white hover:border-gray-300"
                 }`}
               >

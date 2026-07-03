@@ -131,7 +131,7 @@ export default function AnalyticsPage() {
                 value={`${data.workOrders.completionRate}%`}
                 sub={`${data.workOrders.completed} / ${data.workOrders.total} orders`}
                 icon={CheckCircle}
-                color="bg-amber-50 text-amber-600"
+                color="bg-gray-100 text-gray-600"
               />
               <MetricCard
                 label="Avg Asset Health"

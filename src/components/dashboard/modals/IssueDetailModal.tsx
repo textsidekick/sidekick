@@ -30,7 +30,7 @@ export function IssueDetailModal({ issue, onClose, onUpdate, companyName }: Prop
       <div className="bg-white rounded-2xl max-w-lg w-full shadow-xl">
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${issue.severity === "high" ? "bg-red-100" : issue.severity === "medium" ? "bg-amber-100" : "bg-green-100"}`}>
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center bg-gray-100`}>
               <AlertTriangle className={`w-5 h-5 ${issue.severity === "high" ? "text-red-600" : issue.severity === "medium" ? "text-amber-600" : "text-green-600"}`} />
             </div>
             <div>

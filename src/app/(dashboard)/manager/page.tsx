@@ -461,7 +461,7 @@ export default function ManagerDashboard() {
 
   // ─── Render ───────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-[#F7F3EC]">
+    <div className="min-h-screen bg-[#F8F9FC]">
 
       {/* ── Modals ─────────────────────────────────────────────────────────────── */}
       <IssueDetailModal
@@ -617,9 +617,9 @@ export default function ManagerDashboard() {
                     <EmptyState icon={ClipboardList} title="No work orders yet" description="Work orders will appear here once created." />
                   )}
                   {!loadingWorkOrders && recentWOs.map(wo => (
-                    <div key={wo.id} className="flex items-start justify-between gap-3 rounded-xl border border-black/5 p-3 hover:bg-[#F7F3EC] transition-colors">
+                    <div key={wo.id} className="flex items-start justify-between gap-3 rounded-xl border border-black/5 p-3 hover:bg-[#F8F9FC] transition-colors">
                       <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium text-[#1C1A16] truncate">{wo.short_id} · {wo.title}</div>
+                        <div className="text-sm font-medium text-[#111827] truncate">{wo.short_id} · {wo.title}</div>
                         <div className="mt-1 flex items-center gap-2 flex-wrap">
                           <span className="text-xs text-black/40">{formatTimeAgo(wo.created_at)}</span>
                           <PriorityBadge priority={wo.priority} />
@@ -647,7 +647,7 @@ export default function ManagerDashboard() {
                     <div key={wo.id} className="flex items-start gap-3 rounded-xl border border-red-100 bg-red-50/50 p-3">
                       <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
                       <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium text-[#1C1A16] truncate">{wo.short_id} · {wo.title}</div>
+                        <div className="text-sm font-medium text-[#111827] truncate">{wo.short_id} · {wo.title}</div>
                         <div className="mt-1 flex items-center gap-2">
                           <PriorityBadge priority={wo.priority} />
                           <StatusBadge status={wo.status} />
@@ -660,7 +660,7 @@ export default function ManagerDashboard() {
                     <div key={wo.id} className="flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3">
                       <Clock className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
                       <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium text-[#1C1A16] truncate">{wo.short_id} · {wo.title} <span className="text-xs font-normal text-amber-600 ml-1">overdue</span></div>
+                        <div className="text-sm font-medium text-[#111827] truncate">{wo.short_id} · {wo.title} <span className="text-xs font-normal text-amber-600 ml-1">overdue</span></div>
                         <div className="mt-1 flex items-center gap-2">
                           <PriorityBadge priority={wo.priority} />
                           <StatusBadge status={wo.status} />
@@ -674,7 +674,7 @@ export default function ManagerDashboard() {
                     <div key={i.id} className="flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3 cursor-pointer hover:border-gray-300 transition-colors" onClick={() => setSelectedIssue(i)}>
                       <AlertCircle className="h-4 w-4 text-orange-500 flex-shrink-0 mt-0.5" />
                       <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium text-[#1C1A16] truncate">{i.description}</div>
+                        <div className="text-sm font-medium text-[#111827] truncate">{i.description}</div>
                         <div className="mt-1 text-xs text-black/40">{i.worker_name || "Worker"} · {formatTimeAgo(i.created_at)}</div>
                       </div>
                     </div>
@@ -709,18 +709,18 @@ export default function ManagerDashboard() {
                   return (
                     <div
                       key={q.id || i}
-                      className="py-3 flex items-start gap-3 hover:bg-[#F7F3EC] -mx-6 px-6 transition-colors cursor-pointer"
+                      className="py-3 flex items-start gap-3 hover:bg-[#F8F9FC] -mx-6 px-6 transition-colors cursor-pointer"
                       onClick={() => { if (!answered) { setSelectedUQ(q); setUqAnswer(""); } }}
                     >
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                         answered ? "bg-gray-100" : "bg-gray-100"
                       }`}>
                         <MessageSquare className={`h-4 w-4 ${
-                          answered ? "text-emerald-600" : "text-amber-600"
+                          answered ? "text-gray-500" : "text-gray-400"
                         }`} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[#1C1A16] line-clamp-2">{q.question}</p>
+                        <p className="text-sm font-medium text-[#111827] line-clamp-2">{q.question}</p>
                         <p className="text-xs text-black/40 mt-0.5">
                           {q.worker_name || "Worker"} · {formatTimeAgo(q.created_at)}
                         </p>

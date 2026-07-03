@@ -72,7 +72,7 @@ export default function KnowledgePage() {
 
   return (
     <>
-      <div style={{ background: "#F7F3EC", minHeight: "100vh" }}>
+      <div style={{ background: "#F8F9FC", minHeight: "100vh" }}>
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="flex items-start justify-between">
             <SectionHeader title="Knowledge Base" subtitle="Auto-captured operational intelligence from resolved work orders" />
@@ -88,8 +88,8 @@ export default function KnowledgePage() {
           {/* Hero stats */}
           <div className="mt-6 flex items-center gap-4 flex-wrap">
             <div className="bg-white rounded-xl border border-gray-200 px-6 py-4 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-[#C96442]/10 flex items-center justify-center">
-                <BookOpen className="w-6 h-6 text-[#C96442]" />
+              <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center">
+                <BookOpen className="w-6 h-6 text-gray-500" />
               </div>
               <div>
                 <div className="text-3xl font-bold text-gray-900">{articles.length}</div>
@@ -101,12 +101,12 @@ export default function KnowledgePage() {
                 onClick={() => setShowReviewOnly((v) => !v)}
                 className={`rounded-xl border px-6 py-4 flex items-center gap-4 transition text-left ${
                   showReviewOnly
-                    ? "border-[#C96442] bg-[#C96442]/10"
-                    : "border-amber-200 bg-amber-50 hover:bg-amber-100"
+                    ? "border-gray-300 bg-gray-50"
+                    : "border-gray-200 bg-gray-50 hover:bg-gray-100"
                 }`}
               >
-                <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
-                  <BookOpen className="w-6 h-6 text-amber-600" />
+                <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center">
+                  <BookOpen className="w-6 h-6 text-gray-500" />
                 </div>
                 <div>
                   <div className="text-3xl font-bold text-amber-700">{needsReview.length}</div>
