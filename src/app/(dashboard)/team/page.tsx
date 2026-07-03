@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Users, Plus, Trash2, Edit2, CheckCircle, Clock, Award, ClipboardList, CheckCircle2, XCircle, Minus } from "lucide-react";
+import { Users, Plus, Trash2, Edit2, CheckCircle, Clock, Award, ClipboardList, CheckCircle2, XCircle, Minus, ChevronDown, ChevronUp } from "lucide-react";
+import { RegistrationCard } from "@/components/dashboard/workers/RegistrationCard";
 import { cn } from "@/lib/utils";
 import { SectionHeader } from "@/components/dashboard/shared/SectionHeader";
 import { EmptyState } from "@/components/dashboard/shared/EmptyState";
@@ -91,6 +92,11 @@ export default function TeamPage() {
   const [showAddCertModal, setShowAddCertModal] = useState(false);
   const [newCert, setNewCert] = useState({ workerPhone: "", certType: "", expiryDate: "" });
 
+  // Join code
+  const [joinCode, setJoinCode] = useState<string | undefined>(undefined);
+  // Expanded worker row
+  const [expandedWorker, setExpandedWorker] = useState<string | null>(null);
+
   // Safety checklists state
   const [checklists, setChecklists] = useState<Checklist[]>([]);
   const [checklistStats, setChecklistStats] = useState<ChecklistStats | null>(null);
@@ -124,6 +130,7 @@ export default function TeamPage() {
     }
     if (sessionRes.ok) {
       const session = await sessionRes.json();
+      if (session.company?.access_code) setJoinCode(session.company.access_code);
       const cid = session.companyId || companyId;
       if (cid) {
         const woRes = await fetch(`/api/operations/work-orders?companyId=${encodeURIComponent(cid)}`, { cache: "no-store" });
@@ -183,6 +190,13 @@ export default function TeamPage() {
   useEffect(() => {
     loadTeam();
   }, []);
+
+  useEffect(() => {
+    if (companyId) {
+      loadCertifications();
+      loadChecklists();
+    }
+  }, [companyId]);
 
   useEffect(() => {
     if (companyId) {
@@ -287,7 +301,9 @@ export default function TeamPage() {
         {/* ── TEAM TAB ─────────────────────────────────────────────────────── */}
         {activeTab === "team" && (
           <>
-            <div className="flex items-center justify-between mb-6">
+            <RegistrationCard joinCode={joinCode} />
+
+            <div className="flex items-center justify-between mb-6 mt-6">
               <div>
                 <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
                   <Users className="h-6 w-6 text-[#C96442]" /> Team
@@ -311,6 +327,7 @@ export default function TeamPage() {
                 <table className="w-full text-sm">
                   <thead className="border-b border-gray-100 bg-gray-50">
                     <tr>
+                      <th className="px-4 py-3 w-8" />
                       <th className="text-left px-4 py-3 font-medium text-gray-600">Name</th>
                       <th className="text-left px-4 py-3 font-medium text-gray-600">Phone</th>
                       <th className="text-left px-4 py-3 font-medium text-gray-600">Role</th>
@@ -325,8 +342,15 @@ export default function TeamPage() {
                     {workers.map(w => {
                       const skills = ROLE_SKILLS[w.role] || ["General"];
                       const wosCompleted = workOrders.filter(wo => wo.assigned_to === w.id && wo.status === "completed").length;
+                      const isExpanded = expandedWorker === w.id;
+                      const workerCerts = certifications.filter(c => c.worker_phone === w.phone);
+                      const workerChecklists = checklists.filter(c => c.worker_phone === w.phone);
                       return (
-                        <tr key={w.id} className="hover:bg-gray-50">
+                        <>
+                        <tr key={w.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => setExpandedWorker(isExpanded ? null : w.id)}>
+                          <td className="px-4 py-3 text-gray-400">
+                            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                          </td>
                           <td className="px-4 py-3 font-medium text-gray-900">{w.name || <span className="text-gray-400 italic">Unnamed</span>}</td>
                           <td className="px-4 py-3 text-gray-600 font-mono text-xs">{w.phone}</td>
                           <td className="px-4 py-3">{roleBadge(w.role)}</td>
@@ -344,11 +368,57 @@ export default function TeamPage() {
                           <td className="px-4 py-3 text-gray-400 text-xs">{new Date(w.created_at).toLocaleDateString()}</td>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-1 justify-end">
-                              <button onClick={() => openEdit(w)} className="p-1.5 text-gray-400 hover:text-gray-700 rounded"><Edit2 className="h-3.5 w-3.5" /></button>
-                              <button onClick={() => setDeleteConfirmId(w.id)} className="p-1.5 text-gray-400 hover:text-red-500 rounded"><Trash2 className="h-3.5 w-3.5" /></button>
+                              <button onClick={e => { e.stopPropagation(); openEdit(w); }} className="p-1.5 text-gray-400 hover:text-gray-700 rounded"><Edit2 className="h-3.5 w-3.5" /></button>
+                              <button onClick={e => { e.stopPropagation(); setDeleteConfirmId(w.id); }} className="p-1.5 text-gray-400 hover:text-red-500 rounded"><Trash2 className="h-3.5 w-3.5" /></button>
                             </div>
                           </td>
                         </tr>
+                        {isExpanded && (
+                          <tr key={`${w.id}-expanded`} className="bg-gray-50">
+                            <td colSpan={9} className="px-6 py-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Certifications</p>
+                                  {workerCerts.length === 0 ? (
+                                    <p className="text-xs text-gray-400">No certifications</p>
+                                  ) : (
+                                    <ul className="space-y-1">
+                                      {workerCerts.map((c, i) => {
+                                        const valid = new Date(c.expiry_date || c.expiryDate || '') > new Date();
+                                        return (
+                                          <li key={i} className="flex items-center gap-2 text-xs">
+                                            <span className={`px-2 py-0.5 rounded-full font-medium ${valid ? 'bg-green-100 text-gray-700' : 'bg-red-100 text-gray-700'}`}>{valid ? 'Valid' : 'Expired'}</span>
+                                            <span className="text-gray-700">{c.cert_name || c.certType}</span>
+                                            <span className="text-gray-400">· {new Date(c.expiry_date || c.expiryDate || '').toLocaleDateString()}</span>
+                                          </li>
+                                        );
+                                      })}
+                                    </ul>
+                                  )}
+                                </div>
+                                <div>
+                                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Safety Checklists</p>
+                                  {workerChecklists.length === 0 ? (
+                                    <p className="text-xs text-gray-400">No checklists submitted</p>
+                                  ) : (
+                                    <ul className="space-y-1">
+                                      {workerChecklists.slice(0, 5).map((c, i) => {
+                                        const passed = c.ppe_ok && c.loto_ok && c.equipment_ok;
+                                        return (
+                                          <li key={i} className="flex items-center gap-2 text-xs">
+                                            <span className={`px-2 py-0.5 rounded-full font-medium ${passed ? 'bg-green-100 text-gray-700' : 'bg-red-100 text-gray-700'}`}>{passed ? 'Passed' : 'Failed'}</span>
+                                            <span className="text-gray-400">{new Date(c.shift_date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                                          </li>
+                                        );
+                                      })}
+                                    </ul>
+                                  )}
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                        </>
                       );
                     })}
                   </tbody>

@@ -27,7 +27,7 @@ function RegistrationCard({ joinCode, smsNumber = '+1 (888) 707-4659' }: Registr
   }
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
+    <div className="rounded-xl border border-gray-200 bg-white p-5">
       <SectionHeader
         title="Worker Registration"
         action={
@@ -44,7 +44,7 @@ function RegistrationCard({ joinCode, smsNumber = '+1 (888) 707-4659' }: Registr
             Workers text this to join:
           </p>
           {joinCode ? (
-            <p className="font-mono text-2xl font-bold text-[#C96442] dark:text-[#C96442] tracking-wider">
+            <p className="font-mono text-2xl font-bold text-[#C96442] tracking-wider">
               JOIN {joinCode}
             </p>
           ) : (
