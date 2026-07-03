@@ -1,91 +1,115 @@
 import PhoneFrame from "@/components/landing/PhoneFrame";
 import SidekickChat from "@/components/landing/SidekickChat";
+import Reveal from "@/components/landing/Reveal";
 import { YCBadge, HeadlineWithSidekick } from "@/components/landing/Brand";
-import { ArrowIcon, CheckIcon } from "@/components/landing/icons";
+import { ArrowIcon } from "@/components/landing/icons";
 
 const HEADLINE = "Your workers text. Sidekick handles the rest.";
 const SUBHEAD =
-  "A machine acting up. A safety hazard on the floor. A part running low. Your workers see it all — now they can report it in 20 seconds by text. Sidekick triages, assigns, and tracks every issue automatically.";
+  "A machine acting up. A safety hazard on the floor. A part running low. Your workers report it in 20 seconds by text — Sidekick triages, assigns, and tracks every issue automatically.";
 
 export default function Hero() {
   return (
-    <section className="relative px-14 pt-18 pb-15" style={{ paddingTop: 72, paddingBottom: 60 }}>
-      <div className="max-w-[1180px] mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-16 items-center">
+    <section className="relative px-6 pt-36 pb-16 md:px-10 md:pt-44 md:pb-24">
+      <div className="mx-auto grid max-w-[1120px] grid-cols-1 items-center gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
         <div>
-          <div className="mb-6 flex">
-            <YCBadge height={32} />
-          </div>
-          <h1
-            className="font-serif font-normal m-0 mb-7"
-            style={{
-              fontSize: 88,
-              lineHeight: 0.98,
-              letterSpacing: "-0.025em",
-              textWrap: "balance" as React.CSSProperties["textWrap"],
-            }}
-          >
-            <HeadlineWithSidekick text={HEADLINE} />
-          </h1>
-          <p
-            className="text-ink/70 m-0 mb-9 max-w-[520px]"
-            style={{ fontSize: 19, lineHeight: 1.5 }}
-          >
-            {SUBHEAD}
-          </p>
-          <div className="flex items-center gap-3.5">
-            <a
-              href="/login"
-              className="inline-flex items-center gap-2.5 bg-ink text-cream px-[26px] py-4 rounded-full text-[15px] font-medium"
+          <Reveal>
+            <div className="mb-8 flex">
+              <YCBadge height={26} />
+            </div>
+          </Reveal>
+
+          <Reveal delay={80}>
+            <h1
+              className="m-0 mb-6 font-serif font-normal text-ink"
+              style={{
+                fontSize: "clamp(2.75rem, 6.5vw, 5rem)",
+                lineHeight: 1.02,
+                letterSpacing: "-0.03em",
+                textWrap: "balance" as React.CSSProperties["textWrap"],
+              }}
             >
-              Get Started <ArrowIcon size={14} />
-            </a>
-            <a
-              href="https://calendly.com/justin-textsidekick"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center border border-ink/15 bg-transparent text-ink px-[22px] py-[15px] rounded-full text-[15px] font-medium"
+              <HeadlineWithSidekick text={HEADLINE} />
+            </h1>
+          </Reveal>
+
+          <Reveal delay={160}>
+            <p
+              className="m-0 mb-10 max-w-[500px] font-light text-[rgba(28,26,22,0.65)]"
+              style={{ fontSize: "clamp(1.0625rem, 1.6vw, 1.1875rem)", lineHeight: 1.6 }}
             >
-              Book a walkthrough
-            </a>
-          </div>
-          <div className="flex items-center gap-2 mt-7 text-[13px] text-ink/55">
-            <span className="text-accent">
-              <CheckIcon size={14} w={2.4} />
-            </span>
-            No app download · Works on any phone · Set up in 90 seconds
-          </div>
+              {SUBHEAD}
+            </p>
+          </Reveal>
+
+          <Reveal delay={240}>
+            <div className="flex flex-wrap items-center gap-3">
+              <a
+                href="/login"
+                className="btn inline-flex items-center gap-2.5 rounded-full bg-ink px-7 py-[15px] text-[15px] font-medium text-cream no-underline hover:bg-[#33302a]"
+                style={{ boxShadow: "0 1px 2px rgba(28,26,22,0.12), 0 8px 24px -12px rgba(28,26,22,0.35)" }}
+              >
+                Get started
+                <span className="btn-arrow inline-flex">
+                  <ArrowIcon size={14} />
+                </span>
+              </a>
+              <a
+                href="https://calendly.com/justin-textsidekick"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn inline-flex items-center rounded-full border border-[rgba(28,26,22,0.14)] px-6 py-[14px] text-[15px] font-medium text-ink no-underline hover:border-[rgba(28,26,22,0.28)] hover:bg-[rgba(28,26,22,0.03)]"
+              >
+                Book a walkthrough
+              </a>
+            </div>
+
+            <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-[rgba(28,26,22,0.5)]">
+              {["No app download", "Works on any phone", "Set up in 90 seconds"].map((t) => (
+                <span key={t} className="inline-flex items-center gap-1.5">
+                  <span className="block h-1 w-1 rounded-full bg-accent" style={{ opacity: 0.7 }} />
+                  {t}
+                </span>
+              ))}
+            </div>
+          </Reveal>
         </div>
-        <div className="flex justify-center relative">
+
+        {/* Phone */}
+        <Reveal delay={200} className="relative flex justify-center lg:justify-end">
           <div
-            className="absolute -inset-5 rounded-[64px] z-0"
+            aria-hidden
+            className="absolute -inset-10 z-0"
             style={{
               background:
-                "radial-gradient(60% 60% at 50% 40%, rgba(201,100,66,0.08), transparent 70%)",
-              filter: "blur(20px)",
+                "radial-gradient(55% 50% at 50% 42%, rgba(201,100,66,0.09) 0%, rgba(201,100,66,0.03) 45%, transparent 72%)",
             }}
           />
           <div className="relative z-10">
             <PhoneFrame scale={0.92}>
               <SidekickChat />
             </PhoneFrame>
-          </div>
-          <div
-            className="absolute z-20 bg-white border border-ink/10 rounded-[14px] px-3.5 py-2.5 max-w-[200px]"
-            style={{
-              top: 40,
-              left: -30,
-              boxShadow: "0 8px 24px rgba(28,26,22,0.06)",
-              fontSize: 12,
-              color: "rgba(28,26,22,0.7)",
-              transform: "rotate(-3deg)",
-            }}
-          >
-            <div className="font-semibold text-ink mb-0.5">
-              Any phone, any language.
+
+            {/* Grounded status chip — replaces the rotated sticky note */}
+            <div
+              className="absolute -left-6 bottom-16 z-20 hidden items-center gap-2.5 rounded-full border border-[rgba(28,26,22,0.08)] py-2.5 pl-3.5 pr-4 md:flex"
+              style={{
+                background: "rgba(252,249,243,0.85)",
+                backdropFilter: "blur(12px)",
+                boxShadow: "0 1px 2px rgba(28,26,22,0.04), 0 12px 32px -16px rgba(28,26,22,0.16)",
+              }}
+            >
+              <span
+                className="block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent"
+                style={{ animation: "sk-pulse 2.4s ease-in-out infinite" }}
+              />
+              <span className="text-[12.5px] font-medium text-ink">
+                Any phone. Any language.{" "}
+                <span className="font-normal text-[rgba(28,26,22,0.55)]">No app.</span>
+              </span>
             </div>
-            Workers text issues just like they text a coworker.
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   );

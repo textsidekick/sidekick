@@ -1,124 +1,132 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ink: #1c1a16;
+  --cream: #f7f3ec;
+  --cream-2: #fcf9f3;
+  --accent: #c96442;
+  --accent-deep: #a74d30;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+::selection {
+  background: rgba(201, 100, 66, 0.18);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* Custom animations */
-@keyframes gradient {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+/* ------- Scroll reveal (driven by IntersectionObserver, not loops) ------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
 }
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
 }
-
-@keyframes float-delay {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-15px); }
-}
-
-.animate-gradient {
-  background-size: 200% 200%;
-  animation: gradient 3s ease infinite;
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-.animate-float-delay {
-  animation: float-delay 4s ease-in-out infinite;
-}
-
-/* Smooth fade-in animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
+    transition: none;
   }
 }
 
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+/* ------- Interactive elements: color/shadow transitions only ------- */
+.btn {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.25s ease;
+}
+.btn:active {
+  transition-duration: 0.05s;
 }
 
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+/* Arrow nudge on button hover — the icon moves, not the button */
+.btn .btn-arrow {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn:hover .btn-arrow {
+  transform: translateX(3px);
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.6s ease-out;
+/* Quiet link underline reveal */
+.link-quiet {
+  transition: color 0.2s ease;
 }
 
-.animate-slide-in-left {
-  animation: slideInLeft 0.6s ease-out;
+@keyframes sk-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
 }
 
-.animate-slide-in-right {
-  animation: slideInRight 0.6s ease-out;
+@layer utilities {
+  .bg-cream { background-color: var(--cream); }
+  .bg-cream2 { background-color: var(--cream-2); }
+  .text-ink { color: var(--ink); }
+  .bg-ink { background-color: var(--ink); }
+  .text-cream { color: var(--cream); }
+  .text-accent { color: var(--accent); }
+  .bg-accent { background-color: var(--accent); }
+  .font-serif { font-family: var(--font-instrument), ui-serif, Georgia, serif; }
+  .font-sans { font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif; }
+
+  /* Extra opacity utilities used in landing */
+  .text-ink\/5 { color: rgba(28,26,22,0.05); }
+  .text-ink\/10 { color: rgba(28,26,22,0.1); }
+  .text-ink\/50 { color: rgba(28,26,22,0.5); }
+  .text-ink\/55 { color: rgba(28,26,22,0.55); }
+  .text-ink\/60 { color: rgba(28,26,22,0.6); }
+  .text-ink\/65 { color: rgba(28,26,22,0.65); }
+  .text-ink\/70 { color: rgba(28,26,22,0.7); }
+  .text-ink\/75 { color: rgba(28,26,22,0.75); }
+  .bg-ink\/5 { background-color: rgba(28,26,22,0.05); }
+  .bg-ink\/10 { background-color: rgba(28,26,22,0.1); }
+  .border-ink\/5 { border-color: rgba(28,26,22,0.05); }
+  .border-ink\/6 { border-color: rgba(28,26,22,0.06); }
+  .border-ink\/7 { border-color: rgba(28,26,22,0.07); }
+  .border-ink\/8 { border-color: rgba(28,26,22,0.08); }
+  .border-ink\/10 { border-color: rgba(28,26,22,0.1); }
+  .border-ink\/14 { border-color: rgba(28,26,22,0.14); }
+  .border-ink\/15 { border-color: rgba(28,26,22,0.15); }
+  .bg-cream\/85 { background-color: rgba(247,243,236,0.85); }
+  .bg-accent\/5 { background-color: rgba(201,100,66,0.05); }
+  .bg-accent\/70 { background-color: rgba(201,100,66,0.7); }
 }
 
-/* Smooth hover transitions */
+/* Hover lift utility — explicit opt-in only, not global */
 .hover-lift {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
 .hover-lift:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
 }
 
-/* Responsive hero background */
-
 /* Dashboard CSS variables — light mode */
 :root {
+  --background: #F7F3EC;
+  --foreground: #1C1A16;
   --page-bg: #f9fafb;
   --card-bg: #ffffff;
   --card-shadow: 0 1px 3px rgba(0,0,0,0.08);
   --card-shadow-hover: 0 4px 12px rgba(0,0,0,0.12);
   --border-subtle: #f0f0f0;
+  --card-text: #111827;
+  --card-text-secondary: #6b7280;
 }
 
 /* Dashboard CSS variables — dark mode (next-themes uses .dark class) */
@@ -128,31 +136,11 @@ body {
   --card-shadow: 0 1px 3px rgba(0,0,0,0.3);
   --card-shadow-hover: 0 4px 12px rgba(0,0,0,0.5);
   --border-subtle: #2a2d3a;
-  --background: #0f1117;
-  --foreground: #ededed;
-}
-
-/* Force correct text colors in light mode */
-:root {
-  color-scheme: light;
-}
-
-.dark {
-  color-scheme: dark;
-}
-
-/* Ensure dashboard cards have correct text in light mode */
-:root {
-  --card-text: #111827;
-  --card-text-secondary: #6b7280;
-}
-
-.dark {
   --card-text: #ffffff;
   --card-text-secondary: #9ca3af;
 }
 
-/* Force light mode - override all dark variants */
+/* Force light mode */
 html, html.dark, [data-theme="dark"] {
   color-scheme: light !important;
   --background: #F7F3EC !important;
@@ -163,45 +151,15 @@ html, html.dark, [data-theme="dark"] {
   color-scheme: light !important;
 }
 
-/* Landing page color utilities */
-@layer utilities {
-  .bg-cream { background-color: #F7F3EC; }
-  .bg-cream2 { background-color: #FAF6EE; }
-  .bg-cream\/85 { background-color: rgba(247,243,236,0.85); }
-  .text-ink { color: #1C1A16; }
-  .text-ink\/5 { color: rgba(28,26,22,0.05); }
-  .text-ink\/10 { color: rgba(28,26,22,0.1); }
-  .text-ink\/50 { color: rgba(28,26,22,0.5); }
-  .text-ink\/70 { color: rgba(28,26,22,0.7); }
-  .text-ink\/75 { color: rgba(28,26,22,0.75); }
-  .bg-ink { background-color: #1C1A16; }
-  .bg-ink\/5 { background-color: rgba(28,26,22,0.05); }
-  .bg-ink\/10 { background-color: rgba(28,26,22,0.1); }
-  .text-cream { color: #F7F3EC; }
-  .text-accent { color: #C96442; }
-  .bg-accent { background-color: #C96442; }
-  .border-ink\/10 { border-color: rgba(28,26,22,0.1); }
-  .border-ink\/5 { border-color: rgba(28,26,22,0.05); }
-  .font-serif { font-family: var(--font-instrument), ui-serif, Georgia, serif; }
-  .font-sans { font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif; }
-}
-
-/* Button hover/click effects */
-a, button {
-  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
-}
-a:hover, button:hover {
-  transform: translateY(-1px);
-}
-a:active, button:active {
-  transform: translateY(1px) scale(0.97);
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 /* Mobile responsive fixes */
 @media (max-width: 768px) {
   .max-w-7xl { padding-left: 12px !important; padding-right: 12px !important; }
-  .grid-cols-2, .grid-cols-3, .grid-cols-4 { grid-template-columns: 1fr !important; }
-  .lg\:grid-cols-2, .lg\:grid-cols-3, .lg\:grid-cols-4 { grid-template-columns: 1fr !important; }
   table { display: block; overflow-x: auto; }
   .space-y-6 > * { overflow-x: hidden; }
 }

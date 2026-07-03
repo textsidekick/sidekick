@@ -1,30 +1,34 @@
+import Reveal from "@/components/landing/Reveal";
+
 const LOGOS = [
-  { name: "EDS Manufacturing", mono: false },
-  { name: "IPI Plastics", mono: true },
-  { name: "S&F Electropolishing", mono: false },
-  { name: "3D Dynamics Manufacturing", mono: true },
+  "EDS Manufacturing",
+  "IPI Plastics",
+  "S&F Electropolishing",
+  "3D Dynamics",
 ];
 
 export default function Logos() {
   return (
-    <section className="px-14 pt-8 pb-16">
-      <div className="text-center text-xs uppercase tracking-[0.12em] text-ink/50 mb-8">
-        Trusted by teams across industries
-      </div>
-      <div className="flex items-center justify-center flex-wrap max-w-[1040px] mx-auto gap-x-8 gap-y-4 opacity-90">
-        {LOGOS.map((l) => (
-          <div
-            key={l.name}
-            className={
-              l.mono
-                ? "font-mono text-[18px] md:text-[22px] text-ink/55 tracking-wide whitespace-nowrap"
-                : "font-serif italic text-[18px] md:text-[22px] text-ink/55 tracking-tight whitespace-nowrap"
-            }
-          >
-            {l.name}
+    <section className="px-6 pb-24 pt-4 md:px-10">
+      <Reveal>
+        <div className="mx-auto max-w-[1120px] border-t border-[rgba(28,26,22,0.07)] pt-10">
+          <div className="flex flex-col items-center gap-7 md:flex-row md:items-center md:justify-between">
+            <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-[rgba(28,26,22,0.4)]">
+              Trusted on the floor at
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4 md:gap-x-14">
+              {LOGOS.map((name) => (
+                <span
+                  key={name}
+                  className="whitespace-nowrap text-[15px] font-medium tracking-[0.01em] text-[rgba(28,26,22,0.35)] transition-colors duration-300 hover:text-[rgba(28,26,22,0.7)]"
+                >
+                  {name}
+                </span>
+              ))}
+            </div>
           </div>
-        ))}
-      </div>
+        </div>
+      </Reveal>
     </section>
   );
 }
