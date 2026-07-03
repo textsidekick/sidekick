@@ -1,6 +1,8 @@
 "use client";
+import { formatTimeAgo } from "@/lib/format";
+import { getAvatarColor, getInitials } from "@/lib/avatar";
 
-// ─── Existing integrations & utilities (unchanged) ────────────────────────────
+// Existing integrations & utilities (unchanged)
 import WalkthroughUpload from "@/components/WalkthroughUpload";
 import GoogleDriveIntegration from "@/components/GoogleDriveIntegration";
 import DropboxIntegration from "@/components/DropboxIntegration";
@@ -18,7 +20,7 @@ import {
   Wrench, AlertCircle, CheckCircle2, CircleDot, ClipboardList, Send, Edit2, XCircle, Info, Clock
 } from "lucide-react";
 
-// ─── New design components ────────────────────────────────────────────────────
+// New design components
 import { MetricCard } from "@/components/dashboard/shared/MetricCard";
 import { SectionHeader } from "@/components/dashboard/shared/SectionHeader";
 import { EmptyState } from "@/components/dashboard/shared/EmptyState";
@@ -46,7 +48,7 @@ import {
 } from "@/components/dashboard/modals";
 import { cn } from "@/lib/utils";
 
-// ─── Existing interfaces (unchanged) ─────────────────────────────────────────
+// Existing interfaces (unchanged)
 interface Document { id: string; name: string; uploadedAt: string; chunksCount?: number; classification?: { type: string; title: string; confidence: number }; }
 interface Company { id: string; name: string; access_code?: string; locations?: { id: string; name: string; city: string; state: string }[]; }
 interface Worker { phone: string; company_id: string; name?: string; photo_url?: string; registered_at?: string; }
@@ -97,29 +99,14 @@ interface WorkOrder {
   description?: string;
 }
 
-// ─── Existing helpers (unchanged) ─────────────────────────────────────────────
-function getAvatarColor(name: string): string {
-  const colors = ["bg-[#C96442]","bg-green-500","bg-purple-500","bg-pink-500","bg-indigo-500","bg-cyan-500","bg-orange-500","bg-teal-500"];
-  return colors[name ? name.charCodeAt(0) % colors.length : 0];
-}
-function getInitials(name: string): string {
-  if (!name) return "?";
-  return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
-}
-function formatTimeAgo(date: string): string {
-  const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
-  if (seconds < 60) return "just now";
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-  return `${Math.floor(seconds / 86400)}d ago`;
-}
+// Existing helpers (unchanged)
 function healthColor(score: number) {
   if (score >= 85) return "text-green-700";
   if (score >= 70) return "text-gray-600";
   return "text-red-700";
 }
 
-// ─── Main component ────────────────────────────────────────────────────────────
+// Main component
 export default function ManagerDashboard() {
   // Read tab from URL query param if present
   const [activeTab, setActiveTab] = useState<"analytics" | "alerts" | "documents" | "workers">("analytics");
@@ -409,7 +396,7 @@ export default function ManagerDashboard() {
   const filteredIssues = issues.filter(i => issueFilter === "all" || i.status === issueFilter);
   const workerQuestions = selectedWorker ? (stats?.recentQuestions || []).filter(q => q.worker_phone === selectedWorker.phone) : [];
 
-  // ─── Adapters: map real data shapes to new component prop shapes ─────────────
+  // Adapters: map real data shapes to new component prop shapes
 
   const mappedAlerts = issues.map(i => ({
     id: i.id,
@@ -460,9 +447,9 @@ export default function ManagerDashboard() {
     category: wo.status,
   }));
 
-  // ─── Render ───────────────────────────────────────────────────────────────────
+  // Render
   return (
-    <div className="min-h-screen bg-[#F7F3EC]">
+    <div className="min-h-screen">
 
       {/* ── Modals ─────────────────────────────────────────────────────────────── */}
       <IssueDetailModal
@@ -789,7 +776,7 @@ export default function ManagerDashboard() {
         {/* DOCUMENTS TAB */}
         {activeTab === "documents" && (
           <div className="space-y-6">
-            <div className="rounded-xl border-2 border-dashed border-gray-200 bg-white p-8 text-center hover:border-blue-400 transition-colors cursor-pointer">
+            <div className="rounded-xl border-2 border-dashed border-gray-200 bg-white p-8 text-center hover:border-[#C96442] transition-colors cursor-pointer">
               <input type="file" id="upload" className="hidden" accept=".pdf,.txt,.doc,.docx,.xlsx,.csv" onChange={handleUpload} disabled={uploading} />
               <label htmlFor="upload" className="cursor-pointer flex flex-col items-center gap-3">
                 <Upload className="h-8 w-8 text-gray-400" />

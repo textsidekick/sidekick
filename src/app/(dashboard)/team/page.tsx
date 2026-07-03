@@ -125,7 +125,7 @@ export default function TeamPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F3EC]">
+    <div className="min-h-screen">
       <div className="max-w-5xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -134,7 +134,7 @@ export default function TeamPage() {
             </h1>
             <p className="text-sm text-gray-500 mt-1">{workers.length} worker{workers.length !== 1 ? "s" : ""} enrolled</p>
           </div>
-          <Button onClick={() => { setEditWorker(null); setForm({ name: "", phone: "", role: "operator" }); setShowAdd(true); }} className="bg-[#C96442] hover:bg-[#a8532f] text-white">
+          <Button onClick={() => { setEditWorker(null); setForm({ name: "", phone: "", role: "operator" }); setShowAdd(true); }} className="bg-[#C96442] hover:bg-[#B0532F] text-white">
             <Plus className="h-4 w-4 mr-1" /> Add Worker
           </Button>
         </div>
@@ -237,7 +237,7 @@ export default function TeamPage() {
               </select>
             </div>
             <div className="flex gap-2 pt-1">
-              <Button onClick={handleSave} disabled={saving} className="flex-1 bg-[#C96442] hover:bg-[#a8532f] text-white">
+              <Button onClick={handleSave} disabled={saving} className="flex-1 bg-[#C96442] hover:bg-[#B0532F] text-white">
                 {saving ? "Saving…" : editWorker ? "Save Changes" : "Add Worker"}
               </Button>
               <Button variant="outline" onClick={() => { setShowAdd(false); setEditWorker(null); }} className="flex-1">Cancel</Button>

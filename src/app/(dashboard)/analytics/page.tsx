@@ -79,7 +79,7 @@ export default function AnalyticsPage() {
   const maxHealth = data ? Math.max(...data.healthTrend.map((h) => h.avgHealth), 1) : 100;
 
   return (
-    <div className="min-h-screen bg-[#F7F3EC]">
+    <div className="min-h-screen">
       <div className="max-w-6xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>

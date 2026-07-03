@@ -51,7 +51,7 @@ export default function UpgradeBanner({ companyId, plan, email }: Props) {
         <button
           onClick={handleUpgrade}
           disabled={loading}
-          className="flex items-center gap-2 px-5 py-2.5 bg-[#C96442] text-white rounded-lg text-sm font-semibold hover:bg-[#b5573a] disabled:opacity-50 transition-colors flex-shrink-0"
+          className="flex items-center gap-2 px-5 py-2.5 bg-[#C96442] text-white rounded-lg text-sm font-semibold hover:bg-[#B0532F] disabled:opacity-50 transition-colors flex-shrink-0"
         >
           {loading ? (
             <><Loader2 className="h-4 w-4 animate-spin" /> Processing...</>

@@ -61,7 +61,7 @@ export default function AssetImportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F3EC]">
+    <div className="min-h-screen">
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="mb-6">
           <a href="/assets" className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 mb-3">
@@ -134,7 +134,7 @@ export default function AssetImportPage() {
           </div>
         )}
 
-        <Button onClick={handleUpload} disabled={!file || uploading} className="w-full bg-[#C96442] hover:bg-[#a8532f] text-white">
+        <Button onClick={handleUpload} disabled={!file || uploading} className="w-full bg-[#C96442] hover:bg-[#B0532F] text-white">
           {uploading ? "Uploading…" : "Import Assets"}
         </Button>
       </div>

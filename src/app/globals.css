@@ -1,31 +1,29 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/* ── Brand tokens ────────────────────────────────────────────────────────── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-cream: #F7F3EC;
+  --color-cream-2: #FAF6EE;
+  --color-ink: #1C1A16;
+  --color-accent: #C96442;
+  --color-accent-hover: #B0532F;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument), ui-serif, Georgia, serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  color-scheme: light;
+  --background: #F7F3EC;
+  --foreground: #1C1A16;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }
 
-/* Custom animations */
+/* ── Landing page animations ─────────────────────────────────────────────── */
 @keyframes gradient {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -41,129 +39,43 @@ body {
   50% { transform: translateY(-15px); }
 }
 
-.animate-gradient {
-  background-size: 200% 200%;
-  animation: gradient 3s ease infinite;
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-.animate-float-delay {
-  animation: float-delay 4s ease-in-out infinite;
-}
-
-/* Smooth fade-in animation */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.6s ease-out;
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-.animate-slide-in-left {
-  animation: slideInLeft 0.6s ease-out;
-}
+.animate-gradient { background-size: 200% 200%; animation: gradient 3s ease infinite; }
+.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-float-delay { animation: float-delay 4s ease-in-out infinite; }
+.animate-fade-in { animation: fadeIn 0.6s ease-out; }
+.animate-slide-in-left { animation: slideInLeft 0.6s ease-out; }
+.animate-slide-in-right { animation: slideInRight 0.6s ease-out; }
 
-.animate-slide-in-right {
-  animation: slideInRight 0.6s ease-out;
-}
-
-/* Smooth hover transitions */
+/* Landing page hover lift (scoped — not global) */
 .hover-lift {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
 .hover-lift:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
 }
 
-/* Responsive hero background */
-
-/* Dashboard CSS variables — light mode */
-:root {
-  --page-bg: #f9fafb;
-  --card-bg: #ffffff;
-  --card-shadow: 0 1px 3px rgba(0,0,0,0.08);
-  --card-shadow-hover: 0 4px 12px rgba(0,0,0,0.12);
-  --border-subtle: #f0f0f0;
-}
-
-/* Dashboard CSS variables — dark mode (next-themes uses .dark class) */
-.dark {
-  --page-bg: #0f1117;
-  --card-bg: #1a1d27;
-  --card-shadow: 0 1px 3px rgba(0,0,0,0.3);
-  --card-shadow-hover: 0 4px 12px rgba(0,0,0,0.5);
-  --border-subtle: #2a2d3a;
-  --background: #0f1117;
-  --foreground: #ededed;
-}
-
-/* Force correct text colors in light mode */
-:root {
-  color-scheme: light;
-}
-
-.dark {
-  color-scheme: dark;
-}
-
-/* Ensure dashboard cards have correct text in light mode */
-:root {
-  --card-text: #111827;
-  --card-text-secondary: #6b7280;
-}
-
-.dark {
-  --card-text: #ffffff;
-  --card-text-secondary: #9ca3af;
-}
-
-/* Force light mode - override all dark variants */
-html, html.dark, [data-theme="dark"] {
-  color-scheme: light !important;
-  --background: #F7F3EC !important;
-  --foreground: #1C1A16 !important;
-}
-
-.dark {
-  color-scheme: light !important;
-}
-
-/* Landing page color utilities */
+/* ── Brand utilities ─────────────────────────────────────────────────────── */
 @layer utilities {
   .bg-cream { background-color: #F7F3EC; }
   .bg-cream2 { background-color: #FAF6EE; }
@@ -182,22 +94,4 @@ html, html.dark, [data-theme="dark"] {
   .bg-accent { background-color: #C96442; }
   .border-ink\/10 { border-color: rgba(28,26,22,0.1); }
   .border-ink\/5 { border-color: rgba(28,26,22,0.05); }
-  .font-serif { font-family: var(--font-instrument), ui-serif, Georgia, serif; }
-  .font-sans { font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif; }
-}
-
-/* Button hover/click effects — scoped to landing CTAs only */
-
-/* Mobile responsive fixes */
-@media (max-width: 768px) {
-  .max-w-7xl { padding-left: 12px !important; padding-right: 12px !important; }
-  .grid-cols-2, .grid-cols-3, .grid-cols-4 { grid-template-columns: 1fr !important; }
-  .lg\:grid-cols-2, .lg\:grid-cols-3, .lg\:grid-cols-4 { grid-template-columns: 1fr !important; }
-  table { display: block; overflow-x: auto; }
-  .space-y-6 > * { overflow-x: hidden; }
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
 }

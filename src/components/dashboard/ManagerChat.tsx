@@ -73,7 +73,7 @@ export default function ManagerChat() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#C96442] hover:bg-[#a84f35] text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-105"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#C96442] hover:bg-[#B0532F] text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-105"
         title="Ask Sidekick"
       >
         <MessageSquare className="w-6 h-6" />
@@ -89,7 +89,7 @@ export default function ManagerChat() {
           <MessageSquare className="w-5 h-5" />
           <span className="font-semibold">Ask Sidekick</span>
         </div>
-        <button onClick={() => setIsOpen(false)} className="hover:bg-[#a84f35] rounded p-1 transition">
+        <button onClick={() => setIsOpen(false)} className="hover:bg-[#B0532F] rounded p-1 transition">
           <X className="w-5 h-5" />
         </button>
       </div>
@@ -166,7 +166,7 @@ export default function ManagerChat() {
           <button
             type="submit"
             disabled={!input.trim() || loading}
-            className="p-2 bg-[#C96442] text-white rounded-lg hover:bg-[#a84f35] disabled:opacity-50 disabled:cursor-not-allowed transition"
+            className="p-2 bg-[#C96442] text-white rounded-lg hover:bg-[#B0532F] disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
             <Send className="w-4 h-4" />
           </button>

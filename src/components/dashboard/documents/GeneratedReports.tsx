@@ -138,7 +138,7 @@ export default function GeneratedReports({ companyId }: Props) {
                   <button
                     onClick={() => handleGenerate(report.reportType)}
                     disabled={isGenerating || (report.reportType === "custom" && !customPrompt && !isGenerated)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#C96442] text-white rounded-lg text-xs font-medium hover:bg-[#b5573a] disabled:opacity-50 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#C96442] text-white rounded-lg text-xs font-medium hover:bg-[#B0532F] disabled:opacity-50 transition-colors"
                   >
                     {isGenerating ? (
                       <>

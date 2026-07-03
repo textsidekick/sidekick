@@ -132,7 +132,7 @@ export default function KnowledgeBaseViewer({ companyId }: Props) {
           <button
             onClick={handleSyncAll}
             disabled={syncing === "all"}
-            className="flex items-center gap-2 px-3 py-1.5 bg-[#C96442] text-white rounded-lg text-sm font-medium hover:bg-[#b5573a] disabled:opacity-50 transition-colors"
+            className="flex items-center gap-2 px-3 py-1.5 bg-[#C96442] text-white rounded-lg text-sm font-medium hover:bg-[#B0532F] disabled:opacity-50 transition-colors"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${syncing === "all" ? "animate-spin" : ""}`} />
             {syncing === "all" ? "Syncing..." : "Sync All"}

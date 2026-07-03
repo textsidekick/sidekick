@@ -1,4 +1,5 @@
 "use client";
+import { formatTimeAgo } from "@/lib/format";
 
 import React, { useEffect, useMemo, useState } from "react";
 import { MetricCard } from "@/components/dashboard/shared/MetricCard";
@@ -40,13 +41,6 @@ type OpsResponse = {
 
 type Technician = { id: string; name: string | null; phone?: string; role?: string };
 
-function formatTimeAgo(iso: string) {
-  const ms = Date.now() - new Date(iso).getTime();
-  if (ms < 60_000) return "just now";
-  if (ms < 3600_000) return `${Math.floor(ms / 60_000)}m`;
-  if (ms < 86400_000) return `${Math.floor(ms / 3600_000)}h`;
-  return `${Math.floor(ms / 86400_000)}d`;
-}
 
 function timeOpenMinutes(wo: WorkOrder): number {
   const start = new Date(wo.created_at).getTime();

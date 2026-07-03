@@ -128,7 +128,7 @@ function AlertsTable({ alerts }: AlertsTableProps) {
                 placeholder="Search issues..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="h-8 w-48 rounded-lg border border-gray-200 bg-transparent pl-8 pr-3 text-sm text-gray-900 placeholder-gray-400 outline-none transition-colors focus:border-blue-300 focus:ring-1 focus:ring-blue-200 dark:placeholder-gray-500 dark:focus:border-blue-700 dark:focus:ring-blue-900"
+                className="h-8 w-48 rounded-lg border border-gray-200 bg-transparent pl-8 pr-3 text-sm text-gray-900 placeholder-gray-400 outline-none transition-colors focus:border-[#C96442] focus:ring-1 focus:ring-[#C96442]/30 dark:placeholder-gray-500 dark:focus:border-blue-700 dark:focus:ring-blue-900"
               />
             </div>
           </div>

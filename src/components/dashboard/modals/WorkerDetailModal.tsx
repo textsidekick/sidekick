@@ -1,24 +1,11 @@
 "use client";
+import { formatTimeAgo } from "@/lib/format";
+import { getAvatarColor, getInitials } from "@/lib/avatar";
 
 import { X, User, Award } from "lucide-react";
 
-function formatTimeAgo(date: string): string {
-  const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
-  if (seconds < 60) return "just now";
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-  return `${Math.floor(seconds / 86400)}d ago`;
-}
 
-function getAvatarColor(name: string): string {
-  const colors = ["bg-[#C96442]","bg-green-500","bg-purple-500","bg-pink-500","bg-indigo-500","bg-cyan-500","bg-orange-500","bg-teal-500"];
-  return colors[name ? name.charCodeAt(0) % colors.length : 0];
-}
 
-function getInitials(name: string): string {
-  if (!name) return "?";
-  return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
-}
 
 interface Worker { phone: string; company_id: string; name?: string; photo_url?: string; registered_at?: string; }
 interface Question { id: string; question: string; answer: string; worker_phone: string; worker_name?: string; confidence: number; created_at: string; topic?: string; }
