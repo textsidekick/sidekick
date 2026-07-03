@@ -30,15 +30,28 @@ const ROLE_SKILLS: Record<string, string[]> = {
 
 const ROLES = ["operator", "technician", "supervisor", "manager"];
 
+const ROLE_COLORS = [
+  "#2D3436", "#5F4B8B", "#1B4F72", "#4A4A4A",
+  "#6C3483", "#1E8449", "#2E4053", "#7D3C98",
+  "#1A5276", "#6E2C00", "#1C2833", "#4A235A",
+];
+
+function hashString(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
 function roleBadge(role: string) {
-  const cls: Record<string, string> = {
-    manager: "bg-[#5F4B8B] text-white",
-    supervisor: "bg-[#1B4F72] text-white",
-    technician: "bg-[#2D3436] text-white",
-    operator: "bg-gray-100 text-gray-700",
-  };
+  const color = ROLE_COLORS[hashString(role) % ROLE_COLORS.length];
   return (
-    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${cls[role] || "bg-gray-100 text-gray-700"}`}>
+    <span
+      className="text-xs font-medium px-2 py-0.5 rounded-full text-white"
+      style={{ backgroundColor: color }}
+    >
       {role}
     </span>
   );
