@@ -7,9 +7,9 @@ export const metadata = {
 export default function SMSConsent() {
   return (
     <div style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
-      <div style={{ position: "sticky", top: 0, zIndex: 50, padding: "16px 24px", borderBottom: "1px solid rgba(28,26,22,0.06)", background: "rgba(247,243,236,0.95)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", gap: 10 }}><a href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", color: "#111827" }}><span style={{ fontSize: 16, fontWeight: 600 }}>← Sidekick</span></a></div>
+      <div style={{ position: "sticky", top: 0, zIndex: 50, padding: "16px 24px", borderBottom: "1px solid rgba(28,26,22,0.06)", background: "rgba(247,243,236,0.95)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", gap: 10 }}><a href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", color: "#1C1A16" }}><span style={{ fontSize: 16, fontWeight: 600 }}>← Sidekick</span></a></div>
       
-      <main style={{ paddingTop: '80px', paddingBottom: '60px', minHeight: '100vh', background: '#F8F9FC' }}>
+      <main style={{ paddingTop: '80px', paddingBottom: '60px', minHeight: '100vh', background: '#F7F3EC' }}>
         <div style={{ maxWidth: 800, margin: "0 auto", padding: "0 24px" }}>
           <div>
             <div>
@@ -59,7 +59,7 @@ export default function SMSConsent() {
 
                 <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#1A1615', marginTop: '40px', marginBottom: '20px' }}>Privacy</h2>
                 <p style={{ color: '#1A1615cc', fontSize: '16px', lineHeight: '1.8', marginBottom: '16px' }}>
-                  We respect your privacy. Your phone number and message content will be handled according to our <a href="/privacy" style={{ color: '#0060F0' }}>Privacy Policy</a>. We do not sell your information to third parties.
+                  We respect your privacy. Your phone number and message content will be handled according to our <a href="/privacy" style={{ color: '#C96442' }}>Privacy Policy</a>. We do not sell your information to third parties.
                 </p>
 
                 <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#1A1615', marginTop: '40px', marginBottom: '20px' }}>Contact Us</h2>
@@ -72,7 +72,7 @@ export default function SMSConsent() {
                   lineHeight: '1.8',
                 }}>
                   <p style={{ margin: 0 }}><strong>Sidekick AI Inc.</strong></p>
-                  <p style={{ margin: '8px 0' }}>Email: <a href="mailto:hello@textsidekick.com" style={{ color: '#0060F0' }}>hello@textsidekick.com</a></p>
+                  <p style={{ margin: '8px 0' }}>Email: <a href="mailto:hello@textsidekick.com" style={{ color: '#C96442' }}>hello@textsidekick.com</a></p>
                   <p style={{ margin: 0 }}>For SMS help, text HELP to +1 (888) 707-4659</p>
                 </div>
               </div>
@@ -81,7 +81,7 @@ export default function SMSConsent() {
         </div>
       </main>
 
-      <div style={{ textAlign: "center", padding: "40px 20px", borderTop: "1px solid rgba(28,26,22,0.1)" }}><a href="/" style={{ color: "#0060F0", textDecoration: "none", fontWeight: 500 }}>← Back to Sidekick</a></div>
+      <div style={{ textAlign: "center", padding: "40px 20px", borderTop: "1px solid rgba(28,26,22,0.1)" }}><a href="/" style={{ color: "#C96442", textDecoration: "none", fontWeight: 500 }}>← Back to Sidekick</a></div>
     </div>
   );
 }

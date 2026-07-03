@@ -72,13 +72,13 @@ export default function KnowledgePage() {
 
   return (
     <>
-      <div style={{ background: "#F8F9FC", minHeight: "100vh" }}>
+      <div style={{ background: "#F7F3EC", minHeight: "100vh" }}>
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="flex items-start justify-between">
             <SectionHeader title="Knowledge Base" subtitle="Auto-captured operational intelligence from resolved work orders" />
             <div className="flex-shrink-0">
               <input ref={fileRef} type="file" accept=".pdf,.txt,.doc,.docx" className="hidden" onChange={handleDocUpload} />
-              <button onClick={() => fileRef.current?.click()} disabled={uploading} className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[#0060F0] text-white rounded-lg hover:bg-[#a8532f] disabled:opacity-50">
+              <button onClick={() => fileRef.current?.click()} disabled={uploading} className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[#C96442] text-white rounded-lg hover:bg-[#a8532f] disabled:opacity-50">
                 <Upload className="h-4 w-4" />{uploading ? "Uploading…" : "Upload Document"}
               </button>
               {uploadMsg && <p className="text-xs mt-1 text-right text-gray-500">{uploadMsg}</p>}
@@ -88,8 +88,8 @@ export default function KnowledgePage() {
           {/* Hero stats */}
           <div className="mt-6 flex items-center gap-4 flex-wrap">
             <div className="bg-white rounded-xl border border-gray-200 px-6 py-4 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-[#0060F0]/10 flex items-center justify-center">
-                <BookOpen className="w-6 h-6 text-[#0060F0]" />
+              <div className="w-12 h-12 rounded-xl bg-[#C96442]/10 flex items-center justify-center">
+                <BookOpen className="w-6 h-6 text-[#C96442]" />
               </div>
               <div>
                 <div className="text-3xl font-bold text-gray-900">{articles.length}</div>
@@ -101,7 +101,7 @@ export default function KnowledgePage() {
                 onClick={() => setShowReviewOnly((v) => !v)}
                 className={`rounded-xl border px-6 py-4 flex items-center gap-4 transition text-left ${
                   showReviewOnly
-                    ? "border-[#0060F0] bg-[#0060F0]/10"
+                    ? "border-[#C96442] bg-[#C96442]/10"
                     : "border-amber-200 bg-amber-50 hover:bg-amber-100"
                 }`}
               >
@@ -124,7 +124,7 @@ export default function KnowledgePage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search knowledge base — e.g. 'spindle vibration', 'hydraulic leak', 'conveyor belt'..."
-              className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30 focus:border-[#0060F0]"
+              className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#C96442]/30 focus:border-[#C96442]"
             />
           </div>
 
@@ -168,7 +168,7 @@ export default function KnowledgePage() {
                             <span className="inline-flex items-center gap-1 text-amber-600 font-medium">⚠ Needs Review</span>
                             <a
                               href={`/work-orders?id=${article.source_work_order_id}`}
-                              className="text-[#0060F0] underline hover:text-[#a8532f]"
+                              className="text-[#C96442] underline hover:text-[#a8532f]"
                               onClick={(e) => e.stopPropagation()}
                             >View source WO</a>
                           </>
@@ -202,7 +202,7 @@ export default function KnowledgePage() {
                           <div className="text-xs font-semibold text-gray-500 uppercase mb-1">Parts Used</div>
                           <div className="flex gap-2 flex-wrap">
                             {article.parts_used.map((p) => (
-                              <span key={p} className="text-xs px-2 py-1 bg-blue-50 text-[#0060F0] rounded">{p}</span>
+                              <span key={p} className="text-xs px-2 py-1 bg-orange-50 text-[#C96442] rounded">{p}</span>
                             ))}
                           </div>
                         </div>

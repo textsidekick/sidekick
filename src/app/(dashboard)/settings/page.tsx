@@ -95,13 +95,13 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F9FC]">
+    <div className="min-h-screen bg-[#F7F3EC]">
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
-            <Settings className="h-6 w-6 text-[#0060F0]" /> Company Settings
+            <Settings className="h-6 w-6 text-[#C96442]" /> Company Settings
           </h1>
-          <Button onClick={handleSave} disabled={saving} className="bg-[#0060F0] hover:bg-[#a8532f] text-white flex items-center gap-2">
+          <Button onClick={handleSave} disabled={saving} className="bg-[#C96442] hover:bg-[#a8532f] text-white flex items-center gap-2">
             <Save className="h-4 w-4" /> {saving ? "Saving…" : success ? "Saved ✓" : "Save Changes"}
           </Button>
         </div>

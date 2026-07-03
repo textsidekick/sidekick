@@ -100,7 +100,7 @@ export default function LoginPage() {
     boxSizing: "border-box" as const,
     fontFamily: "'Inter', system-ui, sans-serif",
     backgroundColor: "#ffffff",
-    color: "#111827",
+    color: "#1C1A16",
     transition: "border-color 0.2s, box-shadow 0.2s",
     letterSpacing: step === "code" ? "0.3em" : "normal",
     textAlign: step === "code" ? "center" as const : "left" as const,
@@ -112,7 +112,7 @@ export default function LoginPage() {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      background: "#F8F9FC",
+      background: "#F7F3EC",
       fontFamily: "'Inter', system-ui, sans-serif",
       padding: 20,
     }}>
@@ -132,13 +132,13 @@ export default function LoginPage() {
         <div style={{ textAlign: "center", marginBottom: 36 }}>
           <div style={{
             width: 56, height: 56, margin: "0 auto 20px",
-            background: "#0060F0", borderRadius: 14,
+            background: "#C96442", borderRadius: 14,
             display: "flex", alignItems: "center", justifyContent: "center", padding: 10,
           }}>
             <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={36} height={36} style={{ objectFit: "contain", filter: "brightness(0) invert(1)" }} />
           </div>
           <h1 style={{
-            fontSize: 26, fontWeight: 600, color: "#111827", marginBottom: 8,
+            fontSize: 26, fontWeight: 600, color: "#1C1A16", marginBottom: 8,
             letterSpacing: "-0.02em",
           }}>
             {step === "phone" ? "Welcome to Sidekick" : "Enter your code"}
@@ -155,7 +155,7 @@ export default function LoginPage() {
             <div style={{ marginBottom: 24 }}>
               <label style={{
                 display: "block", fontSize: 13, fontWeight: 500,
-                color: "#111827", marginBottom: 8, letterSpacing: "0.01em",
+                color: "#1C1A16", marginBottom: 8, letterSpacing: "0.01em",
               }}>Phone number</label>
               <div style={{ position: "relative" }}>
                 <span style={{
@@ -169,7 +169,7 @@ export default function LoginPage() {
                   placeholder="(555) 123-4567"
                   required
                   style={{ ...inputStyle, paddingLeft: 44 }}
-                  onFocus={(e) => { e.target.style.borderColor = "#0060F0"; e.target.style.boxShadow = "0 0 0 3px rgba(201,100,66,0.1)"; }}
+                  onFocus={(e) => { e.target.style.borderColor = "#C96442"; e.target.style.boxShadow = "0 0 0 3px rgba(201,100,66,0.1)"; }}
                   onBlur={(e) => { e.target.style.borderColor = "rgba(28,26,22,0.15)"; e.target.style.boxShadow = "none"; }}
                 />
               </div>
@@ -179,13 +179,13 @@ export default function LoginPage() {
               <div style={{
                 padding: "12px 16px", background: "rgba(201,100,66,0.08)",
                 border: "1px solid rgba(201,100,66,0.2)", borderRadius: 10,
-                color: "#004BB8", fontSize: 14, marginBottom: 20, textAlign: "center",
+                color: "#A74D30", fontSize: 14, marginBottom: 20, textAlign: "center",
               }}>{error}</div>
             )}
 
             <button type="submit" disabled={isLoading} style={{
-              width: "100%", padding: "14px", background: isLoading ? "rgba(28,26,22,0.4)" : "#111827",
-              color: "#F8F9FC", border: "none", borderRadius: 12, fontSize: 15, fontWeight: 600,
+              width: "100%", padding: "14px", background: isLoading ? "rgba(28,26,22,0.4)" : "#1C1A16",
+              color: "#F7F3EC", border: "none", borderRadius: 12, fontSize: 15, fontWeight: 600,
               cursor: isLoading ? "not-allowed" : "pointer", letterSpacing: "-0.01em",
             }}>
               {isLoading ? "Sending..." : "Send verification code"}
@@ -196,7 +196,7 @@ export default function LoginPage() {
             <div style={{ marginBottom: 24 }}>
               <label style={{
                 display: "block", fontSize: 13, fontWeight: 500,
-                color: "#111827", marginBottom: 8, letterSpacing: "0.01em",
+                color: "#1C1A16", marginBottom: 8, letterSpacing: "0.01em",
               }}>Verification code</label>
               <input
                 type="text"
@@ -206,7 +206,7 @@ export default function LoginPage() {
                 required
                 maxLength={6}
                 style={inputStyle}
-                onFocus={(e) => { e.target.style.borderColor = "#0060F0"; e.target.style.boxShadow = "0 0 0 3px rgba(201,100,66,0.1)"; }}
+                onFocus={(e) => { e.target.style.borderColor = "#C96442"; e.target.style.boxShadow = "0 0 0 3px rgba(201,100,66,0.1)"; }}
                 onBlur={(e) => { e.target.style.borderColor = "rgba(28,26,22,0.15)"; e.target.style.boxShadow = "none"; }}
                 autoFocus
               />
@@ -216,14 +216,14 @@ export default function LoginPage() {
               <div style={{
                 padding: "12px 16px", background: "rgba(201,100,66,0.08)",
                 border: "1px solid rgba(201,100,66,0.2)", borderRadius: 10,
-                color: "#004BB8", fontSize: 14, marginBottom: 20, textAlign: "center",
+                color: "#A74D30", fontSize: 14, marginBottom: 20, textAlign: "center",
               }}>{error}</div>
             )}
 
             <button type="submit" disabled={isLoading || code.length < 6} style={{
               width: "100%", padding: "14px",
-              background: (isLoading || code.length < 6) ? "rgba(28,26,22,0.4)" : "#111827",
-              color: "#F8F9FC", border: "none", borderRadius: 12, fontSize: 15, fontWeight: 600,
+              background: (isLoading || code.length < 6) ? "rgba(28,26,22,0.4)" : "#1C1A16",
+              color: "#F7F3EC", border: "none", borderRadius: 12, fontSize: 15, fontWeight: 600,
               cursor: (isLoading || code.length < 6) ? "not-allowed" : "pointer", letterSpacing: "-0.01em",
             }}>
               {isLoading ? "Verifying..." : "Verify & sign in"}
@@ -249,7 +249,7 @@ export default function LoginPage() {
         }}>
           {step === "phone" && (
             <>
-              <a href="https://textsidekick.com/#contact" style={{ color: "#0060F0", textDecoration: "none", fontWeight: 500 }}>
+              <a href="https://textsidekick.com/#contact" style={{ color: "#C96442", textDecoration: "none", fontWeight: 500 }}>
                 Book a demo
               </a>
             </>

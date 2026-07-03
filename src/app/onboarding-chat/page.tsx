@@ -358,13 +358,13 @@ export default function OnboardingChat() {
   // Show error state
   if (completionError) {
     return (
-      <div style={{ minHeight: "100vh", background: "#F8F9FC", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+      <div style={{ minHeight: "100vh", background: "#F7F3EC", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
         <div style={{ background: "white", borderRadius: 16, border: "1px solid rgba(239,68,68,0.2)", padding: 32, textAlign: "center", maxWidth: 480 }}>
           <h2 style={{ color: "#ef4444", marginBottom: 8, fontSize: 20, fontWeight: 600 }}>Oops! Something went wrong</h2>
           <p style={{ color: "#6b7280", marginBottom: 24, fontSize: 14 }}>{completionError}</p>
           <button
             onClick={() => { setCompletionError(null); setIsComplete(false); }}
-            style={{ background: "#0060F0", color: "white", padding: "12px 24px", borderRadius: 10, border: "none", cursor: "pointer", fontWeight: 600, fontSize: 14 }}
+            style={{ background: "#C96442", color: "white", padding: "12px 24px", borderRadius: 10, border: "none", cursor: "pointer", fontWeight: 600, fontSize: 14 }}
           >
             Try Again
           </button>
@@ -379,20 +379,20 @@ export default function OnboardingChat() {
       <div style={{ width: 320, background: "white", borderRight: "1px solid rgba(28,26,22,0.06)", display: "flex", flexDirection: "column", position: "fixed", top: 0, bottom: 0, zIndex: 50 }}>
         {/* Logo */}
         <div style={{ height: 72, display: "flex", alignItems: "center", gap: 14, padding: "0 24px", borderBottom: "1px solid rgba(28,26,22,0.06)" }}>
-          <div style={{ width: 40, height: 40, background: "#0060F0", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", padding: 6 }}>
+          <div style={{ width: 40, height: 40, background: "#C96442", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", padding: 6 }}>
             <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={28} height={28} style={{ objectFit: "contain", filter: "brightness(0) invert(1)" }} />
           </div>
-          <span style={{ fontSize: 22, fontWeight: 700, color: "#111827", letterSpacing: "-0.02em" }}>Sidekick</span>
+          <span style={{ fontSize: 22, fontWeight: 700, color: "#1C1A16", letterSpacing: "-0.02em" }}>Sidekick</span>
         </div>
 
         {/* Progress */}
         <div style={{ padding: "20px 24px 12px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
             <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(28,26,22,0.4)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Setup Progress</span>
-            <span style={{ fontSize: 14, fontWeight: 600, color: "#0060F0" }}>{completedCount}/{sections.length}</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: "#C96442" }}>{completedCount}/{sections.length}</span>
           </div>
           <div style={{ height: 6, background: "rgba(28,26,22,0.06)", borderRadius: 3 }}>
-            <div style={{ height: 6, background: "#0060F0", borderRadius: 3, width: `${progressPct}%`, transition: "width 0.3s" }} />
+            <div style={{ height: 6, background: "#C96442", borderRadius: 3, width: `${progressPct}%`, transition: "width 0.3s" }} />
           </div>
         </div>
 
@@ -418,15 +418,15 @@ export default function OnboardingChat() {
                     transition: "background 0.15s",
                   }}
                 >
-                  <Icon size={20} style={{ color: isActive ? "#0060F0" : "rgba(28,26,22,0.4)", flexShrink: 0 }} />
+                  <Icon size={20} style={{ color: isActive ? "#C96442" : "rgba(28,26,22,0.4)", flexShrink: 0 }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 15, fontWeight: 600, color: isActive ? "#0060F0" : "#111827" }}>{section.label}</div>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: isActive ? "#C96442" : "#1C1A16" }}>{section.label}</div>
                     <div style={{ fontSize: 13, color: "rgba(28,26,22,0.35)", marginTop: 2 }}>{section.description}</div>
                   </div>
                   {section.status === "complete" ? (
                     <CheckCircle2 size={18} style={{ color: "#22c55e", flexShrink: 0 }} />
                   ) : section.status === "in_progress" ? (
-                    <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#0060F0", flexShrink: 0 }} />
+                    <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#C96442", flexShrink: 0 }} />
                   ) : (
                     <Circle size={18} style={{ color: "rgba(28,26,22,0.15)", flexShrink: 0 }} />
                   )}
@@ -505,7 +505,7 @@ export default function OnboardingChat() {
       </div>
 
       {/* ── Main Content ────────────────────────────────────── */}
-      <div style={{ marginLeft: 320, marginRight: 400, flex: 1, background: "#F8F9FC", display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <div style={{ marginLeft: 320, marginRight: 400, flex: 1, background: "#F7F3EC", display: "flex", flexDirection: "column", minHeight: "100vh" }}>
 
         {/* Chat area */}
         <div style={{ flex: 1, overflow: "auto", padding: "32px 24px", display: "flex", flexDirection: "column" }}>
@@ -524,8 +524,8 @@ export default function OnboardingChat() {
                     maxWidth: "85%",
                     padding: msg.role === "user" ? "12px 18px" : "14px 18px",
                     borderRadius: msg.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
-                    background: msg.role === "user" ? "#0060F0" : "white",
-                    color: msg.role === "user" ? "white" : "#111827",
+                    background: msg.role === "user" ? "#C96442" : "white",
+                    color: msg.role === "user" ? "white" : "#1C1A16",
                     fontSize: 15, lineHeight: "1.6",
                     border: msg.role === "user" ? "none" : "1px solid rgba(28,26,22,0.1)",
                     boxShadow: "0 1px 3px rgba(0, 0, 0, 0.06)",
@@ -558,7 +558,7 @@ export default function OnboardingChat() {
               <div key={i} style={{
                 display: "flex", alignItems: "center", gap: 6,
                 background: "rgba(201,100,66,0.1)", border: "1px solid rgba(201,100,66,0.2)",
-                borderRadius: 8, padding: "4px 10px", fontSize: 13, color: "#0060F0",
+                borderRadius: 8, padding: "4px 10px", fontSize: 13, color: "#C96442",
               }}>
                 <FileText size={14} />
                 <span style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file.name}</span>
@@ -584,7 +584,7 @@ export default function OnboardingChat() {
               style={{
                 flex: 1, padding: "14px 18px", borderRadius: 14,
                 border: isRecording ? "2px solid #ef4444" : "1px solid rgba(28,26,22,0.15)",
-                fontSize: 15, outline: "none", color: "#111827",
+                fontSize: 15, outline: "none", color: "#1C1A16",
                 background: loading ? "#F0EBE3" : "white",
                 cursor: loading || isRecording ? "not-allowed" : "text",
               }}
@@ -594,7 +594,7 @@ export default function OnboardingChat() {
               disabled={loading || !input.trim() || isComplete}
               style={{
                 padding: "14px 22px", borderRadius: 14,
-                background: !loading && input.trim() && !isComplete ? "#0060F0" : "#F0EBE3",
+                background: !loading && input.trim() && !isComplete ? "#C96442" : "#F0EBE3",
                 color: !loading && input.trim() && !isComplete ? "white" : "rgba(28,26,22,0.35)",
                 border: "1px solid rgba(28,26,22,0.1)",
                 cursor: !loading && input.trim() && !isComplete ? "pointer" : "not-allowed",

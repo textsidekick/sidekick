@@ -99,7 +99,7 @@ export default function GustoIntegration({ companyId, darkMode = false, onEmploy
       <div className={`${darkMode ? "bg-gray-700 border-gray-600" : "bg-gray-50 border-gray-200"} rounded-lg border p-4`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${connected ? "bg-blue-100" : darkMode ? "bg-gray-600" : "bg-gray-200"}`}>
+            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${connected ? "bg-orange-100" : darkMode ? "bg-gray-600" : "bg-gray-200"}`}>
               <svg className={`w-6 h-6 ${connected ? "text-orange-600" : darkMode ? "text-gray-400" : "text-gray-500"}`} viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
               </svg>

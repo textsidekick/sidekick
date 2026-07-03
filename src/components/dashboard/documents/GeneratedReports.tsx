@@ -85,7 +85,7 @@ export default function GeneratedReports({ companyId }: Props) {
     <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
       <div className="p-5 border-b border-gray-100">
         <div className="flex items-center gap-2 mb-1">
-          <FileText className="h-5 w-5 text-[#0060F0]" />
+          <FileText className="h-5 w-5 text-[#C96442]" />
           <h3 className="text-base font-semibold text-gray-900">Generated Reports</h3>
         </div>
         <p className="text-sm text-gray-500">AI-generated documents based on your company knowledge base</p>
@@ -103,12 +103,12 @@ export default function GeneratedReports({ companyId }: Props) {
                 key={report.id}
                 className={`rounded-xl border p-4 transition-all ${
                   isGenerated
-                    ? "border-[#0060F0]/30 bg-[#0060F0]/5"
+                    ? "border-[#C96442]/30 bg-[#C96442]/5"
                     : "border-gray-200 bg-white hover:border-gray-300"
                 }`}
               >
                 <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-2 text-[#0060F0]">
+                  <div className="flex items-center gap-2 text-[#C96442]">
                     {report.icon}
                     <h4 className="text-sm font-semibold text-gray-900">{report.title}</h4>
                   </div>
@@ -130,7 +130,7 @@ export default function GeneratedReports({ companyId }: Props) {
                     placeholder="What report do you need?"
                     value={customPrompt}
                     onChange={(e) => setCustomPrompt(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg mb-3 focus:outline-none focus:border-[#0060F0]"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg mb-3 focus:outline-none focus:border-[#C96442]"
                   />
                 )}
 
@@ -138,7 +138,7 @@ export default function GeneratedReports({ companyId }: Props) {
                   <button
                     onClick={() => handleGenerate(report.reportType)}
                     disabled={isGenerating || (report.reportType === "custom" && !customPrompt && !isGenerated)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0060F0] text-white rounded-lg text-xs font-medium hover:bg-[#0052CC] disabled:opacity-50 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#C96442] text-white rounded-lg text-xs font-medium hover:bg-[#b5573a] disabled:opacity-50 transition-colors"
                   >
                     {isGenerating ? (
                       <>

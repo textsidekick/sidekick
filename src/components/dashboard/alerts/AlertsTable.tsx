@@ -207,7 +207,7 @@ function AlertsTable({ alerts }: AlertsTableProps) {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 rounded-md text-gray-400 hover:text-[#0060F0] dark:text-gray-500 dark:hover:text-[#0060F0]"
+                        className="h-7 w-7 rounded-md text-gray-400 hover:text-[#C96442] dark:text-gray-500 dark:hover:text-[#C96442]"
                         title="View details"
                       >
                         <Eye className="h-3.5 w-3.5" />

@@ -28,7 +28,7 @@ export function AddCertificationModal({ open, onClose, newCert, setNewCert, comp
             <select
               value={newCert.workerPhone}
               onChange={e => setNewCert(p => ({ ...p, workerPhone: e.target.value }))}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]"
             >
               <option value="">Select worker...</option>
               {companyWorkers.map(w => <option key={w.phone} value={w.phone}>{w.name || w.phone}</option>)}
@@ -41,7 +41,7 @@ export function AddCertificationModal({ open, onClose, newCert, setNewCert, comp
               value={newCert.certType}
               onChange={e => setNewCert(p => ({ ...p, certType: e.target.value }))}
               placeholder="e.g. Forklift Operator"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]"
             />
           </div>
           <div>
@@ -50,13 +50,13 @@ export function AddCertificationModal({ open, onClose, newCert, setNewCert, comp
               type="date"
               value={newCert.expiryDate}
               onChange={e => setNewCert(p => ({ ...p, expiryDate: e.target.value }))}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]"
             />
           </div>
         </div>
         <div className="flex gap-3 mt-6">
           <button onClick={onClose} className="flex-1 px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600">Cancel</button>
-          <button onClick={onAdd} className="flex-1 px-4 py-2 bg-[#0060F0] text-white rounded-lg text-sm font-medium hover:opacity-90">Add Certification</button>
+          <button onClick={onAdd} className="flex-1 px-4 py-2 bg-[#C96442] text-white rounded-lg text-sm font-medium hover:opacity-90">Add Certification</button>
         </div>
       </div>
     </div>

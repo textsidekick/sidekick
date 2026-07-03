@@ -63,7 +63,7 @@ function AlertMetrics({ alerts }: AlertMetricsProps) {
         label="Total Reported"
         value={totalReported}
         icon={Wrench}
-        iconClassName="h-5 w-5 text-[#0060F0]"
+        iconClassName="h-5 w-5 text-[#C96442]"
         accentColor="blue"
         subtext="All time across team"
       />

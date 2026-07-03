@@ -18,18 +18,18 @@ export default function ChoosePage() {
   return (
     <div style={{
       minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
-      background: "#F8F9FC", fontFamily: "'Inter', system-ui, sans-serif", padding: 20,
+      background: "#F7F3EC", fontFamily: "'Inter', system-ui, sans-serif", padding: 20,
     }}>
       <div style={{ width: "100%", maxWidth: 480, textAlign: "center" }}>
         <div style={{
           width: 56, height: 56, margin: "0 auto 24px",
-          background: "#0060F0", borderRadius: 14,
+          background: "#C96442", borderRadius: 14,
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>
           <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={36} height={36}
             style={{ objectFit: "contain", filter: "brightness(0) invert(1)" }} />
         </div>
-        <h1 style={{ fontSize: 26, fontWeight: 600, color: "#111827", marginBottom: 8, letterSpacing: "-0.02em" }}>
+        <h1 style={{ fontSize: 26, fontWeight: 600, color: "#1C1A16", marginBottom: 8, letterSpacing: "-0.02em" }}>
           Welcome back
         </h1>
         <p style={{ color: "rgba(28,26,22,0.5)", fontSize: 15, marginBottom: 36 }}>
@@ -50,10 +50,10 @@ export default function ChoosePage() {
               width: 44, height: 44, borderRadius: 12, background: "rgba(201,100,66,0.1)",
               display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
             }}>
-              <LayoutDashboard size={22} style={{ color: "#0060F0" }} />
+              <LayoutDashboard size={22} style={{ color: "#C96442" }} />
             </div>
             <div>
-              <div style={{ fontSize: 16, fontWeight: 600, color: "#111827" }}>Existing Company</div>
+              <div style={{ fontSize: 16, fontWeight: 600, color: "#1C1A16" }}>Existing Company</div>
               <div style={{ fontSize: 13, color: "rgba(28,26,22,0.5)", marginTop: 2 }}>Go to your dashboard, manage workers, upload documents, and view analytics</div>
             </div>
           </button>
@@ -71,10 +71,10 @@ export default function ChoosePage() {
               width: 44, height: 44, borderRadius: 12, background: "rgba(201,100,66,0.1)",
               display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
             }}>
-              <MessageCircle size={22} style={{ color: "#0060F0" }} />
+              <MessageCircle size={22} style={{ color: "#C96442" }} />
             </div>
             <div>
-              <div style={{ fontSize: 16, fontWeight: 600, color: "#111827" }}>New Company</div>
+              <div style={{ fontSize: 16, fontWeight: 600, color: "#1C1A16" }}>New Company</div>
               <div style={{ fontSize: 13, color: "rgba(28,26,22,0.5)", marginTop: 2 }}>Set up a new company on Sidekick</div>
             </div>
           </button>
