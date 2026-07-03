@@ -204,14 +204,14 @@ export async function POST(request: NextRequest) {
               const transcription = whisperData.text || "";
               
               if (transcription) {
-                const claudeRes = await openai.chat.completions.create({
+                const llmRes = await openai.chat.completions.create({
                   model: "gpt-4.1",
                   max_tokens: 1500,
                   messages: [{ role: "user", content: 'Extract Q&A pairs from this voice note about workplace policies:\n\n"' + transcription + '"\n\nReturn ONLY a JSON array like: [{"question":"...","answer":"..."}]' }]
                 });
                 
-                const claudeText = claudeRes.choices[0]?.message?.content || "[]";
-                const cleaned = claudeText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+                const llmText = llmRes.choices[0]?.message?.content || "[]";
+                const cleaned = llmText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
                 
                 try {
                   const qaPairs = JSON.parse(cleaned);
