@@ -10,8 +10,8 @@ export default function CTA() {
           style={{
             maxWidth: 1120,
             padding: "72px 64px",
-            background: "linear-gradient(135deg, #C96442 0%, #A74D30 100%)",
-            boxShadow: "0 1px 2px rgba(28,26,22,0.12), 0 24px 64px -24px rgba(167,77,48,0.5)",
+            background: "linear-gradient(135deg, #0060F0 0%, #004BB8 100%)",
+            boxShadow: "0 1px 2px rgba(17,24,39,0.12), 0 24px 64px -24px rgba(0,75,184,0.5)",
           }}
         >
           <div
@@ -19,12 +19,12 @@ export default function CTA() {
             className="pointer-events-none absolute inset-0"
             style={{
               background:
-                "radial-gradient(60% 70% at 80% -10%, rgba(247,243,236,0.12), transparent 65%)",
+                "radial-gradient(60% 70% at 80% -10%, rgba(255,255,255,0.15), transparent 65%)",
             }}
           />
           <div className="relative text-center">
             <h2
-              className="font-serif font-normal text-cream m-0 mb-5"
+              className="font-serif font-bold text-cream m-0 mb-5"
               style={{
                 fontSize: "clamp(2.25rem, 5vw, 3.5rem)",
                 lineHeight: 0.98,
@@ -35,7 +35,7 @@ export default function CTA() {
             </h2>
             <p
               className="m-0 mx-auto mb-9 font-light"
-              style={{ fontSize: 17, lineHeight: 1.55, maxWidth: 480, color: "rgba(247,243,236,0.85)" }}
+              style={{ fontSize: 17, lineHeight: 1.55, maxWidth: 480, color: "rgba(255,255,255,0.85)" }}
             >
               Set up in 90 seconds. No app, no training, no per-seat pricing.
             </p>
@@ -44,9 +44,9 @@ export default function CTA() {
                 href="/login"
                 className="btn inline-flex items-center gap-2.5 rounded-full px-7 py-[15px] text-[15px] font-semibold no-underline"
                 style={{
-                  background: "#F7F3EC",
-                  color: "#1C1A16",
-                  boxShadow: "0 1px 2px rgba(28,26,22,0.08)",
+                  background: "#FFFFFF",
+                  color: "#111827",
+                  boxShadow: "0 1px 2px rgba(17,24,39,0.08)",
                 }}
               >
                 Get Started

@@ -49,7 +49,7 @@ export function HeadlineWithSidekick({ text }: { text: string }) {
         const stripped = word.toLowerCase().replace(/[^a-z]/g, "");
         if (stripped === "sidekick") {
           return (
-            <span key={i} className="italic text-accent">
+            <span key={i} className="text-accent font-bold">
               {word}{" "}
             </span>
           );

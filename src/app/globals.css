@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --ink: #1c1a16;
-  --cream: #f7f3ec;
-  --cream-2: #fcf9f3;
-  --accent: #c96442;
-  --accent-deep: #a74d30;
+  --ink: #111827;
+  --cream: #F8F9FC;
+  --cream-2: #FFFFFF;
+  --accent: #0060F0;
+  --accent-deep: #004BB8;
 }
 
 ::selection {
-  background: rgba(201, 100, 66, 0.18);
+  background: rgba(0, 96, 240, 0.16);
 }
 
 html {
@@ -78,33 +78,33 @@ body {
   .bg-cream2 { background-color: var(--cream-2); }
   .text-ink { color: var(--ink); }
   .bg-ink { background-color: var(--ink); }
-  .text-cream { color: var(--cream); }
+  .text-cream { color: #F8F9FC; }
   .text-accent { color: var(--accent); }
   .bg-accent { background-color: var(--accent); }
-  .font-serif { font-family: var(--font-instrument), ui-serif, Georgia, serif; }
+  .font-serif { font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif; }
   .font-sans { font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif; }
 
   /* Extra opacity utilities used in landing */
-  .text-ink\/5 { color: rgba(28,26,22,0.05); }
-  .text-ink\/10 { color: rgba(28,26,22,0.1); }
-  .text-ink\/50 { color: rgba(28,26,22,0.5); }
-  .text-ink\/55 { color: rgba(28,26,22,0.55); }
-  .text-ink\/60 { color: rgba(28,26,22,0.6); }
-  .text-ink\/65 { color: rgba(28,26,22,0.65); }
-  .text-ink\/70 { color: rgba(28,26,22,0.7); }
-  .text-ink\/75 { color: rgba(28,26,22,0.75); }
-  .bg-ink\/5 { background-color: rgba(28,26,22,0.05); }
-  .bg-ink\/10 { background-color: rgba(28,26,22,0.1); }
-  .border-ink\/5 { border-color: rgba(28,26,22,0.05); }
-  .border-ink\/6 { border-color: rgba(28,26,22,0.06); }
-  .border-ink\/7 { border-color: rgba(28,26,22,0.07); }
-  .border-ink\/8 { border-color: rgba(28,26,22,0.08); }
-  .border-ink\/10 { border-color: rgba(28,26,22,0.1); }
-  .border-ink\/14 { border-color: rgba(28,26,22,0.14); }
-  .border-ink\/15 { border-color: rgba(28,26,22,0.15); }
-  .bg-cream\/85 { background-color: rgba(247,243,236,0.85); }
-  .bg-accent\/5 { background-color: rgba(201,100,66,0.05); }
-  .bg-accent\/70 { background-color: rgba(201,100,66,0.7); }
+  .text-ink\/5 { color: rgba(17,24,39,0.05); }
+  .text-ink\/10 { color: rgba(17,24,39,0.1); }
+  .text-ink\/50 { color: rgba(17,24,39,0.5); }
+  .text-ink\/55 { color: rgba(17,24,39,0.55); }
+  .text-ink\/60 { color: rgba(17,24,39,0.6); }
+  .text-ink\/65 { color: rgba(17,24,39,0.65); }
+  .text-ink\/70 { color: rgba(17,24,39,0.7); }
+  .text-ink\/75 { color: rgba(17,24,39,0.75); }
+  .bg-ink\/5 { background-color: rgba(17,24,39,0.05); }
+  .bg-ink\/10 { background-color: rgba(17,24,39,0.1); }
+  .border-ink\/5 { border-color: rgba(17,24,39,0.05); }
+  .border-ink\/6 { border-color: rgba(17,24,39,0.06); }
+  .border-ink\/7 { border-color: rgba(17,24,39,0.07); }
+  .border-ink\/8 { border-color: rgba(17,24,39,0.08); }
+  .border-ink\/10 { border-color: rgba(17,24,39,0.1); }
+  .border-ink\/14 { border-color: rgba(17,24,39,0.14); }
+  .border-ink\/15 { border-color: rgba(17,24,39,0.15); }
+  .bg-cream\/85 { background-color: rgba(248,249,252,0.85); }
+  .bg-accent\/5 { background-color: rgba(0,96,240,0.05); }
+  .bg-accent\/70 { background-color: rgba(0,96,240,0.7); }
 }
 
 /* Hover lift utility — explicit opt-in only, not global */
@@ -118,8 +118,8 @@ body {
 
 /* Dashboard CSS variables — light mode */
 :root {
-  --background: #F7F3EC;
-  --foreground: #1C1A16;
+  --background: #F8F9FC;
+  --foreground: #111827;
   --page-bg: #f9fafb;
   --card-bg: #ffffff;
   --card-shadow: 0 1px 3px rgba(0,0,0,0.08);
@@ -143,8 +143,8 @@ body {
 /* Force light mode */
 html, html.dark, [data-theme="dark"] {
   color-scheme: light !important;
-  --background: #F7F3EC !important;
-  --foreground: #1C1A16 !important;
+  --background: #F8F9FC !important;
+  --foreground: #111827 !important;
 }
 
 .dark {

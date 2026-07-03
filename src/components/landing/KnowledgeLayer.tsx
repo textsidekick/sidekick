@@ -18,23 +18,23 @@ const ENTRIES = [
 
 export default function KnowledgeLayer() {
   return (
-    <section className="border-t border-[rgba(28,26,22,0.07)] px-6 py-28 md:px-10 md:py-36">
+    <section className="border-t border-[rgba(17,24,39,0.07)] px-6 py-28 md:px-10 md:py-36">
       <div className="mx-auto grid max-w-[1120px] grid-cols-1 items-center gap-16 lg:grid-cols-[0.95fr_1.05fr] lg:gap-20">
         {/* Mock — on the left for page rhythm */}
         <Reveal className="order-2 lg:order-1">
           <div
             className="overflow-hidden rounded-[20px] bg-white"
             style={{
-              border: "1px solid rgba(28,26,22,0.06)",
+              border: "1px solid rgba(17,24,39,0.06)",
               boxShadow:
-                "0 1px 2px rgba(28,26,22,0.04), 0 24px 64px -32px rgba(28,26,22,0.18)",
+                "0 1px 2px rgba(17,24,39,0.04), 0 24px 64px -32px rgba(17,24,39,0.18)",
             }}
           >
-            <div className="flex items-center justify-between border-b border-[rgba(28,26,22,0.06)] px-6 py-4">
+            <div className="flex items-center justify-between border-b border-[rgba(17,24,39,0.06)] px-6 py-4">
               <div className="text-[13px] font-semibold text-ink">
                 Knowledge base · Halverson Mfg
               </div>
-              <div className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-[rgba(28,26,22,0.4)]">
+              <div className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-[rgba(17,24,39,0.4)]">
                 <span
                   className="block h-1.5 w-1.5 rounded-full bg-accent"
                   style={{ animation: "sk-pulse 2.4s ease-in-out infinite" }}
@@ -46,20 +46,20 @@ export default function KnowledgeLayer() {
               {ENTRIES.map((r) => (
                 <div
                   key={r.q}
-                  className="grid grid-cols-[1fr_auto] items-center gap-4 border-b border-[rgba(28,26,22,0.05)] px-6 py-3.5 transition-colors duration-200 last:border-b-0 hover:bg-[rgba(28,26,22,0.025)]"
+                  className="grid grid-cols-[1fr_auto] items-center gap-4 border-b border-[rgba(17,24,39,0.05)] px-6 py-3.5 transition-colors duration-200 last:border-b-0 hover:bg-[rgba(17,24,39,0.025)]"
                 >
                   <div className="min-w-0">
                     <div className="mb-0.5 truncate text-[13.5px] font-medium text-ink">{r.q}</div>
-                    <div className="truncate text-[12.5px] font-light text-[rgba(28,26,22,0.5)]">
+                    <div className="truncate text-[12.5px] font-light text-[rgba(17,24,39,0.5)]">
                       {r.a}
                     </div>
                   </div>
-                  <div className="font-mono text-[11px] text-[rgba(28,26,22,0.35)]">{r.d}</div>
+                  <div className="font-mono text-[11px] text-[rgba(17,24,39,0.35)]">{r.d}</div>
                 </div>
               ))}
             </div>
-            <div className="flex items-center gap-2.5 bg-[rgba(201,100,66,0.05)] px-6 py-3.5">
-              <div className="text-[12.5px] text-[rgba(28,26,22,0.65)]">
+            <div className="flex items-center gap-2.5 bg-[rgba(0,96,240,0.05)] px-6 py-3.5">
+              <div className="text-[12.5px] text-[rgba(17,24,39,0.65)]">
                 <span className="font-semibold text-ink">+12 entries</span> captured this week
               </div>
             </div>
@@ -70,7 +70,7 @@ export default function KnowledgeLayer() {
         <Reveal delay={120} className="order-1 lg:order-2">
           <Eyebrow>The knowledge layer</Eyebrow>
           <h2
-            className="mb-6 mt-5 font-serif font-normal text-ink"
+            className="mb-6 mt-5 font-serif font-bold text-ink"
             style={{
               fontSize: "clamp(2.125rem, 4.5vw, 3.5rem)",
               lineHeight: 1.05,
@@ -80,7 +80,7 @@ export default function KnowledgeLayer() {
           >
             Every repair makes your plant <em className="italic text-accent">smarter.</em>
           </h2>
-          <p className="m-0 mb-10 max-w-[480px] text-[16px] font-light leading-[1.65] text-[rgba(28,26,22,0.6)]">
+          <p className="m-0 mb-10 max-w-[480px] text-[16px] font-light leading-[1.65] text-[rgba(17,24,39,0.6)]">
             When a tech fixes a machine, Sidekick turns the resolution into a searchable
             knowledge article — automatically. Next time it breaks, anyone can ask
             &ldquo;what worked last time?&rdquo; and get a cited, verified answer.
@@ -89,10 +89,10 @@ export default function KnowledgeLayer() {
             {PAYOFFS.map((p) => (
               <div
                 key={p.h}
-                className="border-t border-[rgba(28,26,22,0.07)] py-4 text-[15px] leading-relaxed last:border-b last:border-b-[rgba(28,26,22,0.07)]"
+                className="border-t border-[rgba(17,24,39,0.07)] py-4 text-[15px] leading-relaxed last:border-b last:border-b-[rgba(17,24,39,0.07)]"
               >
                 <span className="font-medium text-ink">{p.h}</span>{" "}
-                <span className="font-light text-[rgba(28,26,22,0.55)]">{p.b}</span>
+                <span className="font-light text-[rgba(17,24,39,0.55)]">{p.b}</span>
               </div>
             ))}
           </div>

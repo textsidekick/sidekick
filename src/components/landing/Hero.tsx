@@ -10,7 +10,7 @@ const SUBHEAD =
 
 export default function Hero() {
   return (
-    <section className="relative px-6 pt-36 pb-16 md:px-10 md:pt-44 md:pb-24">
+    <section className="relative px-6 pt-24 pb-16 md:px-10 md:pt-32 md:pb-24">
       <div className="mx-auto grid max-w-[1120px] grid-cols-1 items-center gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
         <div>
           <Reveal>
@@ -21,7 +21,7 @@ export default function Hero() {
 
           <Reveal delay={80}>
             <h1
-              className="m-0 mb-6 font-serif font-normal text-ink"
+              className="m-0 mb-6 font-serif font-bold text-ink"
               style={{
                 fontSize: "clamp(2.75rem, 6.5vw, 5rem)",
                 lineHeight: 1.02,
@@ -35,7 +35,7 @@ export default function Hero() {
 
           <Reveal delay={160}>
             <p
-              className="m-0 mb-10 max-w-[500px] font-light text-[rgba(28,26,22,0.65)]"
+              className="m-0 mb-10 max-w-[500px] font-light text-[rgba(17,24,39,0.65)]"
               style={{ fontSize: "clamp(1.0625rem, 1.6vw, 1.1875rem)", lineHeight: 1.6 }}
             >
               {SUBHEAD}
@@ -46,8 +46,8 @@ export default function Hero() {
             <div className="flex flex-wrap items-center gap-3">
               <a
                 href="/login"
-                className="btn inline-flex items-center gap-2.5 rounded-full bg-ink px-7 py-[15px] text-[15px] font-medium text-cream no-underline hover:bg-[#33302a]"
-                style={{ boxShadow: "0 1px 2px rgba(28,26,22,0.12), 0 8px 24px -12px rgba(28,26,22,0.35)" }}
+                className="btn inline-flex items-center gap-2.5 rounded-full bg-ink px-7 py-[15px] text-[15px] font-medium text-cream no-underline hover:bg-[#1e293b]"
+                style={{ boxShadow: "0 1px 2px rgba(17,24,39,0.12), 0 8px 24px -12px rgba(17,24,39,0.35)" }}
               >
                 Get started
                 <span className="btn-arrow inline-flex">
@@ -58,13 +58,13 @@ export default function Hero() {
                 href="https://calendly.com/justin-textsidekick"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn inline-flex items-center rounded-full border border-[rgba(28,26,22,0.14)] px-6 py-[14px] text-[15px] font-medium text-ink no-underline hover:border-[rgba(28,26,22,0.28)] hover:bg-[rgba(28,26,22,0.03)]"
+                className="btn inline-flex items-center rounded-full border border-[rgba(17,24,39,0.14)] px-6 py-[14px] text-[15px] font-medium text-ink no-underline hover:border-[rgba(17,24,39,0.28)] hover:bg-[rgba(17,24,39,0.03)]"
               >
                 Book a walkthrough
               </a>
             </div>
 
-            <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-[rgba(28,26,22,0.5)]">
+            <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-[rgba(17,24,39,0.5)]">
               {["No app download", "Works on any phone", "Set up in 90 seconds"].map((t) => (
                 <span key={t} className="inline-flex items-center gap-1.5">
                   <span className="block h-1 w-1 rounded-full bg-accent" style={{ opacity: 0.7 }} />
@@ -82,7 +82,7 @@ export default function Hero() {
             className="absolute -inset-10 z-0"
             style={{
               background:
-                "radial-gradient(55% 50% at 50% 42%, rgba(201,100,66,0.09) 0%, rgba(201,100,66,0.03) 45%, transparent 72%)",
+                "radial-gradient(55% 50% at 50% 42%, rgba(0,96,240,0.06) 0%, rgba(0,96,240,0.02) 45%, transparent 72%)",
             }}
           />
           <div className="relative z-10">
@@ -92,11 +92,11 @@ export default function Hero() {
 
             {/* Grounded status chip — replaces the rotated sticky note */}
             <div
-              className="absolute -left-6 bottom-16 z-20 hidden items-center gap-2.5 rounded-full border border-[rgba(28,26,22,0.08)] py-2.5 pl-3.5 pr-4 md:flex"
+              className="absolute -left-6 -bottom-4 z-20 hidden items-center gap-2.5 rounded-full border border-[rgba(17,24,39,0.08)] py-2.5 pl-3.5 pr-4 md:flex"
               style={{
-                background: "rgba(252,249,243,0.85)",
+                background: "rgba(248,249,252,0.85)",
                 backdropFilter: "blur(12px)",
-                boxShadow: "0 1px 2px rgba(28,26,22,0.04), 0 12px 32px -16px rgba(28,26,22,0.16)",
+                boxShadow: "0 1px 2px rgba(17,24,39,0.04), 0 12px 32px -16px rgba(17,24,39,0.16)",
               }}
             >
               <span
@@ -105,7 +105,7 @@ export default function Hero() {
               />
               <span className="text-[12.5px] font-medium text-ink">
                 Any phone. Any language.{" "}
-                <span className="font-normal text-[rgba(28,26,22,0.55)]">No app.</span>
+                <span className="font-normal text-[rgba(17,24,39,0.55)]">No app.</span>
               </span>
             </div>
           </div>

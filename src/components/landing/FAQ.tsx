@@ -27,12 +27,12 @@ export default function FAQ() {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section className="border-t border-[rgba(28,26,22,0.07)] px-6 py-28 md:px-10 md:py-36">
+    <section className="border-t border-[rgba(17,24,39,0.07)] px-6 py-28 md:px-10 md:py-36">
       <div className="mx-auto max-w-[720px]">
         <Reveal>
           <Eyebrow>FAQ</Eyebrow>
           <h2
-            className="font-serif font-normal mt-5 mb-12 text-ink"
+            className="font-serif font-bold mt-5 mb-12 text-ink"
             style={{
               fontSize: "clamp(2.125rem, 4.5vw, 3.25rem)",
               lineHeight: 1.05,
@@ -45,7 +45,7 @@ export default function FAQ() {
         <div className="flex flex-col">
           {FAQS.map((faq, i) => (
             <Reveal key={i} delay={i * 60}>
-              <div className="border-t border-[rgba(28,26,22,0.07)] last:border-b last:border-b-[rgba(28,26,22,0.07)]">
+              <div className="border-t border-[rgba(17,24,39,0.07)] last:border-b last:border-b-[rgba(17,24,39,0.07)]">
                 <button
                   className="w-full flex items-center justify-between px-0 py-5 text-left bg-transparent border-none cursor-pointer"
                   onClick={() => setOpen(open === i ? null : i)}
@@ -70,7 +70,7 @@ export default function FAQ() {
                   }}
                 >
                   <div className="overflow-hidden">
-                    <div className="pb-5 text-[15px] font-light leading-relaxed text-[rgba(28,26,22,0.65)]">
+                    <div className="pb-5 text-[15px] font-light leading-relaxed text-[rgba(17,24,39,0.65)]">
                       {faq.a}
                     </div>
                   </div>

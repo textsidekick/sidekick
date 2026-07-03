@@ -18,12 +18,12 @@ export default function Nav() {
       <nav
         className="pointer-events-auto inline-flex max-w-full items-center gap-1 rounded-full border py-1.5 pl-4 pr-1.5"
         style={{
-          borderColor: scrolled ? "rgba(28,26,22,0.08)" : "rgba(28,26,22,0.05)",
-          background: scrolled ? "rgba(247,243,236,0.82)" : "rgba(247,243,236,0.5)",
+          borderColor: scrolled ? "rgba(17,24,39,0.08)" : "rgba(17,24,39,0.05)",
+          background: scrolled ? "rgba(248,249,252,0.82)" : "rgba(248,249,252,0.5)",
           backdropFilter: "blur(20px) saturate(1.4)",
           WebkitBackdropFilter: "blur(20px) saturate(1.4)",
           boxShadow: scrolled
-            ? "0 1px 2px rgba(28,26,22,0.04), 0 12px 32px -16px rgba(28,26,22,0.18)"
+            ? "0 1px 2px rgba(17,24,39,0.04), 0 12px 32px -16px rgba(17,24,39,0.18)"
             : "none",
           transition: "background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease",
         }}
@@ -52,7 +52,7 @@ export default function Nav() {
               key={l.label}
               href={l.href}
               {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-              className="link-quiet whitespace-nowrap text-[rgba(28,26,22,0.55)] no-underline hover:text-ink"
+              className="link-quiet whitespace-nowrap text-[rgba(17,24,39,0.55)] no-underline hover:text-ink"
             >
               {l.label}
             </a>
@@ -62,13 +62,13 @@ export default function Nav() {
         <div className="flex items-center gap-1">
           <a
             href="/login"
-            className="btn whitespace-nowrap rounded-full px-3.5 py-2 text-[13px] font-medium text-ink no-underline hover:bg-[rgba(28,26,22,0.06)]"
+            className="btn whitespace-nowrap rounded-full px-3.5 py-2 text-[13px] font-medium text-ink no-underline hover:bg-[rgba(17,24,39,0.06)]"
           >
             Log in
           </a>
           <a
             href="/login"
-            className="btn whitespace-nowrap rounded-full bg-ink px-4 py-2 text-[13px] font-medium text-cream no-underline hover:bg-[#33302a]"
+            className="btn whitespace-nowrap rounded-full bg-ink px-4 py-2 text-[13px] font-medium text-cream no-underline hover:bg-[#1e293b]"
           >
             Try Sidekick
           </a>
