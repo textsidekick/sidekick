@@ -15,30 +15,21 @@ interface MetricCardProps {
   valueClassName?: string
   isHighlighted?: boolean
   accentColor?: 'amber' | 'red' | 'emerald' | 'blue' | 'purple'
+  action?: React.ReactNode
 }
 
 const ACCENT_BORDER: Record<string, string> = {
-  amber:   'border-l-amber-400',
-  red:     'border-l-red-400',
-  emerald: 'border-l-emerald-400',
-  blue:    'border-l-blue-400',
-  purple:  'border-l-purple-400',
+  amber:   'border-l-amber-200',
+  red:     'border-l-red-200',
+  emerald: 'border-l-green-200',
+  blue:    'border-l-blue-200',
+  purple:  'border-l-purple-200',
 }
 
 function MetricCard({
   label, value, icon: Icon, subtext, iconClassName = 'h-5 w-5 text-gray-400',
-  previousValue, change, valueClassName, dateRange, isHighlighted = false, accentColor,
+  previousValue, change, valueClassName, dateRange, isHighlighted = false, accentColor, action,
 }: MetricCardProps) {
-  const getTrendColor = (val: number) => {
-    if (val > 0) return 'text-emerald-600'
-    if (val < 0) return 'text-red-500'
-    return 'text-gray-400'
-  }
-  const getTrendBg = (val: number) => {
-    if (val > 0) return 'bg-emerald-50'
-    if (val < 0) return 'bg-red-50'
-    return 'bg-gray-100'
-  }
   const TrendIcon = change !== undefined ? (change > 0 ? TrendingUp : change < 0 ? TrendingDown : Minus) : null
 
   const borderClass = isHighlighted ? 'border-blue-200' : 'border-gray-200'
@@ -59,13 +50,14 @@ function MetricCard({
       <div className="mt-2 flex items-center gap-2">
         {previousValue !== undefined && <span className="text-xs text-gray-400">{previousValue}</span>}
         {change !== undefined && TrendIcon && (
-          <span className={'inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[11px] font-medium ' + getTrendBg(change) + ' ' + getTrendColor(change)}>
+          <span className="inline-flex items-center gap-0.5 text-xs text-gray-500">
             {change > 0 ? '+' : ''}{change.toFixed(1)}%
             <TrendIcon className="h-3 w-3" />
           </span>
         )}
         {subtext && !previousValue && <p className="text-xs text-gray-400">{subtext}</p>}
       </div>
+      {action && <div className="mt-2">{action}</div>}
     </div>
   )
 }
