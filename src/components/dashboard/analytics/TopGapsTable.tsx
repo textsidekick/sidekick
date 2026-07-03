@@ -14,7 +14,7 @@ export interface GapItem {
 const CATEGORY_COLORS: Record<string, string> = {
   Safety: 'bg-[#C0392B] text-white',
   HR: 'bg-[#2980B9] text-white',
-  Training: 'bg-[#D4A900] text-white',
+  Training: 'bg-[#E9C46A] text-white',
   General: 'bg-[#4A4A4A] text-white',
 }
 

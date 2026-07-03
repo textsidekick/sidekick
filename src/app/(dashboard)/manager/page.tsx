@@ -728,7 +728,7 @@ export default function ManagerDashboard() {
                       <span className={`flex-shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${
                         answered
                           ? "bg-[#27AE60] text-white"
-                          : "bg-[#D4A900] text-white"
+                          : "bg-[#E9C46A] text-white"
                       }`}>
                         {answered ? "Answered" : "Needs answer"}
                       </span>
@@ -758,7 +758,7 @@ export default function ManagerDashboard() {
                         <p className="font-medium text-sm text-gray-900">{q.question}</p>
                         <p className="text-xs mt-1 text-gray-400">Asked by {q.worker_name || "Worker"} · {q.created_at ? new Date(q.created_at).toLocaleDateString() : ""}</p>
                       </div>
-                      <span className="text-xs px-2 py-1 rounded-full bg-[#D4A900] text-white">Needs Answer</span>
+                      <span className="text-xs px-2 py-1 rounded-full bg-[#E9C46A] text-white">Needs Answer</span>
                     </div>
                   ))}
                 </div>
