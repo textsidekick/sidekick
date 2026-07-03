@@ -88,8 +88,8 @@ export default function KnowledgePage() {
           {/* Hero stats */}
           <div className="mt-6 flex items-center gap-4 flex-wrap">
             <div className="bg-white rounded-xl border border-gray-200 px-6 py-4 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-[#C96442]/10 flex items-center justify-center">
-                <BookOpen className="w-6 h-6 text-[#C96442]" />
+              <div className="w-12 h-12 rounded-xl bg-[#0891B2] flex items-center justify-center">
+                <BookOpen className="w-6 h-6 text-white" />
               </div>
               <div>
                 <div className="text-3xl font-bold text-gray-900">{articles.length}</div>
@@ -105,8 +105,8 @@ export default function KnowledgePage() {
                     : "border-amber-200 bg-amber-50 hover:bg-amber-100"
                 }`}
               >
-                <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
-                  <BookOpen className="w-6 h-6 text-amber-600" />
+                <div className="w-12 h-12 rounded-xl bg-[#F59E0B] flex items-center justify-center">
+                  <BookOpen className="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <div className="text-3xl font-bold text-amber-700">{needsReview.length}</div>
