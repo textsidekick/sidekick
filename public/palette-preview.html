@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Color Palette Options</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Inter, -apple-system, system-ui, sans-serif; background: #F7F3EC; padding: 40px; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 8px; color: #1C1A16; }
+  p.sub { font-size: 14px; color: #888; margin-bottom: 36px; }
+  .option { background: white; border-radius: 16px; padding: 28px 32px; margin-bottom: 24px; border: 1px solid rgba(0,0,0,0.06); }
+  .option h2 { font-size: 16px; font-weight: 700; margin-bottom: 4px; color: #1C1A16; }
+  .option .desc { font-size: 13px; color: #999; margin-bottom: 20px; }
+  .group { margin-bottom: 16px; }
+  .group-label { font-size: 11px; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+  .badges { display: flex; gap: 8px; flex-wrap: wrap; }
+  .badge { display: inline-flex; align-items: center; padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; letter-spacing: 0.03em; }
+  .tag { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; }
+  .status { font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; margin-right: 16px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+</style>
+</head>
+<body>
+
+<h1>Color Palette Options</h1>
+<p class="sub">Same pattern (solid bg + white text). Different shade families. Pick one or mix.</p>
+
+<!-- OPTION A -->
+<div class="option">
+  <h2>Option A — Muted & Earthy</h2>
+  <div class="desc">Deeper, desaturated tones. Warm and grounded. Matches the cream/orange brand.</div>
+  
+  <div class="group">
+    <div class="group-label">Priority</div>
+    <div class="badges">
+      <span class="badge" style="background:#B91C1C; color:#fff;">CRITICAL</span>
+      <span class="badge" style="background:#B45309; color:#fff;">HIGH</span>
+      <span class="badge" style="background:#A16207; color:#fff;">MEDIUM</span>
+      <span class="badge" style="background:#78716C; color:#fff;">LOW</span>
+    </div>
+  </div>
+  
+  <div class="group">
+    <div class="group-label">Status</div>
+    <div class="badges">
+      <span class="badge" style="background:#1D4ED8; color:#fff;">OPEN</span>
+      <span class="badge" style="background:#5B21B6; color:#fff;">ASSIGNED</span>
+      <span class="badge" style="background:#B45309; color:#fff;">IN PROGRESS</span>
+      <span class="badge" style="background:#047857; color:#fff;">COMPLETED</span>
+      <span class="badge" style="background:#78716C; color:#fff;">ON HOLD</span>
+    </div>
+  </div>
+  
+  <div class="group">
+    <div class="group-label">Roles</div>
+    <div class="badges">
+      <span class="badge" style="background:#44403C; color:#fff;">technician</span>
+      <span class="badge" style="background:#5B21B6; color:#fff;">manager</span>
+      <span class="badge" style="background:#1E3A5F; color:#fff;">supervisor</span>
+      <span class="badge" style="background:#57534E; color:#fff;">operator</span>
+    </div>
+  </div>
+  
+  <div class="group">
+    <div class="group-label">Skill Tags</div>
+    <div class="badges">
+      <span class="tag" style="background:#F5F5F4; color:#57534E;">Mechanical</span>
+      <span class="tag" style="background:#F5F5F4; color:#57534E;">Electrical</span>
+      <span class="tag" style="background:#F5F5F4; color:#57534E;">Conveyor Specialist</span>
+    </div>
+  </div>
+  
+  <div class="group">
+    <div class="group-label">Inline Status</div>
+    <span class="status" style="color:#047857;"><span class="dot" style="background:#047857;"></span> Active</span>
+    <span class="status" style="color:#B45309;"><span class="dot" style="background:#B45309;"></span> Pending</span>
+    <span class="status" style="color:#B91C1C;">Needs answer</span>
+  </div>
+</div>
+
+<!-- OPTION B -->
+<div class="option">
+  <h2>Option B — Cool & Punchy</h2>
+  <div class="desc">More saturated, modern SaaS feel. Bolder contrast, slightly cooler tones.</div>
+  
+  <div class="group">
+    <div class="group-label">Priority</div>
+    <div class="badges">
+      <span class="badge" style="background:#E11D48; color:#fff;">CRITICAL</span>
+      <span class="badge" style="background:#EA580C; color:#fff;">HIGH</span>
+      <span class="badge" style="background:#CA8A04; color:#fff;">MEDIUM</span>
+      <span class="badge" style="background:#6B7280; color:#fff;">LOW</span>
+    </div>
+  </div>
+  
+  <div class="group">
+    <div class="group-label">Status</div>
+    <div class="badges">
+      <span class="badge" style="background:#0284C7; color:#fff;">OPEN</span>
+      <span class="badge" style="background:#7C3AED; color:#fff;">ASSIGNED</span>
+      <span class="badge" style="background:#EA580C; color:#fff;">IN PROGRESS</span>
+      <span class="badge" style="background:#0D9488; color:#fff;">COMPLETED</span>
+      <span class="badge" style="background:#6B7280; color:#fff;">ON HOLD</span>
+    </div>
+  </div>
+  
+  <div class="group">
+    <div class="group-label">Roles</div>
+    <div class="badges">
+      <span class="badge" style="background:#334155; color:#fff;">technician</span>
+      <span class="badge" style="background:#4C1D95; color:#fff;">manager</span>
+      <span class="badge" style="background:#0C4A6E; color:#fff;">supervisor</span>
+      <span class="badge" style="background:#475569; color:#fff;">operator</span>
+    </div>
+  </div>
+  
+  <div class="group">
+    <div class="group-label">Skill Tags</div>
+    <div class="badges">
+      <span class="tag" style="background:#F0F1F3; color:#4A5568;">Mechanical</span>
+      <span class="tag" style="background:#F0F1F3; color:#4A5568;">Electrical</span>
+      <span class="tag" style="background:#F0F1F3; color:#4A5568;">Conveyor Specialist</span>
+    </div>
+  </div>
+  
+  <div class="group">
+    <div class="group-label">Inline Status</div>
+    <span class="status" style="color:#0D9488;"><span class="dot" style="background:#0D9488;"></span> Active</span>
+    <span class="status" style="color:#EA580C;"><span class="dot" style="background:#EA580C;"></span> Pending</span>
+    <span class="status" style="color:#E11D48;">Needs answer</span>
+  </div>
+</div>
+
+<!-- OPTION C -->
+<div class="option">
+  <h2>Option C — Warm & Distinctive</h2>
+  <div class="desc">Non-Tailwind colors. Unique hues that won't look like every other SaaS tool.</div>
+  
+  <div class="group">
+    <div class="group-label">Priority</div>
+    <div class="badges">
+      <span class="badge" style="background:#C0392B; color:#fff;">CRITICAL</span>
+      <span class="badge" style="background:#D4781C; color:#fff;">HIGH</span>
+      <span class="badge" style="background:#C49B1A; color:#fff;">MEDIUM</span>
+      <span class="badge" style="background:#7F8C8D; color:#fff;">LOW</span>
+    </div>
+  </div>
+  
+  <div class="group">
+    <div class="group-label">Status</div>
+    <div class="badges">
+      <span class="badge" style="background:#2980B9; color:#fff;">OPEN</span>
+      <span class="badge" style="background:#6C5CE7; color:#fff;">ASSIGNED</span>
+      <span class="badge" style="background:#D4781C; color:#fff;">IN PROGRESS</span>
+      <span class="badge" style="background:#27AE60; color:#fff;">COMPLETED</span>
+      <span class="badge" style="background:#7F8C8D; color:#fff;">ON HOLD</span>
+    </div>
+  </div>
+  
+  <div class="group">
+    <div class="group-label">Roles</div>
+    <div class="badges">
+      <span class="badge" style="background:#2D3436; color:#fff;">technician</span>
+      <span class="badge" style="background:#5F4B8B; color:#fff;">manager</span>
+      <span class="badge" style="background:#1B4F72; color:#fff;">supervisor</span>
+      <span class="badge" style="background:#4A4A4A; color:#fff;">operator</span>
+    </div>
+  </div>
+  
+  <div class="group">
+    <div class="group-label">Skill Tags</div>
+    <div class="badges">
+      <span class="tag" style="background:#ECEDF0; color:#505565;">Mechanical</span>
+      <span class="tag" style="background:#ECEDF0; color:#505565;">Electrical</span>
+      <span class="tag" style="background:#ECEDF0; color:#505565;">Conveyor Specialist</span>
+    </div>
+  </div>
+  
+  <div class="group">
+    <div class="group-label">Inline Status</div>
+    <span class="status" style="color:#27AE60;"><span class="dot" style="background:#27AE60;"></span> Active</span>
+    <span class="status" style="color:#D4781C;"><span class="dot" style="background:#D4781C;"></span> Pending</span>
+    <span class="status" style="color:#C0392B;">Needs answer</span>
+  </div>
+</div>
+
+</body>
+</html>
