@@ -8,7 +8,7 @@ const STATUS_CLASSES: Record<string, string> = {
   new: "bg-[#2980B9] text-white",
   open: "bg-[#2980B9] text-white",
   assigned: "bg-[#6C5CE7] text-white",
-  in_progress: "bg-[#D4781C] text-white",
+  in_progress: "bg-[#2563EB] text-white",
   completed: "bg-[#27AE60] text-white",
   cancelled: "bg-[#7F8C8D] text-white",
   on_hold: "bg-[#7F8C8D] text-white",

@@ -33,8 +33,8 @@ export default function DashboardLayout({
         className={`antialiased`}
         style={{
           fontFamily: "Inter, system-ui, sans-serif",
-          background: "#F7F3EC",
-          color: "#1C1A16",
+          background: "#F8F9FC",
+          color: "#111827",
         }}
       >
         <Sidebar />

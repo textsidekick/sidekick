@@ -33,7 +33,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 const CATEGORY_COLORS: Record<string, string> = {
   Safety: '#ef4444',
-  Equipment: '#C96442',
+  Equipment: '#0060F0',
   Compliance: '#f59e0b',
   Health: '#8b5cf6',
 }
@@ -171,7 +171,7 @@ function AlertCharts({ alerts }: AlertChartsProps) {
               <Bar
                 dataKey="alerts"
                 name="Alerts"
-                fill="#C96442"
+                fill="#0060F0"
                 radius={[6, 6, 0, 0]}
                 maxBarSize={40}
               />

@@ -39,7 +39,7 @@ function statusPill(status: AssetStatus) {
     status === "operational"
       ? "bg-[#27AE60] text-white"
       : status === "degraded"
-        ? "bg-[#D4781C] text-white"
+        ? "bg-[#EF4444] text-white"
         : status === "down"
           ? "bg-[#C0392B] text-white"
           : "bg-gray-100 text-gray-700";
@@ -48,7 +48,7 @@ function statusPill(status: AssetStatus) {
 
 function healthGradient(score: number) {
   if (score >= 85) return "text-green-700";
-  if (score >= 70) return "text-amber-700";
+  if (score >= 70) return "text-red-700";
   return "text-red-700";
 }
 
@@ -258,7 +258,7 @@ export default function AssetsPage() {
                 {frequentIssues.map(({ a, count7d }) => (
                   <div key={a.id} className="flex items-center justify-between">
                     <div className="text-sm">{a.name}</div>
-                    <div className="text-sm font-medium text-amber-700">{count7d} WOs</div>
+                    <div className="text-sm font-medium text-red-700">{count7d} WOs</div>
                   </div>
                 ))}
               </div>

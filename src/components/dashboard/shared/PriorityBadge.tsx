@@ -3,10 +3,10 @@
 import { cn } from "@/lib/utils";
 
 const PRIORITY_CLASSES: Record<string, string> = {
-  critical: "bg-[#C0392B] text-white",
-  high: "bg-[#D4781C] text-white",
-  medium: "bg-[#C49B1A] text-white",
-  low: "bg-[#7F8C8D] text-white",
+  critical: "bg-[#DC2626] text-white",
+  high: "bg-[#EF4444] text-white",
+  medium: "bg-[#D97706] text-white",
+  low: "bg-[#6B7280] text-white",
 };
 
 export function PriorityBadge({ priority }: { priority: string }) {

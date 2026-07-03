@@ -11,7 +11,7 @@ function formatTimeAgo(date: string): string {
 }
 
 function getAvatarColor(name: string): string {
-  const colors = ["bg-[#C96442]","bg-green-500","bg-purple-500","bg-pink-500","bg-indigo-500","bg-cyan-500","bg-orange-500","bg-teal-500"];
+  const colors = ["bg-[#0060F0]","bg-green-500","bg-purple-500","bg-pink-500","bg-indigo-500","bg-cyan-500","bg-blue-500","bg-teal-500"];
   return colors[name ? name.charCodeAt(0) % colors.length : 0];
 }
 
@@ -68,7 +68,7 @@ export function WorkerDetailModal({ worker, onClose, workerQuestions, certificat
               <div key={i} className="bg-gray-50 rounded-lg p-3">
                 <div className="flex items-start justify-between mb-2">
                   <p className="font-medium text-gray-900">{q.question}</p>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${q.confidence >= 70 ? "bg-[#27AE60] text-white" : q.confidence >= 40 ? "bg-[#D4781C] text-white" : "bg-[#C0392B] text-white"}`}>{q.confidence}%</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${q.confidence >= 70 ? "bg-[#27AE60] text-white" : q.confidence >= 40 ? "bg-[#EF4444] text-white" : "bg-[#C0392B] text-white"}`}>{q.confidence}%</span>
                 </div>
                 <p className="text-sm text-gray-600 mb-1">{q.answer}</p>
                 <p className="text-xs text-gray-400">{formatTimeAgo(q.created_at)}</p>

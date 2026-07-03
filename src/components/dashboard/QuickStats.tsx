@@ -19,7 +19,7 @@ export default function QuickStats({ companyId }: Props) {
     { label: "Questions Answered", value: stats?.questions?.toLocaleString() ?? "—", icon: <MessageSquare className="h-5 w-5" />, color: "text-blue-500" },
     { label: "Avg Response Time", value: stats?.avgTime ?? "—", icon: <Clock className="h-5 w-5" />, color: "text-green-500" },
     { label: "Languages Detected", value: stats?.languages ?? "—", icon: <Globe className="h-5 w-5" />, color: "text-purple-500" },
-    { label: "Active Workers", value: stats?.workers ?? "—", icon: <Users className="h-5 w-5" />, color: "text-[#C96442]" },
+    { label: "Active Workers", value: stats?.workers ?? "—", icon: <Users className="h-5 w-5" />, color: "text-[#0060F0]" },
   ];
 
   return (

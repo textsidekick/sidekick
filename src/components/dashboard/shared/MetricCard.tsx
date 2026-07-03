@@ -14,11 +14,11 @@ interface MetricCardProps {
   dateRange?: string
   valueClassName?: string
   isHighlighted?: boolean
-  accentColor?: 'amber' | 'red' | 'emerald' | 'blue' | 'purple'
+  accentColor?: 'amber' | 'red' | 'emerald' | 'blue' | 'purple' | 'yellow'
 }
 
 const ACCENT_BORDER: Record<string, string> = {
-  amber:   'border-l-amber-400',
+  amber:   'border-l-yellow-400',
   red:     'border-l-red-400',
   emerald: 'border-l-emerald-400',
   blue:    'border-l-blue-400',
