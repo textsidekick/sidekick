@@ -10,7 +10,7 @@ export default function CTA() {
           color: "#F7F3EC",
           borderRadius: 32,
           padding: "80px 64px",
-          background: "linear-gradient(135deg, #C96442 0%, #A74D30 100%)",
+          background: "linear-gradient(135deg, #0060F0 0%, #004BB8 100%)",
           display: "grid",
           gridTemplateColumns: "1fr",
           gap: 48,
