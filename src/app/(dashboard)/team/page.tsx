@@ -332,14 +332,14 @@ export default function TeamPage() {
                           <td className="px-4 py-3">{roleBadge(w.role)}</td>
                           <td className="px-4 py-3 hidden md:table-cell">
                             <div className="flex flex-wrap gap-1">
-                              {skills.map(s => <span key={s} className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">{s}</span>)}
+                              {skills.map(s => <span key={s} className="text-xs px-2 py-0.5 bg-blue-100 text-gray-700 rounded-full">{s}</span>)}
                             </div>
                           </td>
                           <td className="px-4 py-3 text-sm text-gray-700 font-medium">{wosCompleted || <span className="text-gray-400">—</span>}</td>
                           <td className="px-4 py-3">
                             {w.verified
-                              ? <span className="flex items-center gap-1 text-gray-600 text-xs"><CheckCircle className="h-3.5 w-3.5" /> Active</span>
-                              : <span className="flex items-center gap-1 text-gray-500 text-xs"><Clock className="h-3.5 w-3.5" /> Pending</span>}
+                              ? <span className="flex items-center gap-1 text-green-600 text-xs"><CheckCircle className="h-3.5 w-3.5" /> Active</span>
+                              : <span className="flex items-center gap-1 text-orange-500 text-xs"><Clock className="h-3.5 w-3.5" /> Pending</span>}
                           </td>
                           <td className="px-4 py-3 text-gray-400 text-xs">{new Date(w.created_at).toLocaleDateString()}</td>
                           <td className="px-4 py-3">
