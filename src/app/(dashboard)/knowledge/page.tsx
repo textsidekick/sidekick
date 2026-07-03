@@ -88,7 +88,7 @@ export default function KnowledgePage() {
           {/* Hero stats */}
           <div className="mt-6 flex items-center gap-4 flex-wrap">
             <div className="bg-white rounded-xl border border-gray-200 px-6 py-4 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-[#C96442] flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-[#1B4F72] flex items-center justify-center">
                 <BookOpen className="w-6 h-6 text-white" />
               </div>
               <div>
