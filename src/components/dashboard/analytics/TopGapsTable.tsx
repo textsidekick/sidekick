@@ -12,10 +12,10 @@ export interface GapItem {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Safety: 'bg-red-100 text-red-700',
-  HR: 'bg-blue-100 text-blue-700',
-  Training: 'bg-amber-100 text-amber-700',
-  General: 'bg-gray-100 text-gray-700',
+  Safety: 'bg-[#C0392B] text-white',
+  HR: 'bg-[#2980B9] text-white',
+  Training: 'bg-[#D4781C] text-white',
+  General: 'bg-[#4A4A4A] text-white',
 }
 
 interface TopGapsTableProps {

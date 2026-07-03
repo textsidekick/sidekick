@@ -204,7 +204,7 @@ export default function OperationsDashboardPage() {
             <div className="flex items-center gap-2">
               <Badge className="bg-black/5 text-black hover:bg-black/5">Live</Badge>
               {!!data && (
-                <Badge className={cn("hover:bg-black/5", mttrTrend <= 0 ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800")}>
+                <Badge className={cn("hover:bg-black/5", mttrTrend <= 0 ? "bg-[#27AE60] text-white" : "bg-[#D4781C] text-white")}>
                   {mttrTrend <= 0 ? (
                     <ArrowDownRight className="h-3.5 w-3.5 mr-1" />
                   ) : (
@@ -257,10 +257,10 @@ export default function OperationsDashboardPage() {
               {alerts.map((a) => {
                 const badge =
                   a.type === "critical"
-                    ? "bg-red-100 text-red-800"
+                    ? "bg-[#C0392B] text-white"
                     : a.type === "warning"
-                      ? "bg-amber-100 text-amber-800"
-                      : "bg-blue-100 text-blue-800";
+                      ? "bg-[#D4781C] text-white"
+                      : "bg-[#2980B9] text-white";
 
                 return (
                   <div key={a.id} className="rounded-xl border border-black/5 p-4">
@@ -328,7 +328,7 @@ export default function OperationsDashboardPage() {
                         <StatusBadge status={ev.status} />
                       </div>
                     </div>
-                    <div className={cn("text-xs px-2 py-1 rounded-full", isCompleted ? "bg-green-100 text-green-800" : "bg-black/5 text-black/70")}>
+                    <div className={cn("text-xs px-2 py-1 rounded-full", isCompleted ? "bg-[#27AE60] text-white" : "bg-black/5 text-black/70")}>
                       {isCompleted ? "Done" : "Active"}
                     </div>
                   </div>

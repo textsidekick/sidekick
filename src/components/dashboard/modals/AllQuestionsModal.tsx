@@ -67,7 +67,7 @@ export function AllQuestionsModal({ open, onClose, filteredQuestions, questionSe
                   <div className="flex-1">
                     <div className="flex items-start justify-between mb-1">
                       <span className="font-medium text-gray-900">{q.worker_name || "Unknown"}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${q.confidence >= 70 ? "bg-green-100 text-green-700" : q.confidence >= 40 ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700"}`}>{q.confidence}% confidence</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${q.confidence >= 70 ? "bg-[#27AE60] text-white" : q.confidence >= 40 ? "bg-[#D4781C] text-white" : "bg-[#C0392B] text-white"}`}>{q.confidence}% confidence</span>
                     </div>
                     <p className="text-gray-700 mb-2">{q.question}</p>
                     <p className="text-sm text-gray-500">{q.answer}</p>

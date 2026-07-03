@@ -727,8 +727,8 @@ export default function ManagerDashboard() {
                       </div>
                       <span className={`flex-shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${
                         answered
-                          ? "bg-emerald-100 text-emerald-700"
-                          : "bg-amber-100 text-amber-700"
+                          ? "bg-[#27AE60] text-white"
+                          : "bg-[#D4781C] text-white"
                       }`}>
                         {answered ? "Answered" : "Needs answer"}
                       </span>
@@ -758,7 +758,7 @@ export default function ManagerDashboard() {
                         <p className="font-medium text-sm text-gray-900">{q.question}</p>
                         <p className="text-xs mt-1 text-gray-400">Asked by {q.worker_name || "Worker"} · {q.created_at ? new Date(q.created_at).toLocaleDateString() : ""}</p>
                       </div>
-                      <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700">Needs Answer</span>
+                      <span className="text-xs px-2 py-1 rounded-full bg-[#D4781C] text-white">Needs Answer</span>
                     </div>
                   ))}
                 </div>
@@ -856,7 +856,7 @@ export default function ManagerDashboard() {
                               <td className="py-2.5 pr-4 font-medium text-gray-900">{cert.workerName}</td>
                               <td className="py-2.5 pr-4 text-gray-600">{cert.certName}</td>
                               <td className="py-2.5 pr-4 text-gray-500">{new Date(cert.expiryDate).toLocaleDateString()}</td>
-                              <td className="py-2.5"><span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${valid ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}>{valid ? "Valid" : "Expired"}</span></td>
+                              <td className="py-2.5"><span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${valid ? "bg-[#27AE60] text-white" : "bg-[#C0392B] text-white"}`}>{valid ? "Valid" : "Expired"}</span></td>
                               <td className="py-2.5 text-right"><button onClick={() => deleteCertification(cert.id)} className="text-gray-400 hover:text-red-500"><Trash2 className="h-4 w-4" /></button></td>
                             </tr>
                           );
@@ -902,7 +902,7 @@ export default function ManagerDashboard() {
                               <td className="py-2.5 text-center">{icon(entry.ppeOk)}</td>
                               <td className="py-2.5 text-center">{icon(entry.lotoOk)}</td>
                               <td className="py-2.5 text-center">{icon(entry.equipmentOk)}</td>
-                              <td className="py-2.5"><span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${passed ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}>{passed ? "Passed" : "Failed"}</span></td>
+                              <td className="py-2.5"><span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${passed ? "bg-[#27AE60] text-white" : "bg-[#C0392B] text-white"}`}>{passed ? "Passed" : "Failed"}</span></td>
                             </tr>
                           );
                         })}

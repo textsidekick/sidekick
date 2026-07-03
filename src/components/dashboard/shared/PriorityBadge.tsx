@@ -3,14 +3,14 @@
 import { cn } from "@/lib/utils";
 
 const PRIORITY_CLASSES: Record<string, string> = {
-  critical: "bg-red-100 text-red-800",
-  high: "bg-orange-100 text-orange-800",
-  medium: "bg-yellow-100 text-yellow-900",
-  low: "bg-green-100 text-green-800",
+  critical: "bg-[#C0392B] text-white",
+  high: "bg-[#D4781C] text-white",
+  medium: "bg-[#C49B1A] text-white",
+  low: "bg-[#7F8C8D] text-white",
 };
 
 export function PriorityBadge({ priority }: { priority: string }) {
-  const cls = PRIORITY_CLASSES[priority] ?? "bg-gray-100 text-gray-700";
+  const cls = PRIORITY_CLASSES[priority] ?? "bg-[#7F8C8D] text-white";
   return (
     <span className={cn("text-xs font-medium px-2 py-1 rounded-full", cls)}>
       {priority.toUpperCase()}
