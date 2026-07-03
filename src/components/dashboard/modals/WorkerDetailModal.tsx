@@ -68,7 +68,7 @@ export function WorkerDetailModal({ worker, onClose, workerQuestions, certificat
               <div key={i} className="bg-gray-50 rounded-lg p-3">
                 <div className="flex items-start justify-between mb-2">
                   <p className="font-medium text-gray-900">{q.question}</p>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${q.confidence >= 70 ? "bg-[#27AE60] text-white" : q.confidence >= 40 ? "bg-[#DB2777] text-white" : "bg-[#DC2626] text-white"}`}>{q.confidence}%</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${q.confidence >= 70 ? "bg-[#27AE60] text-white" : q.confidence >= 40 ? "bg-[#F59E0B] text-white" : "bg-[#DC2626] text-white"}`}>{q.confidence}%</span>
                 </div>
                 <p className="text-sm text-gray-600 mb-1">{q.answer}</p>
                 <p className="text-xs text-gray-400">{formatTimeAgo(q.created_at)}</p>

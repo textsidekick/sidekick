@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 const PRIORITY_CLASSES: Record<string, string> = {
   critical: "bg-[#DC2626] text-white",
-  high: "bg-[#DB2777] text-white",
+  high: "bg-[#F59E0B] text-white",
   medium: "bg-[#2E86AB] text-white",
   low: "bg-[#7F8C8D] text-white",
 };
