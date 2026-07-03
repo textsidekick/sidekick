@@ -18,13 +18,6 @@ interface MetricCardProps {
   action?: React.ReactNode
 }
 
-const ACCENT_BORDER: Record<string, string> = {
-  amber:   'border-l-amber-200',
-  red:     'border-l-red-200',
-  emerald: 'border-l-green-200',
-  blue:    'border-l-blue-200',
-  purple:  'border-l-purple-200',
-}
 
 function MetricCard({
   label, value, icon: Icon, subtext, iconClassName = 'h-5 w-5 text-gray-400',
@@ -33,7 +26,7 @@ function MetricCard({
   const TrendIcon = change !== undefined ? (change > 0 ? TrendingUp : change < 0 ? TrendingDown : Minus) : null
 
   const borderClass = isHighlighted ? 'border-blue-200' : 'border-gray-200'
-  const accentClass = accentColor ? 'border-l-[3px] ' + ACCENT_BORDER[accentColor] : ''
+  const accentClass = ''
 
   return (
     <div className={`rounded-xl border bg-white p-5 ${borderClass} ${accentClass}`}>
