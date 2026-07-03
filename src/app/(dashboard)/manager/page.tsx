@@ -520,6 +520,26 @@ export default function ManagerDashboard() {
         />
       )}
 
+      {/* ── Tab bar ────────────────────────────────────────────────────────── */}
+      <div className="max-w-7xl mx-auto px-6 pt-4">
+        <div className="flex gap-1 border-b border-gray-200">
+          {(["analytics", "alerts", "documents", "workers"] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={cn(
+                "px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px",
+                activeTab === tab
+                  ? "border-[#C96442] text-[#C96442]"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              )}
+            >
+              {tab === "analytics" ? "Overview" : tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* ── Tab content ───────────────────────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
 
