@@ -15,6 +15,7 @@ type Body = {
   company?: string;
   email?: string;
   message?: string;
+  size?: string;
 };
 
 function escapeHtml(s: string) {
@@ -34,7 +35,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { name, company, email, message } = body;
+  const { name, company, email, message, size } = body;
 
   if (!name || !company || !email || !message) {
     return NextResponse.json(
@@ -55,6 +56,7 @@ export async function POST(req: Request) {
     <h2>New demo request</h2>
     <p><strong>Name:</strong> ${escapeHtml(name)}</p>
     <p><strong>Company:</strong> ${escapeHtml(company)}</p>
+    ${size ? `<p><strong>Workforce size:</strong> ${escapeHtml(size)}</p>` : ""}
     <p><strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></p>
     <p><strong>Message:</strong></p>
     <p style="white-space:pre-wrap;">${escapeHtml(message)}</p>
