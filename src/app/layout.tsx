@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
+});
+
+const instrument = Instrument_Serif({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-instrument",
 });
 
 export const metadata: Metadata = {
@@ -37,7 +44,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable}`}>
+    <html lang="en" className={`${inter.variable} ${instrument.variable}`}>
       <body className="antialiased" style={{ fontFamily: "Inter, system-ui, sans-serif", overflowX: "hidden" }}>
         {children}
       </body>

@@ -6,67 +6,53 @@ export default function CTA() {
     <section className="px-6 py-24 md:px-10">
       <Reveal>
         <div
-          className="relative mx-auto overflow-hidden rounded-2xl"
+          className="mx-auto relative overflow-hidden rounded-[28px]"
           style={{
-            maxWidth: 1200,
-            padding: "72px 48px",
-            background: "linear-gradient(135deg, #06080F 0%, #0d1117 50%, #06080F 100%)",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.2), 0 24px 64px -24px rgba(0,0,0,0.4)",
+            maxWidth: 1120,
+            padding: "72px 64px",
+            background: "linear-gradient(135deg, #C96442 0%, #A74D30 100%)",
+            boxShadow: "0 1px 2px rgba(28,26,22,0.12), 0 24px 64px -24px rgba(167,77,48,0.5)",
           }}
         >
-          {/* Gradient orbs */}
           <div
             aria-hidden
-            className="pointer-events-none absolute"
+            className="pointer-events-none absolute inset-0"
             style={{
-              width: 400, height: 400, top: -100, right: -50,
-              background: "radial-gradient(circle, rgba(0,96,240,0.15) 0%, transparent 70%)",
+              background:
+                "radial-gradient(60% 70% at 80% -10%, rgba(247,243,236,0.12), transparent 65%)",
             }}
           />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute"
-            style={{
-              width: 300, height: 300, bottom: -80, left: -60,
-              background: "radial-gradient(circle, rgba(0,96,240,0.08) 0%, transparent 70%)",
-            }}
-          />
-          <div aria-hidden className="pointer-events-none absolute inset-0 dot-grid-dark" />
-
           <div className="relative text-center">
             <h2
-              className="m-0 mb-5 font-extrabold text-white"
+              className="font-serif font-normal text-cream m-0 mb-5"
               style={{
-                fontSize: "clamp(2rem, 4.5vw, 3.25rem)",
-                lineHeight: 1.05,
-                letterSpacing: "-0.03em",
+                fontSize: "clamp(2.25rem, 5vw, 3.5rem)",
+                lineHeight: 0.98,
+                letterSpacing: "-0.025em",
               }}
             >
-              Give your team a{" "}
-              <span className="text-accent">Sidekick.</span>
+              Give your team a <em className="italic">Sidekick.</em>
             </h2>
             <p
-              className="m-0 mx-auto mb-9"
-              style={{ fontSize: 16, lineHeight: 1.6, maxWidth: 440, color: "rgba(255,255,255,0.5)" }}
+              className="m-0 mx-auto mb-9 font-light"
+              style={{ fontSize: 17, lineHeight: 1.55, maxWidth: 480, color: "rgba(247,243,236,0.85)" }}
             >
               Set up in 90 seconds. No app, no training, no per-seat pricing.
             </p>
-            <div className="flex justify-center gap-3 flex-wrap">
+            <div className="flex gap-3 justify-center flex-wrap">
               <a
                 href="/login"
-                className="btn inline-flex items-center gap-2.5 rounded-lg bg-accent px-7 py-[14px] text-[15px] font-semibold text-white no-underline hover:bg-[#0052cc]"
-                style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.2), 0 0 40px rgba(0,96,240,0.2)" }}
+                className="btn inline-flex items-center gap-2.5 rounded-full px-7 py-[15px] text-[15px] font-semibold no-underline"
+                style={{
+                  background: "#F7F3EC",
+                  color: "#1C1A16",
+                  boxShadow: "0 1px 2px rgba(28,26,22,0.08)",
+                }}
               >
                 Get Started
-                <span className="btn-arrow inline-flex"><ArrowIcon size={14} /></span>
-              </a>
-              <a
-                href="https://calendly.com/justin-textsidekick"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn inline-flex items-center rounded-lg border border-[rgba(255,255,255,0.12)] px-6 py-[13px] text-[15px] font-medium text-[rgba(255,255,255,0.8)] no-underline hover:border-[rgba(255,255,255,0.25)] hover:text-white"
-              >
-                Book a demo
+                <span className="btn-arrow inline-flex">
+                  <ArrowIcon size={14} />
+                </span>
               </a>
             </div>
           </div>

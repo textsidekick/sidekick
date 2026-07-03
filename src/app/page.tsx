@@ -11,7 +11,7 @@ import Footer from "@/components/landing/Footer";
 
 export default function Page() {
   return (
-    <main className="overflow-hidden">
+    <main className="overflow-hidden bg-cream text-ink">
       <Nav />
       <Hero />
       <Logos />

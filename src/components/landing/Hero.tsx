@@ -1,129 +1,116 @@
 import PhoneFrame from "@/components/landing/PhoneFrame";
 import SidekickChat from "@/components/landing/SidekickChat";
 import Reveal from "@/components/landing/Reveal";
-import { YCBadge } from "@/components/landing/Brand";
+import { YCBadge, HeadlineWithSidekick } from "@/components/landing/Brand";
 import { ArrowIcon } from "@/components/landing/icons";
 
-const HEADLINE = "Your workers text.\nSidekick handles the rest.";
+const HEADLINE = "Your workers text. Sidekick handles the rest.";
 const SUBHEAD =
-  "Equipment issues, safety hazards, supply needs — workers report by text in 20 seconds. Sidekick triages, assigns, and tracks everything automatically.";
-
-const STATS = [
-  { value: "20s", label: "avg report time" },
-  { value: "0", label: "apps to download" },
-  { value: "50+", label: "languages supported" },
-];
+  "A machine acting up. A safety hazard on the floor. A part running low. Your workers report it in 20 seconds by text — Sidekick triages, assigns, and tracks every issue automatically.";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden" style={{ background: "linear-gradient(180deg, #06080F 0%, #0d1117 100%)" }}>
-      {/* Gradient orbs */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div
-          className="absolute"
-          style={{
-            width: 600, height: 600, top: -200, right: -100,
-            background: "radial-gradient(circle, rgba(0,96,240,0.12) 0%, transparent 70%)",
-            animation: "mesh-shift 20s ease-in-out infinite",
-          }}
-        />
-        <div
-          className="absolute"
-          style={{
-            width: 500, height: 500, bottom: -100, left: -150,
-            background: "radial-gradient(circle, rgba(0,96,240,0.06) 0%, transparent 70%)",
-            animation: "mesh-shift 25s ease-in-out infinite reverse",
-          }}
-        />
-      </div>
+    <section className="relative px-6 pt-36 pb-16 md:px-10 md:pt-44 md:pb-24">
+      <div className="mx-auto grid max-w-[1120px] grid-cols-1 items-center gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
+        <div>
+          <Reveal>
+            <div className="mb-8 flex">
+              <YCBadge height={26} />
+            </div>
+          </Reveal>
 
-      {/* Dot grid */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 dot-grid-dark" />
+          <Reveal delay={80}>
+            <h1
+              className="m-0 mb-6 font-serif font-normal text-ink"
+              style={{
+                fontSize: "clamp(2.75rem, 6.5vw, 5rem)",
+                lineHeight: 1.02,
+                letterSpacing: "-0.03em",
+                textWrap: "balance" as React.CSSProperties["textWrap"],
+              }}
+            >
+              <HeadlineWithSidekick text={HEADLINE} />
+            </h1>
+          </Reveal>
 
-      <div className="relative mx-auto max-w-[1200px] px-6 pt-28 pb-20 md:px-10 md:pt-36 md:pb-28">
-        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
-          {/* Left — Copy */}
-          <div>
-            <Reveal>
-              <YCBadge height={22} dark />
-            </Reveal>
+          <Reveal delay={160}>
+            <p
+              className="m-0 mb-10 max-w-[500px] font-light text-[rgba(28,26,22,0.65)]"
+              style={{ fontSize: "clamp(1.0625rem, 1.6vw, 1.1875rem)", lineHeight: 1.6 }}
+            >
+              {SUBHEAD}
+            </p>
+          </Reveal>
 
-            <Reveal delay={80}>
-              <h1
-                className="mt-8 mb-6 font-extrabold text-white"
-                style={{
-                  fontSize: "clamp(2.5rem, 5.5vw, 4.25rem)",
-                  lineHeight: 1.05,
-                  letterSpacing: "-0.035em",
-                  whiteSpace: "pre-line",
-                }}
+          <Reveal delay={240}>
+            <div className="flex flex-wrap items-center gap-3">
+              <a
+                href="/login"
+                className="btn inline-flex items-center gap-2.5 rounded-full bg-ink px-7 py-[15px] text-[15px] font-medium text-cream no-underline hover:bg-[#33302a]"
+                style={{ boxShadow: "0 1px 2px rgba(28,26,22,0.12), 0 8px 24px -12px rgba(28,26,22,0.35)" }}
               >
-                {HEADLINE.split("Sidekick").map((part, i, arr) =>
-                  i < arr.length - 1 ? (
-                    <span key={i}>
-                      {part}
-                      <span className="text-accent">Sidekick</span>
-                    </span>
-                  ) : (
-                    <span key={i}>{part}</span>
-                  )
-                )}
-              </h1>
-            </Reveal>
+                Get started
+                <span className="btn-arrow inline-flex">
+                  <ArrowIcon size={14} />
+                </span>
+              </a>
+              <a
+                href="https://calendly.com/justin-textsidekick"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn inline-flex items-center rounded-full border border-[rgba(28,26,22,0.14)] px-6 py-[14px] text-[15px] font-medium text-ink no-underline hover:border-[rgba(28,26,22,0.28)] hover:bg-[rgba(28,26,22,0.03)]"
+              >
+                Book a walkthrough
+              </a>
+            </div>
 
-            <Reveal delay={160}>
-              <p className="mb-10 max-w-[480px] text-[16px] leading-[1.65] text-[rgba(255,255,255,0.55)]">
-                {SUBHEAD}
-              </p>
-            </Reveal>
-
-            <Reveal delay={240}>
-              <div className="flex flex-wrap items-center gap-3">
-                <a
-                  href="/login"
-                  className="btn inline-flex items-center gap-2.5 rounded-lg bg-accent px-7 py-[14px] text-[15px] font-semibold text-white no-underline hover:bg-[#0052cc]"
-                  style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.2), 0 0 40px rgba(0,96,240,0.2)" }}
-                >
-                  Get started free
-                  <span className="btn-arrow inline-flex"><ArrowIcon size={14} /></span>
-                </a>
-                <a
-                  href="https://calendly.com/justin-textsidekick"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn inline-flex items-center rounded-lg border border-[rgba(255,255,255,0.12)] px-6 py-[13px] text-[15px] font-medium text-[rgba(255,255,255,0.8)] no-underline hover:border-[rgba(255,255,255,0.25)] hover:text-white"
-                >
-                  Book a demo
-                </a>
-              </div>
-            </Reveal>
-
-            {/* Stats row */}
-            <Reveal delay={320}>
-              <div className="mt-14 flex gap-10 border-t border-[rgba(255,255,255,0.08)] pt-8">
-                {STATS.map((s) => (
-                  <div key={s.label}>
-                    <div className="text-2xl font-bold text-white tracking-tight">{s.value}</div>
-                    <div className="mt-1 text-[13px] text-[rgba(255,255,255,0.4)]">{s.label}</div>
-                  </div>
-                ))}
-              </div>
-            </Reveal>
-          </div>
-
-          {/* Right — Phone */}
-          <Reveal delay={200} className="relative flex justify-center lg:justify-end">
-            <div className="phone-glow relative">
-              <PhoneFrame scale={0.88} color="#1a1d27">
-                <SidekickChat />
-              </PhoneFrame>
+            <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-[rgba(28,26,22,0.5)]">
+              {["No app download", "Works on any phone", "Set up in 90 seconds"].map((t) => (
+                <span key={t} className="inline-flex items-center gap-1.5">
+                  <span className="block h-1 w-1 rounded-full bg-accent" style={{ opacity: 0.7 }} />
+                  {t}
+                </span>
+              ))}
             </div>
           </Reveal>
         </div>
-      </div>
 
-      {/* Bottom fade to white */}
-      <div className="absolute bottom-0 left-0 right-0 h-24" style={{ background: "linear-gradient(to bottom, transparent, #F8F9FC)" }} />
+        {/* Phone */}
+        <Reveal delay={200} className="relative flex justify-center lg:justify-end">
+          <div
+            aria-hidden
+            className="absolute -inset-10 z-0"
+            style={{
+              background:
+                "radial-gradient(55% 50% at 50% 42%, rgba(201,100,66,0.09) 0%, rgba(201,100,66,0.03) 45%, transparent 72%)",
+            }}
+          />
+          <div className="relative z-10">
+            <PhoneFrame scale={0.92}>
+              <SidekickChat />
+            </PhoneFrame>
+
+            {/* Grounded status chip — replaces the rotated sticky note */}
+            <div
+              className="absolute -left-6 bottom-16 z-20 hidden items-center gap-2.5 rounded-full border border-[rgba(28,26,22,0.08)] py-2.5 pl-3.5 pr-4 md:flex"
+              style={{
+                background: "rgba(252,249,243,0.85)",
+                backdropFilter: "blur(12px)",
+                boxShadow: "0 1px 2px rgba(28,26,22,0.04), 0 12px 32px -16px rgba(28,26,22,0.16)",
+              }}
+            >
+              <span
+                className="block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent"
+                style={{ animation: "sk-pulse 2.4s ease-in-out infinite" }}
+              />
+              <span className="text-[12.5px] font-medium text-ink">
+                Any phone. Any language.{" "}
+                <span className="font-normal text-[rgba(28,26,22,0.55)]">No app.</span>
+              </span>
+            </div>
+          </div>
+        </Reveal>
+      </div>
     </section>
   );
 }

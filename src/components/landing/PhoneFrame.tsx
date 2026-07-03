@@ -7,7 +7,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-export default function PhoneFrame({ scale = 1, time = "9:41", color = "#111827", children }: Props) {
+export default function PhoneFrame({ scale = 1, time = "9:41", color = "#1C1A16", children }: Props) {
   const w = 340;
   const h = 720;
   const px = (n: number) => `${n * scale}px`;
@@ -20,7 +20,7 @@ export default function PhoneFrame({ scale = 1, time = "9:41", color = "#111827"
           borderRadius: 50 * scale,
           padding: 10 * scale,
           boxShadow:
-            "0 30px 80px -20px rgba(17,24,39,0.35), 0 10px 30px -10px rgba(17,24,39,0.25)",
+            "0 30px 80px -20px rgba(28,26,22,0.35), 0 10px 30px -10px rgba(28,26,22,0.25)",
         }}
       >
         <div

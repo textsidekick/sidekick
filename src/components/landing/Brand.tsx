@@ -13,20 +13,16 @@ export function SidekickLogo({ size = 28 }: { size?: number }) {
   );
 }
 
-export function YCBadge({ height = 32, dark = false }: { height?: number; dark?: boolean }) {
+export function YCBadge({ height = 32 }: { height?: number }) {
   return (
-    <span className={`inline-flex items-center gap-2.5 rounded-full border px-4 py-2 text-[13px] ${
-      dark
-        ? "border-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.6)]"
-        : "border-[rgba(17,24,39,0.08)] text-[rgba(17,24,39,0.5)]"
-    }`}>
+    <span className="inline-flex items-center gap-2 text-base text-ink/75">
       <span className="font-medium">Backed by</span>
       <Image
         src="/yc-wordmark.png"
         alt="Y Combinator"
         width={height * 4}
         height={height}
-        style={{ height, width: "auto", filter: dark ? "brightness(2)" : undefined }}
+        style={{ height, width: "auto" }}
         className="block"
       />
     </span>
@@ -53,7 +49,7 @@ export function HeadlineWithSidekick({ text }: { text: string }) {
         const stripped = word.toLowerCase().replace(/[^a-z]/g, "");
         if (stripped === "sidekick") {
           return (
-            <span key={i} className="text-accent font-bold">
+            <span key={i} className="italic text-accent">
               {word}{" "}
             </span>
           );
