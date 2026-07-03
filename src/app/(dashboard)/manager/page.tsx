@@ -640,7 +640,7 @@ export default function ManagerDashboard() {
                 <div className="mt-4 space-y-2">
                   {criticalHighWOs.length === 0 && overdueWOs.length === 0 && (
                     <div className="text-sm text-black/40 border border-dashed border-black/10 rounded-xl p-6 text-center">
-                      ✅ Nothing urgent right now
+                      Nothing urgent right now
                     </div>
                   )}
                   {criticalHighWOs.slice(0, 5).map(wo => (
