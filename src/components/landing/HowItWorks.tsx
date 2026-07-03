@@ -28,7 +28,7 @@ export default function HowItWorks() {
             <div>
               <Eyebrow>How it works</Eyebrow>
               <h2
-                className="mt-5 max-w-[560px] font-serif font-bold text-ink"
+                className="mt-5 max-w-[560px] font-serif font-extrabold text-ink"
                 style={{
                   fontSize: "clamp(2.125rem, 4.5vw, 3.25rem)",
                   lineHeight: 1.05,
@@ -59,7 +59,7 @@ export default function HowItWorks() {
                   {s.n}
                 </div>
                 <h3
-                  className="m-0 mb-3 font-serif font-bold text-ink"
+                  className="m-0 mb-3 font-serif font-extrabold text-ink"
                   style={{ fontSize: 26, lineHeight: 1.15, letterSpacing: "-0.015em" }}
                 >
                   {s.title}

@@ -21,7 +21,7 @@ export default function Hero() {
 
           <Reveal delay={80}>
             <h1
-              className="m-0 mb-6 font-serif font-bold text-ink"
+              className="m-0 mb-6 font-serif font-extrabold text-ink"
               style={{
                 fontSize: "clamp(2.75rem, 6.5vw, 5rem)",
                 lineHeight: 1.02,

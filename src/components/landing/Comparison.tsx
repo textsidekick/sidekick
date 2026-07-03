@@ -16,7 +16,7 @@ export default function Comparison() {
         <Reveal>
           <Eyebrow>The difference</Eyebrow>
           <h2
-            className="mb-16 mt-5 max-w-[640px] font-serif font-bold text-ink md:mb-20"
+            className="mb-16 mt-5 max-w-[640px] font-serif font-extrabold text-ink md:mb-20"
             style={{
               fontSize: "clamp(2.125rem, 4.5vw, 3.25rem)",
               lineHeight: 1.05,
@@ -78,7 +78,7 @@ export default function Comparison() {
                   With Sidekick
                 </div>
                 <div
-                  className="mb-9 font-serif font-bold text-accent"
+                  className="mb-9 font-serif font-extrabold text-accent"
                   style={{ fontSize: "clamp(2.5rem, 4vw, 3.25rem)", letterSpacing: "-0.02em", lineHeight: 1 }}
                 >
                   20 seconds

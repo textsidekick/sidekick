@@ -81,7 +81,7 @@ body {
   .text-cream { color: #F8F9FC; }
   .text-accent { color: var(--accent); }
   .bg-accent { background-color: var(--accent); }
-  .font-serif { font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif; }
+  .font-serif { font-family: var(--font-inter), Inter, ui-sans-serif, system-ui, sans-serif; }
   .font-sans { font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif; }
 
   /* Extra opacity utilities used in landing */

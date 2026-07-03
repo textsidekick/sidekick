@@ -24,7 +24,7 @@ export default function CTA() {
           />
           <div className="relative text-center">
             <h2
-              className="font-serif font-bold text-cream m-0 mb-5"
+              className="font-serif font-extrabold text-cream m-0 mb-5"
               style={{
                 fontSize: "clamp(2.25rem, 5vw, 3.5rem)",
                 lineHeight: 0.98,

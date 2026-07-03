@@ -48,7 +48,7 @@ export default function Contact() {
         <Reveal>
           <Eyebrow>Get in touch</Eyebrow>
           <h2
-            className="font-serif font-bold mt-5 mb-6 text-ink"
+            className="font-serif font-extrabold mt-5 mb-6 text-ink"
             style={{
               fontSize: "clamp(2.125rem, 4.5vw, 3.25rem)",
               lineHeight: 1.02,

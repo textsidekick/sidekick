@@ -70,7 +70,7 @@ export default function KnowledgeLayer() {
         <Reveal delay={120} className="order-1 lg:order-2">
           <Eyebrow>The knowledge layer</Eyebrow>
           <h2
-            className="mb-6 mt-5 font-serif font-bold text-ink"
+            className="mb-6 mt-5 font-serif font-extrabold text-ink"
             style={{
               fontSize: "clamp(2.125rem, 4.5vw, 3.5rem)",
               lineHeight: 1.05,
