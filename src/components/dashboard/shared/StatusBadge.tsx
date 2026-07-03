@@ -2,23 +2,22 @@
 
 import { cn } from "@/lib/utils";
 
-type WorkOrderStatus = "open" | "new" | "assigned" | "in_progress" | "completed" | "cancelled" | "on_hold";
-
-const STATUS_CLASSES: Record<string, string> = {
-  new: "bg-blue-100 text-blue-800",
-  open: "bg-blue-100 text-blue-800",
-  assigned: "bg-purple-100 text-purple-800",
-  in_progress: "bg-yellow-100 text-yellow-900",
-  completed: "bg-green-100 text-green-800",
-  cancelled: "bg-gray-100 text-gray-600",
-  on_hold: "bg-gray-100 text-gray-700",
+const STATUS_STYLES: Record<string, { dot: string; label?: string }> = {
+  new: { dot: "bg-blue-500", label: "NEW" },
+  open: { dot: "bg-blue-500", label: "OPEN" },
+  assigned: { dot: "bg-indigo-500", label: "ASSIGNED" },
+  in_progress: { dot: "bg-amber-500", label: "IN PROGRESS" },
+  completed: { dot: "bg-green-500", label: "COMPLETED" },
+  cancelled: { dot: "bg-gray-400", label: "CANCELLED" },
+  on_hold: { dot: "bg-gray-400", label: "ON HOLD" },
 };
 
 export function StatusBadge({ status }: { status: string }) {
-  const cls = STATUS_CLASSES[status] ?? "bg-gray-100 text-gray-700";
+  const style = STATUS_STYLES[status] ?? { dot: "bg-gray-400" };
   return (
-    <span className={cn("text-xs font-medium px-2 py-1 rounded-full", cls)}>
-      {status.replaceAll("_", " ").toUpperCase()}
+    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-gray-600 bg-gray-100 px-2.5 py-1 rounded-md">
+      <span className={cn("h-1.5 w-1.5 rounded-full flex-shrink-0", style.dot)} />
+      {style.label ?? status.replaceAll("_", " ").toUpperCase()}
     </span>
   );
 }

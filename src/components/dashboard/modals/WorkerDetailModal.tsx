@@ -68,7 +68,7 @@ export function WorkerDetailModal({ worker, onClose, workerQuestions, certificat
               <div key={i} className="bg-gray-50 rounded-lg p-3">
                 <div className="flex items-start justify-between mb-2">
                   <p className="font-medium text-gray-900">{q.question}</p>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${q.confidence >= 70 ? "bg-green-100 text-green-700" : q.confidence >= 40 ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700"}`}>{q.confidence}%</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${q.confidence >= 70 ? "bg-gray-100 text-gray-600" : q.confidence >= 40 ? "bg-gray-100 text-gray-600" : "bg-gray-100 text-gray-600"}`}>{q.confidence}%</span>
                 </div>
                 <p className="text-sm text-gray-600 mb-1">{q.answer}</p>
                 <p className="text-xs text-gray-400">{formatTimeAgo(q.created_at)}</p>
@@ -89,7 +89,7 @@ export function WorkerDetailModal({ worker, onClose, workerQuestions, certificat
                     <p className="text-xs text-gray-500">Expires: {new Date(cert.expiry_date).toLocaleDateString()}</p>
                   </div>
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full ${new Date(cert.expiry_date) > new Date() ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                <span className={`text-xs px-2 py-1 rounded-full ${new Date(cert.expiry_date) > new Date() ? "bg-gray-100 text-gray-600" : "bg-gray-100 text-gray-600"}`}>
                   {new Date(cert.expiry_date) > new Date() ? "Valid" : "Expired"}
                 </span>
               </div>
