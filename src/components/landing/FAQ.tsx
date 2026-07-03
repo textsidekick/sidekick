@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Eyebrow } from "@/components/landing/Brand";
-import Reveal from "@/components/landing/Reveal";
 
 const FAQS = [
   {
@@ -27,56 +26,40 @@ export default function FAQ() {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section className="border-t border-[rgba(28,26,22,0.07)] px-6 py-28 md:px-10 md:py-36">
-      <div className="mx-auto max-w-[720px]">
-        <Reveal>
-          <Eyebrow>FAQ</Eyebrow>
-          <h2
-            className="font-serif font-normal mt-5 mb-12 text-ink"
-            style={{
-              fontSize: "clamp(2.125rem, 4.5vw, 3.25rem)",
-              lineHeight: 1.05,
-              letterSpacing: "-0.025em",
-            }}
-          >
-            Common questions.
-          </h2>
-        </Reveal>
-        <div className="flex flex-col">
+    <section className="px-14 py-24 border-t border-ink/10">
+      <div className="max-w-[720px] mx-auto">
+        <Eyebrow>FAQ</Eyebrow>
+        <h2
+          className="font-serif font-normal mt-5 mb-12"
+          style={{ fontSize: 48, lineHeight: 1.05, letterSpacing: "-0.02em" }}
+        >
+          Common questions.
+        </h2>
+        <div className="flex flex-col gap-3">
           {FAQS.map((faq, i) => (
-            <Reveal key={i} delay={i * 60}>
-              <div className="border-t border-[rgba(28,26,22,0.07)] last:border-b last:border-b-[rgba(28,26,22,0.07)]">
-                <button
-                  className="w-full flex items-center justify-between px-0 py-5 text-left bg-transparent border-none cursor-pointer"
-                  onClick={() => setOpen(open === i ? null : i)}
+            <div
+              key={i}
+              className="bg-white rounded-[16px] border border-ink/[0.07] overflow-hidden"
+              style={{ boxShadow: "0 1px 0 rgba(28,26,22,0.04)" }}
+            >
+              <button
+                className="w-full flex items-center justify-between px-6 py-5 text-left"
+                onClick={() => setOpen(open === i ? null : i)}
+              >
+                <span className="text-[16px] font-medium text-ink">{faq.q}</span>
+                <span
+                  className="ml-4 flex-shrink-0 text-accent text-xl leading-none transition-transform"
+                  style={{ transform: open === i ? "rotate(45deg)" : "rotate(0deg)" }}
                 >
-                  <span className="text-[16px] font-medium text-ink pr-6">{faq.q}</span>
-                  <span
-                    className="flex-shrink-0 text-accent text-xl leading-none"
-                    style={{
-                      transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-                      transform: open === i ? "rotate(45deg)" : "rotate(0deg)",
-                      display: "block",
-                    }}
-                  >
-                    +
-                  </span>
-                </button>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateRows: open === i ? "1fr" : "0fr",
-                    transition: "grid-template-rows 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
-                  }}
-                >
-                  <div className="overflow-hidden">
-                    <div className="pb-5 text-[15px] font-light leading-relaxed text-[rgba(28,26,22,0.65)]">
-                      {faq.a}
-                    </div>
-                  </div>
+                  +
+                </span>
+              </button>
+              {open === i && (
+                <div className="px-6 pb-5 text-[15px] text-ink/65 leading-relaxed border-t border-ink/[0.06] pt-4">
+                  {faq.a}
                 </div>
-              </div>
-            </Reveal>
+              )}
+            </div>
           ))}
         </div>
       </div>
