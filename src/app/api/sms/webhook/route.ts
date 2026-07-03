@@ -15,7 +15,7 @@ const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER;
 
 async function detectLanguage(text: string): Promise<string> {
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-5",
+    model: "claude-sonnet-4-6",
     max_tokens: 50,
     messages: [{ role: "user", content: `What language is this? Reply with just the language name: "${text}"` }],
   });
@@ -25,7 +25,7 @@ async function detectLanguage(text: string): Promise<string> {
 async function translate(text: string, lang: string): Promise<string> {
   if (lang === "English") return text;
   const r = await anthropic.messages.create({
-    model: "claude-sonnet-4-5",
+    model: "claude-sonnet-4-6",
     max_tokens: 300,
     messages: [{ role: "user", content: `Translate to ${lang}. Only return translation: "${text}"` }],
   });
@@ -83,7 +83,7 @@ async function generateResponse(
   const context = chunks.map((c) => c.content).join("\n\n---\n\n");
 
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-5",
+    model: "claude-sonnet-4-6",
     max_tokens: 300,
     messages: [
       {

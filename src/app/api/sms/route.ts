@@ -209,7 +209,7 @@ Respond ONLY with valid JSON, no markdown or explanation.`;
 
   try {
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-5",
+      model: "claude-sonnet-4-6",
       max_tokens: 500,
       messages: [
         {
@@ -301,7 +301,7 @@ ${context ? `\nCompany docs that might help:\n${context}` : ""}`;
 
   try {
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-5",
+      model: "claude-sonnet-4-6",
       max_tokens: 300,
       messages: [{ role: "user", content: systemPrompt }],
     });
@@ -356,7 +356,7 @@ function buildDirectResponse(imageAnalysis: ImageAnalysis, workerQuestion?: stri
 async function getAIResponse(systemPrompt: string, userMessage: string): Promise<string> {
   try {
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-5",
+      model: "claude-sonnet-4-6",
       max_tokens: 300,
       system: systemPrompt,
       messages: [{ role: "user", content: userMessage }],

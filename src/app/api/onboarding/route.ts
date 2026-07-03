@@ -205,7 +205,7 @@ export async function POST(request: NextRequest) {
               
               if (transcription) {
                 const claudeRes = await anthropic.messages.create({
-                  model: "claude-sonnet-4-5",
+                  model: "claude-sonnet-4-6",
                   max_tokens: 1500,
                   messages: [{ role: "user", content: 'Extract Q&A pairs from this voice note about workplace policies:\n\n"' + transcription + '"\n\nReturn ONLY a JSON array like: [{"question":"...","answer":"..."}]' }]
                 });

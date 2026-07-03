@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     };
 
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-5",
+      model: "claude-sonnet-4-6",
       max_tokens: 1024,
       system: "Generate a concise, professional weekly email digest for a company manager. Use plain text, no markdown. Keep it under 200 words. Be specific with numbers. End with 1-2 actionable suggestions.",
       messages: [{

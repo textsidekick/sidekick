@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
     let extractedData = null;
     try {
       const extractionRes = await anthropic.messages.create({
-        model: "claude-haiku-4-5",
+        model: "claude-haiku-4-5-20251001",
         max_tokens: 512,
         system: extractionPrompt,
         messages: [

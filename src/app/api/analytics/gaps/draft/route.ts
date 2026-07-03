@@ -17,7 +17,7 @@ Write a clear policy document with: title, purpose, rules, procedures, contact i
 
   try {
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-5",
+      model: "claude-sonnet-4-6",
       max_tokens: 1500,
       messages: [{ role: "user", content: prompt }]
     });

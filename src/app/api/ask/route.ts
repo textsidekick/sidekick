@@ -8,7 +8,7 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 async function detectAndTranslate(query: string): Promise<{ language: string; englishQuery: string; isEnglish: boolean }> {
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-5",
+    model: "claude-sonnet-4-6",
     max_tokens: 300,
     messages: [{
       role: "user",
@@ -34,7 +34,7 @@ async function detectAndTranslate(query: string): Promise<{ language: string; en
 async function translateResponse(answer: string, targetLanguage: string): Promise<string> {
   if (targetLanguage.toLowerCase() === "english") return answer;
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-5",
+    model: "claude-sonnet-4-6",
     max_tokens: 500,
     messages: [{
       role: "user",
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
   if (relevantChunks.length > 0 && process.env.ANTHROPIC_API_KEY) {
     const context = relevantChunks.map((c: any) => c.content).join("\n\n---\n\n");
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-5",
+      model: "claude-sonnet-4-6",
       max_tokens: 500,
       system: "You're a helpful workplace assistant. Answer based on the documents provided. Be concise and direct.",
       messages: [{
