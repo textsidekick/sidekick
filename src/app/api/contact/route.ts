@@ -8,7 +8,7 @@ import { NextResponse } from "next/server";
 export const runtime = "nodejs";
 
 const TO = process.env.CONTACT_TO_EMAIL || "hello@textsidekick.com";
-const FROM = process.env.CONTACT_FROM_EMAIL || "Sidekick <onboarding@resend.dev>";
+const FROM = process.env.CONTACT_FROM_EMAIL || "Sidekick <hello@textsidekick.com>";
 
 type Body = {
   name?: string;
