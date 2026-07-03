@@ -233,7 +233,7 @@ export default function TeamPage() {
             <div>
               <label className="text-sm font-medium text-gray-700 block mb-1">Role</label>
               <select className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" value={form.role} onChange={(e) => setForm(f => ({ ...f, role: e.target.value }))}>
-                {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+                {ROLES.map((r) => <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>)}
               </select>
             </div>
             <div className="flex gap-2 pt-1">
