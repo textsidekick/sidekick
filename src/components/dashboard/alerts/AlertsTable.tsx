@@ -23,10 +23,10 @@ interface AlertsTableProps {
 }
 
 const SEVERITY_STYLES: Record<Severity, string> = {
-  high: 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400 border-transparent',
+  high: 'bg-red-700 text-white dark:bg-red-700 dark:text-white border-transparent',
   medium:
-    'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400 border-transparent',
-  low: 'bg-gray-100 text-gray-600 dark:bg-white dark:text-gray-400 border-transparent',
+    'bg-amber-600 text-white dark:bg-amber-600 dark:text-white border-transparent',
+  low: 'bg-gray-500 text-white dark:bg-gray-500 dark:text-white border-transparent',
 }
 
 const STATUS_DOT_COLORS: Record<AlertStatus, string> = {
