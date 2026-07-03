@@ -198,8 +198,8 @@ export default function OperationsDashboardPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Operations</h1>
-          <p className="text-sm text-black/50 mt-1">Real-time plant view — health, work orders, alerts, and activity.</p>
+          <h1 className="text-2xl font-semibold tracking-tight">Plant Metrics</h1>
+          <p className="text-sm text-black/50 mt-1">Live equipment health, maintenance performance, and active alerts.</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={() => location.reload()}>Refresh</Button>
@@ -290,7 +290,10 @@ export default function OperationsDashboardPage() {
             );
           })}
           {!loading && (data?.recentActivity || []).length === 0 && (
-            <div className="text-sm text-black/50 border border-dashed border-black/10 rounded-xl p-6">No recent activity.</div>
+            <div className="text-sm text-black/45 border border-dashed border-black/10 rounded-xl p-8 text-center">
+              <p className="font-medium text-black/60">No recent activity</p>
+              <p className="mt-1 text-xs">Work orders and maintenance events will show up here as they happen.</p>
+            </div>
           )}
         </div>
         <div className="mt-4 flex items-center gap-2 text-xs text-black/50">

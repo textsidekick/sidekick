@@ -302,7 +302,7 @@ export default function KnowledgePage() {
     <div className="min-h-screen px-6 py-8 max-w-7xl mx-auto">
 
       {/* ── Header ── */}
-      <SectionHeader title="Knowledge Base" subtitle="Your team's operational intelligence — upload, record, text, or connect tools to grow it" />
+      <SectionHeader title="Ops Knowledge" subtitle="Your crew's operating memory — everything they've learned, documented, and captured" />
 
       {/* ══════════════════════════════════════════════════════════════════════
           ADD KNOWLEDGE — always visible, top of page, impossible to miss
@@ -310,14 +310,15 @@ export default function KnowledgePage() {
       <div className="mt-6 rounded-2xl border border-[#C96442]/20 bg-gradient-to-r from-orange-50/60 via-white to-purple-50/40 p-5">
         <div className="flex items-center gap-2 mb-4">
           <Plus className="w-5 h-5 text-[#C96442]" />
-          <h2 className="text-base font-bold text-gray-900">Add Knowledge</h2>
-          <span className="text-xs text-gray-400 ml-1">— upload, speak, text, or connect</span>
+          <h2 className="text-base font-bold text-gray-900">Capture Knowledge</h2>
+          <span className="text-xs text-gray-400 ml-1">— from the field, your phone, or existing docs</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <UploadCard companyId={companyId} />
-          <VoiceInputCard companyId={companyId} />
+          {/* Phone-first: text capture is the primary input method */}
           <TextSidekickCard />
+          <VoiceInputCard companyId={companyId} />
+          <UploadCard companyId={companyId} />
           <IntegrationsCard companyId={companyId} />
         </div>
       </div>
@@ -330,7 +331,7 @@ export default function KnowledgePage() {
           </div>
           <div>
             <div className="text-3xl font-bold text-gray-900">{articles.length}</div>
-            <div className="text-sm text-gray-500">Knowledge articles captured</div>
+            <div className="text-sm text-gray-500">Procedures & fixes documented</div>
           </div>
         </div>
         {needsReview.length > 0 && (
@@ -339,11 +340,11 @@ export default function KnowledgePage() {
             className={`rounded-xl border px-6 py-4 flex items-center gap-4 transition text-left ${showReviewOnly ? "border-[#C96442] bg-[#C96442]/10" : "border-gray-200 bg-amber-50 hover:bg-gray-50"}`}
           >
             <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
-              <BookOpen className="w-6 h-6 text-white" />
+              <BookOpen className="w-6 h-6 text-amber-700" />
             </div>
             <div>
               <div className="text-3xl font-bold text-gray-600">{needsReview.length}</div>
-              <div className="text-sm text-gray-600">Needs Review (auto-generated)</div>
+              <div className="text-sm text-gray-600">Needs Review <span className="text-xs text-amber-600">(auto-generated from work orders)</span></div>
             </div>
           </button>
         )}
@@ -356,7 +357,7 @@ export default function KnowledgePage() {
           type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Search knowledge base — e.g. 'spindle vibration', 'hydraulic leak', 'conveyor belt'..."
+          placeholder="Search procedures, fixes, SOPs — e.g. 'spindle vibration', 'hydraulic leak'..."
           className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#C96442]/30 focus:border-[#C96442]"
         />
       </div>
@@ -367,10 +368,10 @@ export default function KnowledgePage() {
           <div className="text-center py-12 text-gray-400">Loading knowledge base...</div>
         ) : filtered.length === 0 ? (
           <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-            <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500 font-medium">No knowledge articles yet</p>
-            <p className="text-gray-400 text-sm mt-1">
-              Use the controls above to upload documents, record voice SOPs, or text knowledge from your phone.
+            <BookOpen className="w-12 h-12 text-[#C96442]/30 mx-auto mb-3" />
+            <p className="text-gray-700 font-semibold">No procedures captured yet</p>
+            <p className="text-gray-400 text-sm mt-1 max-w-sm mx-auto">
+              Text a tip to your Sidekick number, upload an SOP, or record a voice walkthrough above. Knowledge your team captures here becomes instantly searchable for every worker.
             </p>
           </div>
         ) : (
@@ -390,11 +391,13 @@ export default function KnowledgePage() {
                     {article.asset_name && <span className="flex items-center gap-1"><Wrench className="w-3 h-3" />{article.asset_name}</span>}
                     {article.time_estimate_minutes && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{article.time_estimate_minutes}m</span>}
                     <span className="flex items-center gap-1"><Hash className="w-3 h-3" />Referenced {article.times_referenced || 0}x</span>
-                    {article.source_work_order_id && (
+                    {article.source_work_order_id ? (
                       <>
-                        <span className="inline-flex items-center gap-1 text-gray-600 font-medium">Needs Review</span>
-                        <a href={`/work-orders?id=${article.source_work_order_id}`} className="text-[#C96442] underline hover:text-[#B0532F]" onClick={e => e.stopPropagation()}>View source WO</a>
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-semibold uppercase tracking-wide">Auto-generated · Needs Review</span>
+                        <a href={`/work-orders?id=${article.source_work_order_id}`} className="text-[#C96442] underline hover:text-[#B0532F]" onClick={e => e.stopPropagation()}>Source work order</a>
                       </>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-green-50 border border-green-200 text-green-700 text-[10px] font-semibold uppercase tracking-wide">Verified</span>
                     )}
                   </div>
                   {article.tags?.length > 0 && (

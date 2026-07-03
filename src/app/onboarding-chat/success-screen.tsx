@@ -118,7 +118,7 @@ export default function SuccessScreen({
               <CheckCircle2 size={48} color="#A74D30" />
             </div>
             <h1 style={{ fontSize: "32px", fontWeight: "bold", color: "#1C1A16", marginBottom: "12px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>You're all set <Sparkles size={28} color="#C96442" /></h1>
-            <p style={{ fontSize: "16px", color: "rgba(28,26,22,0.5)" }}>{onboardingResult.companyName} is ready to go.</p>
+            <p style={{ fontSize: "16px", color: "rgba(28,26,22,0.5)" }}>{onboardingResult.companyName}'s operating memory is live. Your crew can start texting questions now.</p>
           </div>
 
           {/* Access Code Card */}

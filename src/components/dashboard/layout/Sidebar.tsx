@@ -12,8 +12,9 @@ const NAV_ITEMS = [
   { id: "work-orders", label: "Work Orders", icon: ClipboardList, href: "/work-orders" },
   { id: "assets", label: "Assets", icon: Wrench, href: "/assets" },
   { id: "team", label: "Team", icon: Users, href: "/team" },
-  { id: "knowledge", label: "Knowledge", icon: BookOpen, href: "/knowledge" },
-  { id: "operations", label: "Operations", icon: Activity, href: "/operations" },
+  { id: "knowledge", label: "Ops Knowledge", icon: BookOpen, href: "/knowledge" },
+  { id: "operations", label: "Plant Metrics", icon: Activity, href: "/operations" },
+  { id: "analytics", label: "Analytics", icon: BarChart3, href: "/analytics" },
   { id: "settings", label: "Settings", icon: Settings, href: "/settings" },
 ];
 
@@ -69,6 +70,7 @@ export function Sidebar() {
           <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={26} height={26} style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
         </div>
         <span style={{ fontSize: 18, fontWeight: 700, color: '#1C1A16', letterSpacing: '-0.02em' }}>Sidekick</span>
+        {/* Mobile close button — moved here for layout */}
         {/* Mobile close button */}
         <button
           className="lg:hidden ml-auto p-1 text-gray-500 hover:text-gray-900"
@@ -87,7 +89,7 @@ export function Sidebar() {
             className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-[#F7F3EC] hover:bg-[#ede9e1] transition-colors text-left"
           >
             <Building2 className="h-4 w-4 text-[#C96442] flex-shrink-0" />
-            <span className="flex-1 min-w-0 text-xs font-medium text-[#1C1A16] truncate">
+            <span className="flex-1 min-w-0 text-sm font-semibold text-[#1C1A16] truncate">
               {selectedCompany?.name || "Select company"}
             </span>
             {companies.length > 1 && <ChevronDown className="h-3 w-3 text-black/40 flex-shrink-0" />}

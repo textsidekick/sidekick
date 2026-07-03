@@ -14,8 +14,8 @@ const instrument = Instrument_Serif({
 });
 
 export const metadata = {
-  title: "Sidekick | Manager Dashboard",
-  description: "Manage your frontline team with Sidekick.",
+  title: "Sidekick | Ops Dashboard",
+  description: "Your frontline team's operating memory.",
 };
 
 export default function DashboardLayout({
