@@ -188,7 +188,7 @@ export default function TeamPage() {
                     <td className="px-4 py-3 hidden md:table-cell">
                       <div className="flex flex-wrap gap-1">
                         {skills.map((s) => (
-                          <span key={s} className="text-xs px-2 py-0.5 bg-[#ECEDF0] text-[#505565] rounded-full">{s}</span>
+                          <span key={s} className="text-xs px-2 py-0.5 bg-[#2980B9] text-white rounded-full">{s}</span>
                         ))}
                       </div>
                     </td>

@@ -713,10 +713,10 @@ export default function ManagerDashboard() {
                       onClick={() => { if (!answered) { setSelectedUQ(q); setUqAnswer(""); } }}
                     >
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        answered ? "bg-emerald-100" : "bg-amber-100"
+                        answered ? "bg-[#27AE60]" : "bg-[#D4781C]"
                       }`}>
                         <MessageSquare className={`h-4 w-4 ${
-                          answered ? "text-emerald-600" : "text-amber-600"
+                          "text-white"
                         }`} />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -753,7 +753,7 @@ export default function ManagerDashboard() {
                 <div className="divide-y divide-gray-100">
                   {unansweredQuestions.map((q: any, i: number) => (
                     <div key={q.id || i} onClick={() => { setSelectedUQ(q); setUqAnswer(""); }} className="p-4 flex items-center gap-4 cursor-pointer hover:bg-gray-50">
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-100"><MessageSquare className="w-5 h-5 text-[#C96442]" /></div>
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[#2980B9]"><MessageSquare className="w-5 h-5 text-white" /></div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm text-gray-900">{q.question}</p>
                         <p className="text-xs mt-1 text-gray-400">Asked by {q.worker_name || "Worker"} · {q.created_at ? new Date(q.created_at).toLocaleDateString() : ""}</p>
