@@ -115,7 +115,7 @@ function formatTimeAgo(date: string): string {
 }
 function healthColor(score: number) {
   if (score >= 85) return "text-green-700";
-  if (score >= 70) return "text-amber-700";
+  if (score >= 70) return "text-gray-600";
   return "text-red-700";
 }
 
@@ -585,7 +585,7 @@ export default function ManagerDashboard() {
                   label="Open Issues"
                   value={openIssuesCount}
                   icon={AlertTriangle}
-                  iconClassName="h-5 w-5 text-amber-500"
+                  iconClassName="h-5 w-5 text-gray-400"
                   accentColor="amber"
                   subtext={openHighPriorityCount > 0 ? `${openHighPriorityCount} high priority` : "No urgent issues"}
                 />
@@ -658,9 +658,9 @@ export default function ManagerDashboard() {
                   ))}
                   {overdueWOs.filter(wo => !criticalHighWOs.includes(wo)).slice(0, 3).map(wo => (
                     <div key={wo.id} className="flex items-start gap-3 rounded-xl border border-amber-100 bg-amber-50/50 p-3">
-                      <Clock className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                      <Clock className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5" />
                       <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium text-[#1C1A16] truncate">{wo.short_id} · {wo.title} <span className="text-xs font-normal text-amber-600 ml-1">overdue</span></div>
+                        <div className="text-sm font-medium text-[#1C1A16] truncate">{wo.short_id} · {wo.title} <span className="text-xs font-normal text-gray-500 ml-1">overdue</span></div>
                         <div className="mt-1 flex items-center gap-2">
                           <PriorityBadge priority={wo.priority} />
                           <StatusBadge status={wo.status} />
@@ -872,7 +872,7 @@ export default function ManagerDashboard() {
                 <SectionHeader
                   title="Safety Checklists"
                   subtitle="Pre-shift safety compliance"
-                  action={checklistStats ? <span className={`text-sm font-medium ${checklistStats.complianceRate === 100 ? "text-emerald-600" : "text-amber-600"}`}>{checklistStats.complianceRate}% compliant today</span> : undefined}
+                  action={checklistStats ? <span className={`text-sm font-medium ${checklistStats.complianceRate === 100 ? "text-emerald-600" : "text-gray-500"}`}>{checklistStats.complianceRate}% compliant today</span> : undefined}
                 />
                 {mappedChecklists.length === 0 ? (
                   <EmptyState icon={ClipboardList} title="No checklists submitted" description="Pre-shift safety checklists submitted by workers will appear here." />
