@@ -204,7 +204,7 @@ export default function OperationsDashboardPage() {
             <div className="flex items-center gap-2">
               <Badge className="bg-black/5 text-black hover:bg-black/5">Live</Badge>
               {!!data && (
-                <Badge className={cn("hover:bg-black/5", mttrTrend <= 0 ? "bg-[#27AE60] text-white" : "bg-[#E9C46A] text-white")}>
+                <Badge className={cn("hover:bg-black/5", mttrTrend <= 0 ? "bg-[#27AE60] text-white" : "bg-[#D4781C] text-white")}>
                   {mttrTrend <= 0 ? (
                     <ArrowDownRight className="h-3.5 w-3.5 mr-1" />
                   ) : (
@@ -259,7 +259,7 @@ export default function OperationsDashboardPage() {
                   a.type === "critical"
                     ? "bg-[#C0392B] text-white"
                     : a.type === "warning"
-                      ? "bg-[#E9C46A] text-white"
+                      ? "bg-[#D4781C] text-white"
                       : "bg-[#2980B9] text-white";
 
                 return (

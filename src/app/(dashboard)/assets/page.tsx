@@ -39,7 +39,7 @@ function statusPill(status: AssetStatus) {
     status === "operational"
       ? "bg-[#27AE60] text-white"
       : status === "degraded"
-        ? "bg-[#E9C46A] text-white"
+        ? "bg-[#D4781C] text-white"
         : status === "down"
           ? "bg-[#C0392B] text-white"
           : "bg-gray-100 text-gray-700";

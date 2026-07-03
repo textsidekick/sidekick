@@ -713,7 +713,7 @@ export default function ManagerDashboard() {
                       onClick={() => { if (!answered) { setSelectedUQ(q); setUqAnswer(""); } }}
                     >
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        answered ? "bg-emerald-600" : "bg-[#E9C46A]"
+                        answered ? "bg-emerald-600" : "bg-[#D4781C]"
                       }`}>
                         <MessageSquare className="h-4 w-4 text-white" />
                       </div>
@@ -726,7 +726,7 @@ export default function ManagerDashboard() {
                       <span className={`flex-shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${
                         answered
                           ? "bg-[#27AE60] text-white"
-                          : "bg-[#E9C46A] text-white"
+                          : "bg-[#D4781C] text-white"
                       }`}>
                         {answered ? "Answered" : "Needs answer"}
                       </span>
@@ -756,7 +756,7 @@ export default function ManagerDashboard() {
                         <p className="font-medium text-sm text-gray-900">{q.question}</p>
                         <p className="text-xs mt-1 text-gray-400">Asked by {q.worker_name || "Worker"} · {q.created_at ? new Date(q.created_at).toLocaleDateString() : ""}</p>
                       </div>
-                      <span className="text-xs px-2 py-1 rounded-full bg-[#E9C46A] text-white">Needs Answer</span>
+                      <span className="text-xs px-2 py-1 rounded-full bg-[#D4781C] text-white">Needs Answer</span>
                     </div>
                   ))}
                 </div>
