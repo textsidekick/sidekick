@@ -102,7 +102,7 @@ export default function SettingsPage() {
             <Settings className="h-6 w-6 text-gray-500" /> Company Settings
           </h1>
           <Button onClick={handleSave} disabled={saving} className="bg-[#C96442] hover:bg-[#a8532f] text-white flex items-center gap-2">
-            <Save className="h-4 w-4" /> {saving ? "Saving…" : success ? "Saved ✓" : "Save Changes"}
+            <Save className="h-4 w-4" /> {saving ? "Saving…" : success ? "Saved" : "Save Changes"}
           </Button>
         </div>
 
