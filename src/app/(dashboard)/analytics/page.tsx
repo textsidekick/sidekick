@@ -23,17 +23,17 @@ type Analytics = {
   healthTrend: { week: string; avgHealth: number }[];
 };
 
-function MetricCard({ label, value, sub, icon: Icon, color }: { label: string; value: string; sub?: string; icon: React.ElementType; color: string }) {
+function MetricCard({ label, value, sub, icon: Icon }: { label: string; value: string; sub?: string; icon: React.ElementType; color?: string }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5">
-      <div className="flex items-center gap-3 mb-3">
-        <div className={`p-2 rounded-lg ${color}`}>
-          <Icon className="h-4 w-4" />
+      <div className="flex items-start justify-between">
+        <div>
+          <span className="text-xs font-medium uppercase tracking-wide text-gray-500">{label}</span>
         </div>
-        <span className="text-sm font-medium text-gray-600">{label}</span>
+        <Icon className="h-5 w-5 text-gray-400" />
       </div>
-      <p className="text-3xl font-bold text-gray-900">{value}</p>
-      {sub && <p className="text-xs text-gray-400 mt-1">{sub}</p>}
+      <p className="text-3xl font-bold text-gray-900 mt-2">{value}</p>
+      {sub && <p className="text-xs text-gray-400 mt-2">{sub}</p>}
     </div>
   );
 }
