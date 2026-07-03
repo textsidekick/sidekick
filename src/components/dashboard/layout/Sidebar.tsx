@@ -14,7 +14,6 @@ const NAV_ITEMS = [
   { id: "team", label: "Team", icon: Users, href: "/team" },
   { id: "knowledge", label: "Knowledge", icon: BookOpen, href: "/knowledge" },
   { id: "operations", label: "Operations", icon: Activity, href: "/operations" },
-  { id: "analytics", label: "Analytics", icon: BarChart3, href: "/analytics" },
   { id: "settings", label: "Settings", icon: Settings, href: "/settings" },
 ];
 
