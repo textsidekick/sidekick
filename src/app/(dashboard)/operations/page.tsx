@@ -68,7 +68,7 @@ function formatMinutes(min: number) {
 
 function healthColor(score: number) {
   if (score >= 85) return "text-green-700";
-  if (score >= 70) return "text-red-700";
+  if (score >= 70) return "text-amber-700";
   return "text-red-700";
 }
 
@@ -195,7 +195,7 @@ export default function OperationsDashboardPage() {
             {showHealthBreakdown && plantHealthBreakdown && (
               <div className="mt-2 text-xs text-black/50 bg-black/[0.03] rounded-xl p-3 space-y-1 max-w-xs">
                 <div>Asset health avg: <span className="font-medium text-black/70">{plantHealthBreakdown.assetAvg}</span></div>
-                <div>− Open WO penalty ({plantHealthBreakdown.openWOs} open): <span className="font-medium text-red-700">−{plantHealthBreakdown.woPenalty}</span></div>
+                <div>− Open WO penalty ({plantHealthBreakdown.openWOs} open): <span className="font-medium text-amber-700">−{plantHealthBreakdown.woPenalty}</span></div>
                 <div>− Overdue PM penalty ({plantHealthBreakdown.overdueCount} overdue): <span className="font-medium text-red-700">−{plantHealthBreakdown.overduePenalty}</span></div>
                 <div className="border-t border-black/10 pt-1 font-medium text-black/70">= {plantHealthBreakdown.total}/100</div>
               </div>
@@ -204,7 +204,7 @@ export default function OperationsDashboardPage() {
             <div className="flex items-center gap-2">
               <Badge className="bg-black/5 text-black hover:bg-black/5">Live</Badge>
               {!!data && (
-                <Badge className={cn("hover:bg-black/5", mttrTrend <= 0 ? "bg-[#27AE60] text-white" : "bg-[#EF4444] text-white")}>
+                <Badge className={cn("hover:bg-black/5", mttrTrend <= 0 ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800")}>
                   {mttrTrend <= 0 ? (
                     <ArrowDownRight className="h-3.5 w-3.5 mr-1" />
                   ) : (
@@ -257,10 +257,10 @@ export default function OperationsDashboardPage() {
               {alerts.map((a) => {
                 const badge =
                   a.type === "critical"
-                    ? "bg-[#C0392B] text-white"
+                    ? "bg-red-100 text-red-800"
                     : a.type === "warning"
-                      ? "bg-[#EF4444] text-white"
-                      : "bg-[#2980B9] text-white";
+                      ? "bg-amber-100 text-amber-800"
+                      : "bg-blue-100 text-blue-800";
 
                 return (
                   <div key={a.id} className="rounded-xl border border-black/5 p-4">
@@ -328,7 +328,7 @@ export default function OperationsDashboardPage() {
                         <StatusBadge status={ev.status} />
                       </div>
                     </div>
-                    <div className={cn("text-xs px-2 py-1 rounded-full", isCompleted ? "bg-[#27AE60] text-white" : "bg-black/5 text-black/70")}>
+                    <div className={cn("text-xs px-2 py-1 rounded-full", isCompleted ? "bg-green-100 text-green-800" : "bg-black/5 text-black/70")}>
                       {isCompleted ? "Done" : "Active"}
                     </div>
                   </div>

@@ -3,7 +3,7 @@
 import { X, Search, User } from "lucide-react";
 
 function getAvatarColor(name: string): string {
-  const colors = ["bg-[#0060F0]","bg-green-500","bg-purple-500","bg-pink-500","bg-indigo-500","bg-cyan-500","bg-blue-500","bg-teal-500"];
+  const colors = ["bg-[#C96442]","bg-green-500","bg-purple-500","bg-pink-500","bg-indigo-500","bg-cyan-500","bg-orange-500","bg-teal-500"];
   return colors[name ? name.charCodeAt(0) % colors.length : 0];
 }
 
@@ -42,13 +42,13 @@ export function AllQuestionsModal({ open, onClose, filteredQuestions, questionSe
                 placeholder="Search questions or workers..."
                 value={questionSearch}
                 onChange={(e) => setQuestionSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0060F0]"
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C96442]"
               />
             </div>
             <select
               value={questionFilter}
               onChange={(e) => setQuestionFilter(e.target.value as any)}
-              className="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0060F0]"
+              className="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C96442]"
             >
               <option value="all">All</option>
               <option value="answered">Answered</option>
@@ -67,7 +67,7 @@ export function AllQuestionsModal({ open, onClose, filteredQuestions, questionSe
                   <div className="flex-1">
                     <div className="flex items-start justify-between mb-1">
                       <span className="font-medium text-gray-900">{q.worker_name || "Unknown"}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${q.confidence >= 70 ? "bg-[#27AE60] text-white" : q.confidence >= 40 ? "bg-[#EF4444] text-white" : "bg-[#C0392B] text-white"}`}>{q.confidence}% confidence</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${q.confidence >= 70 ? "bg-green-100 text-green-700" : q.confidence >= 40 ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700"}`}>{q.confidence}% confidence</span>
                     </div>
                     <p className="text-gray-700 mb-2">{q.question}</p>
                     <p className="text-sm text-gray-500">{q.answer}</p>

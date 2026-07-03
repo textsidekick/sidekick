@@ -79,12 +79,12 @@ export default function AnalyticsPage() {
   const maxHealth = data ? Math.max(...data.healthTrend.map((h) => h.avgHealth), 1) : 100;
 
   return (
-    <div className="min-h-screen bg-[#F8F9FC]">
+    <div className="min-h-screen bg-[#F7F3EC]">
       <div className="max-w-6xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
-              <BarChart3 className="h-6 w-6 text-[#0060F0]" /> Analytics
+              <BarChart3 className="h-6 w-6 text-[#C96442]" /> Analytics
             </h1>
             <p className="text-sm text-gray-500 mt-1">Operational performance metrics</p>
           </div>
@@ -152,7 +152,7 @@ export default function AnalyticsPage() {
                       <span className="text-xs text-gray-500 w-20 capitalize">{p}</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-2">
                         <div
-                          className="h-2 rounded-full bg-[#0060F0]"
+                          className="h-2 rounded-full bg-[#C96442]"
                           style={{ width: `${Math.min((count / data.workOrders.total) * 100, 100)}%` }}
                         />
                       </div>
@@ -169,7 +169,7 @@ export default function AnalyticsPage() {
                 <h2 className="text-sm font-semibold text-gray-700 mb-4">Asset Status</h2>
                 <div className="space-y-3">
                   {Object.entries(data.assets.byStatus).map(([status, count]) => {
-                    const color = status === "operational" ? "bg-green-400" : status === "degraded" ? "bg-red-400" : status === "down" ? "bg-red-400" : "bg-gray-400";
+                    const color = status === "operational" ? "bg-green-400" : status === "degraded" ? "bg-amber-400" : status === "down" ? "bg-red-400" : "bg-gray-400";
                     return (
                       <div key={status} className="flex items-center gap-3">
                         <span className="text-xs text-gray-500 w-24 capitalize">{status}</span>
@@ -196,7 +196,7 @@ export default function AnalyticsPage() {
                     <div key={point.week} className="flex-1 flex flex-col items-center gap-1">
                       <span className="text-[10px] text-gray-400">{Math.round(point.avgHealth)}</span>
                       <div
-                        className="w-full rounded-t bg-[#0060F0] opacity-80 transition-all"
+                        className="w-full rounded-t bg-[#C96442] opacity-80 transition-all"
                         style={{ height: `${(point.avgHealth / maxHealth) * 100}px`, minHeight: "4px" }}
                       />
                       <span className="text-[9px] text-gray-400 truncate w-full text-center">{point.week.slice(5)}</span>

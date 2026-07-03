@@ -24,7 +24,7 @@ export function DraftModal({ modal, onClose }: Props) {
         </div>
         <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-100">
           <button onClick={onClose} className="px-4 py-2 text-gray-600">Close</button>
-          <button onClick={() => navigator.clipboard.writeText(modal.draft)} className="px-4 py-2 bg-[#0060F0] text-white rounded-lg font-medium hover:opacity-90">
+          <button onClick={() => navigator.clipboard.writeText(modal.draft)} className="px-4 py-2 bg-[#C96442] text-white rounded-lg font-medium hover:opacity-90">
             Copy to Clipboard
           </button>
         </div>

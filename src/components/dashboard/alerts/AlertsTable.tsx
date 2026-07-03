@@ -23,14 +23,14 @@ interface AlertsTableProps {
 }
 
 const SEVERITY_STYLES: Record<Severity, string> = {
-  high: 'bg-[#C0392B] text-white dark:bg-red-950 dark:text-red-400 border-transparent',
+  high: 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400 border-transparent',
   medium:
-    'bg-[#EF4444] text-white dark:bg-red-950 dark:text-red-400 border-transparent',
+    'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400 border-transparent',
   low: 'bg-gray-100 text-gray-600 dark:bg-white dark:text-gray-400 border-transparent',
 }
 
 const STATUS_DOT_COLORS: Record<AlertStatus, string> = {
-  open: 'bg-red-400',
+  open: 'bg-amber-400',
   resolved: 'bg-emerald-400',
 }
 
@@ -207,7 +207,7 @@ function AlertsTable({ alerts }: AlertsTableProps) {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 rounded-md text-gray-400 hover:text-[#0060F0] dark:text-gray-500 dark:hover:text-[#0060F0]"
+                        className="h-7 w-7 rounded-md text-gray-400 hover:text-[#C96442] dark:text-gray-500 dark:hover:text-[#C96442]"
                         title="View details"
                       >
                         <Eye className="h-3.5 w-3.5" />

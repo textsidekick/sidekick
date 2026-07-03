@@ -91,7 +91,7 @@ function QuestionsPerHourChart({ data = [] }: QuestionsPerHourChartProps) {
               <Tooltip content={<CustomTooltip />} />
               <Bar
                 dataKey="questions"
-                fill="#0060F0"
+                fill="#C96442"
                 radius={[3, 3, 0, 0]}
                 barSize={14}
               />

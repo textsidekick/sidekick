@@ -30,28 +30,15 @@ const ROLE_SKILLS: Record<string, string[]> = {
 
 const ROLES = ["operator", "technician", "supervisor", "manager"];
 
-const ROLE_COLORS = [
-  "#2D3436", "#5F4B8B", "#1B4F72", "#4A4A4A",
-  "#6C3483", "#1E8449", "#2E4053", "#7D3C98",
-  "#1A5276", "#6E2C00", "#1C2833", "#4A235A",
-];
-
-function hashString(str: string): number {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) - hash) + str.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash);
-}
-
 function roleBadge(role: string) {
-  const color = ROLE_COLORS[hashString(role) % ROLE_COLORS.length];
+  const cls: Record<string, string> = {
+    manager: "bg-purple-100 text-purple-800",
+    supervisor: "bg-blue-100 text-blue-800",
+    technician: "bg-amber-100 text-amber-800",
+    operator: "bg-gray-100 text-gray-700",
+  };
   return (
-    <span
-      className="text-xs font-medium px-2 py-0.5 rounded-full text-white"
-      style={{ backgroundColor: color }}
-    >
+    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${cls[role] || "bg-gray-100 text-gray-700"}`}>
       {role}
     </span>
   );
@@ -138,16 +125,16 @@ export default function TeamPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F9FC]">
+    <div className="min-h-screen bg-[#F7F3EC]">
       <div className="max-w-5xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
-              <Users className="h-6 w-6 text-[#0060F0]" /> Team
+              <Users className="h-6 w-6 text-[#C96442]" /> Team
             </h1>
             <p className="text-sm text-gray-500 mt-1">{workers.length} worker{workers.length !== 1 ? "s" : ""} enrolled</p>
           </div>
-          <Button onClick={() => { setEditWorker(null); setForm({ name: "", phone: "", role: "operator" }); setShowAdd(true); }} className="bg-[#0060F0] hover:bg-[#a8532f] text-white">
+          <Button onClick={() => { setEditWorker(null); setForm({ name: "", phone: "", role: "operator" }); setShowAdd(true); }} className="bg-[#C96442] hover:bg-[#a8532f] text-white">
             <Plus className="h-4 w-4 mr-1" /> Add Worker
           </Button>
         </div>
@@ -188,7 +175,7 @@ export default function TeamPage() {
                     <td className="px-4 py-3 hidden md:table-cell">
                       <div className="flex flex-wrap gap-1">
                         {skills.map((s) => (
-                          <span key={s} className="text-xs px-2 py-0.5 bg-[#2980B9] text-white rounded-full">{s}</span>
+                          <span key={s} className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">{s}</span>
                         ))}
                       </div>
                     </td>
@@ -250,7 +237,7 @@ export default function TeamPage() {
               </select>
             </div>
             <div className="flex gap-2 pt-1">
-              <Button onClick={handleSave} disabled={saving} className="flex-1 bg-[#0060F0] hover:bg-[#a8532f] text-white">
+              <Button onClick={handleSave} disabled={saving} className="flex-1 bg-[#C96442] hover:bg-[#a8532f] text-white">
                 {saving ? "Saving…" : editWorker ? "Save Changes" : "Add Worker"}
               </Button>
               <Button variant="outline" onClick={() => { setShowAdd(false); setEditWorker(null); }} className="flex-1">Cancel</Button>
