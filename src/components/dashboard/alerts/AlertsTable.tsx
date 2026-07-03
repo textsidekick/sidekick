@@ -29,8 +29,8 @@ const SEVERITY_STYLES: Record<Severity, string> = {
 }
 
 const STATUS_DOT_COLORS: Record<AlertStatus, string> = {
-  open: 'bg-amber-400',
-  resolved: 'bg-emerald-400',
+  open: 'bg-amber-200',
+  resolved: 'bg-green-200',
 }
 
 const FILTER_OPTIONS: { value: FilterStatus; label: string }[] = [
@@ -197,7 +197,7 @@ function AlertsTable({ alerts }: AlertsTableProps) {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-7 w-7 rounded-md text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400"
+                          className="h-7 w-7 rounded-md text-gray-400 hover:text-gray-600 "
                           title="Mark resolved"
                         >
                           <CheckCircle2 className="h-3.5 w-3.5" />

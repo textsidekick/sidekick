@@ -67,9 +67,9 @@ function formatMinutes(min: number) {
 }
 
 function healthColor(score: number) {
-  if (score >= 85) return "text-green-700";
-  if (score >= 70) return "text-amber-700";
-  return "text-red-700";
+  if (score >= 85) return "text-gray-700";
+  if (score >= 70) return "text-gray-700";
+  return "text-gray-700";
 }
 
 export default function OperationsDashboardPage() {
@@ -195,8 +195,8 @@ export default function OperationsDashboardPage() {
             {showHealthBreakdown && plantHealthBreakdown && (
               <div className="mt-2 text-xs text-black/50 bg-black/[0.03] rounded-xl p-3 space-y-1 max-w-xs">
                 <div>Asset health avg: <span className="font-medium text-black/70">{plantHealthBreakdown.assetAvg}</span></div>
-                <div>− Open WO penalty ({plantHealthBreakdown.openWOs} open): <span className="font-medium text-amber-700">−{plantHealthBreakdown.woPenalty}</span></div>
-                <div>− Overdue PM penalty ({plantHealthBreakdown.overdueCount} overdue): <span className="font-medium text-red-700">−{plantHealthBreakdown.overduePenalty}</span></div>
+                <div>− Open WO penalty ({plantHealthBreakdown.openWOs} open): <span className="font-medium text-gray-700">−{plantHealthBreakdown.woPenalty}</span></div>
+                <div>− Overdue PM penalty ({plantHealthBreakdown.overdueCount} overdue): <span className="font-medium text-gray-700">−{plantHealthBreakdown.overduePenalty}</span></div>
                 <div className="border-t border-black/10 pt-1 font-medium text-black/70">= {plantHealthBreakdown.total}/100</div>
               </div>
             )}
@@ -245,7 +245,7 @@ export default function OperationsDashboardPage() {
           </div>
 
           {!!error && (
-            <div className="mt-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl p-3">{error}</div>
+            <div className="mt-4 text-sm text-gray-700 bg-red-50 border border-red-200 rounded-xl p-3">{error}</div>
           )}
         </div>
 
@@ -275,7 +275,7 @@ export default function OperationsDashboardPage() {
                         <div className="mt-2 font-medium">{a.title}</div>
                         <div className="mt-1 text-sm text-black/60">{a.description}</div>
                       </div>
-                      <AlertTriangle className={cn("h-5 w-5", a.type === "critical" ? "text-red-500" : a.type === "warning" ? "text-amber-500" : "text-blue-500")} />
+                      <AlertTriangle className={cn("h-5 w-5", a.type === "critical" ? "text-gray-400" : a.type === "warning" ? "text-gray-400" : "text-gray-400")} />
                     </div>
 
                     <div className="mt-3 flex flex-wrap gap-2">
@@ -344,11 +344,11 @@ export default function OperationsDashboardPage() {
 
             <div className="mt-4 flex items-center gap-2 text-xs text-black/50">
               <span>Overdue PMs:</span>
-              <span className={cn("font-medium", (data?.overduePMsCount || 0) ? "text-red-700" : "text-black/70")}>
+              <span className={cn("font-medium", (data?.overduePMsCount || 0) ? "text-gray-700" : "text-black/70")}>
                 {loading ? "—" : data?.overduePMsCount || 0}
               </span>
               {(data?.overduePMsCount || 0) > 0 && (
-                <Button size="sm" variant="ghost" className="h-7 px-2 text-red-700" onClick={() => setAlerts((prev) => prev)}>
+                <Button size="sm" variant="ghost" className="h-7 px-2 text-gray-700" onClick={() => setAlerts((prev) => prev)}>
                   <X className="h-4 w-4 mr-1" /> Review
                 </Button>
               )}

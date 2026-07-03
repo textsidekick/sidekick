@@ -47,9 +47,9 @@ function statusPill(status: AssetStatus) {
 }
 
 function healthGradient(score: number) {
-  if (score >= 85) return "text-green-700";
-  if (score >= 70) return "text-amber-700";
-  return "text-red-700";
+  if (score >= 85) return "text-gray-700";
+  if (score >= 70) return "text-gray-700";
+  return "text-gray-700";
 }
 
 export default function AssetsPage() {
@@ -231,7 +231,7 @@ export default function AssetsPage() {
         </div>
 
         {!!error && (
-          <div className="mt-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl p-3">{error}</div>
+          <div className="mt-4 text-sm text-gray-700 bg-red-50 border border-red-200 rounded-xl p-3">{error}</div>
         )}
 
         <div className="mt-8 rounded-2xl bg-white border border-black/5 p-6">
@@ -258,7 +258,7 @@ export default function AssetsPage() {
                 {frequentIssues.map(({ a, count7d }) => (
                   <div key={a.id} className="flex items-center justify-between">
                     <div className="text-sm">{a.name}</div>
-                    <div className="text-sm font-medium text-amber-700">{count7d} WOs</div>
+                    <div className="text-sm font-medium text-gray-700">{count7d} WOs</div>
                   </div>
                 ))}
               </div>

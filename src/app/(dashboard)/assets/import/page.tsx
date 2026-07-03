@@ -75,10 +75,10 @@ export default function AssetImportPage() {
 
         {result && (
           <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 flex items-start gap-3">
-            <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+            <CheckCircle className="h-5 w-5 text-gray-600 mt-0.5" />
             <div>
-              <p className="font-medium text-green-800">Import successful!</p>
-              <p className="text-sm text-green-600">Imported {result.imported} of {result.total} rows.</p>
+              <p className="font-medium text-gray-700">Import successful!</p>
+              <p className="text-sm text-gray-600">Imported {result.imported} of {result.total} rows.</p>
             </div>
           </div>
         )}

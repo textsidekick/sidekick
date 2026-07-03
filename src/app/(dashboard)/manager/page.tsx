@@ -101,9 +101,9 @@ interface WorkOrder {
 
 // Existing helpers (unchanged)
 function healthColor(score: number) {
-  if (score >= 85) return "text-green-700";
+  if (score >= 85) return "text-gray-700";
   if (score >= 70) return "text-gray-600";
-  return "text-red-700";
+  return "text-gray-700";
 }
 
 // Main component
@@ -653,7 +653,7 @@ export default function ManagerDashboard() {
                   )}
                   {criticalHighWOs.slice(0, 5).map(wo => (
                     <div key={wo.id} className="flex items-start gap-3 rounded-xl border border-red-100 bg-red-50/50 p-3">
-                      <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
+                      <AlertTriangle className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5" />
                       <div className="min-w-0 flex-1">
                         <div className="text-sm font-medium text-[#1C1A16] truncate">{wo.short_id} · {wo.title}</div>
                         <div className="mt-1 flex items-center gap-2">
@@ -680,7 +680,7 @@ export default function ManagerDashboard() {
                   {/* Also show open issues */}
                   {issues.filter(i => i.status === "open" && i.severity === "high").slice(0, 3).map(i => (
                     <div key={i.id} className="flex items-start gap-3 rounded-xl border border-orange-100 bg-orange-50/50 p-3 cursor-pointer hover:border-orange-200 transition-colors" onClick={() => setSelectedIssue(i)}>
-                      <AlertCircle className="h-4 w-4 text-orange-500 flex-shrink-0 mt-0.5" />
+                      <AlertCircle className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5" />
                       <div className="min-w-0 flex-1">
                         <div className="text-sm font-medium text-[#1C1A16] truncate">{i.description}</div>
                         <div className="mt-1 text-xs text-black/40">{i.worker_name || "Worker"} · {formatTimeAgo(i.created_at)}</div>
@@ -880,7 +880,7 @@ export default function ManagerDashboard() {
                 <SectionHeader
                   title="Safety Checklists"
                   subtitle="Pre-shift safety compliance"
-                  action={checklistStats ? <span className={`text-sm font-medium ${checklistStats.complianceRate === 100 ? "text-emerald-600" : "text-gray-500"}`}>{checklistStats.complianceRate}% compliant today</span> : undefined}
+                  action={checklistStats ? <span className={`text-sm font-medium ${checklistStats.complianceRate === 100 ? "text-gray-600" : "text-gray-500"}`}>{checklistStats.complianceRate}% compliant today</span> : undefined}
                 />
                 {mappedChecklists.length === 0 ? (
                   <EmptyState icon={ClipboardList} title="No checklists submitted" description="Pre-shift safety checklists submitted by workers will appear here." />
@@ -900,7 +900,7 @@ export default function ManagerDashboard() {
                       <tbody className="divide-y divide-gray-50">
                         {mappedChecklists.map(entry => {
                           const passed = entry.ppeOk && entry.lotoOk && entry.equipmentOk;
-                          const icon = (v: boolean | null) => v === true ? <CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /> : v === false ? <XCircle className="h-4 w-4 text-red-500 mx-auto" /> : <Minus className="h-4 w-4 text-gray-400 mx-auto" />;
+                          const icon = (v: boolean | null) => v === true ? <CheckCircle2 className="h-4 w-4 text-gray-500 mx-auto" /> : v === false ? <XCircle className="h-4 w-4 text-gray-500 mx-auto" /> : <Minus className="h-4 w-4 text-gray-400 mx-auto" />;
                           return (
                             <tr key={entry.id}>
                               <td className="py-2.5 pr-4 font-medium text-gray-900">{entry.workerName}</td>

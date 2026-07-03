@@ -37,7 +37,7 @@ function formatDate(dateStr: string): string {
 
 const TYPE_BADGE_CLASSES: Record<string, string> = {
   PDF: 'bg-[#DC2626] text-white dark:bg-red-950 dark:text-red-400 border-transparent',
-  Word: 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-[#C96442] border-transparent',
+  Word: 'bg-blue-100 text-gray-600',
   Excel: 'bg-[#27AE60] text-white dark:bg-green-950 dark:text-green-400 border-transparent',
   Text: 'bg-gray-100 text-gray-600 border-transparent',
 }

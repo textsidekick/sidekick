@@ -102,15 +102,15 @@ export default function KnowledgePage() {
                 className={`rounded-xl border px-6 py-4 flex items-center gap-4 transition text-left ${
                   showReviewOnly
                     ? "border-[#C96442] bg-[#C96442]/10"
-                    : "border-amber-200 bg-amber-50 hover:bg-amber-100"
+                    : "border-gray-200 bg-amber-50 hover:bg-gray-50"
                 }`}
               >
                 <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
                   <BookOpen className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-amber-600">{needsReview.length}</div>
-                  <div className="text-sm text-amber-600">Needs Review (auto-generated)</div>
+                  <div className="text-3xl font-bold text-gray-600">{needsReview.length}</div>
+                  <div className="text-sm text-gray-600">Needs Review (auto-generated)</div>
                 </div>
               </button>
             )}
@@ -165,7 +165,7 @@ export default function KnowledgePage() {
                         <span className="flex items-center gap-1"><Hash className="w-3 h-3" />Referenced {article.times_referenced || 0}x</span>
                         {article.source_work_order_id && (
                           <>
-                            <span className="inline-flex items-center gap-1 text-amber-600 font-medium">⚠ Needs Review</span>
+                            <span className="inline-flex items-center gap-1 text-gray-600 font-medium">Needs Review</span>
                             <a
                               href={`/work-orders?id=${article.source_work_order_id}`}
                               className="text-[#C96442] underline hover:text-[#B0532F]"

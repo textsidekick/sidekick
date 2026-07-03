@@ -117,28 +117,28 @@ export default function AnalyticsPage() {
                 value={`${data.workOrders.mttr}h`}
                 sub="Mean time to resolve"
                 icon={Clock}
-                color="bg-blue-50 text-blue-600"
+                color="bg-blue-50 text-gray-600"
               />
               <MetricCard
                 label="MTBF"
                 value={`${data.assets.mtbf}h`}
                 sub="Mean time between failures"
                 icon={TrendingUp}
-                color="bg-green-50 text-green-600"
+                color="bg-green-50 text-gray-600"
               />
               <MetricCard
                 label="WO Completion"
                 value={`${data.workOrders.completionRate}%`}
                 sub={`${data.workOrders.completed} / ${data.workOrders.total} orders`}
                 icon={CheckCircle}
-                color="bg-amber-50 text-amber-600"
+                color="bg-amber-50 text-gray-600"
               />
               <MetricCard
                 label="Avg Asset Health"
                 value={`${data.assets.avgHealthScore}`}
                 sub={`${data.assets.total} assets tracked`}
                 icon={AlertTriangle}
-                color="bg-red-50 text-red-600"
+                color="bg-red-50 text-gray-600"
               />
             </div>
 
@@ -169,7 +169,7 @@ export default function AnalyticsPage() {
                 <h2 className="text-sm font-semibold text-gray-700 mb-4">Asset Status</h2>
                 <div className="space-y-3">
                   {Object.entries(data.assets.byStatus).map(([status, count]) => {
-                    const color = status === "operational" ? "bg-green-400" : status === "degraded" ? "bg-amber-400" : status === "down" ? "bg-red-400" : "bg-gray-400";
+                    const color = status === "operational" ? "bg-green-300" : status === "degraded" ? "bg-amber-300" : status === "down" ? "bg-red-300" : "bg-gray-300";
                     return (
                       <div key={status} className="flex items-center gap-3">
                         <span className="text-xs text-gray-500 w-24 capitalize">{status}</span>

@@ -42,10 +42,10 @@ export default function UpgradeBanner({ companyId, plan, email }: Props) {
             <span className="text-sm font-bold text-[#C96442]">$200/mo</span>
           </div>
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600">
-            <span className="flex items-center gap-1"><Check className="h-3 w-3 text-green-600" /> Unlimited questions</span>
-            <span className="flex items-center gap-1"><Check className="h-3 w-3 text-green-600" /> All integrations</span>
-            <span className="flex items-center gap-1"><Check className="h-3 w-3 text-green-600" /> Priority support</span>
-            <span className="flex items-center gap-1"><Check className="h-3 w-3 text-green-600" /> Weekly digest reports</span>
+            <span className="flex items-center gap-1"><Check className="h-3 w-3 text-gray-500" /> Unlimited questions</span>
+            <span className="flex items-center gap-1"><Check className="h-3 w-3 text-gray-500" /> All integrations</span>
+            <span className="flex items-center gap-1"><Check className="h-3 w-3 text-gray-500" /> Priority support</span>
+            <span className="flex items-center gap-1"><Check className="h-3 w-3 text-gray-500" /> Weekly digest reports</span>
           </div>
         </div>
         <button

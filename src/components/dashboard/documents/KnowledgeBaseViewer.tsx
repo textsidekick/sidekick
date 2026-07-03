@@ -189,7 +189,7 @@ export default function KnowledgeBaseViewer({ companyId }: Props) {
                   </span>
                 </div>
                 {connections[source] && (
-                  <span className="text-xs text-green-600 font-medium">Connected</span>
+                  <span className="text-xs text-gray-600 font-medium">Connected</span>
                 )}
               </button>
 

@@ -21,21 +21,21 @@ interface AlertChartsProps {
 }
 
 const SEVERITY_COLORS: Record<string, string> = {
-  High: '#ef4444',
-  Medium: '#f59e0b',
-  Low: '#9ca3af',
+  High: '#fca5a5',
+  Medium: '#fde68a',
+  Low: '#d1d5db',
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  Open: '#f59e0b',
-  Resolved: '#10b981',
+  Open: '#fde68a',
+  Resolved: '#bbf7d0',
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Safety: '#ef4444',
+  Safety: '#fca5a5',
   Equipment: '#C96442',
-  Compliance: '#f59e0b',
-  Health: '#8b5cf6',
+  Compliance: '#fde68a',
+  Health: '#c4b5fd',
 }
 
 function capitalize(str: string): string {
@@ -171,7 +171,7 @@ function AlertCharts({ alerts }: AlertChartsProps) {
               <Bar
                 dataKey="alerts"
                 name="Alerts"
-                fill="#C96442"
+                fill="#d4a48a"
                 radius={[6, 6, 0, 0]}
                 maxBarSize={40}
               />

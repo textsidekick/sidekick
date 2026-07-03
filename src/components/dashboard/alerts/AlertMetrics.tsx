@@ -35,7 +35,7 @@ function AlertMetrics({ alerts }: AlertMetricsProps) {
         label="Open Issues"
         value={openIssues}
         icon={Clock}
-        iconClassName="h-5 w-5 text-amber-500"
+        iconClassName="h-5 w-5 text-gray-400"
         accentColor="amber"
         change={15.0}
         subtext="Reported in last 24 hours"
@@ -44,8 +44,8 @@ function AlertMetrics({ alerts }: AlertMetricsProps) {
         label="High Priority"
         value={highPriority}
         icon={AlertTriangle}
-        iconClassName="h-5 w-5 text-red-500"
-        valueClassName="text-red-500 dark:text-red-400"
+        iconClassName="h-5 w-5 text-gray-400"
+        valueClassName="text-gray-400 dark:text-red-400"
         accentColor="red"
         change={-8.0}
         subtext="Need immediate action"
@@ -54,7 +54,7 @@ function AlertMetrics({ alerts }: AlertMetricsProps) {
         label="Resolved"
         value={resolved}
         icon={CheckCircle2}
-        iconClassName="h-5 w-5 text-emerald-500"
+        iconClassName="h-5 w-5 text-gray-400"
         accentColor="emerald"
         change={20.0}
         subtext="Resolved this week"
