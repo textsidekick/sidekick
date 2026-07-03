@@ -105,6 +105,63 @@ export default function OnboardingChat() {
     integrations: [],
   });
 
+  // Parse [suggestions: A | B | C] from message text
+  const parseSuggestions = (content: string): { text: string; suggestions: string[] } => {
+    const match = content.match(/\[suggestions?:\s*([^\]]+)\]/);
+    if (!match) return { text: content, suggestions: [] };
+    const text = content.replace(/\[suggestions?:\s*[^\]]+\]/g, '').trim();
+    const suggestions = match[1].split('|').map(s => s.trim()).filter(Boolean);
+    return { text, suggestions };
+  };
+
+  const sendMessage = async (text: string) => {
+    const userMessage: Message = { role: 'user', content: text };
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
+    setInput('');
+    setLoading(true);
+    try {
+      const response = await fetch('/api/onboarding/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: newMessages, sessionId, section: activeSectionId }),
+      });
+      if (!response.ok) throw new Error('Failed to get response');
+      const data = await response.json();
+      const assistantMessage: Message = { role: 'assistant', content: data.message };
+      const finalMessages = [...newMessages, assistantMessage];
+      setMessages(finalMessages);
+      if (data.extractedData) {
+        setSectionData(prev => {
+          const updated = { ...prev };
+          const ed = data.extractedData;
+          if (ed.company) updated.company = { ...prev.company, ...ed.company };
+          if (ed.assets && ed.assets.length > 0) updated.assets = ed.assets;
+          if (ed.team && ed.team.length > 0) updated.team = ed.team;
+          if (ed.knowledge && ed.knowledge.length > 0) updated.knowledge = ed.knowledge;
+          if (ed.workorders && ed.workorders.length > 0) updated.workorders = ed.workorders;
+          if (ed.integrations && ed.integrations.length > 0) updated.integrations = ed.integrations;
+          return updated;
+        });
+      }
+      const isDone = data.done ||
+        data.message.includes('All set! Setting up your account now') ||
+        (data.message.includes('All set') && data.message.includes('setting up')) ||
+        data.message.includes('Perfect! I have everything I need');
+      if (isDone) { setIsComplete(true); handleCompleteInterview(finalMessages); }
+    } catch (error) {
+      console.error('Chat error:', error);
+      setMessages([...newMessages, { role: 'assistant', content: "Sorry, I hit a snag. Could you try that again?" }]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    if (loading || isComplete) return;
+    sendMessage(suggestion);
+  };
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -235,53 +292,9 @@ export default function OnboardingChat() {
     }
   };
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = () => {
     if (!input.trim()) return;
-    const userMessage: Message = { role: "user", content: input };
-    const newMessages = [...messages, userMessage];
-    setMessages(newMessages);
-    setInput("");
-    setLoading(true);
-    try {
-      const response = await fetch("/api/onboarding/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: newMessages, sessionId, section: activeSectionId }),
-      });
-      if (!response.ok) throw new Error("Failed to get response");
-      const data = await response.json();
-      const assistantMessage: Message = { role: "assistant", content: data.message };
-      setMessages([...newMessages, assistantMessage]);
-
-      // Extract structured data from response if provided
-      // The extraction sees the full conversation, so replace (not append) arrays
-      if (data.extractedData) {
-        setSectionData((prev) => {
-          const updated = { ...prev };
-          const ed = data.extractedData;
-          if (ed.company) updated.company = { ...prev.company, ...ed.company };
-          if (ed.assets && ed.assets.length > 0) updated.assets = ed.assets;
-          if (ed.team && ed.team.length > 0) updated.team = ed.team;
-          if (ed.knowledge && ed.knowledge.length > 0) updated.knowledge = ed.knowledge;
-          if (ed.workorders && ed.workorders.length > 0) updated.workorders = ed.workorders;
-          if (ed.integrations && ed.integrations.length > 0) updated.integrations = ed.integrations;
-          return updated;
-        });
-      }
-      const isDone = data.done ||
-        data.message.includes("All set! Setting up your account now") ||
-        (data.message.includes("All set") && data.message.includes("setting up")) ||
-        data.message.includes("Perfect! I have everything I need");
-      if (isDone) {
-        setIsComplete(true);
-        handleCompleteInterview([...newMessages, assistantMessage]);
-      }
-    } catch (error) {
-      console.error("Chat error:", error);
-      setMessages([...newMessages, { role: "assistant", content: "Sorry, I hit a snag. Could you try that again?" }]);
-    } finally {
-      setLoading(false);
-    }
+    sendMessage(input.trim());
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -510,31 +523,63 @@ export default function OnboardingChat() {
         {/* Chat area */}
         <div style={{ flex: 1, overflow: "auto", padding: "32px 24px", display: "flex", flexDirection: "column" }}>
           <div style={{ maxWidth: 672, margin: "0 auto", width: "100%" }}>
-            {messages.map((msg, idx) => (
-              <div
-                key={idx}
-                style={{
-                  display: "flex",
-                  justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
-                  marginBottom: 16, gap: 12,
-                }}
-              >
+            {messages.map((msg, idx) => {
+              const isLastAssistant = msg.role === 'assistant' && idx === messages.length - 1;
+              const { text, suggestions } = msg.role === 'assistant' ? parseSuggestions(msg.content) : { text: msg.content, suggestions: [] };
+              return (
+              <div key={idx}>
                 <div
                   style={{
-                    maxWidth: "85%",
-                    padding: msg.role === "user" ? "12px 18px" : "14px 18px",
-                    borderRadius: msg.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
-                    background: msg.role === "user" ? "#C96442" : "white",
-                    color: msg.role === "user" ? "white" : "#1C1A16",
-                    fontSize: 15, lineHeight: "1.6",
-                    border: msg.role === "user" ? "none" : "1px solid rgba(28,26,22,0.1)",
-                    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.06)",
+                    display: "flex",
+                    justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
+                    marginBottom: suggestions.length > 0 ? 8 : 16, gap: 12,
                   }}
                 >
-                  {msg.content}
+                  <div
+                    style={{
+                      maxWidth: "85%",
+                      padding: msg.role === "user" ? "12px 18px" : "14px 18px",
+                      borderRadius: msg.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
+                      background: msg.role === "user" ? "#C96442" : "white",
+                      color: msg.role === "user" ? "white" : "#1C1A16",
+                      fontSize: 15, lineHeight: "1.6",
+                      border: msg.role === "user" ? "none" : "1px solid rgba(28,26,22,0.1)",
+                      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.06)",
+                    }}
+                  >
+                    {text}
+                  </div>
                 </div>
+                {suggestions.length > 0 && (
+                  <div style={{
+                    display: 'flex', flexWrap: 'wrap', gap: 8,
+                    marginBottom: 16, paddingLeft: 4,
+                  }}>
+                    {suggestions.map((s, si) => (
+                      <button
+                        key={si}
+                        onClick={() => handleSuggestionClick(s)}
+                        disabled={loading || isComplete || !isLastAssistant}
+                        style={{
+                          padding: '8px 16px', borderRadius: 20,
+                          border: '1.5px solid rgba(201,100,66,0.35)',
+                          background: 'rgba(201,100,66,0.06)',
+                          color: '#C96442', fontSize: 14, fontWeight: 500,
+                          cursor: loading || isComplete || !isLastAssistant ? 'default' : 'pointer',
+                          opacity: !isLastAssistant ? 0.5 : 1,
+                          transition: 'all 0.15s',
+                        }}
+                        onMouseEnter={e => { if (isLastAssistant && !loading && !isComplete) { (e.target as HTMLButtonElement).style.background = 'rgba(201,100,66,0.15)'; } }}
+                        onMouseLeave={e => { (e.target as HTMLButtonElement).style.background = 'rgba(201,100,66,0.06)'; }}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
-            ))}
+              );
+            })}
             {loading && (
               <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: 20 }}>
                 <div style={{

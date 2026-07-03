@@ -1,6 +1,5 @@
 import { Inter, Instrument_Serif } from "next/font/google";
 import "../globals.css";
-import ManagerChat from "@/components/dashboard/ManagerChat";
 import { Sidebar } from "@/components/dashboard/layout/Sidebar";
 
 const inter = Inter({
@@ -41,7 +40,6 @@ export default function DashboardLayout({
         <div className="lg:ml-[220px]">
           {children}
         </div>
-        <ManagerChat />
       </body>
     </html>
   );
