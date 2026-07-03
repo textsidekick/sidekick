@@ -682,6 +682,61 @@ export default function ManagerDashboard() {
                 </div>
               </div>
             </div>
+
+            {/* ── Recent Questions from Workers ─────────────────────────── */}
+            <div className="rounded-2xl bg-white border border-[rgba(28,26,22,0.06)] p-6">
+              <SectionHeader
+                title="Recent Questions"
+                subtitle="What workers are asking and reporting"
+                action={
+                  <button
+                    onClick={() => setShowAllQuestions(true)}
+                    className="text-xs text-[#C96442] hover:underline font-medium"
+                  >
+                    View all →
+                  </button>
+                }
+              />
+              <div className="mt-4 divide-y divide-[rgba(28,26,22,0.04)]">
+                {loadingStats && (
+                  <div className="text-sm text-black/40 py-6 text-center">Loading…</div>
+                )}
+                {!loadingStats && (stats?.recentQuestions || []).length === 0 && (
+                  <EmptyState icon={MessageSquare} title="No questions yet" description="Worker questions will appear here as they come in." />
+                )}
+                {!loadingStats && (stats?.recentQuestions || []).slice(0, 10).map((q, i) => {
+                  const answered = q.confidence >= 50;
+                  return (
+                    <div
+                      key={q.id || i}
+                      className="py-3 flex items-start gap-3 hover:bg-[#F7F3EC] -mx-6 px-6 transition-colors cursor-pointer"
+                      onClick={() => { if (!answered) { setSelectedUQ(q); setUqAnswer(""); } }}
+                    >
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        answered ? "bg-emerald-100" : "bg-amber-100"
+                      }`}>
+                        <MessageSquare className={`h-4 w-4 ${
+                          answered ? "text-emerald-600" : "text-amber-600"
+                        }`} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-[#1C1A16] line-clamp-2">{q.question}</p>
+                        <p className="text-xs text-black/40 mt-0.5">
+                          {q.worker_name || "Worker"} · {formatTimeAgo(q.created_at)}
+                        </p>
+                      </div>
+                      <span className={`flex-shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${
+                        answered
+                          ? "bg-emerald-100 text-emerald-700"
+                          : "bg-amber-100 text-amber-700"
+                      }`}>
+                        {answered ? "Answered" : "Needs answer"}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         )}
 
