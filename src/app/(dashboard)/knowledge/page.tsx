@@ -89,7 +89,7 @@ export default function KnowledgePage() {
           <div className="mt-6 flex items-center gap-4 flex-wrap">
             <div className="bg-white rounded-xl border border-gray-200 px-6 py-4 flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center">
-                <BookOpen className="w-6 h-6 text-gray-500" />
+                <BookOpen className="w-6 h-6 text-[#C96442]" />
               </div>
               <div>
                 <div className="text-3xl font-bold text-gray-900">{articles.length}</div>
@@ -106,7 +106,7 @@ export default function KnowledgePage() {
                 }`}
               >
                 <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center">
-                  <BookOpen className="w-6 h-6 text-gray-500" />
+                  <BookOpen className="w-6 h-6 text-[#C96442]" />
                 </div>
                 <div>
                   <div className="text-3xl font-bold text-amber-700">{needsReview.length}</div>

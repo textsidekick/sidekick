@@ -716,7 +716,7 @@ export default function ManagerDashboard() {
                         answered ? "bg-gray-100" : "bg-gray-100"
                       }`}>
                         <MessageSquare className={`h-4 w-4 ${
-                          answered ? "text-gray-500" : "text-gray-400"
+                          answered ? "text-emerald-600" : "text-gray-400"
                         }`} />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -856,7 +856,7 @@ export default function ManagerDashboard() {
                               <td className="py-2.5 pr-4 font-medium text-gray-900">{cert.workerName}</td>
                               <td className="py-2.5 pr-4 text-gray-600">{cert.certName}</td>
                               <td className="py-2.5 pr-4 text-gray-500">{new Date(cert.expiryDate).toLocaleDateString()}</td>
-                              <td className="py-2.5"><span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${valid ? "bg-gray-100 text-gray-600" : "bg-gray-100 text-gray-600"}`}>{valid ? "Valid" : "Expired"}</span></td>
+                              <td className="py-2.5"><span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${valid ? "bg-emerald-600 text-white" : "bg-red-500 text-white"}`}>{valid ? "Valid" : "Expired"}</span></td>
                               <td className="py-2.5 text-right"><button onClick={() => deleteCertification(cert.id)} className="text-gray-400 hover:text-red-500"><Trash2 className="h-4 w-4" /></button></td>
                             </tr>
                           );
@@ -902,7 +902,7 @@ export default function ManagerDashboard() {
                               <td className="py-2.5 text-center">{icon(entry.ppeOk)}</td>
                               <td className="py-2.5 text-center">{icon(entry.lotoOk)}</td>
                               <td className="py-2.5 text-center">{icon(entry.equipmentOk)}</td>
-                              <td className="py-2.5"><span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${passed ? "bg-gray-100 text-gray-600" : "bg-gray-100 text-gray-600"}`}>{passed ? "Passed" : "Failed"}</span></td>
+                              <td className="py-2.5"><span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${passed ? "bg-emerald-600 text-white" : "bg-red-500 text-white"}`}>{passed ? "Passed" : "Failed"}</span></td>
                             </tr>
                           );
                         })}

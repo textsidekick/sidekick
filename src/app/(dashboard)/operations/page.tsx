@@ -259,7 +259,7 @@ export default function OperationsDashboardPage() {
                   a.type === "critical"
                     ? "bg-gray-100 text-gray-600"
                     : a.type === "warning"
-                      ? "bg-gray-100 text-gray-600"
+                      ? "bg-blue-600 text-white"
                       : "bg-gray-100 text-gray-600";
 
                 return (

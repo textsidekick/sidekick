@@ -37,11 +37,11 @@ type AddAssetForm = {
 function statusPill(status: AssetStatus) {
   const cls =
     status === "operational"
-      ? "bg-gray-100 text-gray-600"
+      ? "bg-emerald-600 text-white"
       : status === "degraded"
-        ? "bg-gray-100 text-gray-600"
+        ? "bg-amber-600 text-white"
         : status === "down"
-          ? "bg-gray-100 text-gray-600"
+          ? "bg-red-600 text-white"
           : "bg-gray-100 text-gray-700";
   return <span className={cn("text-xs font-medium px-2 py-1 rounded-full", cls)}>{status.toUpperCase()}</span>;
 }
