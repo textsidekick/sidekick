@@ -291,7 +291,6 @@ export default function KnowledgePage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [showReviewOnly, setShowReviewOnly] = useState(false);
   const [companyId, setCompanyId] = useState<string>("");
   const [activeCaptureTab, setActiveCaptureTab] = useState<CaptureTab>("text");
 
@@ -319,7 +318,7 @@ export default function KnowledgePage() {
   }, []);
 
   const needsReview = articles.filter(a => !!a.source_work_order_id);
-  const filtered = (showReviewOnly ? needsReview : articles).filter(a =>
+  const filtered = articles.filter(a =>
     search.trim()
       ? a.title?.toLowerCase().includes(search.toLowerCase()) ||
         a.problem?.toLowerCase().includes(search.toLowerCase()) ||
@@ -401,21 +400,22 @@ export default function KnowledgePage() {
             <div className="text-sm text-gray-500">Procedures & fixes documented</div>
           </div>
         </div>
-        {needsReview.length > 0 && (
-          <button
-            onClick={() => setShowReviewOnly(v => !v)}
-            className={`flex items-center gap-4 rounded-xl border px-6 py-4 text-left transition ${showReviewOnly ? "border-[#C96442]/40 bg-[#C96442]/5" : "border-gray-200 bg-white hover:bg-gray-50"}`}
-          >
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F7F3EC]">
-              <BookOpen className="w-6 h-6 text-gray-700" />
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-gray-900">{needsReview.length}</div>
-              <div className="text-sm text-gray-600">Needs Review <span className="text-xs text-gray-400">(auto-generated from work orders)</span></div>
-            </div>
-          </button>
-        )}
       </div>
+
+      {needsReview.length > 0 && (
+        <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50/60 px-4 py-3">
+          <div className="text-sm text-gray-700">
+            <span className="font-semibold">{needsReview.length} items need review.</span>{" "}
+            Auto-generated knowledge is reviewed separately before it reaches the team.
+          </div>
+          <a
+            href="/review-queue"
+            className="shrink-0 rounded-lg border border-amber-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-amber-50"
+          >
+            Open Review Queue
+          </a>
+        </div>
+      )}
 
       {/* ── Search ── */}
       <div className="mt-6 relative">
