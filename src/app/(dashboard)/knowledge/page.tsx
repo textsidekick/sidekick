@@ -124,7 +124,7 @@ function UploadCard({ companyId }: { companyId: string }) {
       </button>
 
       {result && (
-        <div className={cn("text-xs px-3 py-2 rounded-lg flex items-center gap-2", result.ok ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700")}>
+        <div className={cn("text-xs px-3 py-2 rounded-lg flex items-center gap-2", result.ok ? "bg-green-50 text-gray-700" : "bg-red-50 text-gray-700")}>
           {result.ok ? <><CheckCircle2 className="w-3.5 h-3.5" /> Uploaded {result.name}</> : <><X className="w-3.5 h-3.5" /> {result.error}</>}
         </div>
       )}
@@ -217,8 +217,8 @@ function VoiceInputCard({ companyId }: { companyId: string }) {
       )}
 
       {result && (
-        <div className={cn("text-xs px-3 py-2 rounded-lg", result.ok ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700")}>
-          {result.ok ? <><CheckCircle2 className="w-3.5 h-3.5 inline mr-1" />Saved! {result.preview && <span className="block mt-1 text-green-600 italic">"{result.preview}…"</span>}</> : <><X className="w-3.5 h-3.5 inline mr-1" />{result.error}</>}
+        <div className={cn("text-xs px-3 py-2 rounded-lg", result.ok ? "bg-green-50 text-gray-700" : "bg-red-50 text-gray-700")}>
+          {result.ok ? <><CheckCircle2 className="w-3.5 h-3.5 inline mr-1" />Saved! {result.preview && <span className="block mt-1 text-gray-600 italic">"{result.preview}…"</span>}</> : <><X className="w-3.5 h-3.5 inline mr-1" />{result.error}</>}
         </div>
       )}
     </div>

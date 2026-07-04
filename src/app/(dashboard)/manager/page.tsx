@@ -322,7 +322,7 @@ export default function ManagerDashboard() {
             <div className="flex items-center gap-3">
               <h2 className="text-base font-semibold text-[#1C1A16]">Needs Attention</h2>
               {totalAttentionCount > 0 && (
-                <span className="inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-red-100 text-red-700 text-xs font-bold">
+                <span className="inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-red-100 text-gray-700 text-xs font-bold">
                   {totalAttentionCount}
                 </span>
               )}
@@ -331,10 +331,10 @@ export default function ManagerDashboard() {
 
           {attentionItems.length === 0 ? (
             <div className="flex items-center gap-3 rounded-xl border border-green-100 bg-green-50/50 p-5">
-              <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+              <CheckCircle2 className="h-5 w-5 text-gray-700 flex-shrink-0" />
               <div>
-                <div className="text-sm font-medium text-green-800">All clear</div>
-                <div className="text-xs text-green-600 mt-0.5">No blocked work, overdue items, or unanswered questions right now.</div>
+                <div className="text-sm font-medium text-gray-800">All clear</div>
+                <div className="text-xs text-gray-600 mt-0.5">No blocked work, overdue items, or unanswered questions right now.</div>
               </div>
             </div>
           ) : (
@@ -355,7 +355,7 @@ export default function ManagerDashboard() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-semibold text-[#1C1A16]">{item.label}</span>
-                        <span className={cn("text-xs font-bold px-1.5 py-0.5 rounded-full", item.bgColor, item.color)}>
+                        <span className={cn("text-xs font-bold px-1.5 py-0.5 rounded-full", item.bgColor, "text-gray-700")}>
                           {item.count}
                         </span>
                       </div>
@@ -536,7 +536,7 @@ export default function ManagerDashboard() {
                     "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
                     answered ? "bg-green-100" : "bg-amber-100"
                   )}>
-                    <MessageSquare className={cn("h-4 w-4", answered ? "text-green-600" : "text-amber-600")} />
+                    <MessageSquare className="h-4 w-4 text-gray-700" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-[#1C1A16] line-clamp-2">{q.question}</p>
@@ -544,7 +544,7 @@ export default function ManagerDashboard() {
                   </div>
                   <span className={cn(
                     "flex-shrink-0 text-xs px-2 py-0.5 rounded-full font-medium",
-                    answered ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
+                    answered ? "bg-green-100 text-gray-700" : "bg-amber-100 text-gray-700"
                   )}>
                     {answered ? "Resolved" : "Needs answer"}
                   </span>
