@@ -373,10 +373,14 @@ export default function KnowledgePage() {
           </div>
         </div>
 
-        <div className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-[1.35fr_.9fr_.9fr_.9fr]">
+        <div className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-[1.35fr_.95fr_1fr] lg:items-start">
           <TextSidekickCard />
-          <VoiceInputCard companyId={companyId} />
-          <UploadCard companyId={companyId} />
+
+          <div className="flex flex-col gap-4">
+            <VoiceInputCard companyId={companyId} />
+            <UploadCard companyId={companyId} />
+          </div>
+
           <IntegrationsCard companyId={companyId} />
         </div>
       </div>
