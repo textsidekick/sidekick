@@ -332,7 +332,7 @@ export default function KnowledgePage() {
     <div className="min-h-screen px-6 py-8 max-w-7xl mx-auto">
 
       {/* ── Header ── */}
-      <SectionHeader title="Ops Knowledge" subtitle="Your crew's operating memory — everything they've learned, documented, and captured" />
+      <SectionHeader title="Operational Knowledge" subtitle="Your crew's operating memory — everything they've learned, documented, and captured" />
 
       {/* ══════════════════════════════════════════════════════════════════════
           ADD KNOWLEDGE — always visible, top of page, impossible to miss
