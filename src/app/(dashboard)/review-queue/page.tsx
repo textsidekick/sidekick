@@ -43,9 +43,9 @@ function riskLevel(article: ReviewArticle): "high" | "medium" | "low" {
 }
 
 function riskBadge(level: "high" | "medium" | "low") {
-  const cls = level === "high" ? "bg-red-100 text-red-700 border-red-200"
-    : level === "medium" ? "bg-amber-100 text-amber-700 border-amber-200"
-    : "bg-green-100 text-green-700 border-green-200";
+  const cls = level === "high" ? "bg-red-100 text-gray-700 border-red-200"
+    : level === "medium" ? "bg-amber-100 text-gray-700 border-amber-200"
+    : "bg-green-100 text-gray-700 border-green-200";
   return (
     <span className={cn("text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded border", cls)}>
       {level} risk
@@ -110,7 +110,7 @@ function SnoozeModal({ onConfirm, onCancel }: { onConfirm: (days: number) => voi
         <p className="text-sm text-gray-500 mb-3">Come back to this item later.</p>
         <div className="flex gap-2">
           {[1, 3, 7, 14, 30].map(d => (
-            <button key={d} onClick={() => setDays(d)} className={cn("px-3 py-1.5 text-sm rounded-lg border", days === d ? "border-[#C96442] bg-[#C96442]/10 text-[#C96442]" : "border-gray-200 text-gray-600 hover:bg-gray-50")}>
+            <button key={d} onClick={() => setDays(d)} className={cn("px-3 py-1.5 text-sm rounded-lg border", days === d ? "border-[#C96442]/20 bg-[#F7F3EC] text-gray-700" : "border-gray-200 text-gray-600 hover:bg-gray-50")}>
               {d}d
             </button>
           ))}
@@ -233,7 +233,7 @@ export default function ReviewQueuePage() {
       <div className="mt-6 flex items-center gap-4 flex-wrap">
         <div className="bg-white rounded-xl border border-gray-200 px-5 py-3 flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
-            <AlertTriangle className="w-5 h-5 text-amber-700" />
+            <AlertTriangle className="w-5 h-5 text-gray-700" />
           </div>
           <div>
             <div className="text-2xl font-bold text-gray-900">{items.length}</div>
@@ -246,10 +246,10 @@ export default function ReviewQueuePage() {
             disabled={actionLoading === "bulk"}
             className="rounded-xl border border-green-200 bg-green-50 hover:bg-green-100 px-5 py-3 flex items-center gap-3 transition text-left disabled:opacity-50"
           >
-            <CheckCircle2 className="w-5 h-5 text-green-600" />
+            <CheckCircle2 className="w-5 h-5 text-gray-700" />
             <div>
-              <div className="text-sm font-semibold text-green-800">Bulk Verify {lowRiskIds.length} Low-Risk</div>
-              <div className="text-xs text-green-600">Items with linked assets & complete info</div>
+              <div className="text-sm font-semibold text-gray-800">Bulk Verify {lowRiskIds.length} Low-Risk</div>
+              <div className="text-xs text-gray-600">Items with linked assets & complete info</div>
             </div>
           </button>
         )}
@@ -298,8 +298,8 @@ export default function ReviewQueuePage() {
                     {flags.length > 0 && (
                       <div className="mt-2 space-y-1">
                         {flags.map((f, i) => (
-                          <div key={i} className="flex items-start gap-1.5 text-[11px] text-amber-600">
-                            <AlertTriangle className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                          <div key={i} className="flex items-start gap-1.5 text-[11px] text-gray-600">
+                            <AlertTriangle className="w-3 h-3 mt-0.5 flex-shrink-0 text-gray-500" />
                             <span>{f}</span>
                           </div>
                         ))}
@@ -326,7 +326,7 @@ export default function ReviewQueuePage() {
                       <div>
                         <div className="text-xs font-semibold text-gray-500 uppercase mb-1">Parts Used</div>
                         <div className="flex gap-2 flex-wrap">
-                          {article.parts_used.map(p => <span key={p} className="text-xs px-2 py-1 bg-orange-50 text-[#C96442] rounded">{p}</span>)}
+                          {article.parts_used.map(p => <span key={p} className="text-xs px-2 py-1 bg-orange-50 text-gray-700 rounded">{p}</span>)}
                         </div>
                       </div>
                     )}
@@ -350,7 +350,7 @@ export default function ReviewQueuePage() {
                       <button
                         onClick={() => setModal({ type: "reject", articleId: article.id })}
                         disabled={isLoading}
-                        className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 disabled:opacity-50 transition-colors"
+                        className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 disabled:opacity-50 transition-colors"
                       >
                         <XCircle className="w-4 h-4" /> Reject
                       </button>
