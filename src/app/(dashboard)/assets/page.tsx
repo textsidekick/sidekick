@@ -263,7 +263,7 @@ export default function AssetsPage() {
           <div className="mt-4 text-sm text-gray-700 bg-red-50 border border-red-200 rounded-xl p-3">{error}</div>
         )}
 
-        <div className="mt-8 rounded-lg bg-white border border-black/5 p-6">
+        <div className="mt-8 rounded-2xl bg-white border border-black/5 p-6">
           <SectionHeader title="Asset health overview" subtitle="Watch what’s trending down or spiking in issues" />
 
           <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -316,7 +316,7 @@ export default function AssetsPage() {
               <div
                 key={a.id}
                 className={cn(
-                  "rounded-lg bg-white border border-black/5 p-5 cursor-pointer transition",
+                  "rounded-2xl bg-white border border-black/5 p-5 cursor-pointer transition",
                   isOpen && "ring-2 ring-black/10"
                 )}
                 onClick={() => setExpanded((cur) => (cur === a.id ? null : a.id))}

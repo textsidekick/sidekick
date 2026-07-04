@@ -14,8 +14,8 @@ const instrument = Instrument_Serif({
 });
 
 export const metadata = {
-  title: "Sidekick | Ops Dashboard",
-  description: "Your frontline team's operating memory.",
+  title: "Sidekick | Manager Dashboard",
+  description: "Manage your frontline team with Sidekick.",
 };
 
 export default function DashboardLayout({
@@ -32,7 +32,7 @@ export default function DashboardLayout({
         className={`antialiased`}
         style={{
           fontFamily: "Inter, system-ui, sans-serif",
-          background: "#F5F5F4",
+          background: "#F7F3EC",
           color: "#1C1A16",
         }}
       >

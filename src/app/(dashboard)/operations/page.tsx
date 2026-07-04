@@ -208,7 +208,7 @@ export default function OperationsDashboardPage() {
       </div>
 
       {/* 1. Plant Health Score + key metrics */}
-      <div className="rounded-lg bg-white border border-black/5 p-6">
+      <div className="rounded-2xl bg-white border border-black/5 p-6">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
             <div className="text-xs uppercase tracking-wide text-black/40">Plant Health Score</div>
@@ -268,7 +268,7 @@ export default function OperationsDashboardPage() {
       )}
 
       {/* 5. Overdue PMs + Recent Activity */}
-      <div className="rounded-lg bg-white border border-black/5 p-6">
+      <div className="rounded-2xl bg-white border border-black/5 p-6">
         <SectionHeader title="Recent activity" subtitle="Latest work orders and operational events" />
         <div className="mt-4 space-y-3">
           {(data?.recentActivity || []).slice(0, 15).map((ev) => {

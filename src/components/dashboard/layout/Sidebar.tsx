@@ -1,6 +1,6 @@
 "use client";
 
-import { ClipboardList, Wrench, Users, BookOpen, Settings, Home, LogOut, LayoutDashboard, Menu, X, ChevronDown, Building2, BarChart3, Activity, ShieldCheck } from "lucide-react";
+import { ClipboardList, Wrench, Users, BookOpen, Settings, Home, LogOut, LayoutDashboard, Menu, X, ChevronDown, Building2, BarChart3, Activity } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -12,10 +12,8 @@ const NAV_ITEMS = [
   { id: "work-orders", label: "Work Orders", icon: ClipboardList, href: "/work-orders" },
   { id: "assets", label: "Assets", icon: Wrench, href: "/assets" },
   { id: "team", label: "Team", icon: Users, href: "/team" },
-  { id: "knowledge", label: "Ops Knowledge", icon: BookOpen, href: "/knowledge" },
-  { id: "review-queue", label: "Review Queue", icon: ShieldCheck, href: "/review-queue" },
-  { id: "operations", label: "Plant Metrics", icon: Activity, href: "/operations" },
-  { id: "analytics", label: "Analytics", icon: BarChart3, href: "/analytics" },
+  { id: "knowledge", label: "Knowledge", icon: BookOpen, href: "/knowledge" },
+  { id: "operations", label: "Operations", icon: Activity, href: "/operations" },
   { id: "settings", label: "Settings", icon: Settings, href: "/settings" },
 ];
 
@@ -71,7 +69,6 @@ export function Sidebar() {
           <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={26} height={26} style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
         </div>
         <span style={{ fontSize: 18, fontWeight: 700, color: '#1C1A16', letterSpacing: '-0.02em' }}>Sidekick</span>
-        {/* Mobile close button — moved here for layout */}
         {/* Mobile close button */}
         <button
           className="lg:hidden ml-auto p-1 text-gray-500 hover:text-gray-900"
@@ -87,10 +84,10 @@ export function Sidebar() {
         <div className="relative px-3 pt-3 pb-2 border-b border-[rgba(28,26,22,0.06)]">
           <button
             onClick={() => setCompanyDropdownOpen(v => !v)}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-[#F7F3EC] hover:bg-[#ede9e1] transition-colors text-left"
           >
-            <Building2 className="h-4 w-4 text-gray-500 flex-shrink-0" />
-            <span className="flex-1 min-w-0 text-sm font-semibold text-[#1C1A16] truncate">
+            <Building2 className="h-4 w-4 text-[#C96442] flex-shrink-0" />
+            <span className="flex-1 min-w-0 text-xs font-medium text-[#1C1A16] truncate">
               {selectedCompany?.name || "Select company"}
             </span>
             {companies.length > 1 && <ChevronDown className="h-3 w-3 text-black/40 flex-shrink-0" />}
@@ -104,8 +101,8 @@ export function Sidebar() {
                   className={cn(
                     "w-full text-left px-3 py-2.5 text-xs font-medium transition-colors",
                     c.id === selectedCompanyId
-                      ? "bg-gray-100 text-gray-900 font-semibold"
-                      : "text-[#1C1A16] hover:bg-gray-50"
+                      ? "bg-[#C96442]/10 text-[#C96442]"
+                      : "text-[#1C1A16] hover:bg-[#F7F3EC]"
                   )}
                 >
                   {c.name}

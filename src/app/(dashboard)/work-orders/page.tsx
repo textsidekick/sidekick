@@ -351,7 +351,7 @@ export default function WorkOrdersPage() {
           <div className="mt-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl p-3">{error}</div>
         )}
 
-        <div className="mt-8 rounded-lg bg-white border border-black/5 p-6">
+        <div className="mt-8 rounded-2xl bg-white border border-black/5 p-6">
           <SectionHeader title="All work orders" subtitle="Filter, sort, and take quick actions" />
 
           <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-3">

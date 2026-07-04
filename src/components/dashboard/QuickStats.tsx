@@ -16,16 +16,16 @@ export default function QuickStats({ companyId }: Props) {
   }, [companyId]);
 
   const cards = [
-    { label: "Questions Answered", value: stats?.questions?.toLocaleString() ?? "—", icon: <MessageSquare className="h-5 w-5" />, color: "text-gray-400" },
-    { label: "Avg Response Time", value: stats?.avgTime ?? "—", icon: <Clock className="h-5 w-5" />, color: "text-gray-400" },
-    { label: "Languages Detected", value: stats?.languages ?? "—", icon: <Globe className="h-5 w-5" />, color: "text-gray-400" },
-    { label: "Active Workers", value: stats?.workers ?? "—", icon: <Users className="h-5 w-5" />, color: "text-gray-400" },
+    { label: "Questions Answered", value: stats?.questions?.toLocaleString() ?? "—", icon: <MessageSquare className="h-5 w-5" />, color: "text-blue-500" },
+    { label: "Avg Response Time", value: stats?.avgTime ?? "—", icon: <Clock className="h-5 w-5" />, color: "text-green-500" },
+    { label: "Languages Detected", value: stats?.languages ?? "—", icon: <Globe className="h-5 w-5" />, color: "text-purple-500" },
+    { label: "Active Workers", value: stats?.workers ?? "—", icon: <Users className="h-5 w-5" />, color: "text-[#C96442]" },
   ];
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       {cards.map(c => (
-        <div key={c.label} className="rounded-lg border border-gray-200 bg-white p-4 relative">
+        <div key={c.label} className="rounded-xl border border-gray-200 bg-white p-4 relative">
           <div className={`absolute top-4 right-4 ${c.color} opacity-40`}>{c.icon}</div>
           {stats === null ? (
             <>
