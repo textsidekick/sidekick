@@ -33,7 +33,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 const CATEGORY_COLORS: Record<string, string> = {
   Safety: '#fca5a5',
-  Equipment: '#C96442',
+  Equipment: '#94a3b8',
   Compliance: '#fde68a',
   Health: '#c4b5fd',
 }
