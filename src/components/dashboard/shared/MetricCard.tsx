@@ -20,11 +20,11 @@ interface MetricCardProps {
 }
 
 const accentStyles: Record<string, { icon: string; border: string; indicator: string }> = {
-  amber:   { icon: 'text-amber-500',   border: 'border-amber-100',   indicator: 'bg-amber-500' },
-  red:     { icon: 'text-red-500',     border: 'border-red-100',     indicator: 'bg-red-500' },
-  emerald: { icon: 'text-emerald-500', border: 'border-emerald-100', indicator: 'bg-emerald-500' },
-  blue:    { icon: 'text-blue-500',    border: 'border-blue-100',    indicator: 'bg-blue-500' },
-  purple:  { icon: 'text-purple-500',  border: 'border-purple-100',  indicator: 'bg-purple-500' },
+  amber:   { icon: 'text-amber-500',   border: 'border-gray-200',   indicator: 'bg-amber-500' },
+  red:     { icon: 'text-red-500',     border: 'border-gray-200',    indicator: 'bg-red-500' },
+  emerald: { icon: 'text-emerald-500', border: 'border-gray-200',    indicator: 'bg-emerald-500' },
+  blue:    { icon: 'text-blue-500',    border: 'border-gray-200',    indicator: 'bg-blue-500' },
+  purple:  { icon: 'text-purple-500',  border: 'border-gray-200',    indicator: 'bg-purple-500' },
 }
 
 function MetricCard({
@@ -36,9 +36,9 @@ function MetricCard({
 
   return (
     <div className={cn(
-      'rounded-xl border bg-white p-5 relative overflow-hidden',
+      'rounded-lg border bg-white p-5 relative overflow-hidden',
       accent?.border || 'border-gray-200',
-      isHighlighted && 'border-blue-200',
+      isHighlighted && 'border-gray-300',
     )}>
       {/* Accent indicator strip */}
       {accent && (

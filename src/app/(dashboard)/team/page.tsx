@@ -57,7 +57,7 @@ const ROLES = ["operator", "technician", "supervisor", "manager"];
 
 function roleBadge(role: string) {
   const cls: Record<string, string> = {
-    manager: "bg-[#C96442]/10 text-gray-700",
+    manager: "bg-gray-100 text-gray-700",
     supervisor: "bg-slate-100 text-slate-700",
     technician: "bg-gray-100 text-gray-700",
     operator: "bg-gray-100 text-gray-700",

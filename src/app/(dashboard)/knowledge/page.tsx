@@ -102,10 +102,10 @@ function UploadCard({ companyId }: { companyId: string }) {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col gap-3">
+    <div className="bg-white rounded-lg border border-gray-200 p-5 flex flex-col gap-3">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-[#C96442]/10 flex items-center justify-center flex-shrink-0">
-          <Upload className="w-5 h-5 text-[#C96442]" />
+        <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+          <Upload className="w-5 h-5 text-gray-500" />
         </div>
         <div>
           <div className="text-sm font-semibold text-gray-900">Upload Documents</div>
@@ -118,7 +118,7 @@ function UploadCard({ companyId }: { companyId: string }) {
       <button
         onClick={() => fileRef.current?.click()}
         disabled={uploading}
-        className="w-full py-2.5 rounded-lg border-2 border-dashed border-gray-300 hover:border-[#C96442] hover:bg-[#C96442]/5 transition-colors text-sm text-gray-600 hover:text-[#C96442] flex items-center justify-center gap-2 disabled:opacity-50"
+        className="w-full py-2.5 rounded-lg border-2 border-dashed border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-colors text-sm text-gray-600 hover:text-gray-900 flex items-center justify-center gap-2 disabled:opacity-50"
       >
         {uploading ? <><Loader2 className="w-4 h-4 animate-spin" /> Uploading…</> : <><Plus className="w-4 h-4" /> Choose file</>}
       </button>
@@ -191,7 +191,7 @@ function VoiceInputCard({ companyId }: { companyId: string }) {
   const formatTime = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col gap-3">
+    <div className="bg-white rounded-lg border border-gray-200 p-5 flex flex-col gap-3">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0">
           <Mic className="w-5 h-5 text-purple-600" />
@@ -230,10 +230,10 @@ function TextSidekickCard() {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="bg-gradient-to-br from-[#C96442]/5 to-orange-50 rounded-xl border border-[#C96442]/20 p-5 flex flex-col gap-3">
+    <div className="bg-white rounded-lg border border-gray-200 p-5 flex flex-col gap-3">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-[#C96442] flex items-center justify-center flex-shrink-0">
-          <Smartphone className="w-5 h-5 text-white" />
+        <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+          <Smartphone className="w-5 h-5 text-gray-500" />
         </div>
         <div>
           <div className="text-sm font-semibold text-gray-900">Text Sidekick from Your Phone</div>
@@ -241,16 +241,16 @@ function TextSidekickCard() {
         </div>
       </div>
 
-      <div className="bg-white/80 rounded-lg px-4 py-3 border border-[#C96442]/10">
+      <div className="bg-gray-50 rounded-lg px-4 py-3 border border-gray-200">
         <div className="text-center">
-          <div className="text-lg font-bold text-[#C96442] tracking-wide">Text your Sidekick number</div>
+          <div className="text-lg font-bold text-gray-900 tracking-wide">Text your Sidekick number</div>
           <div className="text-xs text-gray-500 mt-1">The same number your workers text</div>
         </div>
       </div>
 
       <button
         onClick={() => setExpanded(v => !v)}
-        className="text-xs text-[#C96442] font-medium flex items-center gap-1 mx-auto hover:underline"
+        className="text-xs text-gray-600 font-medium flex items-center gap-1 mx-auto hover:underline"
       >
         {expanded ? "Hide" : "What can I send?"} <ChevronDown className={cn("w-3 h-3 transition-transform", expanded && "rotate-180")} />
       </button>
@@ -258,7 +258,7 @@ function TextSidekickCard() {
       {expanded && (
         <div className="grid grid-cols-2 gap-2 text-xs">
           <div className="flex items-start gap-2 bg-white rounded-lg p-2.5 border border-gray-100">
-            <MessageSquare className="w-3.5 h-3.5 text-[#C96442] mt-0.5 flex-shrink-0" />
+            <MessageSquare className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
             <div><span className="font-medium text-gray-800">Text</span><br /><span className="text-gray-500">"The boiler reset code is 4829"</span></div>
           </div>
           <div className="flex items-start gap-2 bg-white rounded-lg p-2.5 border border-gray-100">
@@ -284,7 +284,7 @@ function IntegrationsCard({ companyId }: { companyId: string }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col gap-3">
+    <div className="bg-white rounded-lg border border-gray-200 p-5 flex flex-col gap-3">
       <button onClick={() => setOpen(v => !v)} className="flex items-center gap-3 w-full text-left">
         <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
           <FileText className="w-5 h-5 text-blue-600" />
@@ -356,9 +356,9 @@ export default function KnowledgePage() {
       {/* ══════════════════════════════════════════════════════════════════════
           ADD KNOWLEDGE — always visible, top of page, impossible to miss
           ══════════════════════════════════════════════════════════════════════ */}
-      <div className="mt-6 rounded-2xl border border-[#C96442]/20 bg-gradient-to-r from-orange-50/60 via-white to-purple-50/40 p-5">
+      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-5">
         <div className="flex items-center gap-2 mb-4">
-          <Plus className="w-5 h-5 text-[#C96442]" />
+          <Plus className="w-5 h-5 text-gray-500" />
           <h2 className="text-base font-bold text-gray-900">Capture Knowledge</h2>
           <span className="text-xs text-gray-400 ml-1">— from the field, your phone, or existing docs</span>
         </div>
@@ -374,9 +374,9 @@ export default function KnowledgePage() {
 
       {/* ── Stats row ── */}
       <div className="mt-6 flex items-center gap-4 flex-wrap">
-        <div className="bg-white rounded-xl border border-gray-200 px-6 py-4 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-[#C96442] flex items-center justify-center">
-            <BookOpen className="w-6 h-6 text-white" />
+        <div className="bg-white rounded-lg border border-gray-200 px-6 py-4 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
+            <BookOpen className="w-6 h-6 text-gray-500" />
           </div>
           <div>
             <div className="text-3xl font-bold text-gray-900">{articles.length}</div>
@@ -386,9 +386,9 @@ export default function KnowledgePage() {
         {needsReview.length > 0 && (
           <button
             onClick={() => setShowReviewOnly(v => !v)}
-            className={`rounded-xl border px-6 py-4 flex items-center gap-4 transition text-left ${showReviewOnly ? "border-[#C96442] bg-[#C96442]/10" : "border-gray-200 bg-amber-50 hover:bg-gray-50"}`}
+            className={`rounded-lg border px-6 py-4 flex items-center gap-4 transition text-left ${showReviewOnly ? "border-gray-400 bg-gray-50" : "border-gray-200 bg-white hover:bg-gray-50"}`}
           >
-            <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-lg bg-amber-50 flex items-center justify-center">
               <BookOpen className="w-6 h-6 text-amber-700" />
             </div>
             <div>
@@ -407,7 +407,7 @@ export default function KnowledgePage() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search procedures, fixes, SOPs — e.g. 'spindle vibration', 'hydraulic leak'..."
-          className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#C96442]/30 focus:border-[#C96442]"
+          className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#C96442]/30 focus:border-[#C96442]"
         />
       </div>
 
@@ -416,7 +416,7 @@ export default function KnowledgePage() {
         {loading ? (
           <div className="text-center py-12 text-gray-400">Loading knowledge base...</div>
         ) : filtered.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
+          <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
             <BookOpen className="w-12 h-12 text-[#C96442]/30 mx-auto mb-3" />
             <p className="text-gray-700 font-semibold">No procedures captured yet</p>
             <p className="text-gray-400 text-sm mt-1 max-w-sm mx-auto">
@@ -425,7 +425,7 @@ export default function KnowledgePage() {
           </div>
         ) : (
           filtered.map(article => (
-            <div key={article.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div key={article.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
               <button
                 onClick={() => setExpanded(expanded === article.id ? null : article.id)}
                 className="w-full px-5 py-4 flex items-start justify-between text-left"
@@ -470,7 +470,7 @@ export default function KnowledgePage() {
                     <div>
                       <div className="text-xs font-semibold text-gray-500 uppercase mb-1">Parts Used</div>
                       <div className="flex gap-2 flex-wrap">
-                        {article.parts_used.map(p => <span key={p} className="text-xs px-2 py-1 bg-orange-50 text-[#C96442] rounded">{p}</span>)}
+                        {article.parts_used.map(p => <span key={p} className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">{p}</span>)}
                       </div>
                     </div>
                   )}

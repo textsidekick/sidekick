@@ -87,9 +87,9 @@ export function Sidebar() {
         <div className="relative px-3 pt-3 pb-2 border-b border-[rgba(28,26,22,0.06)]">
           <button
             onClick={() => setCompanyDropdownOpen(v => !v)}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-[#F7F3EC] hover:bg-[#ede9e1] transition-colors text-left"
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors text-left"
           >
-            <Building2 className="h-4 w-4 text-[#C96442] flex-shrink-0" />
+            <Building2 className="h-4 w-4 text-gray-500 flex-shrink-0" />
             <span className="flex-1 min-w-0 text-sm font-semibold text-[#1C1A16] truncate">
               {selectedCompany?.name || "Select company"}
             </span>
@@ -104,8 +104,8 @@ export function Sidebar() {
                   className={cn(
                     "w-full text-left px-3 py-2.5 text-xs font-medium transition-colors",
                     c.id === selectedCompanyId
-                      ? "bg-[#C96442]/10 text-[#C96442]"
-                      : "text-[#1C1A16] hover:bg-[#F7F3EC]"
+                      ? "bg-gray-100 text-gray-900 font-semibold"
+                      : "text-[#1C1A16] hover:bg-gray-50"
                   )}
                 >
                   {c.name}

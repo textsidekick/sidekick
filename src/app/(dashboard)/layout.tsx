@@ -32,7 +32,7 @@ export default function DashboardLayout({
         className={`antialiased`}
         style={{
           fontFamily: "Inter, system-ui, sans-serif",
-          background: "#F7F3EC",
+          background: "#F5F5F4",
           color: "#1C1A16",
         }}
       >

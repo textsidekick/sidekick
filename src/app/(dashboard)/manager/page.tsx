@@ -311,7 +311,7 @@ export default function ManagerDashboard() {
         </div>
 
         {/* ══ 1. NEEDS ATTENTION — primary section ═══════════════════════════ */}
-        <div className="rounded-2xl border border-[rgba(28,26,22,0.06)] bg-white p-6">
+        <div className="rounded-lg border border-[rgba(28,26,22,0.06)] bg-white p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <h2 className="text-base font-semibold text-[#1C1A16]">Needs Attention</h2>
@@ -419,7 +419,7 @@ export default function ManagerDashboard() {
         {/* ══ 3. TWO-COLUMN: Recent Work Orders + Open Issues ════════════════ */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Recent Work Orders */}
-          <div className="rounded-2xl bg-white border border-[rgba(28,26,22,0.06)] p-6">
+          <div className="rounded-lg bg-white border border-[rgba(28,26,22,0.06)] p-6">
             <SectionHeader
               title="Recent Work Orders"
               subtitle="Latest maintenance and task activity"
@@ -437,7 +437,7 @@ export default function ManagerDashboard() {
                 />
               )}
               {!loadingWorkOrders && recentWOs.map(wo => (
-                <div key={wo.id} className="flex items-start justify-between gap-3 rounded-xl border border-black/5 p-3 hover:bg-[#F7F3EC] transition-colors">
+                <div key={wo.id} className="flex items-start justify-between gap-3 rounded-xl border border-black/5 p-3 hover:bg-gray-50 transition-colors">
                   <div className="min-w-0 flex-1">
                     <div className="text-sm font-medium text-[#1C1A16] truncate">{wo.short_id} · {wo.title}</div>
                     <div className="mt-1 flex items-center gap-2 flex-wrap">
@@ -452,7 +452,7 @@ export default function ManagerDashboard() {
           </div>
 
           {/* Open Field Issues */}
-          <div className="rounded-2xl bg-white border border-[rgba(28,26,22,0.06)] p-6">
+          <div className="rounded-lg bg-white border border-[rgba(28,26,22,0.06)] p-6">
             <SectionHeader title="Open Field Issues" subtitle="Reported by workers on the floor" />
             <div className="mt-2 space-y-2">
               {issues.filter(i => i.status === "open").length === 0 ? (
@@ -471,7 +471,7 @@ export default function ManagerDashboard() {
                         ? "border-red-100 bg-red-50/40 hover:bg-red-50"
                         : i.severity === "medium"
                         ? "border-amber-100 bg-amber-50/30 hover:bg-amber-50"
-                        : "border-black/5 hover:bg-[#F7F3EC]"
+                        : "border-black/5 hover:bg-gray-50"
                     )}
                     onClick={() => setSelectedIssue(i)}
                   >
@@ -496,7 +496,7 @@ export default function ManagerDashboard() {
         </div>
 
         {/* ══ 4. RECENT WORKER QUESTIONS ═════════════════════════════════════ */}
-        <div className="rounded-2xl bg-white border border-[rgba(28,26,22,0.06)] p-6">
+        <div className="rounded-lg bg-white border border-[rgba(28,26,22,0.06)] p-6">
           <SectionHeader
             title="Recent Field Questions"
             subtitle="What your crew is asking — tap unanswered ones to respond"
@@ -523,7 +523,7 @@ export default function ManagerDashboard() {
               return (
                 <div
                   key={q.id || i}
-                  className="py-3 flex items-start gap-3 hover:bg-[#F7F3EC] -mx-6 px-6 transition-colors cursor-pointer"
+                  className="py-3 flex items-start gap-3 hover:bg-gray-50 -mx-6 px-6 transition-colors cursor-pointer"
                   onClick={() => { if (!answered) { setSelectedUQ(q); setUqAnswer(""); } }}
                 >
                   <div className={cn(
@@ -549,10 +549,10 @@ export default function ManagerDashboard() {
         </div>
 
         {/* ══ 5. QUICK CAPTURE — phone-first CTA ═════════════════════════════ */}
-        <div className="rounded-2xl border border-[#C96442]/15 bg-gradient-to-r from-orange-50/60 to-white p-5">
+        <div className="rounded-lg border border-gray-200 bg-white p-5">
           <div className="flex items-center gap-4 flex-wrap">
-            <div className="w-11 h-11 rounded-xl bg-[#C96442] flex items-center justify-center flex-shrink-0">
-              <Smartphone className="w-5 h-5 text-white" />
+            <div className="w-11 h-11 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+              <Smartphone className="w-5 h-5 text-gray-500" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm font-semibold text-[#1C1A16]">Capture knowledge from your phone</div>

@@ -28,8 +28,8 @@ function EmptyState({
 }: EmptyStateProps) {
   return (
     <div className={`flex flex-col items-center justify-center text-center ${compact ? 'py-6' : 'py-10'}`}>
-      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F7F3EC] border border-[rgba(28,26,22,0.06)]">
-        <Icon className="h-6 w-6 text-[#C96442]/60" />
+      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 border border-gray-200">
+        <Icon className="h-6 w-6 text-gray-400" />
       </div>
       <h3 className="mt-3 text-sm font-semibold text-[#1C1A16]">
         {title}
