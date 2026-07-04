@@ -63,16 +63,16 @@ export function Sidebar() {
   const selectedCompany = companies.find(c => c.id === selectedCompanyId);
 
   const sidebarContent = (
-    <div className="fixed left-0 top-0 bottom-0 w-[220px] bg-white border-r border-[rgba(28,26,22,0.06)] flex flex-col z-50">
+    <div className="fixed left-0 top-0 bottom-0 z-50 flex w-[220px] flex-col border-r border-[rgba(28,26,22,0.06)] bg-white dark:border-white/8 dark:bg-[#141416]">
       {/* Logo area */}
-      <div style={{ height: 64, display: 'flex', alignItems: 'center', gap: 12, padding: '0 20px', borderBottom: '1px solid rgba(28,26,22,0.06)' }}>
+      <div className="flex h-16 items-center gap-3 border-b border-[rgba(28,26,22,0.06)] px-5 dark:border-white/8">
         <div style={{ width: 36, height: 36, background: '#C96442', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 5 }}>
           <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={26} height={26} style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
         </div>
-        <span style={{ fontSize: 18, fontWeight: 700, color: '#1C1A16', letterSpacing: '-0.02em' }}>Sidekick</span>
+        <span className="text-[18px] font-bold tracking-[-0.02em] text-[#1C1A16] dark:text-white">Sidekick</span>
         {/* Mobile close button */}
         <button
-          className="lg:hidden ml-auto p-1 text-gray-500 hover:text-gray-900"
+          className="ml-auto p-1 text-gray-500 hover:text-gray-900 dark:text-white/55 dark:hover:text-white lg:hidden"
           onClick={() => setMobileOpen(false)}
           aria-label="Close menu"
         >
@@ -82,19 +82,19 @@ export function Sidebar() {
 
       {/* Company Switcher */}
       {companies.length > 0 && (
-        <div className="relative px-3 pt-3 pb-2 border-b border-[rgba(28,26,22,0.06)]">
+        <div className="relative border-b border-[rgba(28,26,22,0.06)] px-3 pt-3 pb-2 dark:border-white/8">
           <button
             onClick={() => setCompanyDropdownOpen(v => !v)}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-[#F7F3EC] hover:bg-[#ede9e1] transition-colors text-left"
+            className="w-full rounded-lg bg-[#F7F3EC] px-3 py-2 text-left transition-colors hover:bg-[#ede9e1] dark:bg-[#232329] dark:hover:bg-[#2a2a31]"
           >
             <Building2 className="h-4 w-4 text-[#C96442] flex-shrink-0" />
-            <span className="flex-1 min-w-0 text-xs font-medium text-[#1C1A16] truncate">
+            <span className="min-w-0 flex-1 truncate text-xs font-medium text-[#1C1A16] dark:text-white/90">
               {selectedCompany?.name || "Select company"}
             </span>
-            {companies.length > 1 && <ChevronDown className="h-3 w-3 text-black/40 flex-shrink-0" />}
+            {companies.length > 1 && <ChevronDown className="h-3 w-3 flex-shrink-0 text-black/40 dark:text-white/40" />}
           </button>
           {companyDropdownOpen && companies.length > 1 && (
-            <div className="absolute left-3 right-3 top-full mt-1 z-50 bg-white rounded-xl shadow-lg border border-[rgba(28,26,22,0.08)] overflow-hidden">
+            <div className="absolute left-3 right-3 top-full z-50 mt-1 overflow-hidden rounded-xl border border-[rgba(28,26,22,0.08)] bg-white shadow-lg dark:border-white/10 dark:bg-[#1c1c21]">
               {companies.map(c => (
                 <button
                   key={c.id}
@@ -102,8 +102,8 @@ export function Sidebar() {
                   className={cn(
                     "w-full text-left px-3 py-2.5 text-xs font-medium transition-colors",
                     c.id === selectedCompanyId
-                      ? "bg-[#C96442]/10 text-[#C96442]"
-                      : "text-[#1C1A16] hover:bg-[#F7F3EC]"
+                      ? "bg-[#C96442]/10 text-[#C96442] dark:bg-[#C96442]/15 dark:text-[#ff9d7a]"
+                      : "text-[#1C1A16] hover:bg-[#F7F3EC] dark:text-white/85 dark:hover:bg-[#26262d]"
                   )}
                 >
                   {c.name}
@@ -133,11 +133,11 @@ export function Sidebar() {
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] font-medium transition-colors",
                   isActive
-                    ? "bg-[#C96442]/10 text-[#C96442]"
-                    : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
+                    ? "bg-[#C96442]/10 text-[#C96442] dark:bg-[#C96442]/15 dark:text-[#ff9d7a]"
+                    : "text-gray-500 hover:text-gray-900 hover:bg-gray-50 dark:text-white/55 dark:hover:bg-[#232329] dark:hover:text-white"
                 )}
               >
-                <item.icon className={cn("h-4 w-4 flex-shrink-0", isActive ? "text-[#C96442]" : "")} />
+                <item.icon className={cn("h-4 w-4 flex-shrink-0", isActive ? "text-[#C96442] dark:text-[#ff9d7a]" : "")} />
                 {item.label}
               </Link>
             );
@@ -154,7 +154,7 @@ export function Sidebar() {
     <>
       {/* Hamburger button — mobile only */}
       <button
-        className="lg:hidden fixed top-4 left-4 z-[60] p-2 bg-white rounded-lg border border-[rgba(28,26,22,0.1)] shadow-sm text-gray-600 hover:text-gray-900"
+        className="fixed top-4 left-4 z-[60] rounded-lg border border-[rgba(28,26,22,0.1)] bg-white p-2 text-gray-600 shadow-sm hover:text-gray-900 dark:border-white/10 dark:bg-[#18181b] dark:text-white/70 dark:hover:text-white lg:hidden"
         onClick={() => setMobileOpen(true)}
         aria-label="Open menu"
       >
@@ -194,18 +194,18 @@ function BottomActions({ onNavigate }: { onNavigate?: () => void }) {
   };
 
   return (
-    <div className="px-3 py-3 border-t border-[rgba(28,26,22,0.06)]">
+    <div className="border-t border-[rgba(28,26,22,0.06)] px-3 py-3 dark:border-white/8">
       <div className="flex flex-col gap-1.5">
         <button
           onClick={() => { onNavigate?.(); router.push("/choose"); }}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors border border-[rgba(28,26,22,0.08)]"
+          className="flex items-center gap-3 rounded-lg border border-[rgba(28,26,22,0.08)] px-3 py-2.5 text-[14px] font-medium text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900 dark:border-white/10 dark:text-white/60 dark:hover:bg-[#232329] dark:hover:text-white"
         >
           <Home className="h-4 w-4" />
           Home
         </button>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors border border-[rgba(28,26,22,0.08)]"
+          className="flex items-center gap-3 rounded-lg border border-[rgba(28,26,22,0.08)] px-3 py-2.5 text-[14px] font-medium text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900 dark:border-white/10 dark:text-white/60 dark:hover:bg-[#232329] dark:hover:text-white"
         >
           <LogOut className="h-4 w-4" />
           Logout

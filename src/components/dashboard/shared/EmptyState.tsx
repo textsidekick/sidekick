@@ -22,13 +22,13 @@ function EmptyState({
 }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center">
-      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100">
-        <Icon className="h-6 w-6 text-gray-400" />
+      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-[#232329]">
+        <Icon className="h-6 w-6 text-gray-400 dark:text-white/40" />
       </div>
-      <h3 className="mt-3 text-sm font-semibold text-gray-900">
+      <h3 className="mt-3 text-sm font-semibold text-gray-900 dark:text-white">
         {title}
       </h3>
-      <p className="mt-1 max-w-xs text-sm text-gray-500">
+      <p className="mt-1 max-w-xs text-sm text-gray-500 dark:text-white/60">
         {description}
       </p>
       {actionLabel && onAction && (
