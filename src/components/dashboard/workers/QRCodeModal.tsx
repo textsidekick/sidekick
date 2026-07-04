@@ -15,13 +15,15 @@ import { Button } from '@/components/ui/button'
 
 interface QRCodeModalProps {
   joinCode: string
+  smsNumber: string
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-function QRCodeModal({ joinCode, open, onOpenChange }: QRCodeModalProps) {
+function QRCodeModal({ joinCode, smsNumber, open, onOpenChange }: QRCodeModalProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const qrValue = `JOIN ${joinCode}`
+  const normalizedNumber = smsNumber.replace(/[^0-9+]/g, '')
+  const qrValue = `sms:${normalizedNumber}?body=${encodeURIComponent(`JOIN ${joinCode}`)}`
 
   function handleDownload() {
     try {
@@ -45,7 +47,7 @@ function QRCodeModal({ joinCode, open, onOpenChange }: QRCodeModalProps) {
         <DialogHeader>
           <DialogTitle>Team QR Code</DialogTitle>
           <DialogDescription>
-            Workers scan this code to join your team
+            Workers scan this code to open their default SMS app with your join text prefilled
           </DialogDescription>
         </DialogHeader>
 
@@ -60,6 +62,10 @@ function QRCodeModal({ joinCode, open, onOpenChange }: QRCodeModalProps) {
             size={200}
             level="M"
           />
+        </div>
+
+        <div className="text-center text-xs text-gray-500">
+          Opens a text to {smsNumber} with <span className="font-mono">JOIN {joinCode}</span>
         </div>
 
         <DialogFooter>

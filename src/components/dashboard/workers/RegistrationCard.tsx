@@ -72,6 +72,7 @@ function RegistrationCard({ joinCode, smsNumber = '+1 (888) 707-4659' }: Registr
       {joinCode && (
         <QRCodeModal
           joinCode={joinCode}
+          smsNumber={smsNumber}
           open={qrOpen}
           onOpenChange={setQrOpen}
         />
