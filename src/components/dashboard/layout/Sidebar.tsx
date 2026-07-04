@@ -1,6 +1,6 @@
 "use client";
 
-import { ClipboardList, Wrench, Users, BookOpen, Settings, Home, LogOut, LayoutDashboard, Menu, X, ChevronDown, Building2, BarChart3, ShieldCheck } from "lucide-react";
+import { ClipboardList, Wrench, Users, BookOpen, Settings, Home, LogOut, LayoutDashboard, Menu, X, ChevronDown, Building2, BarChart3, ShieldCheck, Sun, Moon } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -26,12 +26,20 @@ export function Sidebar() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>("");
   const [companyDropdownOpen, setCompanyDropdownOpen] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   useEffect(() => {
     // Load saved company from localStorage
     try {
       const authData = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
       if (authData.companyId) setSelectedCompanyId(authData.companyId);
+    } catch {}
+
+    try {
+      const savedTheme = localStorage.getItem("sidekick_theme");
+      const nextTheme = savedTheme === "light" ? "light" : "dark";
+      setTheme(nextTheme);
+      document.documentElement.classList.toggle("dark", nextTheme === "dark");
     } catch {}
 
     fetch("/api/companies")
@@ -62,6 +70,15 @@ export function Sidebar() {
 
   const selectedCompany = companies.find(c => c.id === selectedCompanyId);
 
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    try {
+      localStorage.setItem("sidekick_theme", nextTheme);
+    } catch {}
+    document.documentElement.classList.toggle("dark", nextTheme === "dark");
+  };
+
   const sidebarContent = (
     <div className="fixed left-0 top-0 bottom-0 z-50 flex w-[220px] flex-col border-r border-[rgba(28,26,22,0.06)] bg-white dark:border-white/8 dark:bg-[#141416]">
       {/* Logo area */}
@@ -70,9 +87,17 @@ export function Sidebar() {
           <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={26} height={26} style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
         </div>
         <span className="text-[18px] font-bold tracking-[-0.02em] text-[#1C1A16] dark:text-white">Sidekick</span>
+        <button
+          className="ml-auto rounded-lg border border-[rgba(28,26,22,0.08)] bg-[#F7F3EC] p-1.5 text-gray-600 transition-colors hover:bg-[#ede9e1] hover:text-gray-900 dark:border-white/10 dark:bg-[#232329] dark:text-white/70 dark:hover:bg-[#2a2a31] dark:hover:text-white"
+          onClick={toggleTheme}
+          aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          title={theme === "dark" ? "Light mode" : "Dark mode"}
+        >
+          {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+        </button>
         {/* Mobile close button */}
         <button
-          className="ml-auto p-1 text-gray-500 hover:text-gray-900 dark:text-white/55 dark:hover:text-white lg:hidden"
+          className="p-1 text-gray-500 hover:text-gray-900 dark:text-white/55 dark:hover:text-white lg:hidden"
           onClick={() => setMobileOpen(false)}
           aria-label="Close menu"
         >
@@ -85,9 +110,9 @@ export function Sidebar() {
         <div className="relative border-b border-[rgba(28,26,22,0.06)] px-3 pt-3 pb-2 dark:border-white/8">
           <button
             onClick={() => setCompanyDropdownOpen(v => !v)}
-            className="w-full rounded-lg bg-[#F7F3EC] px-3 py-2 text-left transition-colors hover:bg-[#ede9e1] dark:bg-[#232329] dark:hover:bg-[#2a2a31]"
+            className="flex w-full items-center gap-2 rounded-lg bg-[#F7F3EC] px-3 py-2 text-left transition-colors hover:bg-[#ede9e1] dark:bg-[#232329] dark:hover:bg-[#2a2a31]"
           >
-            <Building2 className="h-4 w-4 text-[#C96442] flex-shrink-0" />
+            <Building2 className="h-4 w-4 flex-shrink-0 text-[#C96442]" />
             <span className="min-w-0 flex-1 truncate text-xs font-medium text-[#1C1A16] dark:text-white/90">
               {selectedCompany?.name || "Select company"}
             </span>
