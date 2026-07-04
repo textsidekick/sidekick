@@ -26,6 +26,55 @@ interface KnowledgeArticle {
   times_referenced: number;
   source_work_order_id: string;
   created_at: string;
+  metadata?: Record<string, unknown>;
+}
+
+function timeAgo(dateStr: string) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const days = Math.floor(diff / 86400000);
+  if (days > 30) return `${Math.floor(days / 30)}mo ago`;
+  if (days > 0) return `${days}d ago`;
+  const hrs = Math.floor(diff / 3600000);
+  if (hrs > 0) return `${hrs}h ago`;
+  return "just now";
+}
+
+function ProvenanceBadge({ article }: { article: KnowledgeArticle }) {
+  const meta = article.metadata || {};
+  const source = article.source_work_order_id ? "auto-extraction" : "manual";
+  const status = meta.review_status as string | undefined;
+
+  if (status === "verified") {
+    return (
+      <div className="flex flex-col">
+        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-green-50 border border-green-200 text-green-700 text-[10px] font-semibold uppercase tracking-wide">
+          <CheckCircle2 className="w-3 h-3" /> Verified
+        </span>
+        <span className="text-[10px] text-gray-400 mt-0.5">
+          Verified by {meta.verified_by as string || "—"} · {meta.verified_at ? timeAgo(meta.verified_at as string) : ""} · from {source}
+        </span>
+      </div>
+    );
+  }
+  if (status === "rejected") {
+    return (
+      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-50 border border-red-200 text-red-600 text-[10px] font-semibold uppercase tracking-wide">
+        Rejected
+      </span>
+    );
+  }
+  if (article.source_work_order_id) {
+    return (
+      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-semibold uppercase tracking-wide">
+        Auto-generated · Needs Review
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-green-50 border border-green-200 text-green-700 text-[10px] font-semibold uppercase tracking-wide">
+      <CheckCircle2 className="w-3 h-3" /> Verified
+    </span>
+  );
 }
 
 // ─── Upload Card ────────────────────────────────────────────────────────────────
@@ -391,13 +440,9 @@ export default function KnowledgePage() {
                     {article.asset_name && <span className="flex items-center gap-1"><Wrench className="w-3 h-3" />{article.asset_name}</span>}
                     {article.time_estimate_minutes && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{article.time_estimate_minutes}m</span>}
                     <span className="flex items-center gap-1"><Hash className="w-3 h-3" />Referenced {article.times_referenced || 0}x</span>
-                    {article.source_work_order_id ? (
-                      <>
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-semibold uppercase tracking-wide">Auto-generated · Needs Review</span>
-                        <a href={`/work-orders?id=${article.source_work_order_id}`} className="text-[#C96442] underline hover:text-[#B0532F]" onClick={e => e.stopPropagation()}>Source work order</a>
-                      </>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-green-50 border border-green-200 text-green-700 text-[10px] font-semibold uppercase tracking-wide">Verified</span>
+                    <ProvenanceBadge article={article} />
+                    {article.source_work_order_id && (
+                      <a href={`/work-orders?id=${article.source_work_order_id}`} className="text-[#C96442] underline hover:text-[#B0532F]" onClick={e => e.stopPropagation()}>Source WO</a>
                     )}
                   </div>
                   {article.tags?.length > 0 && (

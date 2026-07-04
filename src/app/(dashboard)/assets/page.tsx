@@ -19,6 +19,35 @@ import { SkeletonGrid } from "@/components/dashboard/shared/Skeleton";
 import { AssetPhotoGallery } from "@/components/dashboard/assets/AssetPhotoGallery";
 
 import type { Asset, AssetStatus, WorkOrder } from "@/types/operations";
+import { BookOpen } from "lucide-react";
+
+function RelatedKnowledge({ assetName, equipmentType }: { assetName: string; equipmentType: string }) {
+  const [articles, setArticles] = useState<{ id: string; title: string; problem: string }[]>([]);
+  useEffect(() => {
+    fetch("/api/knowledge")
+      .then(r => r.json())
+      .then(d => {
+        const all = d.articles || [];
+        const related = all.filter((a: any) =>
+          (a.asset_name && a.asset_name.toLowerCase() === assetName.toLowerCase()) ||
+          (a.equipment_type && a.equipment_type.toLowerCase() === equipmentType.toLowerCase())
+        ).slice(0, 5);
+        setArticles(related);
+      })
+      .catch(() => {});
+  }, [assetName, equipmentType]);
+  if (articles.length === 0) return null;
+  return (
+    <div className="rounded-xl border border-black/5 p-4">
+      <div className="text-sm font-medium flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-[#C96442]" /> Related Knowledge</div>
+      <div className="mt-2 space-y-1.5">
+        {articles.map(a => (
+          <a key={a.id} href="/knowledge" className="block text-sm text-[#C96442] hover:underline truncate">{a.title}</a>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 type AssetWithStats = Asset & {
   recentWorkOrders: WorkOrder[];
@@ -329,6 +358,8 @@ export default function AssetsPage() {
                       <div className="text-sm font-medium">Repair Time (30d)</div>
                       <div className="mt-2 text-sm text-black/60">{a.downtimeHours30d.toFixed(1)}h</div>
                     </div>
+
+                    <RelatedKnowledge assetName={a.name} equipmentType={a.type} />
                   </div>
                 )}
               </div>

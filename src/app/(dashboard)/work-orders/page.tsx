@@ -20,10 +20,36 @@ import {
   ChevronDown,
   ChevronUp,
   Save,
+  BookOpen,
 } from "lucide-react";
 
 import type { WorkOrder, WorkOrderPriority, WorkOrderStatus } from "@/types/operations";
 import { SkeletonTable } from "@/components/dashboard/shared/Skeleton";
+
+function WORelatedKnowledge({ workOrderId, assetId }: { workOrderId: string; assetId: string | null }) {
+  const [articles, setArticles] = useState<{ id: string; title: string; source_work_order_id?: string }[]>([]);
+  useEffect(() => {
+    fetch("/api/knowledge")
+      .then(r => r.json())
+      .then(d => {
+        const all = d.articles || [];
+        const related = all.filter((a: any) => a.source_work_order_id === workOrderId).slice(0, 5);
+        setArticles(related);
+      })
+      .catch(() => {});
+  }, [workOrderId]);
+  if (articles.length === 0) return null;
+  return (
+    <div className="mt-4 rounded-xl border border-black/5 bg-white p-4">
+      <div className="text-sm font-medium flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-[#C96442]" /> Generated Knowledge</div>
+      <div className="mt-2 space-y-1.5">
+        {articles.map(a => (
+          <a key={a.id} href="/knowledge" className="block text-sm text-[#C96442] hover:underline truncate">{a.title}</a>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 type OpsResponse = {
   companyId: string;
@@ -499,6 +525,8 @@ export default function WorkOrdersPage() {
                                     {(wo.photos || []).length ? `${wo.photos.length} attached` : "No photos"}
                                   </div>
                                 </div>
+
+                                <WORelatedKnowledge workOrderId={wo.id} assetId={wo.asset_id} />
                               </div>
                             </div>
                           </TableCell>
