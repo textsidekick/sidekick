@@ -47,7 +47,7 @@ function ProvenanceBadge({ article }: { article: KnowledgeArticle }) {
   if (status === "verified") {
     return (
       <div className="flex flex-col">
-        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-green-50 border border-green-200 text-green-700 text-[10px] font-semibold uppercase tracking-wide">
+        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-green-50 border border-green-200 text-gray-700 text-[10px] font-semibold uppercase tracking-wide">
           <CheckCircle2 className="w-3 h-3" /> Verified
         </span>
         <span className="text-[10px] text-gray-400 mt-0.5">
@@ -58,20 +58,20 @@ function ProvenanceBadge({ article }: { article: KnowledgeArticle }) {
   }
   if (status === "rejected") {
     return (
-      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-50 border border-red-200 text-red-600 text-[10px] font-semibold uppercase tracking-wide">
+      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-50 border border-red-200 text-gray-700 text-[10px] font-semibold uppercase tracking-wide">
         Rejected
       </span>
     );
   }
   if (article.source_work_order_id) {
     return (
-      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-semibold uppercase tracking-wide">
+      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 border border-amber-200 text-gray-700 text-[10px] font-semibold uppercase tracking-wide">
         Auto-generated · Needs Review
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-green-50 border border-green-200 text-green-700 text-[10px] font-semibold uppercase tracking-wide">
+    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-green-50 border border-green-200 text-gray-700 text-[10px] font-semibold uppercase tracking-wide">
       <CheckCircle2 className="w-3 h-3" /> Verified
     </span>
   );
@@ -389,7 +389,7 @@ export default function KnowledgePage() {
       <div className="mt-6 flex items-center gap-4 flex-wrap">
         <div className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white px-6 py-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F7F3EC]">
-            <BookOpen className="w-6 h-6 text-[#C96442]" />
+            <BookOpen className="w-6 h-6 text-gray-700" />
           </div>
           <div>
             <div className="text-3xl font-bold text-gray-900">{articles.length}</div>
@@ -402,7 +402,7 @@ export default function KnowledgePage() {
             className={`flex items-center gap-4 rounded-xl border px-6 py-4 text-left transition ${showReviewOnly ? "border-[#C96442]/40 bg-[#C96442]/5" : "border-gray-200 bg-white hover:bg-gray-50"}`}
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F7F3EC]">
-              <BookOpen className="w-6 h-6 text-[#C96442]" />
+              <BookOpen className="w-6 h-6 text-gray-700" />
             </div>
             <div>
               <div className="text-3xl font-bold text-gray-900">{needsReview.length}</div>
@@ -483,7 +483,7 @@ export default function KnowledgePage() {
                     <div>
                       <div className="text-xs font-semibold text-gray-500 uppercase mb-1">Parts Used</div>
                       <div className="flex gap-2 flex-wrap">
-                        {article.parts_used.map(p => <span key={p} className="text-xs px-2 py-1 bg-orange-50 text-[#C96442] rounded">{p}</span>)}
+                        {article.parts_used.map(p => <span key={p} className="text-xs px-2 py-1 bg-orange-50 text-gray-700 rounded">{p}</span>)}
                       </div>
                     </div>
                   )}
