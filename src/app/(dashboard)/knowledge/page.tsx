@@ -12,6 +12,8 @@ import KnowledgeBaseViewer from "@/components/dashboard/documents/KnowledgeBaseV
 import GeneratedReports from "@/components/dashboard/documents/GeneratedReports";
 import IntegrationSelector from "@/components/IntegrationSelector";
 
+type CaptureTab = "text" | "voice" | "upload" | "connect";
+
 interface KnowledgeArticle {
   id: string;
   title: string;
@@ -282,24 +284,6 @@ function TextSidekickCard() {
   );
 }
 
-// ─── Integrations (collapsed list) ──────────────────────────────────────────────
-function IntegrationsCard({ open, onToggle }: { open: boolean; onToggle: () => void }) {
-  return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4">
-      <button onClick={onToggle} className="flex w-full items-center gap-3 text-left">
-        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[#F7F3EC]">
-          <FileText className="w-5 h-5 text-[#C96442]" />
-        </div>
-        <div className="flex-1">
-          <div className="text-sm font-semibold text-gray-900">Connect tools</div>
-          <div className="text-xs text-gray-500">Google Drive, SharePoint, Notion, Slack, and more</div>
-        </div>
-        <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform", open && "rotate-180")} />
-      </button>
-    </div>
-  );
-}
-
 // ─── Main Page ──────────────────────────────────────────────────────────────────
 
 export default function KnowledgePage() {
@@ -309,7 +293,7 @@ export default function KnowledgePage() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [showReviewOnly, setShowReviewOnly] = useState(false);
   const [companyId, setCompanyId] = useState<string>("");
-  const [showIntegrations, setShowIntegrations] = useState(false);
+  const [activeCaptureTab, setActiveCaptureTab] = useState<CaptureTab>("text");
 
   useEffect(() => {
     try {
@@ -354,45 +338,56 @@ export default function KnowledgePage() {
           ADD KNOWLEDGE — always visible, top of page, impossible to miss
           ══════════════════════════════════════════════════════════════════════ */}
       <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div className="max-w-xl">
-            <div className="flex items-center gap-2">
-              <Plus className="w-4 h-4 text-[#C96442]" />
-              <h2 className="text-base font-semibold text-gray-900">Capture Knowledge</h2>
-            </div>
-            <p className="mt-2 text-sm text-gray-500">
-              Bring in fixes, SOPs, and field learnings from the fastest source available — text, voice, docs, or connected tools.
-            </p>
+        <div className="max-w-xl">
+          <div className="flex items-center gap-2">
+            <Plus className="w-4 h-4 text-[#C96442]" />
+            <h2 className="text-base font-semibold text-gray-900">Add to Sidekick</h2>
           </div>
+          <p className="mt-2 text-sm text-gray-500">
+            Add fixes, SOPs, and field learnings in whatever format you have right now.
+          </p>
         </div>
 
-        <div className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-[1.35fr_.95fr] lg:items-start">
-          <TextSidekickCard />
-
-          <div className="flex flex-col gap-4">
-            <VoiceInputCard companyId={companyId} />
-            <UploadCard companyId={companyId} />
-            <IntegrationsCard open={showIntegrations} onToggle={() => setShowIntegrations(v => !v)} />
-          </div>
+        <div className="mt-5 flex flex-wrap gap-2 rounded-2xl border border-gray-200 bg-gray-50 p-2">
+          {[
+            { id: "text", label: "Text", icon: Smartphone },
+            { id: "voice", label: "Voice", icon: Mic },
+            { id: "upload", label: "Upload", icon: Upload },
+            { id: "connect", label: "Connect", icon: FileText },
+          ].map(({ id, label, icon: Icon }) => {
+            const active = activeCaptureTab === id;
+            return (
+              <button
+                key={id}
+                onClick={() => setActiveCaptureTab(id as CaptureTab)}
+                className={cn(
+                  "flex min-w-[110px] flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium transition-colors",
+                  active
+                    ? "bg-white text-[#1C1A16] shadow-sm ring-1 ring-[#C96442]/20"
+                    : "text-gray-600 hover:bg-white hover:text-gray-900"
+                )}
+              >
+                <Icon className={cn("h-4 w-4", active ? "text-[#C96442]" : "text-gray-500")} />
+                {label}
+              </button>
+            );
+          })}
         </div>
 
-        {showIntegrations && (
-          <div className="mt-4 rounded-2xl border border-gray-200 bg-[#FCFBF8] p-4">
-            <div className="mb-3 flex items-center justify-between gap-3">
-              <div>
+        <div className="mt-4">
+          {activeCaptureTab === "text" && <TextSidekickCard />}
+          {activeCaptureTab === "voice" && <VoiceInputCard companyId={companyId} />}
+          {activeCaptureTab === "upload" && <UploadCard companyId={companyId} />}
+          {activeCaptureTab === "connect" && (
+            <div className="rounded-2xl border border-gray-200 bg-[#FCFBF8] p-4">
+              <div className="mb-3">
                 <h3 className="text-sm font-semibold text-gray-900">Connect your tools</h3>
                 <p className="text-xs text-gray-500">Pull knowledge in from the systems your team already uses.</p>
               </div>
-              <button
-                onClick={() => setShowIntegrations(false)}
-                className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
-              >
-                Close
-              </button>
+              <IntegrationSelector companyId={companyId} compact />
             </div>
-            <IntegrationSelector companyId={companyId} compact />
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* ── Stats row ── */}
