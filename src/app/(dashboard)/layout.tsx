@@ -24,11 +24,18 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${instrument.variable} dark`}>
+    <html lang="en" className={`${inter.variable} ${instrument.variable}`}>
       <head>
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className="antialiased">
+      <body
+        className={`antialiased`}
+        style={{
+          fontFamily: "Inter, system-ui, sans-serif",
+          background: "#F7F3EC",
+          color: "#1C1A16",
+        }}
+      >
         <Sidebar />
         <div className="lg:ml-[220px]">
           {children}

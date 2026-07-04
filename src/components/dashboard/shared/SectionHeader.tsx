@@ -12,11 +12,11 @@ function SectionHeader({ title, subtitle, action }: SectionHeaderProps) {
   return (
     <div className="mb-4 flex items-start justify-between">
       <div>
-        <h2 className="text-base font-semibold text-gray-900 dark:text-white">
+        <h2 className="text-base font-semibold text-gray-900">
           {title}
         </h2>
         {subtitle && (
-          <p className="text-sm leading-relaxed text-gray-500 dark:text-white/60">
+          <p className="text-sm leading-relaxed text-gray-500">
             {subtitle}
           </p>
         )}
