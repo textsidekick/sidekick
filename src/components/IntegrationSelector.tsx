@@ -89,7 +89,7 @@ export default function IntegrationSelector({ companyId, onConnect, compact }: I
   return (
     <div style={{ background: "white", border: "1px solid rgba(28,26,22,0.08)", borderRadius: 16, overflow: "hidden", height: "100%" }}>
       <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(28,26,22,0.06)" }}>
-        <h3 style={{ fontSize: 16, fontWeight: 600, color: "#1C1A16", margin: "0 0 4px" }}>Connect Your Tools</h3>
+        <h3 style={{ fontSize: 16, fontWeight: 600, color: "#1C1A16", margin: "0 0 4px" }}>Available Integrations</h3>
         <p style={{ fontSize: 13, color: "rgba(28,26,22,0.5)", margin: 0 }}>Pull your company knowledge from anywhere</p>
         <div style={{ display: "flex", gap: 6, marginTop: 12 }}>
           {(["all", "connected"] as const).map(f => (

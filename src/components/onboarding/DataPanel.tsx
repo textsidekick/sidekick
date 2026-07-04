@@ -87,7 +87,7 @@ function EmptyState({ sectionId }: { sectionId: SectionId }) {
     team: "Share info about your team — names, roles, departments.",
     knowledge: "Upload SOPs, manuals, or describe your procedures.",
     workorders: "Import existing work orders or describe your workflow.",
-    integrations: "Connect your tools using the options below.",
+    integrations: "Choose a tool below to connect your docs, chat, or systems.",
   };
   return (
     <div style={{
