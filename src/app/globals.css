@@ -5,8 +5,8 @@
   --color-cream: #F7F3EC;
   --color-cream-2: #FAF6EE;
   --color-ink: #1C1A16;
-  --color-accent: #C96442;
-  --color-accent-hover: #B0532F;
+  --color-accent: #0060F0;
+  --color-accent-hover: #004BB8;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-instrument), ui-serif, Georgia, serif;
 }
@@ -90,8 +90,8 @@ body {
   .bg-ink\/5 { background-color: rgba(28,26,22,0.05); }
   .bg-ink\/10 { background-color: rgba(28,26,22,0.1); }
   .text-cream { color: #F7F3EC; }
-  .text-accent { color: #C96442; }
-  .bg-accent { background-color: #C96442; }
+  .text-accent { color: #0060F0; }
+  .bg-accent { background-color: #0060F0; }
   .border-ink\/10 { border-color: rgba(28,26,22,0.1); }
   .border-ink\/5 { border-color: rgba(28,26,22,0.05); }
 }
