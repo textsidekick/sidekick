@@ -102,29 +102,31 @@ function UploadCard({ companyId }: { companyId: string }) {
   };
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 flex flex-col gap-3">
-      <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[#F7F3EC]">
+    <div className="rounded-xl border border-gray-200 bg-white p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[#F7F3EC]">
           <Upload className="w-5 h-5 text-[#C96442]" />
+          </div>
+          <div>
+            <div className="text-sm font-semibold text-gray-900">Upload documents</div>
+            <div className="text-xs text-gray-500">PDFs, manuals, SOPs, checklists</div>
+          </div>
         </div>
-        <div>
-          <div className="text-sm font-semibold text-gray-900">Upload documents</div>
-          <div className="text-xs text-gray-500">PDFs, manuals, SOPs, checklists</div>
-        </div>
+
+        <input ref={fileRef} type="file" accept=".pdf,.txt,.md,.doc,.docx" className="hidden" onChange={e => { if (e.target.files?.[0]) handleFile(e.target.files[0]); }} />
+
+        <button
+          onClick={() => fileRef.current?.click()}
+          disabled={uploading}
+          className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-gray-300 px-4 py-2.5 text-sm text-gray-600 transition-colors hover:border-[#C96442]/40 hover:bg-[#FBF7F1] disabled:opacity-50 sm:w-auto"
+        >
+          {uploading ? <><Loader2 className="w-4 h-4 animate-spin" /> Uploading…</> : <><Plus className="w-4 h-4" /> Choose file</>}
+        </button>
       </div>
 
-      <input ref={fileRef} type="file" accept=".pdf,.txt,.md,.doc,.docx" className="hidden" onChange={e => { if (e.target.files?.[0]) handleFile(e.target.files[0]); }} />
-
-      <button
-        onClick={() => fileRef.current?.click()}
-        disabled={uploading}
-        className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-gray-300 py-2.5 text-sm text-gray-600 transition-colors hover:border-[#C96442]/40 hover:bg-[#FBF7F1] disabled:opacity-50"
-      >
-        {uploading ? <><Loader2 className="w-4 h-4 animate-spin" /> Uploading…</> : <><Plus className="w-4 h-4" /> Choose file</>}
-      </button>
-
       {result && (
-        <div className={cn("text-xs px-3 py-2 rounded-lg flex items-center gap-2", result.ok ? "bg-green-50 text-gray-700" : "bg-red-50 text-gray-700")}>
+        <div className={cn("mt-3 text-xs px-3 py-2 rounded-lg flex items-center gap-2", result.ok ? "bg-green-50 text-gray-700" : "bg-red-50 text-gray-700")}>
           {result.ok ? <><CheckCircle2 className="w-3.5 h-3.5" /> Uploaded {result.name}</> : <><X className="w-3.5 h-3.5" /> {result.error}</>}
         </div>
       )}
@@ -191,33 +193,35 @@ function VoiceInputCard({ companyId }: { companyId: string }) {
   const formatTime = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 flex flex-col gap-3">
-      <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[#F7F3EC]">
+    <div className="rounded-xl border border-gray-200 bg-white p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[#F7F3EC]">
           <Mic className="w-5 h-5 text-[#C96442]" />
+          </div>
+          <div>
+            <div className="text-sm font-semibold text-gray-900">Voice input</div>
+            <div className="text-xs text-gray-500">Dictate SOPs, tips, and procedures</div>
+          </div>
         </div>
-        <div>
-          <div className="text-sm font-semibold text-gray-900">Voice input</div>
-          <div className="text-xs text-gray-500">Dictate SOPs, tips, and procedures</div>
-        </div>
-      </div>
 
-      {processing ? (
-        <div className="flex items-center justify-center gap-2 py-3 text-sm text-gray-700"><Loader2 className="w-4 h-4 animate-spin" /> Transcribing &amp; formatting…</div>
-      ) : recording ? (
-        <button onClick={stopRecording} className="flex w-full items-center justify-center gap-2 rounded-lg bg-red-500 py-2.5 text-sm font-medium text-white transition-colors hover:bg-red-600">
+        {processing ? (
+          <div className="flex items-center justify-center gap-2 rounded-lg bg-gray-50 px-4 py-2.5 text-sm text-gray-700 sm:min-w-[210px]"><Loader2 className="w-4 h-4 animate-spin" /> Transcribing…</div>
+        ) : recording ? (
+        <button onClick={stopRecording} className="flex w-full items-center justify-center gap-2 rounded-lg bg-red-500 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-red-600 sm:w-auto sm:min-w-[210px]">
           <MicOff className="w-4 h-4" />
           Stop Recording · {formatTime(seconds)}
         </button>
       ) : (
-        <button onClick={startRecording} className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#1C1A16] py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#2c2924]">
+        <button onClick={startRecording} className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#1C1A16] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#2c2924] sm:w-auto sm:min-w-[210px]">
           <Mic className="w-4 h-4" />
           Start Recording
         </button>
       )}
+      </div>
 
       {result && (
-        <div className={cn("text-xs px-3 py-2 rounded-lg", result.ok ? "bg-green-50 text-gray-700" : "bg-red-50 text-gray-700")}>
+        <div className={cn("mt-3 text-xs px-3 py-2 rounded-lg", result.ok ? "bg-green-50 text-gray-700" : "bg-red-50 text-gray-700")}>
           {result.ok ? <><CheckCircle2 className="w-3.5 h-3.5 inline mr-1" />Saved! {result.preview && <span className="block mt-1 text-gray-600 italic">"{result.preview}…"</span>}</> : <><X className="w-3.5 h-3.5 inline mr-1" />{result.error}</>}
         </div>
       )}
@@ -230,7 +234,7 @@ function TextSidekickCard() {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="rounded-2xl border border-[#EAD8CF] bg-[#FBF7F1] p-5 flex flex-col gap-4">
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 flex flex-col gap-4">
       <div className="flex items-start gap-3">
         <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-[#C96442]">
           <Smartphone className="w-5 h-5 text-white" />
@@ -241,7 +245,7 @@ function TextSidekickCard() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-[#EAD8CF] bg-white px-4 py-4">
+      <div className="rounded-xl border border-[#F0E5DC] bg-[#FBF7F1] px-4 py-4">
         <div className="text-xs font-medium uppercase tracking-wide text-gray-400">Best for</div>
         <div className="mt-1 text-lg font-semibold leading-snug text-[#A95537]">Quick notes from the floor, while the work is still fresh</div>
         <div className="mt-2 text-sm text-gray-500">Use the same Sidekick number your workers already text.</div>
@@ -279,26 +283,19 @@ function TextSidekickCard() {
 }
 
 // ─── Integrations (collapsed list) ──────────────────────────────────────────────
-function IntegrationsCard({ companyId }: { companyId: string }) {
-  const [open, setOpen] = useState(false);
-
+function IntegrationsCard({ open, onToggle }: { open: boolean; onToggle: () => void }) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 flex flex-col gap-3">
-      <button onClick={() => setOpen(v => !v)} className="flex items-center gap-3 w-full text-left">
+    <div className="rounded-xl border border-gray-200 bg-white p-4">
+      <button onClick={onToggle} className="flex w-full items-center gap-3 text-left">
         <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[#F7F3EC]">
           <FileText className="w-5 h-5 text-[#C96442]" />
         </div>
         <div className="flex-1">
           <div className="text-sm font-semibold text-gray-900">Connect tools</div>
-          <div className="text-xs text-gray-500">Google Drive, SharePoint, Notion…</div>
+          <div className="text-xs text-gray-500">Google Drive, SharePoint, Notion, Slack, and more</div>
         </div>
         <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform", open && "rotate-180")} />
       </button>
-      {open && (
-        <div className="pt-1">
-          <IntegrationSelector companyId={companyId} compact />
-        </div>
-      )}
     </div>
   );
 }
@@ -312,6 +309,7 @@ export default function KnowledgePage() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [showReviewOnly, setShowReviewOnly] = useState(false);
   const [companyId, setCompanyId] = useState<string>("");
+  const [showIntegrations, setShowIntegrations] = useState(false);
 
   useEffect(() => {
     try {
@@ -366,23 +364,35 @@ export default function KnowledgePage() {
               Bring in fixes, SOPs, and field learnings from the fastest source available — text, voice, docs, or connected tools.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <div className="rounded-full bg-[#F7F3EC] px-3 py-1 text-xs font-medium text-gray-600">Phone-first</div>
-            <div className="rounded-full bg-[#F7F3EC] px-3 py-1 text-xs font-medium text-gray-600">Voice-friendly</div>
-            <div className="rounded-full bg-[#F7F3EC] px-3 py-1 text-xs font-medium text-gray-600">Docs + tools</div>
-          </div>
         </div>
 
-        <div className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-[1.35fr_.95fr_1fr] lg:items-start">
+        <div className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-[1.35fr_.95fr] lg:items-start">
           <TextSidekickCard />
 
           <div className="flex flex-col gap-4">
             <VoiceInputCard companyId={companyId} />
             <UploadCard companyId={companyId} />
+            <IntegrationsCard open={showIntegrations} onToggle={() => setShowIntegrations(v => !v)} />
           </div>
-
-          <IntegrationsCard companyId={companyId} />
         </div>
+
+        {showIntegrations && (
+          <div className="mt-4 rounded-2xl border border-gray-200 bg-[#FCFBF8] p-4">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900">Connect your tools</h3>
+                <p className="text-xs text-gray-500">Pull knowledge in from the systems your team already uses.</p>
+              </div>
+              <button
+                onClick={() => setShowIntegrations(false)}
+                className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
+              >
+                Close
+              </button>
+            </div>
+            <IntegrationSelector companyId={companyId} compact />
+          </div>
+        )}
       </div>
 
       {/* ── Stats row ── */}
