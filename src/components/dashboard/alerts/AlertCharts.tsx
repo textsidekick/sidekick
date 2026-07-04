@@ -57,7 +57,7 @@ interface CustomTooltipProps {
 function ChartTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload?.length) return null
   return (
-    <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm dark:bg-[#ffffff] [box-shadow:var(--card-shadow)]">
+    <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm [box-shadow:var(--card-shadow)]">
       {label && (
         <p className="mb-1 text-xs font-medium text-gray-500">
           {label}
@@ -137,7 +137,7 @@ function AlertCharts({ alerts }: AlertChartsProps) {
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
       {/* Left: Weekly Trend — spans 2 cols */}
-      <div className="rounded-xl border border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5 lg:col-span-2">
+      <div className="rounded-xl border border-gray-200 bg-white [box-shadow:var(--card-shadow)] p-5 lg:col-span-2">
         <SectionHeader title="Weekly Trend" />
         <p className="mt-1 text-sm text-gray-500">
           Alerts reported per day over the last 7 days
@@ -158,14 +158,14 @@ function AlertCharts({ alerts }: AlertChartsProps) {
                 tick={{ fontSize: 12 }}
                 tickLine={false}
                 axisLine={false}
-                className="fill-gray-400 dark:fill-gray-500"
+                className="fill-gray-400"
               />
               <YAxis
                 allowDecimals={false}
                 tick={{ fontSize: 12 }}
                 tickLine={false}
                 axisLine={false}
-                className="fill-gray-400 dark:fill-gray-500"
+                className="fill-gray-400"
               />
               <Tooltip content={<ChartTooltip />} cursor={{ fill: 'transparent' }} />
               <Bar
@@ -183,7 +183,7 @@ function AlertCharts({ alerts }: AlertChartsProps) {
       {/* Right: Stacked breakdown charts */}
       <div className="flex flex-col gap-6">
         {/* Severity Distribution donut */}
-        <div className="rounded-xl border border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
+        <div className="rounded-xl border border-gray-200 bg-white [box-shadow:var(--card-shadow)] p-5">
           <SectionHeader title="Severity Breakdown" />
           <div className="mt-2 h-[140px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -211,7 +211,7 @@ function AlertCharts({ alerts }: AlertChartsProps) {
                   y="46%"
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  className="fill-gray-900 text-lg font-bold dark:fill-white"
+                  className="fill-gray-900 text-lg font-bold"
                 >
                   {totalAlerts}
                 </text>
@@ -220,7 +220,7 @@ function AlertCharts({ alerts }: AlertChartsProps) {
                   y="58%"
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  className="fill-gray-400 text-[10px] dark:fill-gray-500"
+                  className="fill-gray-400 text-[10px]"
                 >
                   Total
                 </text>
@@ -244,7 +244,7 @@ function AlertCharts({ alerts }: AlertChartsProps) {
         </div>
 
         {/* Resolution Rate donut */}
-        <div className="rounded-xl border border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
+        <div className="rounded-xl border border-gray-200 bg-white [box-shadow:var(--card-shadow)] p-5">
           <SectionHeader title="Resolution Rate" />
           <div className="mt-2 h-[140px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -272,7 +272,7 @@ function AlertCharts({ alerts }: AlertChartsProps) {
                   y="46%"
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  className="fill-gray-900 text-lg font-bold dark:fill-white"
+                  className="fill-gray-900 text-lg font-bold"
                 >
                   {resolutionRate}%
                 </text>
@@ -281,7 +281,7 @@ function AlertCharts({ alerts }: AlertChartsProps) {
                   y="58%"
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  className="fill-gray-400 text-[10px] dark:fill-gray-500"
+                  className="fill-gray-400 text-[10px]"
                 >
                   Resolved
                 </text>
@@ -306,7 +306,7 @@ function AlertCharts({ alerts }: AlertChartsProps) {
       </div>
 
       {/* Bottom: Category Breakdown — full width */}
-      <div className="rounded-xl border border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5 lg:col-span-3">
+      <div className="rounded-xl border border-gray-200 bg-white [box-shadow:var(--card-shadow)] p-5 lg:col-span-3">
         <SectionHeader title="Alerts by Category" />
         <p className="mt-1 text-sm text-gray-500">
           Issue distribution across safety categories

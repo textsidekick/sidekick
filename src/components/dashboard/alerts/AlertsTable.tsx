@@ -85,7 +85,7 @@ function AlertsTable({ alerts }: AlertsTableProps) {
   const isEmpty = alerts.length === 0
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
+    <div className="rounded-xl border border-gray-200 bg-white [box-shadow:var(--card-shadow)] p-5">
       <SectionHeader
         title="Issues"
         action={
@@ -113,8 +113,8 @@ function AlertsTable({ alerts }: AlertsTableProps) {
                   onClick={() => setFilter(opt.value)}
                   className={
                     filter === opt.value
-                      ? 'rounded-md bg-white px-3 py-1.5 text-sm font-medium text-gray-900 transition-all dark:bg-gray-700 [box-shadow:var(--card-shadow)]'
-                      : 'rounded-md px-3 py-1.5 text-sm font-medium text-gray-500 transition-all hover:text-gray-700 dark:hover:text-gray-600'
+                      ? 'rounded-md bg-white px-3 py-1.5 text-sm font-medium text-gray-900 transition-all [box-shadow:var(--card-shadow)]'
+                      : 'rounded-md px-3 py-1.5 text-sm font-medium text-gray-500 transition-all hover:text-gray-700'
                   }
                 >
                   {opt.label} ({filterCounts[opt.value]})
@@ -128,7 +128,7 @@ function AlertsTable({ alerts }: AlertsTableProps) {
                 placeholder="Search issues..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="h-8 w-48 rounded-lg border border-gray-200 bg-transparent pl-8 pr-3 text-sm text-gray-900 placeholder-gray-400 outline-none transition-colors focus:border-[#C96442] focus:ring-1 focus:ring-[#C96442]/30 dark:placeholder-gray-500 dark:focus:border-blue-700 dark:focus:ring-blue-900"
+                className="h-8 w-48 rounded-lg border border-gray-200 bg-transparent pl-8 pr-3 text-sm text-gray-900 placeholder-gray-400 outline-none transition-colors focus:border-[#C96442] focus:ring-1 focus:ring-[#C96442]/30"
               />
             </div>
           </div>
@@ -162,7 +162,7 @@ function AlertsTable({ alerts }: AlertsTableProps) {
               {filteredAlerts.map((alert) => (
                 <TableRow
                   key={alert.id}
-                  className="group/row border-b border-gray-100 hover:bg-gray-50 dark:hover:bg-white/50"
+                  className="group/row border-b border-gray-100 hover:bg-gray-50"
                 >
                   <TableCell className="text-sm font-medium text-gray-900">
                     {alert.issue}
@@ -206,7 +206,7 @@ function AlertsTable({ alerts }: AlertsTableProps) {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 rounded-md text-gray-400 hover:text-[#C96442] dark:hover:text-[#C96442]"
+                        className="h-7 w-7 rounded-md text-gray-400 hover:text-[#C96442]"
                         title="View details"
                       >
                         <Eye className="h-3.5 w-3.5" />
@@ -214,7 +214,7 @@ function AlertsTable({ alerts }: AlertsTableProps) {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-600"
+                        className="h-7 w-7 rounded-md text-gray-400 hover:text-gray-600"
                         title="Dismiss"
                       >
                         <BellOff className="h-3.5 w-3.5" />

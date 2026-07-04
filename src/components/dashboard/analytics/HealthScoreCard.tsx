@@ -8,9 +8,9 @@ interface HealthScoreCardProps {
 }
 
 function getScoreColor(score: number): { text: string; bar: string } {
-  if (score >= 80) return { text: 'text-emerald-600 dark:text-emerald-400', bar: 'bg-emerald-500' }
-  if (score >= 60) return { text: 'text-amber-600 dark:text-amber-400', bar: 'bg-amber-500' }
-  return { text: 'text-red-600 dark:text-red-400', bar: 'bg-red-500' }
+  if (score >= 80) return { text: 'text-emerald-600', bar: 'bg-emerald-500' }
+  if (score >= 60) return { text: 'text-amber-600', bar: 'bg-amber-500' }
+  return { text: 'text-red-600', bar: 'bg-red-500' }
 }
 
 function getScoreLabel(score: number): string {
@@ -24,7 +24,7 @@ function HealthScoreCard({ score, maxScore = 100 }: HealthScoreCardProps) {
   const percentage = Math.min((score / maxScore) * 100, 100)
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
+    <div className="rounded-xl border border-gray-200 bg-white [box-shadow:var(--card-shadow)] p-5">
       <div className="flex items-start justify-between">
         <span className="text-xs font-medium uppercase tracking-wide text-gray-500">
           Health Score

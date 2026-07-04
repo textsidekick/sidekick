@@ -32,7 +32,7 @@ function FeedCard({
   onSeeAll,
 }: FeedCardProps) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
+    <div className="rounded-xl border border-gray-200 bg-white [box-shadow:var(--card-shadow)] p-5">
       <SectionHeader
         title={title}
         action={
@@ -40,7 +40,7 @@ function FeedCard({
             <button
               type="button"
               onClick={onSeeAll}
-              className="flex items-center gap-0.5 text-xs font-medium text-[#C96442] dark:text-[#C96442] hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+              className="flex items-center gap-0.5 text-xs font-medium text-[#C96442] hover:text-blue-700 transition-colors"
             >
               See All
               <ChevronRight className="h-3.5 w-3.5" />
@@ -59,7 +59,7 @@ function FeedCard({
           {items.map((item) => (
             <div
               key={item.id}
-              className="flex items-start gap-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-white/50 transition-colors"
+              className="flex items-start gap-3 rounded-lg p-2 hover:bg-gray-50 transition-colors"
             >
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100">
                 <Icon className="h-4 w-4 text-gray-400" />

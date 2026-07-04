@@ -45,7 +45,7 @@ function AlertMetrics({ alerts }: AlertMetricsProps) {
         value={highPriority}
         icon={AlertTriangle}
         iconClassName="h-5 w-5 text-gray-400"
-        valueClassName="text-gray-400 dark:text-red-400"
+        valueClassName="text-gray-400"
         accentColor="red"
         change={-8.0}
         subtext="Need immediate action"

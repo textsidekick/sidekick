@@ -40,11 +40,11 @@ function WorkersTable({ workers }: WorkersTableProps) {
   const verifiedCount = workers.filter((w) => w.status === 'verified').length
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white dark:bg-[#ffffff] [box-shadow:var(--card-shadow)] p-5">
+    <div className="rounded-xl border border-gray-200 bg-white [box-shadow:var(--card-shadow)] p-5">
       <SectionHeader
         title={`${workers.length} Workers`}
         action={
-          <span className="text-sm text-emerald-600 dark:text-emerald-400">
+          <span className="text-sm text-emerald-600">
             {verifiedCount} verified
           </span>
         }
@@ -79,7 +79,7 @@ function WorkersTable({ workers }: WorkersTableProps) {
             {workers.map((worker) => (
               <TableRow
                 key={worker.id}
-                className="border-b border-gray-100 hover:bg-gray-50 dark:hover:bg-white/50"
+                className="border-b border-gray-100 hover:bg-gray-50"
               >
                 <TableCell className="text-sm font-medium text-gray-900">
                   {worker.name}
@@ -94,7 +94,7 @@ function WorkersTable({ workers }: WorkersTableProps) {
                   {worker.status === 'verified' ? (
                     <Badge
                       variant="secondary"
-                      className="bg-[#27AE60] text-white dark:bg-emerald-950 dark:text-emerald-400 border-transparent"
+                      className="bg-[#27AE60] text-white border-transparent"
                     >
                       <BadgeCheck className="h-3 w-3 mr-1" />
                       Verified
