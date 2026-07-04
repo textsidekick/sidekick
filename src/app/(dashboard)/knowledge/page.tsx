@@ -104,8 +104,8 @@ function UploadCard({ companyId }: { companyId: string }) {
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-4 flex flex-col gap-3">
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100">
-          <Upload className="w-5 h-5 text-gray-700" />
+        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[#F7F3EC]">
+          <Upload className="w-5 h-5 text-[#C96442]" />
         </div>
         <div>
           <div className="text-sm font-semibold text-gray-900">Upload documents</div>
@@ -118,7 +118,7 @@ function UploadCard({ companyId }: { companyId: string }) {
       <button
         onClick={() => fileRef.current?.click()}
         disabled={uploading}
-        className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-gray-300 py-2.5 text-sm text-gray-600 transition-colors hover:border-gray-400 hover:bg-gray-50 disabled:opacity-50"
+        className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-gray-300 py-2.5 text-sm text-gray-600 transition-colors hover:border-[#C96442]/40 hover:bg-[#FBF7F1] disabled:opacity-50"
       >
         {uploading ? <><Loader2 className="w-4 h-4 animate-spin" /> Uploading…</> : <><Plus className="w-4 h-4" /> Choose file</>}
       </button>
@@ -193,8 +193,8 @@ function VoiceInputCard({ companyId }: { companyId: string }) {
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-4 flex flex-col gap-3">
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100">
-          <Mic className="w-5 h-5 text-gray-700" />
+        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[#F7F3EC]">
+          <Mic className="w-5 h-5 text-[#C96442]" />
         </div>
         <div>
           <div className="text-sm font-semibold text-gray-900">Voice input</div>
@@ -230,7 +230,7 @@ function TextSidekickCard() {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-[#FAF6EE] p-5 flex flex-col gap-4">
+    <div className="rounded-2xl border border-[#EAD8CF] bg-[#FBF7F1] p-5 flex flex-col gap-4">
       <div className="flex items-start gap-3">
         <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-[#C96442]">
           <Smartphone className="w-5 h-5 text-white" />
@@ -241,7 +241,7 @@ function TextSidekickCard() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-[#C96442]/10 bg-white px-4 py-4">
+      <div className="rounded-xl border border-[#EAD8CF] bg-white px-4 py-4">
         <div className="text-xs font-medium uppercase tracking-wide text-gray-400">Best for</div>
         <div className="mt-1 text-lg font-semibold leading-snug text-[#A95537]">Quick notes from the floor, while the work is still fresh</div>
         <div className="mt-2 text-sm text-gray-500">Use the same Sidekick number your workers already text.</div>
@@ -256,20 +256,20 @@ function TextSidekickCard() {
 
       {expanded && (
         <div className="grid grid-cols-1 gap-2 text-xs sm:grid-cols-2">
-          <div className="flex items-start gap-2 bg-white rounded-lg p-2.5 border border-gray-100">
+          <div className="flex items-start gap-2 bg-white rounded-lg p-2.5 border border-[#EFE7DE]">
             <MessageSquare className="w-3.5 h-3.5 text-[#C96442] mt-0.5 flex-shrink-0" />
             <div><span className="font-medium text-gray-800">Text</span><br /><span className="text-gray-500">"The boiler reset code is 4829"</span></div>
           </div>
-          <div className="flex items-start gap-2 bg-white rounded-lg p-2.5 border border-gray-100">
-            <Mic className="w-3.5 h-3.5 text-purple-500 mt-0.5 flex-shrink-0" />
+          <div className="flex items-start gap-2 bg-white rounded-lg p-2.5 border border-[#EFE7DE]">
+            <Mic className="w-3.5 h-3.5 text-[#C96442] mt-0.5 flex-shrink-0" />
             <div><span className="font-medium text-gray-800">Voice memo</span><br /><span className="text-gray-500">Record &amp; send a voice note</span></div>
           </div>
-          <div className="flex items-start gap-2 bg-white rounded-lg p-2.5 border border-gray-100">
-            <FileText className="w-3.5 h-3.5 text-blue-500 mt-0.5 flex-shrink-0" />
+          <div className="flex items-start gap-2 bg-white rounded-lg p-2.5 border border-[#EFE7DE]">
+            <FileText className="w-3.5 h-3.5 text-[#C96442] mt-0.5 flex-shrink-0" />
             <div><span className="font-medium text-gray-800">Photos &amp; docs</span><br /><span className="text-gray-500">Snap a label, manual page, etc.</span></div>
           </div>
-          <div className="flex items-start gap-2 bg-white rounded-lg p-2.5 border border-gray-100">
-            <BookOpen className="w-3.5 h-3.5 text-green-600 mt-0.5 flex-shrink-0" />
+          <div className="flex items-start gap-2 bg-white rounded-lg p-2.5 border border-[#EFE7DE]">
+            <BookOpen className="w-3.5 h-3.5 text-[#C96442] mt-0.5 flex-shrink-0" />
             <div><span className="font-medium text-gray-800">Quick answers</span><br /><span className="text-gray-500">Reply when workers ask Sidekick</span></div>
           </div>
         </div>
@@ -285,8 +285,8 @@ function IntegrationsCard({ companyId }: { companyId: string }) {
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-4 flex flex-col gap-3">
       <button onClick={() => setOpen(v => !v)} className="flex items-center gap-3 w-full text-left">
-        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100">
-          <FileText className="w-5 h-5 text-gray-700" />
+        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[#F7F3EC]">
+          <FileText className="w-5 h-5 text-[#C96442]" />
         </div>
         <div className="flex-1">
           <div className="text-sm font-semibold text-gray-900">Connect tools</div>
@@ -368,8 +368,8 @@ export default function KnowledgePage() {
           </div>
           <div className="flex flex-wrap gap-2">
             <div className="rounded-full bg-[#F7F3EC] px-3 py-1 text-xs font-medium text-gray-600">Phone-first</div>
-            <div className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">Voice-friendly</div>
-            <div className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">Docs + tools</div>
+            <div className="rounded-full bg-[#F7F3EC] px-3 py-1 text-xs font-medium text-gray-600">Voice-friendly</div>
+            <div className="rounded-full bg-[#F7F3EC] px-3 py-1 text-xs font-medium text-gray-600">Docs + tools</div>
           </div>
         </div>
 
