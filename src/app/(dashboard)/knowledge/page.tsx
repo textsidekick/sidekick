@@ -102,13 +102,13 @@ function UploadCard({ companyId }: { companyId: string }) {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col gap-3">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-[#C96442]/10 flex items-center justify-center flex-shrink-0">
-          <Upload className="w-5 h-5 text-[#C96442]" />
+    <div className="rounded-xl border border-gray-200 bg-white p-4 flex flex-col gap-3">
+      <div className="flex items-start gap-3">
+        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100">
+          <Upload className="w-5 h-5 text-gray-700" />
         </div>
         <div>
-          <div className="text-sm font-semibold text-gray-900">Upload Documents</div>
+          <div className="text-sm font-semibold text-gray-900">Upload documents</div>
           <div className="text-xs text-gray-500">PDFs, manuals, SOPs, checklists</div>
         </div>
       </div>
@@ -118,7 +118,7 @@ function UploadCard({ companyId }: { companyId: string }) {
       <button
         onClick={() => fileRef.current?.click()}
         disabled={uploading}
-        className="w-full py-2.5 rounded-lg border-2 border-dashed border-gray-300 hover:border-[#C96442] hover:bg-[#C96442]/5 transition-colors text-sm text-gray-600 hover:text-[#C96442] flex items-center justify-center gap-2 disabled:opacity-50"
+        className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-gray-300 py-2.5 text-sm text-gray-600 transition-colors hover:border-gray-400 hover:bg-gray-50 disabled:opacity-50"
       >
         {uploading ? <><Loader2 className="w-4 h-4 animate-spin" /> Uploading…</> : <><Plus className="w-4 h-4" /> Choose file</>}
       </button>
@@ -191,26 +191,26 @@ function VoiceInputCard({ companyId }: { companyId: string }) {
   const formatTime = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col gap-3">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0">
-          <Mic className="w-5 h-5 text-purple-600" />
+    <div className="rounded-xl border border-gray-200 bg-white p-4 flex flex-col gap-3">
+      <div className="flex items-start gap-3">
+        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100">
+          <Mic className="w-5 h-5 text-gray-700" />
         </div>
         <div>
-          <div className="text-sm font-semibold text-gray-900">Voice Input</div>
-          <div className="text-xs text-gray-500">Dictate SOPs, tips &amp; procedures</div>
+          <div className="text-sm font-semibold text-gray-900">Voice input</div>
+          <div className="text-xs text-gray-500">Dictate SOPs, tips, and procedures</div>
         </div>
       </div>
 
       {processing ? (
-        <div className="py-3 flex items-center justify-center gap-2 text-sm text-purple-600"><Loader2 className="w-4 h-4 animate-spin" /> Transcribing &amp; formatting…</div>
+        <div className="flex items-center justify-center gap-2 py-3 text-sm text-gray-700"><Loader2 className="w-4 h-4 animate-spin" /> Transcribing &amp; formatting…</div>
       ) : recording ? (
-        <button onClick={stopRecording} className="w-full py-2.5 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm font-medium flex items-center justify-center gap-2 transition-colors">
+        <button onClick={stopRecording} className="flex w-full items-center justify-center gap-2 rounded-lg bg-red-500 py-2.5 text-sm font-medium text-white transition-colors hover:bg-red-600">
           <MicOff className="w-4 h-4" />
           Stop Recording · {formatTime(seconds)}
         </button>
       ) : (
-        <button onClick={startRecording} className="w-full py-2.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium flex items-center justify-center gap-2 transition-colors">
+        <button onClick={startRecording} className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#1C1A16] py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#2c2924]">
           <Mic className="w-4 h-4" />
           Start Recording
         </button>
@@ -230,33 +230,32 @@ function TextSidekickCard() {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="bg-gradient-to-br from-[#C96442]/5 to-orange-50 rounded-xl border border-[#C96442]/20 p-5 flex flex-col gap-3">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-[#C96442] flex items-center justify-center flex-shrink-0">
+    <div className="rounded-2xl border border-gray-200 bg-[#FAF6EE] p-5 flex flex-col gap-4">
+      <div className="flex items-start gap-3">
+        <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-[#C96442]">
           <Smartphone className="w-5 h-5 text-white" />
         </div>
         <div>
-          <div className="text-sm font-semibold text-gray-900">Text Sidekick from Your Phone</div>
-          <div className="text-xs text-gray-500">Add knowledge anytime, anywhere</div>
+          <div className="text-sm font-semibold text-gray-900">Text Sidekick from your phone</div>
+          <div className="text-xs text-gray-500">Fastest way to capture fixes, tribal knowledge, and quick SOP notes.</div>
         </div>
       </div>
 
-      <div className="bg-white/80 rounded-lg px-4 py-3 border border-[#C96442]/10">
-        <div className="text-center">
-          <div className="text-lg font-bold text-[#C96442] tracking-wide">Text your Sidekick number</div>
-          <div className="text-xs text-gray-500 mt-1">The same number your workers text</div>
-        </div>
+      <div className="rounded-xl border border-[#C96442]/10 bg-white px-4 py-4">
+        <div className="text-xs font-medium uppercase tracking-wide text-gray-400">Best for</div>
+        <div className="mt-1 text-lg font-semibold leading-snug text-[#A95537]">Quick notes from the floor, while the work is still fresh</div>
+        <div className="mt-2 text-sm text-gray-500">Use the same Sidekick number your workers already text.</div>
       </div>
 
       <button
         onClick={() => setExpanded(v => !v)}
-        className="text-xs text-[#C96442] font-medium flex items-center gap-1 mx-auto hover:underline"
+        className="flex items-center gap-1 text-xs font-medium text-[#A95537] hover:underline"
       >
-        {expanded ? "Hide" : "What can I send?"} <ChevronDown className={cn("w-3 h-3 transition-transform", expanded && "rotate-180")} />
+        {expanded ? "Hide examples" : "See examples"} <ChevronDown className={cn("w-3 h-3 transition-transform", expanded && "rotate-180")} />
       </button>
 
       {expanded && (
-        <div className="grid grid-cols-2 gap-2 text-xs">
+        <div className="grid grid-cols-1 gap-2 text-xs sm:grid-cols-2">
           <div className="flex items-start gap-2 bg-white rounded-lg p-2.5 border border-gray-100">
             <MessageSquare className="w-3.5 h-3.5 text-[#C96442] mt-0.5 flex-shrink-0" />
             <div><span className="font-medium text-gray-800">Text</span><br /><span className="text-gray-500">"The boiler reset code is 4829"</span></div>
@@ -284,13 +283,13 @@ function IntegrationsCard({ companyId }: { companyId: string }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col gap-3">
+    <div className="rounded-xl border border-gray-200 bg-white p-4 flex flex-col gap-3">
       <button onClick={() => setOpen(v => !v)} className="flex items-center gap-3 w-full text-left">
-        <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-          <FileText className="w-5 h-5 text-blue-600" />
+        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100">
+          <FileText className="w-5 h-5 text-gray-700" />
         </div>
         <div className="flex-1">
-          <div className="text-sm font-semibold text-gray-900">Connect Tools</div>
+          <div className="text-sm font-semibold text-gray-900">Connect tools</div>
           <div className="text-xs text-gray-500">Google Drive, SharePoint, Notion…</div>
         </div>
         <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform", open && "rotate-180")} />
@@ -356,15 +355,25 @@ export default function KnowledgePage() {
       {/* ══════════════════════════════════════════════════════════════════════
           ADD KNOWLEDGE — always visible, top of page, impossible to miss
           ══════════════════════════════════════════════════════════════════════ */}
-      <div className="mt-6 rounded-2xl border border-[#C96442]/20 bg-gradient-to-r from-orange-50/60 via-white to-purple-50/40 p-5">
-        <div className="flex items-center gap-2 mb-4">
-          <Plus className="w-5 h-5 text-[#C96442]" />
-          <h2 className="text-base font-bold text-gray-900">Capture Knowledge</h2>
-          <span className="text-xs text-gray-400 ml-1">— from the field, your phone, or existing docs</span>
+      <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="max-w-xl">
+            <div className="flex items-center gap-2">
+              <Plus className="w-4 h-4 text-[#C96442]" />
+              <h2 className="text-base font-semibold text-gray-900">Capture Knowledge</h2>
+            </div>
+            <p className="mt-2 text-sm text-gray-500">
+              Bring in fixes, SOPs, and field learnings from the fastest source available — text, voice, docs, or connected tools.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <div className="rounded-full bg-[#F7F3EC] px-3 py-1 text-xs font-medium text-gray-600">Phone-first</div>
+            <div className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">Voice-friendly</div>
+            <div className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">Docs + tools</div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Phone-first: text capture is the primary input method */}
+        <div className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-[1.35fr_.9fr_.9fr_.9fr]">
           <TextSidekickCard />
           <VoiceInputCard companyId={companyId} />
           <UploadCard companyId={companyId} />
@@ -374,9 +383,9 @@ export default function KnowledgePage() {
 
       {/* ── Stats row ── */}
       <div className="mt-6 flex items-center gap-4 flex-wrap">
-        <div className="bg-white rounded-xl border border-gray-200 px-6 py-4 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-[#C96442] flex items-center justify-center">
-            <BookOpen className="w-6 h-6 text-white" />
+        <div className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white px-6 py-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F7F3EC]">
+            <BookOpen className="w-6 h-6 text-[#C96442]" />
           </div>
           <div>
             <div className="text-3xl font-bold text-gray-900">{articles.length}</div>
@@ -386,14 +395,14 @@ export default function KnowledgePage() {
         {needsReview.length > 0 && (
           <button
             onClick={() => setShowReviewOnly(v => !v)}
-            className={`rounded-xl border px-6 py-4 flex items-center gap-4 transition text-left ${showReviewOnly ? "border-[#C96442] bg-[#C96442]/10" : "border-gray-200 bg-amber-50 hover:bg-gray-50"}`}
+            className={`flex items-center gap-4 rounded-xl border px-6 py-4 text-left transition ${showReviewOnly ? "border-[#C96442]/40 bg-[#C96442]/5" : "border-gray-200 bg-white hover:bg-gray-50"}`}
           >
-            <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
-              <BookOpen className="w-6 h-6 text-amber-700" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F7F3EC]">
+              <BookOpen className="w-6 h-6 text-[#C96442]" />
             </div>
             <div>
-              <div className="text-3xl font-bold text-gray-600">{needsReview.length}</div>
-              <div className="text-sm text-gray-600">Needs Review <span className="text-xs text-amber-600">(auto-generated from work orders)</span></div>
+              <div className="text-3xl font-bold text-gray-900">{needsReview.length}</div>
+              <div className="text-sm text-gray-600">Needs Review <span className="text-xs text-gray-400">(auto-generated from work orders)</span></div>
             </div>
           </button>
         )}
