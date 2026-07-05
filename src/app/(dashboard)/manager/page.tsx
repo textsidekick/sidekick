@@ -210,6 +210,37 @@ export default function ManagerDashboard() {
     .slice(0, 6);
 
   const unansweredCount = unansweredQuestions.length;
+  const importantTexts = [
+    ...(stats?.recentQuestions || []).slice(0, 4).map((q) => ({
+      id: `q-${q.id}`,
+      type: q.answer ? "resolved_question" : "question",
+      title: q.question,
+      meta: `${q.worker_name || "Worker"}${q.topic ? ` · ${q.topic}` : ""}`,
+      created_at: q.created_at,
+      href: "/inbox",
+    })),
+    ...issues
+      .filter((issue) => issue.status === "open")
+      .slice(0, 4)
+      .map((issue) => ({
+        id: `issue-${issue.id}`,
+        type: "issue",
+        title: issue.description,
+        meta: `${issue.worker_name || "Worker"}${issue.equipment ? ` · ${issue.equipment}` : ""}`,
+        created_at: issue.created_at,
+        href: "/inbox",
+      })),
+    ...criticalHighWOs.slice(0, 4).map((wo) => ({
+      id: `wo-${wo.id}`,
+      type: "work_order",
+      title: `${wo.short_id} · ${wo.title}`,
+      meta: `${wo.priority.toUpperCase()} · ${wo.status.replaceAll("_", " ")}`,
+      created_at: wo.created_at,
+      href: `/work-orders/${wo.id}`,
+    })),
+  ]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 6);
 
   // Build the "attention items" list for the job-based view
   const attentionItems: { type: string; priority: number; label: string; detail: string; icon: React.ElementType; color: string; bgColor: string; borderColor: string; count: number; href?: string }[] = [];
@@ -443,7 +474,11 @@ export default function ManagerDashboard() {
                 />
               )}
               {!loadingWorkOrders && recentWOs.map(wo => (
-                <div key={wo.id} className="flex items-start justify-between gap-3 rounded-xl border border-black/5 p-3 hover:bg-[#F7F3EC] transition-colors">
+                <a
+                  key={wo.id}
+                  href={`/work-orders/${wo.id}`}
+                  className="flex items-start justify-between gap-3 rounded-xl border border-black/5 p-3 hover:bg-[#F7F3EC] transition-colors"
+                >
                   <div className="min-w-0 flex-1">
                     <div className="text-sm font-medium text-[#1C1A16] truncate">{wo.short_id} · {wo.title}</div>
                     <div className="mt-1 flex items-center gap-2 flex-wrap">
@@ -452,7 +487,7 @@ export default function ManagerDashboard() {
                       <StatusBadge status={wo.status} />
                     </div>
                   </div>
-                </div>
+                </a>
               ))}
             </div>
           </div>
@@ -554,7 +589,49 @@ export default function ManagerDashboard() {
           </div>
         </div>
 
-        {/* ══ 5. QUICK CAPTURE — phone-first CTA ═════════════════════════════ */}
+        {/* ══ 5. RECENT IMPORTANT TEXTS ═════════════════════════════════════ */}
+        <div className="rounded-2xl bg-white border border-[rgba(28,26,22,0.06)] p-6">
+          <SectionHeader
+            title="Recent Important Texts"
+            subtitle="Messages and reports that are most likely to need manager attention"
+            action={<a href="/inbox" className="text-xs text-[#C96442] hover:underline font-medium">Open inbox →</a>}
+          />
+          <div className="mt-2 space-y-2">
+            {importantTexts.length === 0 ? (
+              <EmptyState
+                icon={MessageSquare}
+                title="No important texts yet"
+                description="Once workers start texting questions and issues, the highest-signal items will surface here."
+              />
+            ) : (
+              importantTexts.map((item) => (
+                <a
+                  key={item.id}
+                  href={item.href}
+                  className="flex items-start gap-3 rounded-xl border border-black/5 p-3 hover:bg-[#F7F3EC] transition-colors"
+                >
+                  <div className={cn(
+                    "mt-0.5 flex h-8 w-8 items-center justify-center rounded-full",
+                    item.type === "issue" ? "bg-red-50 text-red-600" : item.type === "work_order" ? "bg-amber-50 text-amber-700" : "bg-[#F7F3EC] text-[#C96442]"
+                  )}>
+                    {item.type === "issue" ? <AlertTriangle className="h-4 w-4" /> : item.type === "work_order" ? <ClipboardList className="h-4 w-4" /> : <MessageSquare className="h-4 w-4" />}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-medium text-[#1C1A16] line-clamp-2">{item.title}</div>
+                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-black/40">
+                      <span>{item.meta}</span>
+                      <span>·</span>
+                      <span>{formatTimeAgo(item.created_at)}</span>
+                    </div>
+                  </div>
+                  <ArrowRight className="mt-1 h-4 w-4 flex-shrink-0 text-black/25" />
+                </a>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* ══ 6. QUICK CAPTURE — phone-first CTA ═════════════════════════════ */}
         <div className="rounded-2xl border border-[#C96442]/15 bg-gradient-to-r from-orange-50/60 to-white p-5">
           <div className="flex items-center gap-4 flex-wrap">
             <div className="w-11 h-11 rounded-xl bg-[#C96442] flex items-center justify-center flex-shrink-0">
