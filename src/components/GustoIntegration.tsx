@@ -142,7 +142,7 @@ export default function GustoIntegration({ companyId, darkMode = false, onEmploy
             </button>
           </div>
           {syncResult && (
-            <div className={`px-4 py-2 ${syncResult.includes("Error") ? "bg-red-50 text-red-700" : "bg-green-50 text-green-700"}`}>
+            <div className={`px-4 py-2 ${syncResult.includes("Error") ? "bg-red-50 text-gray-800" : "bg-green-50 text-gray-800"}`}>
               {syncResult}
             </div>
           )}

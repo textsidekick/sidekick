@@ -123,7 +123,7 @@ export default function MicrosoftTeamsIntegration({ companyId, darkMode = false,
                 {loadingFiles ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
                 Import Files
               </button>
-              <span className="flex items-center gap-1 px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-sm">
+              <span className="flex items-center gap-1 px-3 py-1.5 bg-green-100 text-gray-800 rounded-full text-sm">
                 <MessageSquare className="w-3 h-3" />
                 Teams enabled
               </span>

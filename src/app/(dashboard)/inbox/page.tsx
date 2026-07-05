@@ -374,7 +374,7 @@ export default function InboxPage() {
               className={cn(
                 "rounded-full border px-4 py-2 text-sm font-medium transition-colors",
                 active
-                  ? "border-[#C96442]/20 bg-[#C96442]/10 text-[#C96442]"
+                  ? "border-[#C96442]/20 bg-[#C96442]/10 text-[#1C1A16]"
                   : "border-black/10 bg-white text-black/55 hover:bg-black/[0.03]"
               )}
             >
@@ -399,7 +399,7 @@ export default function InboxPage() {
                 className={cn(
                   "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
                   active
-                    ? "border-[#C96442]/20 bg-[#C96442]/10 text-[#C96442]"
+                    ? "border-[#C96442]/20 bg-[#C96442]/10 text-[#1C1A16]"
                     : "border-black/10 bg-white text-black/55 hover:bg-black/[0.03]"
                 )}
               >

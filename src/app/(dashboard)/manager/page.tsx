@@ -193,25 +193,25 @@ export default function ManagerDashboard() {
       label: "Needs manager",
       count: unansweredCount + openIssuesCount + unassignedWOs.length + blockedWOs.length,
       href: "/inbox?view=needs_manager",
-      tone: "bg-amber-50 text-amber-800 border-amber-100",
+      tone: "bg-amber-50 text-[#1C1A16] border-amber-100",
     },
     {
       label: "Questions",
       count: unansweredCount,
       href: "/inbox?view=questions",
-      tone: "bg-[#F7F3EC] text-[#C96442] border-[#E8D6CC]",
+      tone: "bg-[#F7F3EC] text-[#1C1A16] border-[#E8D6CC]",
     },
     {
       label: "Open issues",
       count: openIssuesCount,
       href: "/inbox?view=issues",
-      tone: "bg-red-50 text-red-700 border-red-100",
+      tone: "bg-red-50 text-[#1C1A16] border-red-100",
     },
     {
       label: "Unassigned work orders",
       count: unassignedWOs.length,
       href: "/inbox?view=unassigned",
-      tone: "bg-orange-50 text-orange-700 border-orange-100",
+      tone: "bg-orange-50 text-[#1C1A16] border-orange-100",
     },
     {
       label: "Blocked work orders",
@@ -223,7 +223,7 @@ export default function ManagerDashboard() {
       label: "Critical work orders",
       count: criticalHighWOs.length,
       href: "/inbox?view=critical",
-      tone: "bg-red-50 text-red-700 border-red-100",
+      tone: "bg-red-50 text-[#1C1A16] border-red-100",
     },
   ].filter((queue) => queue.count > 0);
 

@@ -347,7 +347,7 @@ export default function WorkOrdersPage() {
         </div>
 
         {!!error && (
-          <div className="mt-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl p-3">{error}</div>
+          <div className="mt-4 text-sm text-gray-800 bg-red-50 border border-red-200 rounded-xl p-3">{error}</div>
         )}
 
         <div className="mt-8 rounded-2xl bg-white border border-black/5 p-6">

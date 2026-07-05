@@ -275,7 +275,7 @@ export default function WorkOrderDetailPage() {
     return (
       <div className="max-w-4xl mx-auto px-6 py-12">
         <Button variant="outline" onClick={() => router.push("/work-orders")}>Back to Work Orders</Button>
-        <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-gray-800">
           {error || "Work order not found."}
         </div>
       </div>
@@ -305,7 +305,7 @@ export default function WorkOrderDetailPage() {
       </div>
 
       {!!error && (
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-gray-800">{error}</div>
       )}
 
       <div className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">

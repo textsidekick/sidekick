@@ -101,7 +101,7 @@ export function Sidebar() {
                   className={cn(
                     "w-full text-left px-3 py-2.5 text-xs font-medium transition-colors",
                     c.id === selectedCompanyId
-                      ? "bg-[#C96442]/10 text-[#C96442]"
+                      ? "bg-[#C96442]/10 text-[#1C1A16]"
                       : "text-[#1C1A16] hover:bg-[#F7F3EC]"
                   )}
                 >
@@ -132,7 +132,7 @@ export function Sidebar() {
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] font-medium transition-colors",
                   isActive
-                    ? "bg-[#C96442]/10 text-[#C96442]"
+                    ? "bg-[#C96442]/10 text-[#1C1A16]"
                     : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
                 )}
               >
