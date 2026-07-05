@@ -379,6 +379,30 @@ export default function KnowledgePage() {
         </div>
       </div>
 
+      <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="max-w-2xl">
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-[#C96442]" />
+              <h2 className="text-base font-semibold text-gray-900">Connected sources</h2>
+            </div>
+            <p className="mt-2 text-sm text-gray-500">
+              Keep every integration together here. This is where Sidekick pulls docs, team context, and operating knowledge from the tools you already use.
+            </p>
+          </div>
+          <a
+            href="/review-queue"
+            className="shrink-0 rounded-lg border border-black/10 bg-white px-3 py-2 text-sm font-medium text-[#1C1A16] hover:bg-black/[0.03]"
+          >
+            Review generated knowledge
+          </a>
+        </div>
+
+        <div className="mt-5">
+          <IntegrationSelector companyId={companyId} />
+        </div>
+      </div>
+
       {/* ── Stats row ── */}
       <div className="mt-6 flex items-center gap-4 flex-wrap">
         <div className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white px-6 py-4">
@@ -487,30 +511,6 @@ export default function KnowledgePage() {
             </div>
           ))
         )}
-      </div>
-
-      <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div className="max-w-2xl">
-            <div className="flex items-center gap-2">
-              <FileText className="h-4 w-4 text-[#C96442]" />
-              <h2 className="text-base font-semibold text-gray-900">Connected sources</h2>
-            </div>
-            <p className="mt-2 text-sm text-gray-500">
-              Keep every integration together here. This is where Sidekick pulls docs, team context, and operating knowledge from the tools you already use.
-            </p>
-          </div>
-          <a
-            href="/review-queue"
-            className="shrink-0 rounded-lg border border-black/10 bg-white px-3 py-2 text-sm font-medium text-[#1C1A16] hover:bg-black/[0.03]"
-          >
-            Review generated knowledge
-          </a>
-        </div>
-
-        <div className="mt-5">
-          <IntegrationSelector companyId={companyId} />
-        </div>
       </div>
 
       <GeneratedReports companyId={companyId} />
