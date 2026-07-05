@@ -1,6 +1,6 @@
 "use client";
 
-import { ClipboardList, Wrench, Users, BookOpen, Settings, LogOut, LayoutDashboard, Menu, X, ChevronDown, Building2, MessageSquare } from "lucide-react";
+import { ClipboardList, Wrench, Users, BookOpen, Settings, Home, LogOut, LayoutDashboard, Menu, X, ChevronDown, Building2, MessageSquare } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -194,13 +194,22 @@ function BottomActions({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <div className="px-3 py-3 border-t border-[rgba(28,26,22,0.06)]">
-      <button
-        onClick={() => { onNavigate?.(); handleLogout(); }}
-        className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors border border-[rgba(28,26,22,0.08)]"
-      >
-        <LogOut className="h-4 w-4" />
-        Logout
-      </button>
+      <div className="flex flex-col gap-1.5">
+        <button
+          onClick={() => { onNavigate?.(); router.push("/choose"); }}
+          className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors border border-[rgba(28,26,22,0.08)]"
+        >
+          <Home className="h-4 w-4" />
+          Home
+        </button>
+        <button
+          onClick={() => { onNavigate?.(); handleLogout(); }}
+          className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors border border-[rgba(28,26,22,0.08)]"
+        >
+          <LogOut className="h-4 w-4" />
+          Logout
+        </button>
+      </div>
     </div>
   );
 }
