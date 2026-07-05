@@ -53,7 +53,7 @@ const SECTION_INTRO: Record<SectionId, string> = {
   assets: "Let's talk about your equipment. What machines or production lines do you have? You can describe them, upload an asset list, or just tell me about the main ones.",
   team: "Tell me about your team. How many workers do you have? What roles or departments — operators, technicians, supervisors? You can also upload a roster if you have one.",
   knowledge: "Now let's capture your knowledge base. Do you have SOPs, equipment manuals, or safety docs? You can upload them directly, or describe your key procedures and I'll help draft them.",
-  integrations: "Let's connect the systems Sidekick should learn from. This is where you can pull together docs, chat history, HR context, and operating knowledge from the tools you already use.",
+  integrations: "Connect any knowledge sources you want Sidekick to learn from. You can do that here, or skip it and come back later.",
   workorders: "Do you have existing work orders or maintenance history you'd like to import? You can upload a CSV, describe your workflow, or we can set this up from scratch.",
 };
 

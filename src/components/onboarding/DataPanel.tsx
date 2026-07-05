@@ -87,7 +87,7 @@ function EmptyState({ sectionId }: { sectionId: SectionId }) {
     team: "Share info about your team — names, roles, departments.",
     knowledge: "Upload SOPs, manuals, fixes, or describe your procedures.",
     workorders: "Import existing work orders or describe your workflow.",
-    integrations: "Connect the tools Sidekick should learn from across your operation.",
+    integrations: "No sources connected yet.",
   };
   return (
     <div style={{
@@ -335,14 +335,24 @@ export default function DataPanel({ activeSectionId, data, integrationSelector }
         {activeSectionId === "knowledge" && <KnowledgePanel data={data.knowledge} />}
         {activeSectionId === "workorders" && <WorkOrderPanel data={data.workorders} />}
         {activeSectionId === "integrations" && (
-          <>
-            <IntegrationsPanel data={data.integrations} />
-            {integrationSelector && (
-              <div style={{ marginTop: 16, padding: "0 4px" }}>
+          data.integrations.length > 0 ? (
+            <>
+              <IntegrationsPanel data={data.integrations} />
+              {integrationSelector && (
+                <div style={{ marginTop: 16, padding: "0 4px" }}>
+                  {integrationSelector}
+                </div>
+              )}
+            </>
+          ) : (
+            integrationSelector ? (
+              <div style={{ padding: "0 4px" }}>
                 {integrationSelector}
               </div>
-            )}
-          </>
+            ) : (
+              <EmptyState sectionId="integrations" />
+            )
+          )
         )}
       </div>
 
