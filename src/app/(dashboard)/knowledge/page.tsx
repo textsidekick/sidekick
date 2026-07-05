@@ -12,7 +12,7 @@ import KnowledgeBaseViewer from "@/components/dashboard/documents/KnowledgeBaseV
 import GeneratedReports from "@/components/dashboard/documents/GeneratedReports";
 import IntegrationSelector from "@/components/IntegrationSelector";
 
-type CaptureTab = "text" | "voice" | "upload" | "connect";
+type CaptureTab = "text" | "voice" | "upload";
 
 interface KnowledgeArticle {
   id: string;
@@ -343,7 +343,7 @@ export default function KnowledgePage() {
             <h2 className="text-base font-semibold text-gray-900">Add to Sidekick</h2>
           </div>
           <p className="mt-2 text-sm text-gray-500">
-            Add fixes, SOPs, and field learnings in whatever format you have right now.
+            Add fixes, SOPs, and field learnings in whatever format you have right now. Connected sources live below.
           </p>
         </div>
 
@@ -352,7 +352,6 @@ export default function KnowledgePage() {
             { id: "text", label: "Text", icon: Smartphone },
             { id: "voice", label: "Voice", icon: Mic },
             { id: "upload", label: "Upload", icon: Upload },
-            { id: "connect", label: "Integrations", icon: FileText },
           ].map(({ id, label, icon: Icon }) => {
             const active = activeCaptureTab === id;
             return (
@@ -377,15 +376,6 @@ export default function KnowledgePage() {
           {activeCaptureTab === "text" && <TextSidekickCard />}
           {activeCaptureTab === "voice" && <VoiceInputCard companyId={companyId} />}
           {activeCaptureTab === "upload" && <UploadCard companyId={companyId} />}
-          {activeCaptureTab === "connect" && (
-            <div className="rounded-2xl border border-gray-200 bg-[#FCFBF8] p-4">
-              <div className="mb-3">
-                <h3 className="text-sm font-semibold text-gray-900">Connect your knowledge sources</h3>
-                <p className="text-xs text-gray-500">Bring docs, team context, and operating knowledge into Sidekick from the tools you already use.</p>
-              </div>
-              <IntegrationSelector companyId={companyId} compact />
-            </div>
-          )}
         </div>
       </div>
 
@@ -507,7 +497,7 @@ export default function KnowledgePage() {
               <h2 className="text-base font-semibold text-gray-900">Connected sources</h2>
             </div>
             <p className="mt-2 text-sm text-gray-500">
-              Keep every integration together here. The goal is not a marketplace — it&apos;s giving Sidekick one place to pull docs, people context, and operating knowledge together.
+              Keep every integration together here. This is where Sidekick pulls docs, team context, and operating knowledge from the tools you already use.
             </p>
           </div>
           <a
