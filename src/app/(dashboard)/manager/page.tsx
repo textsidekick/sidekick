@@ -309,7 +309,7 @@ export default function ManagerDashboard() {
 
         {/* ── Header ───────────────────────────────────────────────────────── */}
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-[#1C1A16]">Overview</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-[#1C1A16]">Today</h1>
           <p className="text-sm text-black/45 mt-1">
             What needs your attention right now
             {currentCompany?.name && <span className="text-black/60 font-medium"> · {currentCompany.name}</span>}

@@ -352,7 +352,7 @@ export default function KnowledgePage() {
             { id: "text", label: "Text", icon: Smartphone },
             { id: "voice", label: "Voice", icon: Mic },
             { id: "upload", label: "Upload", icon: Upload },
-            { id: "connect", label: "Connect", icon: FileText },
+            { id: "connect", label: "Integrations", icon: FileText },
           ].map(({ id, label, icon: Icon }) => {
             const active = activeCaptureTab === id;
             return (
@@ -380,8 +380,8 @@ export default function KnowledgePage() {
           {activeCaptureTab === "connect" && (
             <div className="rounded-2xl border border-gray-200 bg-[#FCFBF8] p-4">
               <div className="mb-3">
-                <h3 className="text-sm font-semibold text-gray-900">Connect your tools</h3>
-                <p className="text-xs text-gray-500">Pull knowledge in from the systems your team already uses.</p>
+                <h3 className="text-sm font-semibold text-gray-900">Connect your knowledge sources</h3>
+                <p className="text-xs text-gray-500">Bring docs, team context, and operating knowledge into Sidekick from the tools you already use.</p>
               </div>
               <IntegrationSelector companyId={companyId} compact />
             </div>
@@ -497,6 +497,30 @@ export default function KnowledgePage() {
             </div>
           ))
         )}
+      </div>
+
+      <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="max-w-2xl">
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-[#C96442]" />
+              <h2 className="text-base font-semibold text-gray-900">Connected sources</h2>
+            </div>
+            <p className="mt-2 text-sm text-gray-500">
+              Keep every integration together here. The goal is not a marketplace — it&apos;s giving Sidekick one place to pull docs, people context, and operating knowledge together.
+            </p>
+          </div>
+          <a
+            href="/review-queue"
+            className="shrink-0 rounded-lg border border-black/10 bg-white px-3 py-2 text-sm font-medium text-[#1C1A16] hover:bg-black/[0.03]"
+          >
+            Review generated knowledge
+          </a>
+        </div>
+
+        <div className="mt-5">
+          <IntegrationSelector companyId={companyId} />
+        </div>
       </div>
 
       <GeneratedReports companyId={companyId} />

@@ -66,9 +66,9 @@ const SECTION_TITLES: Record<SectionId, string> = {
   company: "Company Details",
   assets: "Equipment & Assets",
   team: "Team Roster",
-  knowledge: "Documents",
-  workorders: "Work Orders",
-  integrations: "Connected Tools",
+  knowledge: "Knowledge Library",
+  workorders: "Past Work",
+  integrations: "Connected Knowledge Sources",
 };
 
 const SECTION_ICONS: Record<SectionId, React.ElementType> = {
@@ -85,9 +85,9 @@ function EmptyState({ sectionId }: { sectionId: SectionId }) {
     company: "Tell Sidekick about your company and details will appear here.",
     assets: "Describe your equipment, machines, or production lines.",
     team: "Share info about your team — names, roles, departments.",
-    knowledge: "Upload SOPs, manuals, or describe your procedures.",
+    knowledge: "Upload SOPs, manuals, fixes, or describe your procedures.",
     workorders: "Import existing work orders or describe your workflow.",
-    integrations: "Choose a tool below to connect your docs, chat, or systems.",
+    integrations: "Connect the tools Sidekick should learn from across your operation.",
   };
   return (
     <div style={{

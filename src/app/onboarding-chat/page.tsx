@@ -43,9 +43,9 @@ const INITIAL_SECTIONS: SetupSection[] = [
   { id: "company", label: "Company Info", description: "Basic details about your facility", icon: Building2, status: "in_progress" },
   { id: "assets", label: "Assets & Equipment", description: "Machines, lines, and tools", icon: Wrench, status: "not_started" },
   { id: "team", label: "Team Members", description: "Operators, technicians, managers", icon: Users, status: "not_started" },
-  { id: "knowledge", label: "Knowledge Base", description: "SOPs, manuals, and docs", icon: BookOpen, status: "not_started" },
-  { id: "workorders", label: "Work Orders", description: "Maintenance and task history", icon: ClipboardList, status: "not_started" },
-  { id: "integrations", label: "Integrations", description: "Google Drive, Slack & more", icon: Plug, status: "not_started" },
+  { id: "knowledge", label: "Knowledge Base", description: "SOPs, manuals, fixes, and tribal knowledge", icon: BookOpen, status: "not_started" },
+  { id: "integrations", label: "Knowledge Sources", description: "Drive, Slack, Gusto & more", icon: Plug, status: "not_started" },
+  { id: "workorders", label: "Past Work", description: "Maintenance and task history", icon: ClipboardList, status: "not_started" },
 ];
 
 const SECTION_INTRO: Record<SectionId, string> = {
@@ -53,8 +53,8 @@ const SECTION_INTRO: Record<SectionId, string> = {
   assets: "Let's talk about your equipment. What machines or production lines do you have? You can describe them, upload an asset list, or just tell me about the main ones.",
   team: "Tell me about your team. How many workers do you have? What roles or departments — operators, technicians, supervisors? You can also upload a roster if you have one.",
   knowledge: "Now let's capture your knowledge base. Do you have SOPs, equipment manuals, or safety docs? You can upload them directly, or describe your key procedures and I'll help draft them.",
+  integrations: "Let's connect the systems Sidekick should learn from. This is where you can pull together docs, chat history, HR context, and operating knowledge from the tools you already use.",
   workorders: "Do you have existing work orders or maintenance history you'd like to import? You can upload a CSV, describe your workflow, or we can set this up from scratch.",
-  integrations: "Let's connect the tools you already use. I can pull documents from Google Drive, sync with Slack, and more. Click 'Connect Tools' in the sidebar to get started.",
 };
 
 export default function OnboardingChat() {
@@ -485,7 +485,7 @@ export default function OnboardingChat() {
               }}
             >
               <LinkIcon size={20} />
-              Connect Tools
+              Connect Knowledge Sources
             </button>
           </div>
         </nav>

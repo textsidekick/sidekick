@@ -1,6 +1,6 @@
 "use client";
 
-import { ClipboardList, Wrench, Users, BookOpen, Settings, Home, LogOut, LayoutDashboard, Menu, X, ChevronDown, Building2, BarChart3, ShieldCheck } from "lucide-react";
+import { ClipboardList, Wrench, Users, BookOpen, Settings, LogOut, LayoutDashboard, Menu, X, ChevronDown, Building2, MessageSquare } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -8,13 +8,12 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 
 const NAV_ITEMS = [
-  { id: "overview", label: "Overview", icon: LayoutDashboard, href: "/manager" },
+  { id: "today", label: "Today", icon: LayoutDashboard, href: "/today" },
+  { id: "inbox", label: "Inbox", icon: MessageSquare, href: "/inbox" },
   { id: "work-orders", label: "Work Orders", icon: ClipboardList, href: "/work-orders" },
-  { id: "plant-metrics", label: "Plant Metrics", icon: BarChart3, href: "/operations" },
   { id: "assets", label: "Assets", icon: Wrench, href: "/assets" },
   { id: "team", label: "Team", icon: Users, href: "/team" },
   { id: "knowledge", label: "Knowledge", icon: BookOpen, href: "/knowledge" },
-  { id: "review-queue", label: "Review Queue", icon: ShieldCheck, href: "/review-queue" },
   { id: "settings", label: "Settings", icon: Settings, href: "/settings" },
 ];
 
@@ -119,8 +118,8 @@ export function Sidebar() {
         <div className="space-y-0.5">
           {NAV_ITEMS.map((item) => {
             const isActive =
-              item.id === "overview"
-                ? pathname === "/manager"
+              item.id === "today"
+                ? pathname === "/today" || pathname === "/manager"
                 : (item.href.startsWith("/manager?"))
                   ? false
                   : pathname === item.href ||
@@ -145,7 +144,7 @@ export function Sidebar() {
         </div>
       </nav>
 
-      {/* Bottom actions */}
+  {/* Bottom actions */}
       <BottomActions onNavigate={() => setMobileOpen(false)} />
     </div>
   );
@@ -195,22 +194,13 @@ function BottomActions({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <div className="px-3 py-3 border-t border-[rgba(28,26,22,0.06)]">
-      <div className="flex flex-col gap-1.5">
-        <button
-          onClick={() => { onNavigate?.(); router.push("/choose"); }}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors border border-[rgba(28,26,22,0.08)]"
-        >
-          <Home className="h-4 w-4" />
-          Home
-        </button>
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors border border-[rgba(28,26,22,0.08)]"
-        >
-          <LogOut className="h-4 w-4" />
-          Logout
-        </button>
-      </div>
+      <button
+        onClick={() => { onNavigate?.(); handleLogout(); }}
+        className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors border border-[rgba(28,26,22,0.08)]"
+      >
+        <LogOut className="h-4 w-4" />
+        Logout
+      </button>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 import { formatTimeAgo } from "@/lib/format";
 
+import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
 import { MetricCard } from "@/components/dashboard/shared/MetricCard";
 import { SectionHeader } from "@/components/dashboard/shared/SectionHeader";
@@ -329,7 +330,7 @@ export default function WorkOrdersPage() {
             <p className="text-sm text-black/50 mt-1">Track, assign, and resolve work across the plant.</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => (window.location.href = "/operations")}>Operations</Button>
+            <Button variant="outline" onClick={() => (window.location.href = "/today")}>Today</Button>
             <Button onClick={() => (window.location.href = "/assets")}>Assets</Button>
           </div>
         </div>
@@ -464,7 +465,15 @@ export default function WorkOrdersPage() {
                         className={cn("cursor-pointer", expanded && "bg-black/[0.02]")}
                         onClick={() => setExpandedId((cur) => (cur === wo.id ? null : wo.id))}
                       >
-                        <TableCell className="font-medium">{wo.short_id}</TableCell>
+                        <TableCell className="font-medium">
+                          <Link
+                            href={`/work-orders/${wo.id}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-[#C96442] hover:underline"
+                          >
+                            {wo.short_id}
+                          </Link>
+                        </TableCell>
                         <TableCell><PriorityBadge priority={wo.priority} /></TableCell>
                         <TableCell>{assetName}</TableCell>
                         <TableCell className="max-w-[340px] truncate">{wo.title}</TableCell>
@@ -473,9 +482,18 @@ export default function WorkOrdersPage() {
                         <TableCell className="hidden md:table-cell text-sm text-black/60">{formatTimeAgo(wo.created_at)} ago</TableCell>
                         <TableCell className="hidden md:table-cell text-sm text-black/60">{Math.round(minutes / 60)}h</TableCell>
                         <TableCell>
-                          <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); openActions(wo); }}>
-                            Quick actions
-                          </Button>
+                          <div className="flex items-center gap-2 justify-end">
+                            <Link
+                              href={`/work-orders/${wo.id}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-flex h-8 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium shadow-xs transition-[color,box-shadow] hover:bg-accent hover:text-accent-foreground"
+                            >
+                              Details
+                            </Link>
+                            <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); openActions(wo); }}>
+                              Quick actions
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
 

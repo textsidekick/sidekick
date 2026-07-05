@@ -7,8 +7,8 @@ export default function DashboardIndex() {
   const router = useRouter();
 
   useEffect(() => {
-    // Default dashboard landing — the Overview page answers "what needs attention?"
-    router.replace("/manager");
+    // Default dashboard landing — Today answers what needs attention now.
+    router.replace("/today");
   }, [router]);
 
   return null;
