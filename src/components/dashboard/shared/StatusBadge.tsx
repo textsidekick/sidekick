@@ -5,13 +5,13 @@ import { cn } from "@/lib/utils";
 type WorkOrderStatus = "open" | "new" | "assigned" | "in_progress" | "completed" | "cancelled" | "on_hold";
 
 const STATUS_CLASSES: Record<string, string> = {
-  new: "bg-amber-100 text-gray-700",
-  open: "bg-amber-100 text-gray-700",
-  assigned: "bg-blue-100 text-gray-700",
-  in_progress: "bg-blue-100 text-gray-700",
-  completed: "bg-green-100 text-gray-700",
-  cancelled: "bg-slate-100 text-gray-500",
-  on_hold: "bg-slate-100 text-gray-600",
+  new: "bg-amber-100 text-amber-800",
+  open: "bg-amber-100 text-amber-800",
+  assigned: "bg-sky-100 text-sky-800",
+  in_progress: "bg-blue-100 text-blue-800",
+  completed: "bg-green-100 text-green-800",
+  cancelled: "bg-slate-100 text-slate-500",
+  on_hold: "bg-rose-100 text-rose-700",
 };
 
 export function StatusBadge({ status }: { status: string }) {

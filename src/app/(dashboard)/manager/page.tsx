@@ -16,12 +16,6 @@ import { PriorityBadge } from "@/components/dashboard/shared/PriorityBadge";
 import { StatusBadge } from "@/components/dashboard/shared/StatusBadge";
 import DemoMode from "@/components/dashboard/DemoMode";
 import UpgradeBanner from "@/components/dashboard/UpgradeBanner";
-import {
-  IssueDetailModal,
-  AllQuestionsModal,
-  UnansweredQuestionModal,
-  DraftModal,
-} from "@/components/dashboard/modals";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -61,19 +55,12 @@ export default function ManagerDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [issues, setIssues] = useState<Issue[]>([]);
   const [unansweredQuestions, setUnansweredQuestions] = useState<any[]>([]);
-  const [selectedUQ, setSelectedUQ] = useState<any>(null);
-  const [uqAnswer, setUqAnswer] = useState("");
   const [loadingStats, setLoadingStats] = useState(false);
   const [loadingIssues, setLoadingIssues] = useState(false);
-  const [draftModal, setDraftModal] = useState<{ open: boolean; draft: string; topic: string } | null>(null);
-  const [showAllQuestions, setShowAllQuestions] = useState(false);
-  const [questionSearch, setQuestionSearch] = useState("");
-  const [questionFilter, setQuestionFilter] = useState<"all" | "answered" | "unanswered">("all");
   const [trialInfo, setTrialInfo] = useState<{ plan: string; questionsUsed: number; questionsLimit: number; trialEndsAt: string } | null>(null);
   const [showDemoMode, setShowDemoMode] = useState(false);
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [loadingWorkOrders, setLoadingWorkOrders] = useState(false);
-  const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
 
   // Demo mode
   useEffect(() => {
@@ -175,16 +162,6 @@ export default function ManagerDashboard() {
     setLoadingWorkOrders(false);
   };
 
-  const updateIssue = async (issueId: string, updates: { status?: string; notes?: string; resolved_by?: string }) => {
-    try {
-      const res = await fetch("/api/issues", {
-        method: "PATCH", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ issueId, ...updates }),
-      });
-      if (res.ok) { loadIssues(); setSelectedIssue(null); }
-    } catch (error) { console.error("Failed to update issue:", error); }
-  };
-
   useEffect(() => {
     if (selectedCompany) {
       loadStats();
@@ -201,6 +178,7 @@ export default function ManagerDashboard() {
   const openWOs = workOrders.filter(wo => ["open", "assigned", "in_progress", "on_hold"].includes(wo.status));
   const criticalHighWOs = openWOs.filter(wo => wo.priority === "critical" || wo.priority === "high");
   const blockedWOs = openWOs.filter(wo => wo.status === "on_hold");
+  const unassignedWOs = openWOs.filter(wo => !wo.assigned_to);
   const overdueWOs = openWOs.filter(wo => {
     const daysSince = (Date.now() - new Date(wo.created_at).getTime()) / (1000 * 60 * 60 * 24);
     return daysSince > 7;
@@ -210,37 +188,44 @@ export default function ManagerDashboard() {
     .slice(0, 6);
 
   const unansweredCount = unansweredQuestions.length;
-  const importantTexts = [
-    ...(stats?.recentQuestions || []).slice(0, 4).map((q) => ({
-      id: `q-${q.id}`,
-      type: q.answer ? "resolved_question" : "question",
-      title: q.question,
-      meta: `${q.worker_name || "Worker"}${q.topic ? ` · ${q.topic}` : ""}`,
-      created_at: q.created_at,
-      href: "/inbox",
-    })),
-    ...issues
-      .filter((issue) => issue.status === "open")
-      .slice(0, 4)
-      .map((issue) => ({
-        id: `issue-${issue.id}`,
-        type: "issue",
-        title: issue.description,
-        meta: `${issue.worker_name || "Worker"}${issue.equipment ? ` · ${issue.equipment}` : ""}`,
-        created_at: issue.created_at,
-        href: "/inbox",
-      })),
-    ...criticalHighWOs.slice(0, 4).map((wo) => ({
-      id: `wo-${wo.id}`,
-      type: "work_order",
-      title: `${wo.short_id} · ${wo.title}`,
-      meta: `${wo.priority.toUpperCase()} · ${wo.status.replaceAll("_", " ")}`,
-      created_at: wo.created_at,
-      href: `/work-orders/${wo.id}`,
-    })),
-  ]
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    .slice(0, 6);
+  const inboxQueues = [
+    {
+      label: "Needs manager",
+      count: unansweredCount + openIssuesCount + unassignedWOs.length + blockedWOs.length,
+      href: "/inbox?view=needs_manager",
+      tone: "bg-amber-50 text-amber-800 border-amber-100",
+    },
+    {
+      label: "Questions",
+      count: unansweredCount,
+      href: "/inbox?view=questions",
+      tone: "bg-[#F7F3EC] text-[#C96442] border-[#E8D6CC]",
+    },
+    {
+      label: "Open issues",
+      count: openIssuesCount,
+      href: "/inbox?view=issues",
+      tone: "bg-red-50 text-red-700 border-red-100",
+    },
+    {
+      label: "Unassigned work orders",
+      count: unassignedWOs.length,
+      href: "/inbox?view=unassigned",
+      tone: "bg-orange-50 text-orange-700 border-orange-100",
+    },
+    {
+      label: "Blocked work orders",
+      count: blockedWOs.length,
+      href: "/inbox?view=blocked",
+      tone: "bg-slate-100 text-slate-700 border-slate-200",
+    },
+    {
+      label: "Critical work orders",
+      count: criticalHighWOs.length,
+      href: "/inbox?view=critical",
+      tone: "bg-red-50 text-red-700 border-red-100",
+    },
+  ].filter((queue) => queue.count > 0);
 
   // Build the "attention items" list for the job-based view
   const attentionItems: { type: string; priority: number; label: string; detail: string; icon: React.ElementType; color: string; bgColor: string; borderColor: string; count: number; href?: string }[] = [];
@@ -250,7 +235,7 @@ export default function ManagerDashboard() {
       type: "blocked", priority: 1, label: "Blocked work orders",
       detail: `${blockedWOs.length} on hold — may need parts, approval, or reassignment`,
       icon: ShieldAlert, color: "text-red-700", bgColor: "bg-red-50", borderColor: "border-red-200",
-      count: blockedWOs.length, href: "/work-orders",
+      count: blockedWOs.length, href: "/inbox?view=blocked",
     });
   }
   if (criticalHighWOs.length > 0) {
@@ -258,7 +243,7 @@ export default function ManagerDashboard() {
       type: "critical", priority: 2, label: "Critical / high-priority work orders",
       detail: `${criticalHighWOs.length} open — review and assign if needed`,
       icon: AlertTriangle, color: "text-red-600", bgColor: "bg-red-50/60", borderColor: "border-red-100",
-      count: criticalHighWOs.length, href: "/work-orders",
+      count: criticalHighWOs.length, href: "/inbox?view=critical",
     });
   }
   if (overdueWOs.length > 0) {
@@ -266,67 +251,40 @@ export default function ManagerDashboard() {
       type: "overdue", priority: 3, label: "Overdue work orders",
       detail: `${overdueWOs.length} open for 7+ days — check status or escalate`,
       icon: CalendarClock, color: "text-amber-700", bgColor: "bg-amber-50", borderColor: "border-amber-200",
-      count: overdueWOs.length, href: "/work-orders",
+      count: overdueWOs.length, href: "/inbox?view=overdue",
+    });
+  }
+  if (unassignedWOs.length > 0) {
+    attentionItems.push({
+      type: "unassigned", priority: 4, label: "Unassigned work orders",
+      detail: `${unassignedWOs.length} work order${unassignedWOs.length > 1 ? "s" : ""} still need an owner`,
+      icon: ClipboardList, color: "text-orange-700", bgColor: "bg-orange-50", borderColor: "border-orange-200",
+      count: unassignedWOs.length, href: "/inbox?view=unassigned",
     });
   }
   if (unansweredCount > 0) {
     attentionItems.push({
-      type: "unanswered", priority: 4, label: "Unanswered worker questions",
+      type: "unanswered", priority: 5, label: "Unanswered worker questions",
       detail: `${unansweredCount} question${unansweredCount > 1 ? "s" : ""} waiting for your input`,
       icon: MessageSquare, color: "text-orange-700", bgColor: "bg-orange-50", borderColor: "border-orange-200",
-      count: unansweredCount,
+      count: unansweredCount, href: "/inbox?view=questions",
     });
   }
   if (openHighPriorityCount > 0) {
     attentionItems.push({
-      type: "issues", priority: 5, label: "Open field issues",
+      type: "issues", priority: 6, label: "Open field issues",
       detail: `${openHighPriorityCount} high-severity issue${openHighPriorityCount > 1 ? "s" : ""} reported by workers`,
       icon: AlertCircle, color: "text-orange-600", bgColor: "bg-orange-50/60", borderColor: "border-orange-100",
-      count: openHighPriorityCount,
+      count: openHighPriorityCount, href: "/inbox?view=issues",
     });
   }
 
   attentionItems.sort((a, b) => a.priority - b.priority);
 
-  const filteredQuestions = (stats?.recentQuestions || []).filter(q => {
-    const matchesSearch = questionSearch === "" ||
-      q.question.toLowerCase().includes(questionSearch.toLowerCase()) ||
-      (q.worker_name && q.worker_name.toLowerCase().includes(questionSearch.toLowerCase()));
-    const matchesFilter = questionFilter === "all" ||
-      (questionFilter === "answered" && q.confidence >= 50) ||
-      (questionFilter === "unanswered" && q.confidence < 50);
-    return matchesSearch && matchesFilter;
-  });
-
   const totalAttentionCount = attentionItems.reduce((s, i) => s + i.count, 0);
 
   return (
     <div className="min-h-screen">
-      {/* Modals */}
-      <IssueDetailModal
-        issue={selectedIssue}
-        onClose={() => setSelectedIssue(null)}
-        onUpdate={updateIssue}
-        companyName={currentCompany?.name}
-      />
-      <AllQuestionsModal
-        open={showAllQuestions}
-        onClose={() => setShowAllQuestions(false)}
-        filteredQuestions={filteredQuestions}
-        questionSearch={questionSearch}
-        setQuestionSearch={setQuestionSearch}
-        questionFilter={questionFilter}
-        setQuestionFilter={setQuestionFilter}
-      />
-      <DraftModal modal={draftModal} onClose={() => setDraftModal(null)} />
-      <UnansweredQuestionModal
-        question={selectedUQ}
-        onClose={() => setSelectedUQ(null)}
-        answer={uqAnswer}
-        setAnswer={setUqAnswer}
-        onSend={() => { setSelectedUQ(null); setUqAnswer(""); }}
-      />
-
       <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
         {showDemoMode && (
           <div className="flex items-center justify-end gap-4">
@@ -396,28 +354,6 @@ export default function ManagerDashboard() {
                   </div>
                 );
               })}
-
-              {/* Inline: unanswered questions detail */}
-              {unansweredQuestions.length > 0 && (
-                <div className="ml-8 mt-1 space-y-1">
-                  {unansweredQuestions.slice(0, 3).map((q, i) => (
-                    <button
-                      key={q.id || i}
-                      onClick={() => { setSelectedUQ(q); setUqAnswer(""); }}
-                      className="w-full text-left flex items-center gap-2 rounded-lg border border-orange-100 bg-white px-3 py-2 hover:bg-orange-50/50 transition-colors"
-                    >
-                      <MessageSquare className="h-3.5 w-3.5 text-orange-400 flex-shrink-0" />
-                      <span className="text-xs text-[#1C1A16] truncate flex-1">{q.question}</span>
-                      <span className="text-[10px] text-black/35 flex-shrink-0">{formatTimeAgo(q.created_at)}</span>
-                    </button>
-                  ))}
-                  {unansweredQuestions.length > 3 && (
-                    <button onClick={() => setShowAllQuestions(true)} className="text-xs text-[#C96442] hover:underline font-medium ml-1">
-                      +{unansweredQuestions.length - 3} more →
-                    </button>
-                  )}
-                </div>
-              )}
             </div>
           )}
         </div>
@@ -453,7 +389,7 @@ export default function ManagerDashboard() {
           />
         </div>
 
-        {/* ══ 3. TWO-COLUMN: Recent Work Orders + Open Issues ════════════════ */}
+        {/* ══ 3. TWO-COLUMN: Recent Work Orders + Inbox Queues ═══════════════ */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Recent Work Orders */}
           <div className="rounded-2xl bg-white border border-[rgba(28,26,22,0.06)] p-6">
@@ -492,146 +428,42 @@ export default function ManagerDashboard() {
             </div>
           </div>
 
-          {/* Open Field Issues */}
+          {/* Inbox queues */}
           <div className="rounded-2xl bg-white border border-[rgba(28,26,22,0.06)] p-6">
-            <SectionHeader title="Open Field Issues" subtitle="Reported by workers on the floor" />
+            <SectionHeader title="Inbox Queues" subtitle="Use Inbox to work through questions, issues, and work that still needs a decision" action={<a href="/inbox" className="text-xs text-[#C96442] hover:underline font-medium">Open inbox →</a>} />
             <div className="mt-2 space-y-2">
-              {issues.filter(i => i.status === "open").length === 0 ? (
+              {inboxQueues.length === 0 ? (
                 <EmptyState
-                  icon={AlertCircle}
-                  title="No open issues"
-                  description="When workers report problems via text, they'll show up here for you to triage."
+                  icon={MessageSquare}
+                  title="Inbox is clear"
+                  description="As workers text Sidekick, queues that need manager attention will stack up here."
                 />
               ) : (
-                issues.filter(i => i.status === "open").slice(0, 6).map(i => (
-                  <div
-                    key={i.id}
+                inboxQueues.map((queue) => (
+                  <a
+                    key={queue.label}
+                    href={queue.href}
                     className={cn(
-                      "flex items-start gap-3 rounded-xl border p-3 cursor-pointer transition-colors",
-                      i.severity === "high"
-                        ? "border-red-100 bg-red-50/40 hover:bg-red-50"
-                        : i.severity === "medium"
-                        ? "border-amber-100 bg-amber-50/30 hover:bg-amber-50"
-                        : "border-black/5 hover:bg-[#F7F3EC]"
+                      "flex items-center justify-between gap-3 rounded-xl border p-3 transition-colors hover:bg-[#F7F3EC]",
+                      queue.tone
                     )}
-                    onClick={() => setSelectedIssue(i)}
                   >
-                    <AlertCircle className={cn(
-                      "h-4 w-4 flex-shrink-0 mt-0.5",
-                      i.severity === "high" ? "text-red-500" : i.severity === "medium" ? "text-amber-500" : "text-gray-400"
-                    )} />
                     <div className="min-w-0 flex-1">
-                      <div className="text-sm font-medium text-[#1C1A16] truncate">{i.description}</div>
-                      <div className="mt-1 flex items-center gap-2 text-xs text-black/40">
-                        <span>{i.worker_name || "Worker"}</span>
-                        <span>·</span>
-                        <span>{formatTimeAgo(i.created_at)}</span>
-                        {i.equipment && <><span>·</span><span className="text-black/50">{i.equipment}</span></>}
-                      </div>
+                      <div className="text-sm font-medium text-[#1C1A16]">{queue.label}</div>
+                      <div className="mt-1 text-xs text-black/45">Open this queue in Inbox and work through the items from there.</div>
                     </div>
-                  </div>
+                    <div className="flex items-center gap-3">
+                      <span className="rounded-full bg-white/80 px-2.5 py-1 text-xs font-semibold text-black/65">{queue.count}</span>
+                      <ArrowRight className="h-4 w-4 text-black/25" />
+                    </div>
+                  </a>
                 ))
               )}
             </div>
           </div>
         </div>
 
-        {/* ══ 4. RECENT WORKER QUESTIONS ═════════════════════════════════════ */}
-        <div className="rounded-2xl bg-white border border-[rgba(28,26,22,0.06)] p-6">
-          <SectionHeader
-            title="Recent Field Questions"
-            subtitle="What your crew is asking — tap unanswered ones to respond"
-            action={
-              <button onClick={() => setShowAllQuestions(true)} className="text-xs text-[#C96442] hover:underline font-medium">
-                View all →
-              </button>
-            }
-          />
-          <div className="mt-2 divide-y divide-[rgba(28,26,22,0.04)]">
-            {loadingStats && <div className="text-sm text-black/40 py-6 text-center">Loading…</div>}
-            {!loadingStats && (stats?.recentQuestions || []).length === 0 && (
-              <EmptyState
-                icon={MessageSquare}
-                title="No field questions yet"
-                description="When workers text questions to Sidekick, they'll appear here. You can answer the ones Sidekick couldn't handle."
-                actionLabel="Set Up Worker Access"
-                actionIcon={Smartphone}
-                onAction={() => window.location.href = "/team"}
-              />
-            )}
-            {!loadingStats && (stats?.recentQuestions || []).slice(0, 8).map((q, i) => {
-              const answered = q.confidence >= 50;
-              return (
-                <div
-                  key={q.id || i}
-                  className="py-3 flex items-start gap-3 hover:bg-[#F7F3EC] -mx-6 px-6 transition-colors cursor-pointer"
-                  onClick={() => { if (!answered) { setSelectedUQ(q); setUqAnswer(""); } }}
-                >
-                  <div className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
-                    answered ? "bg-green-100" : "bg-amber-100"
-                  )}>
-                    <MessageSquare className="h-4 w-4 text-gray-700" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#1C1A16] line-clamp-2">{q.question}</p>
-                    <p className="text-xs text-black/40 mt-0.5">{q.worker_name || "Worker"} · {formatTimeAgo(q.created_at)}</p>
-                  </div>
-                  <span className={cn(
-                    "flex-shrink-0 text-xs px-2 py-0.5 rounded-full font-medium",
-                    answered ? "bg-green-100 text-gray-700" : "bg-amber-100 text-gray-700"
-                  )}>
-                    {answered ? "Resolved" : "Needs answer"}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* ══ 5. RECENT IMPORTANT TEXTS ═════════════════════════════════════ */}
-        <div className="rounded-2xl bg-white border border-[rgba(28,26,22,0.06)] p-6">
-          <SectionHeader
-            title="Recent Important Texts"
-            subtitle="Messages and reports that are most likely to need manager attention"
-            action={<a href="/inbox" className="text-xs text-[#C96442] hover:underline font-medium">Open inbox →</a>}
-          />
-          <div className="mt-2 space-y-2">
-            {importantTexts.length === 0 ? (
-              <EmptyState
-                icon={MessageSquare}
-                title="No important texts yet"
-                description="Once workers start texting questions and issues, the highest-signal items will surface here."
-              />
-            ) : (
-              importantTexts.map((item) => (
-                <a
-                  key={item.id}
-                  href={item.href}
-                  className="flex items-start gap-3 rounded-xl border border-black/5 p-3 hover:bg-[#F7F3EC] transition-colors"
-                >
-                  <div className={cn(
-                    "mt-0.5 flex h-8 w-8 items-center justify-center rounded-full",
-                    item.type === "issue" ? "bg-red-50 text-red-600" : item.type === "work_order" ? "bg-amber-50 text-amber-700" : "bg-[#F7F3EC] text-[#C96442]"
-                  )}>
-                    {item.type === "issue" ? <AlertTriangle className="h-4 w-4" /> : item.type === "work_order" ? <ClipboardList className="h-4 w-4" /> : <MessageSquare className="h-4 w-4" />}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-sm font-medium text-[#1C1A16] line-clamp-2">{item.title}</div>
-                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-black/40">
-                      <span>{item.meta}</span>
-                      <span>·</span>
-                      <span>{formatTimeAgo(item.created_at)}</span>
-                    </div>
-                  </div>
-                  <ArrowRight className="mt-1 h-4 w-4 flex-shrink-0 text-black/25" />
-                </a>
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* ══ 6. QUICK CAPTURE — phone-first CTA ═════════════════════════════ */}
+        {/* ══ 4. QUICK CAPTURE — phone-first CTA ═════════════════════════════ */}
         <div className="rounded-2xl border border-[#C96442]/15 bg-gradient-to-r from-orange-50/60 to-white p-5">
           <div className="flex items-center gap-4 flex-wrap">
             <div className="w-11 h-11 rounded-xl bg-[#C96442] flex items-center justify-center flex-shrink-0">

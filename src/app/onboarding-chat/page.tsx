@@ -39,6 +39,9 @@ interface SetupSection {
   status: SectionStatus;
 }
 
+const PRIMARY_SECTION_IDS: SectionId[] = ["company", "assets", "team", "knowledge"];
+const OPTIONAL_SECTION_IDS: SectionId[] = ["integrations", "workorders"];
+
 const INITIAL_SECTIONS: SetupSection[] = [
   { id: "company", label: "Company Info", description: "Basic details about your facility", icon: Building2, status: "in_progress" },
   { id: "assets", label: "Assets & Equipment", description: "Machines, lines, and tools", icon: Wrench, status: "not_started" },
@@ -56,6 +59,34 @@ const SECTION_INTRO: Record<SectionId, string> = {
   integrations: "Connect any knowledge sources you want Sidekick to learn from. You can do that here, or skip it and come back later.",
   workorders: "Do you have existing work orders or maintenance history you'd like to import? You can upload a CSV, describe your workflow, or we can set this up from scratch.",
 };
+
+const SECTION_HELP: Record<SectionId, string> = {
+  company: "Tell me the company name, facility, and what kind of operation you run.",
+  assets: "List your main lines, machines, or equipment. Rough descriptions are fine.",
+  team: "Share the teams, roles, or a roster. Even headcount by function is enough to start.",
+  knowledge: "Upload SOPs, manuals, and recurring fixes — or just describe how work gets done today.",
+  integrations: "Optional: connect docs or tools you want Sidekick to learn from automatically.",
+  workorders: "Optional: import past maintenance history or open work if you already have it somewhere else.",
+};
+
+function sectionHasData(sectionId: SectionId, data: SectionData): boolean {
+  switch (sectionId) {
+    case "company":
+      return Object.keys(data.company || {}).length > 0;
+    case "assets":
+      return (data.assets || []).length > 0;
+    case "team":
+      return (data.team || []).length > 0;
+    case "knowledge":
+      return (data.knowledge || []).length > 0;
+    case "workorders":
+      return (data.workorders || []).length > 0;
+    case "integrations":
+      return (data.integrations || []).length > 0;
+    default:
+      return false;
+  }
+}
 
 export default function OnboardingChat() {
   const [sections, setSections] = useState<SetupSection[]>(INITIAL_SECTIONS);
@@ -104,6 +135,26 @@ export default function OnboardingChat() {
     workorders: [],
     integrations: [],
   });
+
+  const primarySections = sections.filter((section) => PRIMARY_SECTION_IDS.includes(section.id));
+  const optionalSections = sections.filter((section) => OPTIONAL_SECTION_IDS.includes(section.id));
+  const activeSection = sections.find((section) => section.id === activeSectionId) || sections[0];
+  const currentSectionHasData = sectionHasData(activeSectionId, sectionData);
+
+  const goToSection = useCallback((sectionId: SectionId) => {
+    setActiveSectionId(sectionId);
+    setSections((prev) => prev.map((section) => {
+      if (section.id !== sectionId) return section;
+      if (section.status === "not_started") return { ...section, status: "in_progress" };
+      return section;
+    }));
+  }, []);
+
+  const goToNextPrimarySection = useCallback(() => {
+    const currentIndex = PRIMARY_SECTION_IDS.indexOf(activeSectionId);
+    const nextId = currentIndex >= 0 ? PRIMARY_SECTION_IDS[currentIndex + 1] : undefined;
+    if (nextId) goToSection(nextId);
+  }, [activeSectionId, goToSection]);
 
   // Parse [suggestions: A | B | C] from message text
   const parseSuggestions = (content: string): { text: string; suggestions: string[] } => {
@@ -170,8 +221,17 @@ export default function OnboardingChat() {
     scrollToBottom();
   }, [messages]);
 
-  const completedCount = sections.filter((s) => s.status === "complete").length;
-  const progressPct = Math.round((completedCount / sections.length) * 100);
+  useEffect(() => {
+    if (!sectionHasData(activeSectionId, sectionData)) return;
+    setSections((prev) => prev.map((section) => {
+      if (section.id !== activeSectionId) return section;
+      if (section.status === "complete") return section;
+      return { ...section, status: "complete" };
+    }));
+  }, [activeSectionId, sectionData]);
+
+  const completedCount = primarySections.filter((section) => section.status === "complete").length;
+  const progressPct = Math.round((completedCount / primarySections.length) * 100);
 
   const handleCheckCode = async (code: string) => {
     if (!code.trim() || !onboardingResult) return;
@@ -401,29 +461,27 @@ export default function OnboardingChat() {
         {/* Progress */}
         <div style={{ padding: "20px 24px 12px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(28,26,22,0.4)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Setup Progress</span>
-            <span style={{ fontSize: 14, fontWeight: 600, color: "#C96442" }}>{completedCount}/{sections.length}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(28,26,22,0.4)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Core Setup</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: "#C96442" }}>{completedCount}/{primarySections.length}</span>
           </div>
           <div style={{ height: 6, background: "rgba(28,26,22,0.06)", borderRadius: 3 }}>
             <div style={{ height: 6, background: "#C96442", borderRadius: 3, width: `${progressPct}%`, transition: "width 0.3s" }} />
           </div>
+          <p style={{ marginTop: 10, fontSize: 13, lineHeight: 1.5, color: "rgba(28,26,22,0.45)" }}>
+            Get the basics live first: company, assets, team, and knowledge. Imports can wait.
+          </p>
         </div>
 
         {/* Setup Sections */}
         <nav style={{ flex: 1, padding: "8px 16px", overflowY: "auto" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            {sections.map((section) => {
+            {primarySections.map((section) => {
               const Icon = section.icon;
               const isActive = section.id === activeSectionId;
               return (
                 <button
                   key={section.id}
-                  onClick={() => {
-                    setActiveSectionId(section.id);
-                    if (section.status === "not_started") {
-                      setSections((prev) => prev.map((s) => s.id === section.id ? { ...s, status: "in_progress" } : s));
-                    }
-                  }}
+                  onClick={() => goToSection(section.id)}
                   style={{
                     display: "flex", alignItems: "center", gap: 14, padding: "12px 16px", borderRadius: 10,
                     background: isActive ? "rgba(201,100,66,0.1)" : "transparent",
@@ -448,45 +506,31 @@ export default function OnboardingChat() {
             })}
           </div>
 
-          {/* Action buttons */}
-          <div style={{ marginTop: 16, padding: "12px 0", borderTop: "1px solid rgba(28,26,22,0.06)" }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(28,26,22,0.35)", textTransform: "uppercase", letterSpacing: "0.05em", padding: "0 16px", marginBottom: 8 }}>Input Methods</div>
-            <button
-              onClick={isRecording ? stopRecording : startRecording}
-              disabled={loading || isComplete}
-              style={{
-                display: "flex", alignItems: "center", gap: 14, padding: "10px 16px", borderRadius: 10,
-                background: isRecording ? "rgba(239,68,68,0.1)" : "transparent",
-                border: "none", cursor: "pointer", width: "100%", textAlign: "left",
-                color: isRecording ? "#ef4444" : "rgba(28,26,22,0.5)", fontSize: 15, fontWeight: 500,
-              }}
-            >
-              {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
-              {isRecording ? "Stop Recording" : "Voice Input"}
-            </button>
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={loading || isComplete}
-              style={{
-                display: "flex", alignItems: "center", gap: 14, padding: "10px 16px", borderRadius: 10,
-                background: "transparent", border: "none", cursor: "pointer", width: "100%", textAlign: "left",
-                color: "rgba(28,26,22,0.5)", fontSize: 15, fontWeight: 500,
-              }}
-            >
-              <Upload size={20} />
-              Upload Files
-            </button>
-            <button
-              onClick={() => setActiveSectionId("integrations")}
-              style={{
-                display: "flex", alignItems: "center", gap: 14, padding: "10px 16px", borderRadius: 10,
-                background: "transparent", border: "none", cursor: "pointer", width: "100%", textAlign: "left",
-                color: "rgba(28,26,22,0.5)", fontSize: 15, fontWeight: 500,
-              }}
-            >
-              <LinkIcon size={20} />
-              Connect Knowledge Sources
-            </button>
+          <div style={{ marginTop: 16, padding: "12px 16px", borderTop: "1px solid rgba(28,26,22,0.06)" }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(28,26,22,0.35)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 10 }}>Optional Imports</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {optionalSections.map((section) => {
+                const Icon = section.icon;
+                const isActive = section.id === activeSectionId;
+                return (
+                  <button
+                    key={section.id}
+                    onClick={() => goToSection(section.id)}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 12,
+                      background: isActive ? "rgba(201,100,66,0.1)" : "#FAF7F2",
+                      border: "1px solid rgba(28,26,22,0.06)", cursor: "pointer", width: "100%", textAlign: "left",
+                    }}
+                  >
+                    <Icon size={18} style={{ color: isActive ? "#C96442" : "rgba(28,26,22,0.45)", flexShrink: 0 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: "#1C1A16" }}>{section.label}</div>
+                      <div style={{ fontSize: 12, color: "rgba(28,26,22,0.4)", marginTop: 2 }}>{section.description}</div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </nav>
 
@@ -523,6 +567,51 @@ export default function OnboardingChat() {
         {/* Chat area */}
         <div style={{ flex: 1, overflow: "auto", padding: "32px 24px", display: "flex", flexDirection: "column" }}>
           <div style={{ maxWidth: 672, margin: "0 auto", width: "100%" }}>
+            <div style={{
+              marginBottom: 24,
+              padding: 20,
+              borderRadius: 18,
+              background: "rgba(255,255,255,0.82)",
+              border: "1px solid rgba(28,26,22,0.06)",
+              boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)",
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16 }}>
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#C96442", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                      {PRIMARY_SECTION_IDS.includes(activeSectionId) ? "Core setup" : "Optional import"}
+                    </span>
+                    {activeSection?.status === "complete" && (
+                      <span style={{ fontSize: 12, fontWeight: 600, color: "#15803d", background: "#DCFCE7", padding: "4px 8px", borderRadius: 999 }}>Captured</span>
+                    )}
+                  </div>
+                  <h1 style={{ margin: 0, fontSize: 28, lineHeight: 1.1, letterSpacing: "-0.03em", color: "#1C1A16" }}>{activeSection?.label}</h1>
+                  <p style={{ margin: "10px 0 0", fontSize: 15, lineHeight: 1.6, color: "rgba(28,26,22,0.55)" }}>{SECTION_HELP[activeSectionId]}</p>
+                </div>
+                <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                  {PRIMARY_SECTION_IDS.includes(activeSectionId) && (
+                    <button
+                      onClick={goToNextPrimarySection}
+                      disabled={PRIMARY_SECTION_IDS.indexOf(activeSectionId) === PRIMARY_SECTION_IDS.length - 1}
+                      style={{
+                        padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(28,26,22,0.08)",
+                        background: "white", color: "rgba(28,26,22,0.65)", fontSize: 14, fontWeight: 600,
+                        cursor: PRIMARY_SECTION_IDS.indexOf(activeSectionId) === PRIMARY_SECTION_IDS.length - 1 ? "default" : "pointer",
+                        opacity: PRIMARY_SECTION_IDS.indexOf(activeSectionId) === PRIMARY_SECTION_IDS.length - 1 ? 0.5 : 1,
+                      }}
+                    >
+                      {currentSectionHasData ? "Next step" : "Skip for now"}
+                    </button>
+                  )}
+                </div>
+              </div>
+              <div style={{ marginTop: 14, display: "flex", flexWrap: "wrap", gap: 8 }}>
+                <span style={{ fontSize: 13, color: "rgba(28,26,22,0.45)", background: "rgba(28,26,22,0.04)", padding: "8px 10px", borderRadius: 999 }}>Answer in plain English</span>
+                <span style={{ fontSize: 13, color: "rgba(28,26,22,0.45)", background: "rgba(28,26,22,0.04)", padding: "8px 10px", borderRadius: 999 }}>Upload docs or spreadsheets</span>
+                <span style={{ fontSize: 13, color: "rgba(28,26,22,0.45)", background: "rgba(28,26,22,0.04)", padding: "8px 10px", borderRadius: 999 }}>Use voice if that's faster</span>
+              </div>
+            </div>
+
             {messages.map((msg, idx) => {
               const isLastAssistant = msg.role === 'assistant' && idx === messages.length - 1;
               const { text, suggestions } = msg.role === 'assistant' ? parseSuggestions(msg.content) : { text: msg.content, suggestions: [] };
@@ -618,7 +707,45 @@ export default function OnboardingChat() {
         {/* Input area */}
         <div style={{ background: "white", borderTop: "1px solid rgba(28,26,22,0.1)", padding: "16px 24px 20px" }}>
           <input ref={fileInputRef} type="file" multiple accept=".pdf,.doc,.docx,.txt,.csv,.xlsx,.xls" onChange={handleFileSelect} style={{ display: "none" }} />
-          <div style={{ maxWidth: 672, margin: "0 auto", display: "flex", gap: 8, alignItems: "center" }}>
+          <div style={{ maxWidth: 672, margin: "0 auto" }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={loading || isComplete}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 999,
+                  border: "1px solid rgba(28,26,22,0.08)", background: "#FAF7F2", color: "rgba(28,26,22,0.6)",
+                  fontSize: 13, fontWeight: 600, cursor: loading || isComplete ? "default" : "pointer", opacity: loading || isComplete ? 0.6 : 1,
+                }}
+              >
+                <Upload size={14} /> Upload files
+              </button>
+              <button
+                onClick={isRecording ? stopRecording : startRecording}
+                disabled={loading || isComplete}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 999,
+                  border: "1px solid rgba(28,26,22,0.08)", background: isRecording ? "rgba(239,68,68,0.1)" : "#FAF7F2",
+                  color: isRecording ? "#ef4444" : "rgba(28,26,22,0.6)",
+                  fontSize: 13, fontWeight: 600, cursor: loading || isComplete ? "default" : "pointer", opacity: loading || isComplete ? 0.6 : 1,
+                }}
+              >
+                {isRecording ? <MicOff size={14} /> : <Mic size={14} />}
+                {isRecording ? "Stop recording" : "Use voice"}
+              </button>
+              <button
+                onClick={() => goToSection("integrations")}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 999,
+                  border: "1px solid rgba(28,26,22,0.08)", background: "#FAF7F2", color: "rgba(28,26,22,0.6)",
+                  fontSize: 13, fontWeight: 600, cursor: "pointer",
+                }}
+              >
+                <LinkIcon size={14} /> Connect sources
+              </button>
+            </div>
+
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <input
               type="text"
               value={input}
@@ -648,6 +775,7 @@ export default function OnboardingChat() {
             >
               {loading || isComplete ? <Loader2 size={20} style={{ animation: "spin 1s linear infinite" }} /> : <Send size={20} />}
             </button>
+            </div>
           </div>
         </div>
       </div>

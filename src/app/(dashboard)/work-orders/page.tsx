@@ -141,8 +141,6 @@ export default function WorkOrdersPage() {
   const [sortKey, setSortKey] = useState<"priority" | "status" | "created_at">("created_at");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-
   const [activeWO, setActiveWO] = useState<WorkOrder | null>(null);
   const [actionAssignTo, setActionAssignTo] = useState<string | "unassigned">("unassigned");
   const [actionPriority, setActionPriority] = useState<WorkOrderPriority>("medium");
@@ -455,20 +453,14 @@ export default function WorkOrdersPage() {
               </TableHeader>
               <TableBody>
                 {sorted.map((wo) => {
-                  const expanded = expandedId === wo.id;
                   const assetName = wo.asset_id ? assetsById[wo.asset_id]?.name || "—" : "—";
                   const minutes = timeOpenMinutes(wo);
 
                   return (
-                    <React.Fragment key={wo.id}>
-                      <TableRow
-                        className={cn("cursor-pointer", expanded && "bg-black/[0.02]")}
-                        onClick={() => setExpandedId((cur) => (cur === wo.id ? null : wo.id))}
-                      >
+                    <TableRow key={wo.id}>
                         <TableCell className="font-medium">
                           <Link
                             href={`/work-orders/${wo.id}`}
-                            onClick={(e) => e.stopPropagation()}
                             className="text-[#C96442] hover:underline"
                           >
                             {wo.short_id}
@@ -485,72 +477,16 @@ export default function WorkOrdersPage() {
                           <div className="flex items-center gap-2 justify-end">
                             <Link
                               href={`/work-orders/${wo.id}`}
-                              onClick={(e) => e.stopPropagation()}
                               className="inline-flex h-8 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium shadow-xs transition-[color,box-shadow] hover:bg-accent hover:text-accent-foreground"
                             >
                               Details
                             </Link>
-                            <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); openActions(wo); }}>
+                            <Button size="sm" variant="outline" onClick={() => openActions(wo)}>
                               Quick actions
                             </Button>
                           </div>
                         </TableCell>
                       </TableRow>
-
-                      {expanded && (
-                        <TableRow className="bg-black/[0.02]">
-                          <TableCell colSpan={9} className="whitespace-normal">
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-2">
-                              <div className="lg:col-span-2">
-                                <div className="text-sm font-medium">Description</div>
-                                <div className="mt-1 text-sm text-black/60">{wo.description || "—"}</div>
-
-                                <div className="mt-4 text-sm font-medium">AI triage</div>
-                                <div className="mt-1">
-                                  <AITriageCard triage={wo.ai_triage as AITriage} />
-                                </div>
-
-                                <div className="mt-4 text-sm font-medium">Resolution notes</div>
-                                <div className="mt-1 text-sm text-black/60 whitespace-pre-wrap">{wo.resolution_notes || "—"}</div>
-                              </div>
-
-                              <div>
-                                <div className="rounded-xl border border-black/5 bg-white p-4">
-                                  <div className="text-sm font-medium">Timeline</div>
-                                  <div className="mt-2 space-y-2 text-sm text-black/60">
-                                    <div className="flex items-center gap-2">
-                                      <Clock className="h-4 w-4" />
-                                      Created: {new Date(wo.created_at).toLocaleString()}
-                                    </div>
-                                    {!!wo.started_at && (
-                                      <div className="flex items-center gap-2">
-                                        <Wrench className="h-4 w-4" />
-                                        Started: {new Date(wo.started_at).toLocaleString()}
-                                      </div>
-                                    )}
-                                    {!!wo.completed_at && (
-                                      <div className="flex items-center gap-2">
-                                        <Calendar className="h-4 w-4" />
-                                        Completed: {new Date(wo.completed_at).toLocaleString()}
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-
-                                <div className="mt-4 rounded-xl border border-black/5 bg-white p-4">
-                                  <div className="text-sm font-medium">Photos</div>
-                                  <div className="mt-2 text-sm text-black/50">
-                                    {(wo.photos || []).length ? `${wo.photos.length} attached` : "No photos"}
-                                  </div>
-                                </div>
-
-                                <WORelatedKnowledge workOrderId={wo.id} assetId={wo.asset_id} />
-                              </div>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </React.Fragment>
                   );
                 })}
 

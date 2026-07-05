@@ -1,10 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
-import { MessageSquare, AlertTriangle, ShieldAlert, ArrowRight, Clock3, Bot, Users } from "lucide-react";
+import { MessageSquare, AlertTriangle, ShieldAlert, ArrowRight, Clock3, Bot, Users, Wrench } from "lucide-react";
 import { SectionHeader } from "@/components/dashboard/shared/SectionHeader";
 import { PriorityBadge } from "@/components/dashboard/shared/PriorityBadge";
 import { StatusBadge } from "@/components/dashboard/shared/StatusBadge";
+import { IssueDetailModal } from "@/components/dashboard/modals";
 import { formatTimeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +21,8 @@ type Question = {
 };
 
 type Issue = {
+  company_id: string;
+  worker_phone: string;
   id: string;
   description: string;
   equipment?: string;
@@ -38,8 +42,11 @@ type WorkOrder = {
   created_at: string;
 };
 
+type InboxView = "all" | "needs_manager" | "questions" | "issues" | "work_orders" | "blocked" | "critical" | "overdue" | "unassigned";
+
 type InboxItem = {
   id: string;
+  sourceId: string;
   kind: "issue" | "question" | "work_order";
   title: string;
   detail: string;
@@ -48,21 +55,51 @@ type InboxItem = {
   needsManager: boolean;
   priority?: string;
   status?: string;
+  isBlocked?: boolean;
+  isCritical?: boolean;
+  isOverdue?: boolean;
+  isUnassigned?: boolean;
 };
 
 export default function InboxPage() {
   const [companyId, setCompanyId] = useState("");
+  const [companyName, setCompanyName] = useState("");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [issues, setIssues] = useState<Issue[]>([]);
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<"all" | "needs_manager" | "issues" | "questions">("all");
+  const [view, setView] = useState<InboxView>("all");
+  const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
+  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
+  const [managerAnswer, setManagerAnswer] = useState("");
+  const [savingAnswer, setSavingAnswer] = useState(false);
 
   useEffect(() => {
-    try {
-      const auth = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
-      if (auth.companyId) setCompanyId(auth.companyId);
-    } catch {}
+    const requestedView = new URLSearchParams(window.location.search).get("view");
+    const validViews: InboxView[] = ["all", "needs_manager", "questions", "issues", "work_orders", "blocked", "critical", "overdue", "unassigned"];
+    if (requestedView && validViews.includes(requestedView as InboxView)) {
+      setView(requestedView as InboxView);
+    } else {
+      setView("all");
+    }
+  }, []);
+
+  useEffect(() => {
+    let ignore = false;
+    async function loadSession() {
+      try {
+        const res = await fetch("/api/auth/session", { cache: "no-store" });
+        const data = await res.json();
+        if (!ignore && data?.authenticated && data?.companyId) {
+          setCompanyId(data.companyId);
+          setCompanyName(data.company?.name || "");
+        }
+      } catch (error) {
+        console.error("Failed to load session:", error);
+      }
+    }
+    loadSession();
+    return () => { ignore = true; };
   }, []);
 
   useEffect(() => {
@@ -103,6 +140,7 @@ export default function InboxPage() {
   const items = useMemo<InboxItem[]>(() => {
     const questionItems = questions.map((q) => ({
       id: `q-${q.id}`,
+      sourceId: q.id,
       kind: "question" as const,
       title: q.question,
       detail: q.answer ? "Answered from knowledge" : "Needs a manager answer or better knowledge",
@@ -114,6 +152,7 @@ export default function InboxPage() {
 
     const issueItems = issues.map((issue) => ({
       id: `i-${issue.id}`,
+      sourceId: issue.id,
       kind: "issue" as const,
       title: issue.description,
       detail: issue.equipment ? `Reported on ${issue.equipment}` : "Field issue reported from the floor",
@@ -126,6 +165,7 @@ export default function InboxPage() {
 
     const workOrderItems = workOrders.slice(0, 12).map((wo) => ({
       id: `wo-${wo.id}`,
+      sourceId: wo.id,
       kind: "work_order" as const,
       title: `${wo.short_id} · ${wo.title}`,
       detail: wo.assigned_to ? `Assigned to ${wo.assigned_to}` : "Waiting for assignment",
@@ -134,6 +174,10 @@ export default function InboxPage() {
       needsManager: !wo.assigned_to || ["open", "on_hold"].includes(wo.status),
       priority: wo.priority,
       status: wo.status,
+      isBlocked: wo.status === "on_hold",
+      isCritical: ["critical", "high"].includes(wo.priority),
+      isOverdue: ["open", "assigned", "in_progress", "on_hold"].includes(wo.status) && ((Date.now() - new Date(wo.created_at).getTime()) / (1000 * 60 * 60 * 24) > 7),
+      isUnassigned: !wo.assigned_to,
     }));
 
     return [...questionItems, ...issueItems, ...workOrderItems]
@@ -141,23 +185,140 @@ export default function InboxPage() {
   }, [issues, questions, workOrders]);
 
   const filteredItems = items.filter((item) => {
-    if (filter === "needs_manager") return item.needsManager;
-    if (filter === "issues") return item.kind === "issue" || item.kind === "work_order";
-    if (filter === "questions") return item.kind === "question";
-    return true;
+    switch (view) {
+      case "needs_manager":
+        return item.needsManager;
+      case "questions":
+        return item.kind === "question";
+      case "issues":
+        return item.kind === "issue";
+      case "work_orders":
+        return item.kind === "work_order";
+      case "blocked":
+        return item.kind === "work_order" && item.isBlocked;
+      case "critical":
+        return item.kind === "work_order" && item.isCritical;
+      case "overdue":
+        return item.kind === "work_order" && item.isOverdue;
+      case "unassigned":
+        return item.kind === "work_order" && item.isUnassigned;
+      default:
+        return true;
+    }
   });
 
   const counts = {
     needsManager: items.filter((item) => item.needsManager).length,
-    issues: items.filter((item) => item.kind === "issue" || item.kind === "work_order").length,
+    issues: items.filter((item) => item.kind === "issue").length,
     questions: items.filter((item) => item.kind === "question").length,
+    workOrders: items.filter((item) => item.kind === "work_order").length,
+    blocked: items.filter((item) => item.kind === "work_order" && item.isBlocked).length,
+    critical: items.filter((item) => item.kind === "work_order" && item.isCritical).length,
+    overdue: items.filter((item) => item.kind === "work_order" && item.isOverdue).length,
+    unassigned: items.filter((item) => item.kind === "work_order" && item.isUnassigned).length,
+  };
+
+  const currentViewLabel: Record<InboxView, string> = {
+    all: "All live activity",
+    needs_manager: "Needs manager",
+    questions: "Questions",
+    issues: "Open field issues",
+    work_orders: "Work orders",
+    blocked: "Blocked work orders",
+    critical: "Critical work orders",
+    overdue: "Overdue work orders",
+    unassigned: "Unassigned work orders",
+  };
+
+  const updateIssue = async (issueId: string, updates: { status?: string; notes?: string; resolved_by?: string }) => {
+    try {
+      const res = await fetch("/api/issues", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ issueId, ...updates }),
+      });
+      if (!res.ok) throw new Error("Failed to update issue");
+      setIssues((prev) => prev.map((issue) => issue.id === issueId ? { ...issue, ...updates, status: (updates.status as Issue["status"]) || issue.status } : issue));
+      setSelectedIssue(null);
+    } catch (error) {
+      console.error("Failed to update issue:", error);
+    }
+  };
+
+  const handleTeachSidekick = async () => {
+    if (!selectedQuestion || !managerAnswer.trim() || !companyId) return;
+    try {
+      setSavingAnswer(true);
+      const res = await fetch("/api/sms/learn-from-manager", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          company_id: companyId,
+          original_question: selectedQuestion.question,
+          manager_answer: managerAnswer.trim(),
+          worker_phone: selectedQuestion.worker_phone,
+          source_conversation_id: selectedQuestion.id,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to save answer");
+      setQuestions((prev) => prev.map((question) => question.id === selectedQuestion.id ? { ...question, answer: managerAnswer.trim(), confidence: 100 } : question));
+      setSelectedQuestion(null);
+      setManagerAnswer("");
+    } catch (error) {
+      console.error("Failed to teach Sidekick:", error);
+    } finally {
+      setSavingAnswer(false);
+    }
   };
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
+      <IssueDetailModal
+        issue={selectedIssue}
+        onClose={() => setSelectedIssue(null)}
+        onUpdate={updateIssue}
+        companyName={companyName}
+      />
+
+      {selectedQuestion && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setSelectedQuestion(null)}>
+          <div className="w-full max-w-2xl rounded-2xl bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="border-b border-black/5 px-6 py-4">
+              <div className="text-sm font-semibold text-[#1C1A16]">Teach Sidekick</div>
+              <div className="mt-1 text-sm text-black/45">Save the manager answer so Sidekick can handle this question better next time.</div>
+            </div>
+            <div className="space-y-4 px-6 py-5">
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-wide text-black/35">Worker question</div>
+                <p className="mt-2 text-sm text-[#1C1A16]">{selectedQuestion.question}</p>
+                <p className="mt-1 text-xs text-black/40">{selectedQuestion.worker_name || selectedQuestion.worker_phone || "Worker"} · {formatTimeAgo(selectedQuestion.created_at)}</p>
+              </div>
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-wide text-black/35">Manager answer</div>
+                <textarea
+                  value={managerAnswer}
+                  onChange={(e) => setManagerAnswer(e.target.value)}
+                  placeholder="Write the answer Sidekick should learn from..."
+                  className="mt-2 min-h-[140px] w-full rounded-xl border border-black/10 px-3 py-3 text-sm outline-none focus:border-[#C96442]/40"
+                />
+              </div>
+            </div>
+            <div className="flex items-center justify-between border-t border-black/5 px-6 py-4">
+              <div className="text-xs text-black/40">This saves the answer into Sidekick's knowledge for future questions.</div>
+              <div className="flex items-center gap-2">
+                <button onClick={() => setSelectedQuestion(null)} className="rounded-lg px-4 py-2 text-sm text-black/55 hover:bg-black/[0.04]">Cancel</button>
+                <button onClick={handleTeachSidekick} disabled={savingAnswer || !managerAnswer.trim()} className="rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white disabled:opacity-50">
+                  {savingAnswer ? "Saving…" : "Teach Sidekick"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <SectionHeader
         title="Inbox"
-        subtitle="Every text Sidekick is handling — issues, questions, and work that needs manager eyes"
+        subtitle="The one place managers should review questions, field issues, and work that still needs a decision"
       />
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -190,24 +351,26 @@ export default function InboxPage() {
             </div>
             <div>
               <div className="text-2xl font-semibold text-[#1C1A16]">{counts.questions}</div>
-              <div className="text-sm text-black/45">Knowledge requests handled here</div>
+              <div className="text-sm text-black/45">Questions managers can teach Sidekick from</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="space-y-3">
+        <div className="flex flex-wrap gap-2">
         {[
           { id: "all", label: "All", count: items.length },
           { id: "needs_manager", label: "Needs manager", count: counts.needsManager },
-          { id: "issues", label: "Issues & work", count: counts.issues },
           { id: "questions", label: "Questions", count: counts.questions },
+          { id: "issues", label: "Issues", count: counts.issues },
+          { id: "work_orders", label: "Work orders", count: counts.workOrders },
         ].map((tab) => {
-          const active = filter === tab.id;
+          const active = view === tab.id;
           return (
             <button
               key={tab.id}
-              onClick={() => setFilter(tab.id as typeof filter)}
+              onClick={() => setView(tab.id as InboxView)}
               className={cn(
                 "rounded-full border px-4 py-2 text-sm font-medium transition-colors",
                 active
@@ -221,7 +384,36 @@ export default function InboxPage() {
         })}
       </div>
 
+        <div className="flex flex-wrap gap-2">
+          {[
+            { id: "blocked", label: "Blocked", count: counts.blocked },
+            { id: "critical", label: "Critical", count: counts.critical },
+            { id: "overdue", label: "Overdue", count: counts.overdue },
+            { id: "unassigned", label: "Unassigned", count: counts.unassigned },
+          ].filter((tab) => tab.count > 0 || view === tab.id).map((tab) => {
+            const active = view === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setView(tab.id as InboxView)}
+                className={cn(
+                  "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                  active
+                    ? "border-[#C96442]/20 bg-[#C96442]/10 text-[#C96442]"
+                    : "border-black/10 bg-white text-black/55 hover:bg-black/[0.03]"
+                )}
+              >
+                {tab.label} <span className="ml-1 text-black/40">{tab.count}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       <div className="rounded-2xl border border-black/5 bg-white">
+        <div className="border-b border-black/[0.05] px-5 py-3 text-sm text-black/50">
+          Showing <span className="font-medium text-[#1C1A16]">{currentViewLabel[view]}</span>
+        </div>
         {loading ? (
           <div className="py-16 text-center text-sm text-black/40">Loading inbox…</div>
         ) : filteredItems.length === 0 ? (
@@ -255,12 +447,32 @@ export default function InboxPage() {
                       <span className="inline-flex items-center gap-1"><Clock3 className="h-3.5 w-3.5" /> {formatTimeAgo(item.createdAt)}</span>
                     </div>
                   </div>
-                  <a
-                    href={item.kind === "work_order" ? `/work-orders/${item.id.replace("wo-", "")}` : item.kind === "question" ? "/today" : "/work-orders"}
-                    className="inline-flex items-center gap-1 rounded-lg border border-black/10 bg-white px-3 py-2 text-sm font-medium text-[#1C1A16] hover:bg-black/[0.03]"
-                  >
-                    Open <ArrowRight className="h-4 w-4" />
-                  </a>
+                  {item.kind === "work_order" ? (
+                    <Link
+                      href={`/work-orders/${item.sourceId}`}
+                      className="inline-flex items-center gap-1 rounded-lg border border-black/10 bg-white px-3 py-2 text-sm font-medium text-[#1C1A16] hover:bg-black/[0.03]"
+                    >
+                      Open <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  ) : item.kind === "issue" ? (
+                    <button
+                      onClick={() => setSelectedIssue(issues.find((issue) => issue.id === item.sourceId) || null)}
+                      className="inline-flex items-center gap-1 rounded-lg border border-black/10 bg-white px-3 py-2 text-sm font-medium text-[#1C1A16] hover:bg-black/[0.03]"
+                    >
+                      Review <ArrowRight className="h-4 w-4" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        const question = questions.find((entry) => entry.id === item.sourceId) || null;
+                        setSelectedQuestion(question);
+                        setManagerAnswer(question?.answer || "");
+                      }}
+                      className="inline-flex items-center gap-1 rounded-lg border border-black/10 bg-white px-3 py-2 text-sm font-medium text-[#1C1A16] hover:bg-black/[0.03]"
+                    >
+                      Teach <ArrowRight className="h-4 w-4" />
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -271,9 +483,9 @@ export default function InboxPage() {
       <div className="rounded-2xl border border-[#C96442]/15 bg-gradient-to-r from-orange-50/60 to-white p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <div className="text-sm font-semibold text-[#1C1A16]">What Inbox becomes</div>
+            <div className="text-sm font-semibold text-[#1C1A16]">Inbox is the manager operating queue</div>
             <p className="mt-1 max-w-3xl text-sm text-black/55">
-              This is the live operating inbox for Sidekick: worker texts, AI replies, work-order creation, and anything that still needs a manager decision.
+              Review worker questions, field issues, and live work in one place. Today should summarize urgency; Inbox should be where managers actually work through it.
             </p>
           </div>
           <a href="/knowledge" className="text-sm font-medium text-[#C96442] hover:underline">Open Knowledge Sources →</a>
