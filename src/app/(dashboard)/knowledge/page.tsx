@@ -5,11 +5,9 @@ import { SectionHeader } from "@/components/dashboard/shared/SectionHeader";
 import { Badge } from "@/components/ui/badge";
 import {
   Search, BookOpen, Wrench, Clock, Hash, ChevronDown, ChevronUp,
-  Upload, Mic, MicOff, Smartphone, FileText, Loader2, CheckCircle2, X, Plus, MessageSquare
+  Upload, Mic, MicOff, Smartphone, FileText, Loader2, CheckCircle2, X, Plus
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import KnowledgeBaseViewer from "@/components/dashboard/documents/KnowledgeBaseViewer";
-import GeneratedReports from "@/components/dashboard/documents/GeneratedReports";
 import IntegrationSelector from "@/components/IntegrationSelector";
 
 type CaptureTab = "text" | "voice" | "upload";
@@ -105,10 +103,10 @@ function UploadCard({ companyId }: { companyId: string }) {
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3">
           <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[#F7F3EC]">
-          <Upload className="w-5 h-5 text-[#C96442]" />
+          <Upload className="w-5 h-5 text-gray-700" />
           </div>
           <div>
             <div className="text-sm font-semibold text-gray-900">Upload documents</div>
@@ -199,7 +197,7 @@ function VoiceInputCard({ companyId }: { companyId: string }) {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3">
           <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[#F7F3EC]">
-          <Mic className="w-5 h-5 text-[#C96442]" />
+          <Mic className="w-5 h-5 text-gray-700" />
           </div>
           <div>
             <div className="text-sm font-semibold text-gray-900">Voice input</div>
@@ -233,53 +231,23 @@ function VoiceInputCard({ companyId }: { companyId: string }) {
 
 // ─── Text Sidekick CTA Card ────────────────────────────────────────────────────
 function TextSidekickCard() {
-  const [expanded, setExpanded] = useState(false);
-
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-5 flex flex-col gap-4">
       <div className="flex items-start gap-3">
-        <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-[#C96442]">
-          <Smartphone className="w-5 h-5 text-white" />
+        <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-[#F7F3EC]">
+          <Smartphone className="w-5 h-5 text-gray-700" />
         </div>
         <div>
-          <div className="text-sm font-semibold text-gray-900">Text Sidekick from your phone</div>
-          <div className="text-xs text-gray-500">Fastest way to capture fixes, tribal knowledge, and quick SOP notes.</div>
+          <div className="text-sm font-semibold text-gray-900">Text Sidekick from the floor</div>
+          <div className="text-xs text-gray-500">Fastest way to capture quick fixes, tribal knowledge, and SOP notes while the work is still fresh.</div>
         </div>
       </div>
 
       <div className="rounded-xl border border-[#F0E5DC] bg-[#FBF7F1] px-4 py-4">
-        <div className="text-xs font-medium uppercase tracking-wide text-gray-400">Best for</div>
-        <div className="mt-1 text-lg font-semibold leading-snug text-[#A95537]">Quick notes from the floor, while the work is still fresh</div>
-        <div className="mt-2 text-sm text-gray-500">Use the same Sidekick number your workers already text.</div>
+        <div className="text-xs font-medium uppercase tracking-wide text-gray-400">Example</div>
+        <div className="mt-1 text-sm font-medium leading-snug text-gray-800">“Packaging line reset is hold start + green button for 3 seconds.”</div>
+        <div className="mt-2 text-sm text-gray-500">Use the same Sidekick number your crew already texts.</div>
       </div>
-
-      <button
-        onClick={() => setExpanded(v => !v)}
-        className="flex items-center gap-1 text-xs font-medium text-[#A95537] hover:underline"
-      >
-        {expanded ? "Hide examples" : "See examples"} <ChevronDown className={cn("w-3 h-3 transition-transform", expanded && "rotate-180")} />
-      </button>
-
-      {expanded && (
-        <div className="grid grid-cols-1 gap-2 text-xs sm:grid-cols-2">
-          <div className="flex items-start gap-2 bg-white rounded-lg p-2.5 border border-[#EFE7DE]">
-            <MessageSquare className="w-3.5 h-3.5 text-[#C96442] mt-0.5 flex-shrink-0" />
-            <div><span className="font-medium text-gray-800">Text</span><br /><span className="text-gray-500">"The boiler reset code is 4829"</span></div>
-          </div>
-          <div className="flex items-start gap-2 bg-white rounded-lg p-2.5 border border-[#EFE7DE]">
-            <Mic className="w-3.5 h-3.5 text-[#C96442] mt-0.5 flex-shrink-0" />
-            <div><span className="font-medium text-gray-800">Voice memo</span><br /><span className="text-gray-500">Record &amp; send a voice note</span></div>
-          </div>
-          <div className="flex items-start gap-2 bg-white rounded-lg p-2.5 border border-[#EFE7DE]">
-            <FileText className="w-3.5 h-3.5 text-[#C96442] mt-0.5 flex-shrink-0" />
-            <div><span className="font-medium text-gray-800">Photos &amp; docs</span><br /><span className="text-gray-500">Snap a label, manual page, etc.</span></div>
-          </div>
-          <div className="flex items-start gap-2 bg-white rounded-lg p-2.5 border border-[#EFE7DE]">
-            <BookOpen className="w-3.5 h-3.5 text-[#C96442] mt-0.5 flex-shrink-0" />
-            <div><span className="font-medium text-gray-800">Quick answers</span><br /><span className="text-gray-500">Reply when workers ask Sidekick</span></div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -333,17 +301,115 @@ export default function KnowledgePage() {
       {/* ── Header ── */}
       <SectionHeader title="Operational Knowledge" subtitle="Your crew's operating memory — everything they've learned, documented, and captured" />
 
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <div className="inline-flex items-center gap-3 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-600">
+          <BookOpen className="h-4 w-4 text-gray-700" />
+          <span><span className="font-semibold text-gray-900">{articles.length}</span> procedures &amp; fixes documented</span>
+        </div>
+        {needsReview.length > 0 && (
+          <a
+            href="/review-queue"
+            className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-amber-100"
+          >
+            <CheckCircle2 className="h-4 w-4 text-gray-700" />
+            {needsReview.length} items need review
+          </a>
+        )}
+      </div>
+
+      {/* ── Search ── */}
+      <div className="mt-6 relative">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search procedures, fixes, SOPs — e.g. 'spindle vibration', 'hydraulic leak'..."
+          className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#C96442]/30 focus:border-[#C96442]"
+        />
+      </div>
+
+      {/* ── Articles list ── */}
+      <div className="mt-6 space-y-3">
+        {loading ? (
+          <div className="text-center py-12 text-gray-400">Loading knowledge base...</div>
+        ) : filtered.length === 0 ? (
+          <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
+            <BookOpen className="w-12 h-12 text-[#C96442]/30 mx-auto mb-3" />
+            <p className="text-gray-700 font-semibold">No procedures captured yet</p>
+            <p className="text-gray-400 text-sm mt-1 max-w-sm mx-auto">
+              Add a quick fix, upload an SOP, or record a voice walkthrough below. Knowledge your team captures here becomes searchable for every worker.
+            </p>
+          </div>
+        ) : (
+          filtered.map(article => (
+            <div key={article.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <button
+                onClick={() => setExpanded(expanded === article.id ? null : article.id)}
+                className="w-full px-5 py-4 flex items-start justify-between text-left"
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-semibold text-gray-900 text-sm">{article.title}</span>
+                    {article.equipment_type && <Badge variant="outline" className="text-xs">{article.equipment_type}</Badge>}
+                  </div>
+                  <p className="text-sm text-gray-500 mt-1 truncate">{article.problem}</p>
+                  <div className="flex items-center gap-4 mt-2 text-xs text-gray-400 flex-wrap">
+                    {article.asset_name && <span className="flex items-center gap-1"><Wrench className="w-3 h-3" />{article.asset_name}</span>}
+                    {article.time_estimate_minutes && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{article.time_estimate_minutes}m</span>}
+                    <span className="flex items-center gap-1"><Hash className="w-3 h-3" />Referenced {article.times_referenced || 0}x</span>
+                    <ProvenanceBadge article={article} />
+                    {article.source_work_order_id && (
+                      <a href={`/work-orders?id=${article.source_work_order_id}`} className="text-[#C96442] underline hover:text-[#B0532F]" onClick={e => e.stopPropagation()}>Source WO</a>
+                    )}
+                  </div>
+                  {article.tags?.length > 0 && (
+                    <div className="flex gap-1 mt-2 flex-wrap">
+                      {article.tags.map(t => <span key={t} className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">{t}</span>)}
+                    </div>
+                  )}
+                </div>
+                {expanded === article.id ? <ChevronUp className="w-5 h-5 text-gray-400 mt-1" /> : <ChevronDown className="w-5 h-5 text-gray-400 mt-1" />}
+              </button>
+
+              {expanded === article.id && (
+                <div className="px-5 pb-5 border-t border-gray-100 pt-4 space-y-3">
+                  {article.symptoms && (
+                    <div>
+                      <div className="text-xs font-semibold text-gray-500 uppercase mb-1">Symptoms</div>
+                      <p className="text-sm text-gray-700">{article.symptoms}</p>
+                    </div>
+                  )}
+                  <div>
+                    <div className="text-xs font-semibold text-gray-500 uppercase mb-1">Solution</div>
+                    <p className="text-sm text-gray-700 whitespace-pre-wrap">{article.solution}</p>
+                  </div>
+                  {article.parts_used?.length > 0 && (
+                    <div>
+                      <div className="text-xs font-semibold text-gray-500 uppercase mb-1">Parts Used</div>
+                      <div className="flex gap-2 flex-wrap">
+                        {article.parts_used.map(p => <span key={p} className="text-xs px-2 py-1 bg-orange-50 text-gray-700 rounded">{p}</span>)}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+
       {/* ══════════════════════════════════════════════════════════════════════
-          ADD KNOWLEDGE — always visible, top of page, impossible to miss
+          ADD KNOWLEDGE — secondary to browsing/search
           ══════════════════════════════════════════════════════════════════════ */}
-      <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
         <div className="max-w-xl">
           <div className="flex items-center gap-2">
             <Plus className="w-4 h-4 text-[#C96442]" />
-            <h2 className="text-base font-semibold text-gray-900">Add to Sidekick</h2>
+            <h2 className="text-base font-semibold text-gray-900">Capture new knowledge</h2>
           </div>
           <p className="mt-2 text-sm text-gray-500">
-            Add fixes, SOPs, and field learnings in whatever format you have right now. Connected sources live below.
+            Add fixes, SOPs, and field learnings in whatever format you have right now.
           </p>
         </div>
 
@@ -387,7 +453,7 @@ export default function KnowledgePage() {
               <h2 className="text-base font-semibold text-gray-900">Connected sources</h2>
             </div>
             <p className="mt-2 text-sm text-gray-500">
-              Keep every integration together here. This is where Sidekick pulls docs, team context, and operating knowledge from the tools you already use.
+              Keep your integrations and imported docs together here.
             </p>
           </div>
           <a
@@ -402,119 +468,6 @@ export default function KnowledgePage() {
           <IntegrationSelector companyId={companyId} />
         </div>
       </div>
-
-      {/* ── Stats row ── */}
-      <div className="mt-6 flex items-center gap-4 flex-wrap">
-        <div className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white px-6 py-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F7F3EC]">
-            <BookOpen className="w-6 h-6 text-gray-700" />
-          </div>
-          <div>
-            <div className="text-3xl font-bold text-gray-900">{articles.length}</div>
-            <div className="text-sm text-gray-500">Procedures & fixes documented</div>
-          </div>
-        </div>
-      </div>
-
-      {needsReview.length > 0 && (
-        <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50/60 px-4 py-3">
-          <div className="text-sm text-gray-700">
-            <span className="font-semibold">{needsReview.length} items need review.</span>{" "}
-            Auto-generated knowledge is reviewed separately before it reaches the team.
-          </div>
-          <a
-            href="/review-queue"
-            className="shrink-0 rounded-lg border border-amber-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-amber-50"
-          >
-            Open Review Queue
-          </a>
-        </div>
-      )}
-
-      {/* ── Search ── */}
-      <div className="mt-6 relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-        <input
-          type="text"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Search procedures, fixes, SOPs — e.g. 'spindle vibration', 'hydraulic leak'..."
-          className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#C96442]/30 focus:border-[#C96442]"
-        />
-      </div>
-
-      {/* ── Articles list ── */}
-      <div className="mt-6 space-y-3">
-        {loading ? (
-          <div className="text-center py-12 text-gray-400">Loading knowledge base...</div>
-        ) : filtered.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-            <BookOpen className="w-12 h-12 text-[#C96442]/30 mx-auto mb-3" />
-            <p className="text-gray-700 font-semibold">No procedures captured yet</p>
-            <p className="text-gray-400 text-sm mt-1 max-w-sm mx-auto">
-              Text a tip to your Sidekick number, upload an SOP, or record a voice walkthrough above. Knowledge your team captures here becomes instantly searchable for every worker.
-            </p>
-          </div>
-        ) : (
-          filtered.map(article => (
-            <div key={article.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-              <button
-                onClick={() => setExpanded(expanded === article.id ? null : article.id)}
-                className="w-full px-5 py-4 flex items-start justify-between text-left"
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-semibold text-gray-900 text-sm">{article.title}</span>
-                    {article.equipment_type && <Badge variant="outline" className="text-xs">{article.equipment_type}</Badge>}
-                  </div>
-                  <p className="text-sm text-gray-500 mt-1 truncate">{article.problem}</p>
-                  <div className="flex items-center gap-4 mt-2 text-xs text-gray-400">
-                    {article.asset_name && <span className="flex items-center gap-1"><Wrench className="w-3 h-3" />{article.asset_name}</span>}
-                    {article.time_estimate_minutes && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{article.time_estimate_minutes}m</span>}
-                    <span className="flex items-center gap-1"><Hash className="w-3 h-3" />Referenced {article.times_referenced || 0}x</span>
-                    <ProvenanceBadge article={article} />
-                    {article.source_work_order_id && (
-                      <a href={`/work-orders?id=${article.source_work_order_id}`} className="text-[#C96442] underline hover:text-[#B0532F]" onClick={e => e.stopPropagation()}>Source WO</a>
-                    )}
-                  </div>
-                  {article.tags?.length > 0 && (
-                    <div className="flex gap-1 mt-2">
-                      {article.tags.map(t => <span key={t} className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">{t}</span>)}
-                    </div>
-                  )}
-                </div>
-                {expanded === article.id ? <ChevronUp className="w-5 h-5 text-gray-400 mt-1" /> : <ChevronDown className="w-5 h-5 text-gray-400 mt-1" />}
-              </button>
-
-              {expanded === article.id && (
-                <div className="px-5 pb-5 border-t border-gray-100 pt-4 space-y-3">
-                  {article.symptoms && (
-                    <div>
-                      <div className="text-xs font-semibold text-gray-500 uppercase mb-1">Symptoms</div>
-                      <p className="text-sm text-gray-700">{article.symptoms}</p>
-                    </div>
-                  )}
-                  <div>
-                    <div className="text-xs font-semibold text-gray-500 uppercase mb-1">Solution</div>
-                    <p className="text-sm text-gray-700 whitespace-pre-wrap">{article.solution}</p>
-                  </div>
-                  {article.parts_used?.length > 0 && (
-                    <div>
-                      <div className="text-xs font-semibold text-gray-500 uppercase mb-1">Parts Used</div>
-                      <div className="flex gap-2 flex-wrap">
-                        {article.parts_used.map(p => <span key={p} className="text-xs px-2 py-1 bg-orange-50 text-gray-700 rounded">{p}</span>)}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          ))
-        )}
-      </div>
-
-      <GeneratedReports companyId={companyId} />
-      <KnowledgeBaseViewer companyId={companyId} />
     </div>
   );
 }

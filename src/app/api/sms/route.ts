@@ -439,6 +439,16 @@ async function translatedTwimlResponse(message: string, lang: string): Promise<N
   return twimlResponse(translated);
 }
 
+function shouldAutoDetectLanguage(text: string): boolean {
+  const trimmed = text.trim();
+  if (!trimmed) return false;
+  if (/^join(\s|$)/i.test(trimmed)) return false;
+  if (/^(y|yes|n|no|help|done|next|skip)$/i.test(trimmed)) return false;
+  if (trimmed.length < 12) return false;
+  if (trimmed.split(/\s+/).length < 2) return false;
+  return /[a-zA-Z]/.test(trimmed);
+}
+
 function truncateForSms(message: string, max = 480): string {
   const trimmed = (message || "").trim();
   if (trimmed.length <= max) return trimmed;
@@ -503,13 +513,6 @@ export async function POST(request: NextRequest) {
     
     console.log(`[${incomingChannel.toUpperCase()}] From:`, from, "Body:", body, "NumMedia:", numMedia);
 
-    // Detect language from incoming message (non-blocking for short messages)
-    let detectedLang = "en";
-    if (body.length > 0) {
-      detectedLang = await detectLanguage(body);
-      console.log(`[${incomingChannel.toUpperCase()}] Detected language: ${detectedLang}`);
-    }
-
     // Check if this is a manager responding to a question
     const { data: pendingQuestion } = await supabase
       .from("questions")
@@ -562,6 +565,14 @@ export async function POST(request: NextRequest) {
       .select("*")
       .eq("phone", from)
       .single();
+
+    // Resolve response language. Use the worker's saved preference when available.
+    // Avoid auto-detecting on short onboarding replies like names, roles, or JOIN codes.
+    let detectedLang = worker?.preferred_language || "en";
+    if (!worker?.preferred_language && shouldAutoDetectLanguage(body)) {
+      detectedLang = await detectLanguage(body);
+      console.log(`[${incomingChannel.toUpperCase()}] Detected language: ${detectedLang}`);
+    }
 
     // CASE 0: Check if this is a Y/N response to escalation prompt
     if (worker && worker.pending_escalation_question_id) {
