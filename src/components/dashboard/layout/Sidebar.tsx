@@ -13,8 +13,8 @@ const NAV_ITEMS = [
   { id: "work-orders", label: "Work Orders", icon: ClipboardList, href: "/work-orders" },
   { id: "assets", label: "Assets", icon: Wrench, href: "/assets" },
   { id: "team", label: "Team", icon: Users, href: "/team" },
-  { id: "updates", label: "Updates", icon: RefreshCw, href: "/updates" },
   { id: "knowledge", label: "Knowledge", icon: BookOpen, href: "/knowledge" },
+  { id: "updates", label: "Updates", icon: RefreshCw, href: "/updates" },
   { id: "settings", label: "Settings", icon: Settings, href: "/settings" },
 ];
 

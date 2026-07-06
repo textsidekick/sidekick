@@ -41,6 +41,33 @@ type UpdateRecord = {
   created_at: string;
 };
 
+const UPDATE_CAPABILITIES = [
+  {
+    key: "company",
+    icon: Building2,
+    title: "Company details",
+    description: "Manager contact, industry, and high-level org context.",
+  },
+  {
+    key: "team",
+    icon: Users,
+    title: "Team changes",
+    description: "New hires, supervisors, technician contacts, and role changes.",
+  },
+  {
+    key: "assets",
+    icon: Wrench,
+    title: "Assets",
+    description: "New machines, location moves, and equipment notes.",
+  },
+  {
+    key: "knowledge",
+    icon: BookOpen,
+    title: "Knowledge",
+    description: "Reusable SOPs, troubleshooting notes, and tribal knowledge.",
+  },
+] as const;
+
 function formatRelative(dateStr: string) {
   const diff = Date.now() - new Date(dateStr).getTime();
   const minutes = Math.floor(diff / 60000);
@@ -317,6 +344,7 @@ export default function UpdatesPage() {
   );
 
   const orderedUpdates = useMemo(() => [...updates].reverse(), [updates]);
+  const hasUpdates = updates.length > 0;
 
   const sendUpdate = async (message: string) => {
     const trimmed = message.trim();
@@ -364,7 +392,7 @@ export default function UpdatesPage() {
         subtitle="Keep Sidekick current as your operation changes — people, assets, SOPs, and company context all live here."
       />
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[1.5fr_1fr]">
+      <div className={cn("mt-6 grid gap-6", hasUpdates && "xl:grid-cols-[1.5fr_1fr]")}>
         <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
           <div className="flex items-start gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F7F3EC]">
@@ -382,8 +410,22 @@ export default function UpdatesPage() {
             {loadingUpdates ? (
               <div className="py-10 text-center text-sm text-gray-400">Loading recent updates…</div>
             ) : orderedUpdates.length === 0 ? (
-              <div className="py-10 text-center text-sm text-gray-500">
-                No updates yet. Try adding a new contact, asset, SOP, or policy change.
+              <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-5">
+                <div className="text-sm font-medium text-gray-900">No updates yet</div>
+                <p className="mt-1 text-sm text-gray-500">You can add a contact, asset, SOP, or policy change here.</p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {UPDATE_CAPABILITIES.map(({ key, icon: Icon, title, description }) => (
+                    <div key={key} className="rounded-xl border border-gray-200 bg-[#FCFAF7] p-3">
+                      <div className="flex items-start gap-2.5">
+                        <Icon className="mt-0.5 h-4 w-4 text-[#C96442]" />
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">{title}</div>
+                          <div className="mt-0.5 text-xs leading-5 text-gray-500">{description}</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : (
               orderedUpdates.slice(-8).map((update) => (
@@ -432,85 +474,63 @@ export default function UpdatesPage() {
           </div>
         </section>
 
-        <div className="space-y-6">
-          <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <h2 className="text-base font-semibold text-gray-900">What this can update</h2>
-            <div className="mt-4 space-y-3 text-sm text-gray-600">
-              <div className="flex items-start gap-3">
-                <Building2 className="mt-0.5 h-4 w-4 text-[#C96442]" />
-                <div><span className="font-medium text-gray-900">Company details</span><br />Manager contact, industry, and high-level org context.</div>
+        {hasUpdates && (
+          <div className="space-y-6">
+            <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F7F3EC]">
+                  <Sparkles className="h-5 w-5 text-[#C96442]" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-gray-900">{updates.length}</div>
+                  <div className="text-sm text-gray-500">manager updates saved</div>
+                </div>
               </div>
-              <div className="flex items-start gap-3">
-                <Users className="mt-0.5 h-4 w-4 text-[#C96442]" />
-                <div><span className="font-medium text-gray-900">Team changes</span><br />New hires, supervisors, technician contacts, and role changes.</div>
+              <div className="mt-4 flex items-center gap-3 border-t border-gray-100 pt-4">
+                <div className="text-2xl font-bold text-gray-900">{totalStructuredWrites}</div>
+                <div className="text-sm text-gray-500">structured writes applied across company, team, assets, and knowledge</div>
               </div>
-              <div className="flex items-start gap-3">
-                <Wrench className="mt-0.5 h-4 w-4 text-[#C96442]" />
-                <div><span className="font-medium text-gray-900">Assets</span><br />New machines, location moves, and equipment notes.</div>
-              </div>
-              <div className="flex items-start gap-3">
-                <BookOpen className="mt-0.5 h-4 w-4 text-[#C96442]" />
-                <div><span className="font-medium text-gray-900">Knowledge</span><br />Reusable SOPs, troubleshooting notes, and tribal knowledge.</div>
-              </div>
-            </div>
-          </section>
+            </section>
 
-          <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F7F3EC]">
-                <Sparkles className="h-5 w-5 text-[#C96442]" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-gray-900">{updates.length}</div>
-                <div className="text-sm text-gray-500">manager updates saved</div>
-              </div>
-            </div>
-            <div className="mt-4 flex items-center gap-3 border-t border-gray-100 pt-4">
-              <div className="text-2xl font-bold text-gray-900">{totalStructuredWrites}</div>
-              <div className="text-sm text-gray-500">structured writes applied across company, team, assets, and knowledge</div>
-            </div>
-          </section>
+            <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+              <h2 className="text-base font-semibold text-gray-900">Recent structured changes</h2>
+              <div className="mt-4 space-y-3">
+                {loadingUpdates ? (
+                  <div className="text-sm text-gray-400">Loading…</div>
+                ) : (
+                  updates.slice(0, 5).map((update) => {
+                    const changes = update.applied_changes || {};
+                    const chips = [
+                      changes.companyUpdated ? "company" : null,
+                      Number(changes.teamSynced || 0) > 0 ? `${changes.teamSynced} team` : null,
+                      Number(changes.assetsCreated || 0) > 0 ? `${changes.assetsCreated} added asset` : null,
+                      Number(changes.assetsUpdated || 0) > 0 ? `${changes.assetsUpdated} updated asset` : null,
+                      Number(changes.knowledgeAdded || 0) > 0 ? `${changes.knowledgeAdded} knowledge` : null,
+                    ].filter(Boolean) as string[];
 
-          <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <h2 className="text-base font-semibold text-gray-900">Recent structured changes</h2>
-            <div className="mt-4 space-y-3">
-              {loadingUpdates ? (
-                <div className="text-sm text-gray-400">Loading…</div>
-              ) : updates.length === 0 ? (
-                <div className="text-sm text-gray-500">No structured changes yet.</div>
-              ) : (
-                updates.slice(0, 5).map((update) => {
-                  const changes = update.applied_changes || {};
-                  const chips = [
-                    changes.companyUpdated ? "company" : null,
-                    Number(changes.teamSynced || 0) > 0 ? `${changes.teamSynced} team` : null,
-                    Number(changes.assetsCreated || 0) > 0 ? `${changes.assetsCreated} added asset` : null,
-                    Number(changes.assetsUpdated || 0) > 0 ? `${changes.assetsUpdated} updated asset` : null,
-                    Number(changes.knowledgeAdded || 0) > 0 ? `${changes.knowledgeAdded} knowledge` : null,
-                  ].filter(Boolean) as string[];
-
-                  return (
-                    <div key={update.id} className="rounded-xl border border-gray-200 p-3">
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="text-sm font-medium text-gray-900">{update.summary || update.assistant_response}</div>
-                        <div className="text-xs text-gray-400">{formatRelative(update.created_at)}</div>
-                      </div>
-                      {chips.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-1.5">
-                          {chips.map((chip) => (
-                            <span key={chip} className="rounded-full bg-[#F7F3EC] px-2 py-0.5 text-xs text-gray-700">
-                              {chip}
-                            </span>
-                          ))}
+                    return (
+                      <div key={update.id} className="rounded-xl border border-gray-200 p-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="text-sm font-medium text-gray-900">{update.summary || update.assistant_response}</div>
+                          <div className="text-xs text-gray-400">{formatRelative(update.created_at)}</div>
                         </div>
-                      )}
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          </section>
-        </div>
+                        {chips.length > 0 && (
+                          <div className="mt-2 flex flex-wrap gap-1.5">
+                            {chips.map((chip) => (
+                              <span key={chip} className="rounded-full bg-[#F7F3EC] px-2 py-0.5 text-xs text-gray-700">
+                                {chip}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </section>
+          </div>
+        )}
       </div>
 
       <section className="mt-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
