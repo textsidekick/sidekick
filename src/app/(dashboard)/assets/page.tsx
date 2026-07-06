@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { Activity, Plus, TrendingDown, Wrench } from "lucide-react";
+import { Activity, Download, Plus, TrendingDown, Wrench } from "lucide-react";
 import { SkeletonGrid } from "@/components/dashboard/shared/Skeleton";
 import { AssetPhotoGallery } from "@/components/dashboard/assets/AssetPhotoGallery";
 import { buildScopedUrl, readDashboardScope } from "@/lib/dashboard-scope";
@@ -267,6 +267,18 @@ export default function AssetsPage() {
             <p className="text-sm text-black/50 mt-1">Asset health, history, repair time, and more.</p>
           </div>
           <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const scope = readDashboardScope();
+                const params = new URLSearchParams();
+                if (scope.locationId && scope.locationId !== "all") params.set("locationId", scope.locationId);
+                window.open(`/api/export/assets?${params.toString()}`, "_blank");
+              }}
+            >
+              <Download className="h-4 w-4 mr-1" /> Export
+            </Button>
             <Button onClick={() => setShowAdd(true)}>
               <Plus className="h-4 w-4 mr-1" /> Add Asset
             </Button>

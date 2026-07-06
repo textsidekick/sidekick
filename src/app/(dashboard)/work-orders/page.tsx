@@ -23,6 +23,7 @@ import {
   ChevronUp,
   Save,
   BookOpen,
+  Download,
 } from "lucide-react";
 
 import type { WorkOrder, WorkOrderPriority, WorkOrderStatus } from "@/types/operations";
@@ -378,6 +379,20 @@ export default function WorkOrdersPage() {
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Work Orders</h1>
             <p className="text-sm text-black/50 mt-1">Track, assign, and resolve work across the plant.</p>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const scope = readDashboardScope();
+                const params = new URLSearchParams();
+                if (scope.locationId && scope.locationId !== "all") params.set("locationId", scope.locationId);
+                window.open(`/api/export/work-orders?${params.toString()}`, "_blank");
+              }}
+            >
+              <Download className="h-4 w-4 mr-1" /> Export CSV
+            </Button>
           </div>
         </div>
 
