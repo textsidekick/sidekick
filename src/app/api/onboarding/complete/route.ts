@@ -178,14 +178,14 @@ Return ONLY valid JSON, no markdown. Include all fields that have data.`;
       onboarding_completed: true,
       industry: extractedData.industry || null,
       worker_count: extractedData.workerCount || null,
-      metadata: JSON.stringify({
-        locations: extractedData.locations,
-        locationNames: extractedData.locationNames,
-        painPoints: extractedData.painPoints,
-        commonQuestions: extractedData.commonQuestions,
-        wishKnew: extractedData.wishKnew,
-        additionalInfo: extractedData.additionalInfo,
-      }),
+      metadata: {
+        locations: extractedData.locations || null,
+        locationNames: extractedData.locationNames || null,
+        painPoints: extractedData.painPoints || null,
+        commonQuestions: extractedData.commonQuestions || null,
+        wishKnew: extractedData.wishKnew || null,
+        additionalInfo: extractedData.additionalInfo || null,
+      },
     };
     
     console.log("[Complete] Insert data:", JSON.stringify(insertData));
