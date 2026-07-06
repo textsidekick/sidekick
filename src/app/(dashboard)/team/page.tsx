@@ -64,7 +64,7 @@ function roleBadge(role?: string | null) {
   const normalizedRole = normalizeRole(role);
   if (!normalizedRole) {
     return (
-      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">
+      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-50 text-gray-600">
         Pending role
       </span>
     );
