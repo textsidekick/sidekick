@@ -13,6 +13,7 @@ type NotificationPreferences = {
 type CompanySettings = {
   working_hours_start: string;
   working_hours_end: string;
+  escalation_rules: unknown[];
   notification_preferences: NotificationPreferences;
 };
 
@@ -21,6 +22,7 @@ type WoCategory = { id: string; name: string; color: string };
 type WoPriority = {
   id?: string;
   name: "critical" | "high" | "medium" | "low";
+  display_label: string;
   level: number;
   sla_hours: number;
 };
@@ -32,10 +34,10 @@ const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
 };
 
 const DEFAULT_PRIORITIES: WoPriority[] = [
-  { name: "critical", level: 4, sla_hours: 2 },
-  { name: "high", level: 3, sla_hours: 8 },
-  { name: "medium", level: 2, sla_hours: 24 },
-  { name: "low", level: 1, sla_hours: 72 },
+  { name: "critical", display_label: "Critical", level: 4, sla_hours: 2 },
+  { name: "high", display_label: "High", level: 3, sla_hours: 8 },
+  { name: "medium", display_label: "Medium", level: 2, sla_hours: 24 },
+  { name: "low", display_label: "Low", level: 1, sla_hours: 72 },
 ];
 
 function normalizePriorities(rows: Partial<WoPriority>[] = []): WoPriority[] {
@@ -50,10 +52,35 @@ function normalizePriorities(rows: Partial<WoPriority>[] = []): WoPriority[] {
     return {
       id: row?.id,
       name: fallback.name,
+      display_label: typeof row?.display_label === "string" && row.display_label.trim() ? row.display_label : fallback.display_label,
       level: Number.isFinite(Number(row?.level)) ? Number(row?.level) : fallback.level,
       sla_hours: Number.isFinite(Number(row?.sla_hours)) ? Number(row?.sla_hours) : fallback.sla_hours,
     };
   });
+}
+
+function buildPriorityDisplayLabelRules(priorities: WoPriority[], existingRules: unknown[] = []): unknown[] {
+  const preservedRules = Array.isArray(existingRules)
+    ? existingRules.filter((rule) => {
+        if (!rule || typeof rule !== "object") return false;
+        return (rule as { kind?: string }).kind !== "priority_display_label";
+      })
+    : [];
+
+  return [
+    ...preservedRules,
+    ...priorities.map((priority) => ({
+      kind: "priority_display_label",
+      priority: priority.name,
+      display_label: priority.display_label,
+    })),
+  ];
+}
+
+function persistPriorityLabels(priorities: WoPriority[]) {
+  if (typeof window === "undefined") return;
+  const labelMap = Object.fromEntries(priorities.map((priority) => [priority.name, priority.display_label]));
+  window.localStorage.setItem("sidekick_priority_labels", JSON.stringify(labelMap));
 }
 
 export default function SettingsPage() {
@@ -61,6 +88,7 @@ export default function SettingsPage() {
   const [settings, setSettings] = useState<CompanySettings>({
     working_hours_start: "06:00",
     working_hours_end: "22:00",
+    escalation_rules: [],
     notification_preferences: DEFAULT_NOTIFICATION_PREFERENCES,
   });
   const [categories, setCategories] = useState<WoCategory[]>([]);
@@ -79,13 +107,16 @@ export default function SettingsPage() {
       setSettings({
         working_hours_start: json.settings?.working_hours_start || "06:00",
         working_hours_end: json.settings?.working_hours_end || "22:00",
+        escalation_rules: Array.isArray(json.settings?.escalation_rules) ? json.settings.escalation_rules : [],
         notification_preferences: {
           ...DEFAULT_NOTIFICATION_PREFERENCES,
           ...(json.settings?.notification_preferences || {}),
         },
       });
       setCategories(json.categories || []);
-      setPriorities(normalizePriorities(json.priorities || []));
+      const normalizedPriorities = normalizePriorities(json.priorities || []);
+      setPriorities(normalizedPriorities);
+      persistPriorityLabels(normalizedPriorities);
     }
     setLoading(false);
   }
@@ -100,10 +131,18 @@ export default function SettingsPage() {
     const res = await fetch("/api/company-settings", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ settings, company, priorities }),
+      body: JSON.stringify({
+        settings: {
+          ...settings,
+          escalation_rules: buildPriorityDisplayLabelRules(priorities, settings.escalation_rules),
+        },
+        company,
+        priorities,
+      }),
     });
     setSaving(false);
     if (res.ok) {
+      persistPriorityLabels(priorities);
       setSuccess(true);
       await load();
       setTimeout(() => setSuccess(false), 3000);
@@ -253,13 +292,23 @@ export default function SettingsPage() {
 
             <section className="bg-white rounded-xl border border-gray-200 p-5">
               <h2 className="text-sm font-semibold text-gray-700 mb-1">Work Order Priorities</h2>
-              <p className="text-xs text-gray-500 mb-4">These are live. SLA hours are saved to the backend, used to guide AI urgency classification, and attached to new work-order alerting.</p>
+              <p className="text-xs text-gray-500 mb-4">These are live. Display labels drive what the UI shows, while SLA hours are saved to the backend, guide AI urgency classification, and get attached to new work-order alerting.</p>
               <div className="space-y-3">
                 {priorities.map((priority) => (
-                  <div key={priority.name} className="grid grid-cols-1 sm:grid-cols-[120px_100px_120px] gap-3 items-center rounded-lg border border-gray-200 p-3">
+                  <div key={priority.name} className="grid grid-cols-1 sm:grid-cols-[120px_1fr_100px_120px] gap-3 items-center rounded-lg border border-gray-200 p-3">
                     <div>
-                      <div className="text-xs text-gray-500 mb-1">Priority</div>
+                      <div className="text-xs text-gray-500 mb-1">Priority key</div>
                       <div className="text-sm font-medium capitalize text-gray-900">{priority.name}</div>
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-500 block mb-1">Display label</label>
+                      <input
+                        type="text"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                        value={priority.display_label}
+                        onChange={(e) => updatePriority(priority.name, { display_label: e.target.value })}
+                        placeholder="Label shown in the UI"
+                      />
                     </div>
                     <div>
                       <label className="text-xs text-gray-500 block mb-1">Level</label>

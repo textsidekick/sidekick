@@ -1305,7 +1305,10 @@ Rules:
       name: row.name,
       color: row.color,
     }));
-    const priorityProfiles = normalizeCompanyPriorityProfiles(priorityRows as any);
+    const priorityProfiles = normalizeCompanyPriorityProfiles(
+      priorityRows as any,
+      companyRuntimeSettings.priority_display_labels
+    );
 
     // ============================================
     // DIRECT WO STATUS COMMANDS (bypass AI triage)
@@ -1451,7 +1454,11 @@ Rules:
     if (triage.messageType === "issue_report") {
       try {
         const criticalIncidentMeta = detectCriticalIncident(body, triage as any);
-        const priorityProfile = getPriorityProfile(triage.issue?.priority || null, priorityProfiles);
+        const priorityProfile = getPriorityProfile(
+          triage.issue?.priority || null,
+          priorityProfiles,
+          companyRuntimeSettings.priority_display_labels
+        );
         const aiTriageExtra: Record<string, unknown> = {};
         if (criticalIncidentMeta) aiTriageExtra.critical_incident = criticalIncidentMeta;
         if (priorityProfile) aiTriageExtra.priority_profile = {
@@ -1527,7 +1534,8 @@ Rules:
 
           const header = criticalIncidentMeta ? `🚨 CRITICAL WO ${woFull?.short_id || wo.id.slice(0, 8)}` : `⚠️ ALERT WO ${woFull?.short_id || wo.id.slice(0, 8)}`;
           const incidentLine = criticalIncidentMeta ? `\nIncident: ${criticalIncidentMeta.kind.replaceAll("_", " ")}` : "";
-          const mgrMsg = truncateForSms(`${header}\nPriority: ${triage.issue?.priority || "unknown"}\n${triage.issue?.priorityReasoning || ""}${incidentLine}${slaLine}\nAsset: ${assetName}\nFrom: ${worker.name || from}\nAssigned: ${assigned}${costLine}`);
+          const priorityLabel = priorityProfile?.display_label || triage.issue?.priority || "unknown";
+          const mgrMsg = truncateForSms(`${header}\nPriority: ${priorityLabel}\n${triage.issue?.priorityReasoning || ""}${incidentLine}${slaLine}\nAsset: ${assetName}\nFrom: ${worker.name || from}\nAssigned: ${assigned}${costLine}`);
           await sendSMS(company.manager_phone, mgrMsg);
         }
 

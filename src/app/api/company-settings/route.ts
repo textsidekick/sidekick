@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getCompanyId } from "@/lib/dashboard-auth";
 import { auditLog } from "@/lib/audit";
-import { normalizeCompanyPriorityProfiles } from "@/lib/company-settings";
+import { extractPriorityDisplayLabels, normalizeCompanyPriorityProfiles } from "@/lib/company-settings";
 
 export async function GET(req: NextRequest) {
   const companyId = await getCompanyId(req);
@@ -12,8 +12,9 @@ export async function GET(req: NextRequest) {
   const { data: cats } = await supabase.from("wo_categories").select("*").eq("company_id", companyId).order("name");
   const { data: pris } = await supabase.from("wo_priorities").select("*").eq("company_id", companyId).order("level");
   const { data: company } = await supabase.from("companies").select("name,manager_phone,manager_name").eq("id", companyId).single();
+  const priorityDisplayLabels = extractPriorityDisplayLabels(data?.escalation_rules || []);
 
-  return NextResponse.json({ settings: data, categories: cats || [], priorities: normalizeCompanyPriorityProfiles(pris as any), company });
+  return NextResponse.json({ settings: data, categories: cats || [], priorities: normalizeCompanyPriorityProfiles(pris as any, priorityDisplayLabels), company });
 }
 
 export async function PUT(req: NextRequest) {
