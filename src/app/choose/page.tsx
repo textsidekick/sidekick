@@ -1,19 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { LayoutDashboard, MessageCircle, Globe } from "lucide-react";
 
 export default function ChoosePage() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
-
-  useEffect(() => {
-    try {
-      const auth = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
-      setUsername(auth.phone || auth.username || "");
-    } catch {}
-  }, [router]);
 
   return (
     <div style={{
@@ -38,7 +29,7 @@ export default function ChoosePage() {
 
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <button
-            onClick={() => router.push("/manager")}
+            onClick={() => router.push("/today")}
             style={{
               display: "flex", alignItems: "center", gap: 16, padding: "20px 24px",
               background: "#ffffff", border: "1px solid rgba(28,26,22,0.08)", borderRadius: 16,
@@ -75,7 +66,7 @@ export default function ChoosePage() {
             </div>
             <div>
               <div style={{ fontSize: 16, fontWeight: 600, color: "#1C1A16" }}>Set Up New Facility</div>
-              <div style={{ fontSize: 13, color: "rgba(28,26,22,0.5)", marginTop: 2 }}>Tell us about your operation and we'll build your team's operating memory</div>
+              <div style={{ fontSize: 13, color: "rgba(28,26,22,0.5)", marginTop: 2 }}>Tell us about your operation and we’ll build your team’s operating memory</div>
             </div>
           </button>
 

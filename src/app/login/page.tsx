@@ -78,7 +78,7 @@ export default function LoginPage() {
         } else if (data.trialExpired || data.questionsExhausted) {
           router.push("/choose");
         } else {
-          router.push("/operations");
+          router.push("/today");
         }
       } else {
         setError(data.error || "Invalid code.");

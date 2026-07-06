@@ -15,7 +15,7 @@ type Worker = {
   id: string;
   name: string | null;
   phone: string;
-  role: string;
+  role: string | null;
   verified: boolean;
   created_at: string;
 };
@@ -55,7 +55,21 @@ const ROLE_SKILLS: Record<string, string[]> = {
 
 const ROLES = ["operator", "technician", "supervisor", "manager"];
 
-function roleBadge(role: string) {
+function normalizeRole(role?: string | null): string | null {
+  const normalized = role?.trim().toLowerCase();
+  return normalized && ROLES.includes(normalized) ? normalized : null;
+}
+
+function roleBadge(role?: string | null) {
+  const normalizedRole = normalizeRole(role);
+  if (!normalizedRole) {
+    return (
+      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">
+        Pending role
+      </span>
+    );
+  }
+
   const cls: Record<string, string> = {
     manager: "bg-[#C96442]/10 text-gray-700",
     supervisor: "bg-slate-100 text-slate-700",
@@ -63,8 +77,8 @@ function roleBadge(role: string) {
     operator: "bg-gray-100 text-gray-700",
   };
   return (
-    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${cls[role] || "bg-gray-100 text-gray-700"}`}>
-      {role.charAt(0).toUpperCase() + role.slice(1)}
+    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${cls[normalizedRole] || "bg-gray-100 text-gray-700"}`}>
+      {normalizedRole.charAt(0).toUpperCase() + normalizedRole.slice(1)}
     </span>
   );
 }
@@ -240,7 +254,7 @@ export default function TeamPage() {
 
   function openEdit(w: Worker) {
     setEditWorker(w);
-    setForm({ name: w.name || "", phone: w.phone, role: w.role });
+    setForm({ name: w.name || "", phone: w.phone, role: normalizeRole(w.role) || "operator" });
     setShowAdd(true);
   }
 
@@ -324,7 +338,8 @@ export default function TeamPage() {
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {workers.map(w => {
-                      const skills = ROLE_SKILLS[w.role] || ["General"];
+                      const normalizedRole = normalizeRole(w.role);
+                      const skills = normalizedRole ? (ROLE_SKILLS[normalizedRole] || ["General"]) : [];
                       const wosCompleted = workOrders.filter(wo => wo.assigned_to === w.id && wo.status === "completed").length;
                       const isExpanded = expandedWorker === w.id;
                       const workerCerts = certifications.filter(c => c.worker_phone === w.phone);
@@ -339,9 +354,13 @@ export default function TeamPage() {
                           <td className="px-4 py-3 text-gray-600 font-mono text-xs">{w.phone}</td>
                           <td className="px-4 py-3">{roleBadge(w.role)}</td>
                           <td className="px-4 py-3 hidden md:table-cell">
-                            <div className="flex flex-wrap gap-1">
-                              {skills.map(s => <span key={s} className="text-xs px-2 py-0.5 bg-blue-100 text-gray-700 rounded-full">{s}</span>)}
-                            </div>
+                            {skills.length > 0 ? (
+                              <div className="flex flex-wrap gap-1">
+                                {skills.map(s => <span key={s} className="text-xs px-2 py-0.5 bg-blue-100 text-gray-700 rounded-full">{s}</span>)}
+                              </div>
+                            ) : (
+                              <span className="text-xs text-gray-400">—</span>
+                            )}
                           </td>
                           <td className="px-4 py-3 text-sm text-gray-700 font-medium">{wosCompleted || <span className="text-gray-400">—</span>}</td>
                           <td className="px-4 py-3">
