@@ -753,10 +753,10 @@ export default function OnboardingChat() {
                   onClick={() => { setIsComplete(true); handleCompleteInterview(messages); }}
                   disabled={loading}
                   style={{
-                    display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 16px", borderRadius: 999,
+                    display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 999,
                     border: "1px solid rgba(201,100,66,0.3)", background: "rgba(201,100,66,0.08)", color: "#C96442",
                     fontSize: 13, fontWeight: 600, cursor: loading ? "default" : "pointer",
-                    opacity: loading ? 0.6 : 1, marginLeft: "auto",
+                    opacity: loading ? 0.6 : 1,
                   }}
                 >
                   <CheckCircle2 size={14} /> Finish Setup
