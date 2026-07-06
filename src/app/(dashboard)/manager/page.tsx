@@ -86,22 +86,30 @@ export default function ManagerDashboard() {
 
   // Load companies + workers
   useEffect(() => {
-    fetch("/api/companies").then(r => r.json()).then(d => {
+    // First get the session's company (source of truth), then load companies list
+    Promise.all([
+      fetch("/api/auth/session", { cache: "no-store" }).then(r => r.ok ? r.json() : null),
+      fetch("/api/companies").then(r => r.json()),
+    ]).then(([session, d]) => {
       const allCompanies = d.companies || [];
       setCompanies(allCompanies);
 
+      // Use session company as source of truth
+      const sessionCompanyId = session?.companyId;
       const savedAuth = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
-      if (savedAuth.companyId && allCompanies.some((c: any) => c.id === savedAuth.companyId)) {
+      
+      if (sessionCompanyId && allCompanies.some((c: any) => c.id === sessionCompanyId)) {
+        setSelectedCompany(sessionCompanyId);
+        savedAuth.companyId = sessionCompanyId;
+      } else if (savedAuth.companyId && allCompanies.some((c: any) => c.id === savedAuth.companyId)) {
         setSelectedCompany(savedAuth.companyId);
       } else if (allCompanies.length > 0) {
-        // Saved company not found (deleted?) — use first available
         setSelectedCompany(allCompanies[0].id);
-        try {
-          savedAuth.companyId = allCompanies[0].id;
-          localStorage.setItem("sidekick_auth", JSON.stringify(savedAuth));
-        } catch {}
+        savedAuth.companyId = allCompanies[0].id;
       }
-      setSelectedLocationId(savedAuth.locationId || "all");
+
+      try { localStorage.setItem("sidekick_auth", JSON.stringify(savedAuth)); } catch {}
+      setSelectedLocationId(session?.selectedLocationId || savedAuth.locationId || "all");
       if (d.workers) setWorkers(d.workers);
     });
   }, []);
