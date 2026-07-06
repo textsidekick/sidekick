@@ -24,8 +24,8 @@ function generateAccessCode(): string {
 function generateNameBasedCode(name: string): string {
   const cleaned = name.toUpperCase().replace(/[^A-Z0-9]/g, "");
   
-  // If short enough (≤8 chars), use the whole thing
-  if (cleaned.length <= 8) return cleaned;
+  // If short enough (≤6 chars), use the whole thing
+  if (cleaned.length <= 6) return cleaned;
   
   // Try acronym from words (e.g. "Acme Manufacturing" → "AM")
   const words = name.trim().split(/\s+/).filter(w => w.length > 0);
@@ -34,7 +34,8 @@ function generateNameBasedCode(name: string): string {
   // If acronym is too short, use first 6 chars of cleaned name
   if (acronym.length < 3) return cleaned.slice(0, 6);
   
-  return acronym;
+  // Always cap at 6 chars to fit the DB column
+  return acronym.slice(0, 6);
 }
 
 export async function POST(request: NextRequest) {
