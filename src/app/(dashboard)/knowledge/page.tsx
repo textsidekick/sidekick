@@ -301,6 +301,76 @@ export default function KnowledgePage() {
       {/* ── Header ── */}
       <SectionHeader title="Operational Knowledge" subtitle="Your crew's operating memory — everything they've learned, documented, and captured" />
 
+      {/* ══════════════════════════════════════════════════════════════════════
+          ADD KNOWLEDGE — secondary to browsing/search
+          ══════════════════════════════════════════════════════════════════════ */}
+      <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="max-w-xl">
+          <div className="flex items-center gap-2">
+            <Plus className="w-4 h-4 text-[#C96442]" />
+            <h2 className="text-base font-semibold text-gray-900">Capture new knowledge</h2>
+          </div>
+          <p className="mt-2 text-sm text-gray-500">
+            Add fixes, SOPs, and field learnings in whatever format you have right now.
+          </p>
+        </div>
+
+        <div className="mt-5 flex flex-wrap gap-2 rounded-2xl border border-gray-200 bg-gray-50 p-2">
+          {[
+            { id: "text", label: "Text", icon: Smartphone },
+            { id: "voice", label: "Voice", icon: Mic },
+            { id: "upload", label: "Upload", icon: Upload },
+          ].map(({ id, label, icon: Icon }) => {
+            const active = activeCaptureTab === id;
+            return (
+              <button
+                key={id}
+                onClick={() => setActiveCaptureTab(id as CaptureTab)}
+                className={cn(
+                  "flex min-w-[110px] flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium transition-colors",
+                  active
+                    ? "bg-white text-[#1C1A16] shadow-sm ring-1 ring-[#C96442]/20"
+                    : "text-gray-600 hover:bg-white hover:text-gray-900"
+                )}
+              >
+                <Icon className={cn("h-4 w-4", active ? "text-[#C96442]" : "text-gray-500")} />
+                {label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="mt-4">
+          {activeCaptureTab === "text" && <TextSidekickCard />}
+          {activeCaptureTab === "voice" && <VoiceInputCard companyId={companyId} />}
+          {activeCaptureTab === "upload" && <UploadCard companyId={companyId} />}
+        </div>
+      </div>
+
+      <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="max-w-2xl">
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-[#C96442]" />
+              <h2 className="text-base font-semibold text-gray-900">Connected sources</h2>
+            </div>
+            <p className="mt-2 text-sm text-gray-500">
+              Keep your integrations and imported docs together here.
+            </p>
+          </div>
+          <a
+            href="/review-queue"
+            className="shrink-0 rounded-lg border border-black/10 bg-white px-3 py-2 text-sm font-medium text-[#1C1A16] hover:bg-black/[0.03]"
+          >
+            Review generated knowledge
+          </a>
+        </div>
+
+        <div className="mt-5">
+          <IntegrationSelector companyId={companyId} />
+        </div>
+      </div>
+
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <div className="inline-flex items-center gap-3 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-600">
           <BookOpen className="h-4 w-4 text-gray-700" />
@@ -399,75 +469,6 @@ export default function KnowledgePage() {
         )}
       </div>
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          ADD KNOWLEDGE — secondary to browsing/search
-          ══════════════════════════════════════════════════════════════════════ */}
-      <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-        <div className="max-w-xl">
-          <div className="flex items-center gap-2">
-            <Plus className="w-4 h-4 text-[#C96442]" />
-            <h2 className="text-base font-semibold text-gray-900">Capture new knowledge</h2>
-          </div>
-          <p className="mt-2 text-sm text-gray-500">
-            Add fixes, SOPs, and field learnings in whatever format you have right now.
-          </p>
-        </div>
-
-        <div className="mt-5 flex flex-wrap gap-2 rounded-2xl border border-gray-200 bg-gray-50 p-2">
-          {[
-            { id: "text", label: "Text", icon: Smartphone },
-            { id: "voice", label: "Voice", icon: Mic },
-            { id: "upload", label: "Upload", icon: Upload },
-          ].map(({ id, label, icon: Icon }) => {
-            const active = activeCaptureTab === id;
-            return (
-              <button
-                key={id}
-                onClick={() => setActiveCaptureTab(id as CaptureTab)}
-                className={cn(
-                  "flex min-w-[110px] flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium transition-colors",
-                  active
-                    ? "bg-white text-[#1C1A16] shadow-sm ring-1 ring-[#C96442]/20"
-                    : "text-gray-600 hover:bg-white hover:text-gray-900"
-                )}
-              >
-                <Icon className={cn("h-4 w-4", active ? "text-[#C96442]" : "text-gray-500")} />
-                {label}
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="mt-4">
-          {activeCaptureTab === "text" && <TextSidekickCard />}
-          {activeCaptureTab === "voice" && <VoiceInputCard companyId={companyId} />}
-          {activeCaptureTab === "upload" && <UploadCard companyId={companyId} />}
-        </div>
-      </div>
-
-      <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div className="max-w-2xl">
-            <div className="flex items-center gap-2">
-              <FileText className="h-4 w-4 text-[#C96442]" />
-              <h2 className="text-base font-semibold text-gray-900">Connected sources</h2>
-            </div>
-            <p className="mt-2 text-sm text-gray-500">
-              Keep your integrations and imported docs together here.
-            </p>
-          </div>
-          <a
-            href="/review-queue"
-            className="shrink-0 rounded-lg border border-black/10 bg-white px-3 py-2 text-sm font-medium text-[#1C1A16] hover:bg-black/[0.03]"
-          >
-            Review generated knowledge
-          </a>
-        </div>
-
-        <div className="mt-5">
-          <IntegrationSelector companyId={companyId} />
-        </div>
-      </div>
     </div>
   );
 }

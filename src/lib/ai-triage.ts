@@ -17,6 +17,17 @@ export interface Asset {
   tag?: string | null;
 }
 
+export interface CompanyCategory {
+  name: string;
+  color?: string | null;
+}
+
+export interface PriorityProfile {
+  name: "critical" | "high" | "medium" | "low";
+  level: number;
+  sla_hours: number;
+}
+
 export interface WorkOrder {
   id: string;
   status?: string | null;
@@ -42,16 +53,7 @@ export type TriageResult = {
     assetTag: string | null;
     assetId: string | null;
 
-    category:
-      | "mechanical"
-      | "electrical"
-      | "plumbing"
-      | "hydraulic"
-      | "pneumatic"
-      | "safety"
-      | "quality"
-      | "environmental"
-      | "other";
+    category: string;
     priority: "critical" | "high" | "medium" | "low";
     priorityReasoning: string;
 
@@ -165,8 +167,19 @@ export async function triageIncomingMessage(params: {
   imageAnalysis?: ImageAnalysis;
   existingAssets?: Asset[];
   activeWorkOrders?: WorkOrder[];
+  companyCategories?: CompanyCategory[];
+  priorityProfiles?: PriorityProfile[];
 }): Promise<TriageResult> {
-  const { message, workerPhone, companyId, imageAnalysis, existingAssets, activeWorkOrders } = params;
+  const {
+    message,
+    workerPhone,
+    companyId,
+    imageAnalysis,
+    existingAssets,
+    activeWorkOrders,
+    companyCategories,
+    priorityProfiles,
+  } = params;
 
   const assetsForPrompt = (existingAssets || []).slice(0, 80).map((a) => ({
     id: a.id,
@@ -199,11 +212,17 @@ CONSTRAINTS:
 - If message is just "start"/"started"/"on it" => work_order_update action=start.
 - If message is "done"/"fixed"/"completed" => work_order_update action=complete.
 - If uncertain between issue_report and question, prefer issue_report when there is a problem symptom.
+- priority must always be one of: critical, high, medium, low.
 
 MANUFACTURING CONTEXT:
 - Understand common equipment/failure modes: motors, conveyors, pumps, compressors, CNC, presses, hydraulics, pneumatics, sensors, PLCs.
 - Provide actionable troubleshooting steps (safe, practical) and likely parts.
 - Always include LOTO/guarding warnings when rotating machinery or electrical panels are involved.
+
+COMPANY CONFIG:
+- If companyCategories are provided, prefer one of those exact category names for issue.category when it fits the issue.
+- If no company category fits, use a practical maintenance category string like mechanical, electrical, hydraulic, pneumatic, safety, quality, preventive, inspection, or other.
+- If priorityProfiles are provided, use their levels and SLA hours as guidance when choosing critical/high/medium/low.
 
 ASSET MATCHING:
 - Use the provided asset list when possible. If you can map to an asset, set assetId and assetTag.
@@ -231,6 +250,8 @@ OUTPUT JSON SCHEMA:
     imageAnalysis: imageAnalysis || null,
     assets: assetsForPrompt,
     activeWorkOrders: workOrdersForPrompt,
+    companyCategories: companyCategories || [],
+    priorityProfiles: priorityProfiles || [],
   };
 
   let modelText = "";

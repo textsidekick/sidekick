@@ -2,27 +2,73 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Settings, Save } from "lucide-react";
+import { Plus, Save, Settings, Trash2 } from "lucide-react";
+
+type NotificationPreferences = {
+  sms_on_critical: boolean;
+  sms_on_wo_create: boolean;
+  daily_digest: boolean;
+};
 
 type CompanySettings = {
-  notification_preferences: Record<string, boolean>;
+  working_hours_start: string;
+  working_hours_end: string;
+  notification_preferences: NotificationPreferences;
 };
-type Company = { name: string; manager_phone: string; manager_name: string };
 
-const DEFAULT_NOTIFICATION_PREFERENCES = {
+type Company = { name: string; manager_phone: string; manager_name: string };
+type WoCategory = { id: string; name: string; color: string };
+type WoPriority = {
+  id?: string;
+  name: "critical" | "high" | "medium" | "low";
+  level: number;
+  sla_hours: number;
+};
+
+const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
   sms_on_critical: true,
   sms_on_wo_create: false,
   daily_digest: false,
 };
 
+const DEFAULT_PRIORITIES: WoPriority[] = [
+  { name: "critical", level: 4, sla_hours: 2 },
+  { name: "high", level: 3, sla_hours: 8 },
+  { name: "medium", level: 2, sla_hours: 24 },
+  { name: "low", level: 1, sla_hours: 72 },
+];
+
+function normalizePriorities(rows: Partial<WoPriority>[] = []): WoPriority[] {
+  const byName = new Map(
+    rows
+      .filter((row) => typeof row.name === "string")
+      .map((row) => [String(row.name).toLowerCase(), row])
+  );
+
+  return DEFAULT_PRIORITIES.map((fallback) => {
+    const row = byName.get(fallback.name);
+    return {
+      id: row?.id,
+      name: fallback.name,
+      level: Number.isFinite(Number(row?.level)) ? Number(row?.level) : fallback.level,
+      sla_hours: Number.isFinite(Number(row?.sla_hours)) ? Number(row?.sla_hours) : fallback.sla_hours,
+    };
+  });
+}
+
 export default function SettingsPage() {
   const [company, setCompany] = useState<Company>({ name: "", manager_phone: "", manager_name: "" });
   const [settings, setSettings] = useState<CompanySettings>({
+    working_hours_start: "06:00",
+    working_hours_end: "22:00",
     notification_preferences: DEFAULT_NOTIFICATION_PREFERENCES,
   });
+  const [categories, setCategories] = useState<WoCategory[]>([]);
+  const [priorities, setPriorities] = useState<WoPriority[]>(DEFAULT_PRIORITIES);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [newCat, setNewCat] = useState({ name: "", color: "#6b7280" });
 
   async function load() {
     setLoading(true);
@@ -31,16 +77,22 @@ export default function SettingsPage() {
       const json = await res.json();
       if (json.company) setCompany(json.company);
       setSettings({
+        working_hours_start: json.settings?.working_hours_start || "06:00",
+        working_hours_end: json.settings?.working_hours_end || "22:00",
         notification_preferences: {
           ...DEFAULT_NOTIFICATION_PREFERENCES,
           ...(json.settings?.notification_preferences || {}),
         },
       });
+      setCategories(json.categories || []);
+      setPriorities(normalizePriorities(json.priorities || []));
     }
     setLoading(false);
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   async function handleSave() {
     setSaving(true);
@@ -48,16 +100,44 @@ export default function SettingsPage() {
     const res = await fetch("/api/company-settings", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ settings, company }),
+      body: JSON.stringify({ settings, company, priorities }),
     });
     setSaving(false);
-    if (res.ok) { setSuccess(true); setTimeout(() => setSuccess(false), 3000); }
+    if (res.ok) {
+      setSuccess(true);
+      await load();
+      setTimeout(() => setSuccess(false), 3000);
+    }
+  }
+
+  async function addCategory() {
+    if (!newCat.name.trim()) return;
+    const res = await fetch("/api/company-settings/categories", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: newCat.name.trim(), color: newCat.color }),
+    });
+    if (res.ok) {
+      setNewCat({ name: "", color: "#6b7280" });
+      await load();
+    }
+  }
+
+  async function deleteCategory(id: string) {
+    const res = await fetch(`/api/company-settings/categories/${id}`, { method: "DELETE" });
+    if (res.ok) await load();
+  }
+
+  function updatePriority(name: WoPriority["name"], patch: Partial<WoPriority>) {
+    setPriorities((current) =>
+      current.map((priority) => (priority.name === name ? { ...priority, ...patch } : priority))
+    );
   }
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-3xl mx-auto px-6 py-8">
-        <div className="flex items-center justify-between mb-6">
+      <div className="max-w-4xl mx-auto px-6 py-8">
+        <div className="flex items-center justify-between mb-6 gap-4">
           <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
             <Settings className="h-6 w-6 text-[#C96442]" /> Company Settings
           </h1>
@@ -66,22 +146,46 @@ export default function SettingsPage() {
           </Button>
         </div>
 
-        {loading ? <div className="text-gray-400 py-20 text-center">Loading…</div> : (
+        {loading ? (
+          <div className="text-gray-400 py-20 text-center">Loading…</div>
+        ) : (
           <div className="space-y-6">
-            {/* Company Info */}
             <section className="bg-white rounded-xl border border-gray-200 p-5">
               <h2 className="text-sm font-semibold text-gray-700 mb-4">Company Info</h2>
               <div className="grid grid-cols-1 gap-4">
-                <Field label="Company Name" value={company.name} onChange={(v) => setCompany(c => ({ ...c, name: v }))} />
-                <Field label="Manager Name" value={company.manager_name} onChange={(v) => setCompany(c => ({ ...c, manager_name: v }))} />
-                <Field label="Manager Phone" value={company.manager_phone} onChange={(v) => setCompany(c => ({ ...c, manager_phone: v }))} placeholder="+1 555 000 0000" />
+                <Field label="Company Name" value={company.name} onChange={(v) => setCompany((c) => ({ ...c, name: v }))} />
+                <Field label="Manager Name" value={company.manager_name} onChange={(v) => setCompany((c) => ({ ...c, manager_name: v }))} />
+                <Field label="Manager Phone" value={company.manager_phone} onChange={(v) => setCompany((c) => ({ ...c, manager_phone: v }))} placeholder="+1 555 000 0000" />
               </div>
             </section>
 
-
-            {/* Notification Preferences */}
             <section className="bg-white rounded-xl border border-gray-200 p-5">
-              <h2 className="text-sm font-semibold text-gray-700 mb-4">Notification Preferences</h2>
+              <h2 className="text-sm font-semibold text-gray-700 mb-1">Working Hours</h2>
+              <p className="text-xs text-gray-500 mb-4">These are live. Non-critical manager SMS alerts only go out during these hours; critical incidents still break through immediately.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-gray-500 block mb-1">Start Time</label>
+                  <input
+                    type="time"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                    value={settings.working_hours_start}
+                    onChange={(e) => setSettings((s) => ({ ...s, working_hours_start: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 block mb-1">End Time</label>
+                  <input
+                    type="time"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                    value={settings.working_hours_end}
+                    onChange={(e) => setSettings((s) => ({ ...s, working_hours_end: e.target.value }))}
+                  />
+                </div>
+              </div>
+            </section>
+
+            <section className="bg-white rounded-xl border border-gray-200 p-5">
+              <h2 className="text-sm font-semibold text-gray-700 mb-1">Notification Preferences</h2>
               <p className="text-xs text-gray-500 mb-4">These are live. They control manager SMS alerts for work orders and whether daily digests are sent.</p>
               <div className="space-y-3">
                 {[
@@ -92,12 +196,93 @@ export default function SettingsPage() {
                   <label key={key} className="flex items-center gap-3 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={!!settings.notification_preferences[key]}
-                      onChange={(e) => setSettings(s => ({ ...s, notification_preferences: { ...s.notification_preferences, [key]: e.target.checked } }))}
+                      checked={!!settings.notification_preferences[key as keyof NotificationPreferences]}
+                      onChange={(e) =>
+                        setSettings((s) => ({
+                          ...s,
+                          notification_preferences: {
+                            ...s.notification_preferences,
+                            [key]: e.target.checked,
+                          },
+                        }))
+                      }
                       className="rounded"
                     />
                     <span className="text-sm text-gray-700">{label}</span>
                   </label>
+                ))}
+              </div>
+            </section>
+
+            <section className="bg-white rounded-xl border border-gray-200 p-5">
+              <h2 className="text-sm font-semibold text-gray-700 mb-1">Work Order Categories</h2>
+              <p className="text-xs text-gray-500 mb-4">These are live. AI triage now prefers these category names for new issues, and technician routing uses the chosen category string when matching skills.</p>
+              <div className="space-y-2 mb-4">
+                {categories.length === 0 ? (
+                  <div className="text-sm text-gray-400">No categories added yet.</div>
+                ) : (
+                  categories.map((cat) => (
+                    <div key={cat.id} className="flex items-center gap-3">
+                      <span className="w-4 h-4 rounded-full flex-shrink-0" style={{ background: cat.color }} />
+                      <span className="text-sm flex-1">{cat.name}</span>
+                      <button onClick={() => deleteCategory(cat.id)} className="text-gray-400 hover:text-red-500" aria-label={`Delete ${cat.name}`}>
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={newCat.color}
+                  onChange={(e) => setNewCat((c) => ({ ...c, color: e.target.value }))}
+                  className="w-8 h-8 rounded border border-gray-200 cursor-pointer"
+                />
+                <input
+                  className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm"
+                  placeholder="Category name"
+                  value={newCat.name}
+                  onChange={(e) => setNewCat((c) => ({ ...c, name: e.target.value }))}
+                />
+                <Button size="sm" onClick={addCategory} variant="outline">
+                  <Plus className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </section>
+
+            <section className="bg-white rounded-xl border border-gray-200 p-5">
+              <h2 className="text-sm font-semibold text-gray-700 mb-1">Work Order Priorities</h2>
+              <p className="text-xs text-gray-500 mb-4">These are live. SLA hours are saved to the backend, used to guide AI urgency classification, and attached to new work-order alerting.</p>
+              <div className="space-y-3">
+                {priorities.map((priority) => (
+                  <div key={priority.name} className="grid grid-cols-1 sm:grid-cols-[120px_100px_120px] gap-3 items-center rounded-lg border border-gray-200 p-3">
+                    <div>
+                      <div className="text-xs text-gray-500 mb-1">Priority</div>
+                      <div className="text-sm font-medium capitalize text-gray-900">{priority.name}</div>
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-500 block mb-1">Level</label>
+                      <input
+                        type="number"
+                        min={1}
+                        max={4}
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                        value={priority.level}
+                        onChange={(e) => updatePriority(priority.name, { level: Number(e.target.value) || priority.level })}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-500 block mb-1">SLA hours</label>
+                      <input
+                        type="number"
+                        min={1}
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                        value={priority.sla_hours}
+                        onChange={(e) => updatePriority(priority.name, { sla_hours: Number(e.target.value) || priority.sla_hours })}
+                      />
+                    </div>
+                  </div>
                 ))}
               </div>
             </section>

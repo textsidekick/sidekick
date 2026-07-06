@@ -9,15 +9,7 @@ export type WorkOrderStatus =
   | "on_hold"
   | "completed"
   | "cancelled";
-export type WorkOrderCategory =
-  | "mechanical"
-  | "electrical"
-  | "plumbing"
-  | "safety"
-  | "quality"
-  | "preventive"
-  | "inspection"
-  | "other";
+export type WorkOrderCategory = string;
 export type WorkOrderSource =
   | "sms"
   | "voice_note"

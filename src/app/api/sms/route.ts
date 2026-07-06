@@ -22,7 +22,12 @@ import {
   TRAINING_COACH_FOLLOW_UP_TOPIC,
   TRAINING_COACH_TOPIC,
 } from "@/lib/training-coach";
-import { getCompanyRuntimeSettings, shouldSendManagerWorkOrderAlert } from "@/lib/company-settings";
+import {
+  getCompanyRuntimeSettings,
+  getPriorityProfile,
+  normalizeCompanyPriorityProfiles,
+  shouldSendManagerWorkOrderAlert,
+} from "@/lib/company-settings";
 import { detectCriticalIncident, getCriticalIncidentMeta } from "@/lib/critical-incident";
 import { isWhatsAppMessage, stripWhatsAppPrefix, sendMessage } from "@/lib/whatsapp";
 
@@ -1265,20 +1270,42 @@ Rules:
     // ============================================
     // AI TRIAGE (replaces regex issue detection)
     // ============================================
-    const { data: assets } = await supabase
-      .from("assets")
-      .select("id, name, asset_tag")
-      .eq("company_id", worker.company_id)
-      .limit(200);
+    const [
+      { data: assets },
+      { data: activeWorkOrders },
+      { data: categoryRows },
+      { data: priorityRows },
+    ] = await Promise.all([
+      supabase
+        .from("assets")
+        .select("id, name, asset_tag")
+        .eq("company_id", worker.company_id)
+        .limit(200),
+      supabase
+        .from("work_orders")
+        .select("id, short_id, title, status, assigned_to, assigned_to_phone, technician_id, worker_phone, asset_name, ai_triage, created_at")
+        .eq("company_id", worker.company_id)
+        .eq("worker_phone", from)
+        .in("status", ["open", "assigned", "in_progress", "on_hold"])
+        .order("created_at", { ascending: false })
+        .limit(20),
+      supabase
+        .from("wo_categories")
+        .select("name, color")
+        .eq("company_id", worker.company_id)
+        .order("name"),
+      supabase
+        .from("wo_priorities")
+        .select("id, name, level, sla_hours")
+        .eq("company_id", worker.company_id)
+        .order("level", { ascending: false }),
+    ]);
 
-    const { data: activeWorkOrders } = await supabase
-      .from("work_orders")
-      .select("id, short_id, title, status, assigned_to, assigned_to_phone, technician_id, worker_phone, asset_name, ai_triage, created_at")
-      .eq("company_id", worker.company_id)
-      .eq("worker_phone", from)
-      .in("status", ["open", "assigned", "in_progress", "on_hold"])
-      .order("created_at", { ascending: false })
-      .limit(20);
+    const companyCategories = (categoryRows || []).map((row: any) => ({
+      name: row.name,
+      color: row.color,
+    }));
+    const priorityProfiles = normalizeCompanyPriorityProfiles(priorityRows as any);
 
     // ============================================
     // DIRECT WO STATUS COMMANDS (bypass AI triage)
@@ -1344,6 +1371,8 @@ Rules:
       imageAnalysis: imageAnalysisForTriage,
       existingAssets: (assets || []) as any,
       activeWorkOrders: (activeWorkOrders || []) as any,
+      companyCategories: companyCategories as any,
+      priorityProfiles,
     });
 
     // ============================================
@@ -1422,10 +1451,18 @@ Rules:
     if (triage.messageType === "issue_report") {
       try {
         const criticalIncidentMeta = detectCriticalIncident(body, triage as any);
+        const priorityProfile = getPriorityProfile(triage.issue?.priority || null, priorityProfiles);
+        const aiTriageExtra: Record<string, unknown> = {};
+        if (criticalIncidentMeta) aiTriageExtra.critical_incident = criticalIncidentMeta;
+        if (priorityProfile) aiTriageExtra.priority_profile = {
+          level: priorityProfile.level,
+          sla_hours: priorityProfile.sla_hours,
+        };
+
         const wo = await createWorkOrderFromTriage(triage as any, worker.company_id, from, {
           originalMessage: body,
           source: imageAnalysisForTriage ? "photo" : "sms",
-          aiTriageExtra: criticalIncidentMeta ? { critical_incident: criticalIncidentMeta } : undefined,
+          aiTriageExtra: Object.keys(aiTriageExtra).length > 0 ? aiTriageExtra : undefined,
         });
 
         // Best-effort load WO for short_id + asset location
@@ -1486,10 +1523,11 @@ Rules:
               await supabase.from("work_orders").update({ downtime_cost_estimate: costEst.totalEstimatedCost }).eq("id", wo.id);
             }
           } catch { /* cost engine not critical */ }
+          const slaLine = priorityProfile ? `\nTarget SLA: ${priorityProfile.sla_hours}h` : "";
 
           const header = criticalIncidentMeta ? `🚨 CRITICAL WO ${woFull?.short_id || wo.id.slice(0, 8)}` : `⚠️ ALERT WO ${woFull?.short_id || wo.id.slice(0, 8)}`;
           const incidentLine = criticalIncidentMeta ? `\nIncident: ${criticalIncidentMeta.kind.replaceAll("_", " ")}` : "";
-          const mgrMsg = truncateForSms(`${header}\nPriority: ${triage.issue?.priority || "unknown"}\n${triage.issue?.priorityReasoning || ""}${incidentLine}\nAsset: ${assetName}\nFrom: ${worker.name || from}\nAssigned: ${assigned}${costLine}`);
+          const mgrMsg = truncateForSms(`${header}\nPriority: ${triage.issue?.priority || "unknown"}\n${triage.issue?.priorityReasoning || ""}${incidentLine}${slaLine}\nAsset: ${assetName}\nFrom: ${worker.name || from}\nAssigned: ${assigned}${costLine}`);
           await sendSMS(company.manager_phone, mgrMsg);
         }
 

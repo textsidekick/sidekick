@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getCompanyId } from "@/lib/dashboard-auth";
 import { auditLog } from "@/lib/audit";
+import { normalizeCompanyPriorityProfiles } from "@/lib/company-settings";
 
 export async function GET(req: NextRequest) {
   const companyId = await getCompanyId(req);
@@ -12,7 +13,7 @@ export async function GET(req: NextRequest) {
   const { data: pris } = await supabase.from("wo_priorities").select("*").eq("company_id", companyId).order("level");
   const { data: company } = await supabase.from("companies").select("name,manager_phone,manager_name").eq("id", companyId).single();
 
-  return NextResponse.json({ settings: data, categories: cats || [], priorities: pris || [], company });
+  return NextResponse.json({ settings: data, categories: cats || [], priorities: normalizeCompanyPriorityProfiles(pris as any), company });
 }
 
 export async function PUT(req: NextRequest) {
@@ -23,7 +24,11 @@ export async function PUT(req: NextRequest) {
   try { body = await req.json(); } catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }); }
 
   // Upsert settings
-  const { settings, company: companyUpdate } = body as { settings?: Record<string, unknown>; company?: Record<string, unknown> };
+  const { settings, company: companyUpdate, priorities } = body as {
+    settings?: Record<string, unknown>;
+    company?: Record<string, unknown>;
+    priorities?: Array<{ id?: string; name?: string; level?: number; sla_hours?: number }>;
+  };
 
   if (settings) {
     const { error: settingsErr } = await supabase.from("company_settings").upsert({
@@ -43,6 +48,48 @@ export async function PUT(req: NextRequest) {
     for (const k of allowed) if (k in companyUpdate) upd[k] = companyUpdate[k];
     if (Object.keys(upd).length > 0) {
       await supabase.from("companies").update(upd).eq("id", companyId);
+    }
+  }
+
+  if (Array.isArray(priorities)) {
+    const normalized = normalizeCompanyPriorityProfiles(priorities as any);
+    const { data: existingRows } = await supabase
+      .from("wo_priorities")
+      .select("id, name")
+      .eq("company_id", companyId);
+
+    const existingByName = new Map(
+      (existingRows || [])
+        .filter((row: any) => typeof row.name === "string")
+        .map((row: any) => [String(row.name).toLowerCase(), row])
+    );
+
+    for (const priority of normalized) {
+      const existing = existingByName.get(priority.name);
+      const payload = {
+        company_id: companyId,
+        name: priority.name,
+        level: priority.level,
+        sla_hours: priority.sla_hours,
+      };
+
+      if (existing?.id) {
+        const { error } = await supabase
+          .from("wo_priorities")
+          .update({ level: priority.level, sla_hours: priority.sla_hours })
+          .eq("id", existing.id)
+          .eq("company_id", companyId);
+        if (error) {
+          console.error("[Settings] Priority update error:", error);
+          return NextResponse.json({ error: "Failed to save priorities", details: error.message }, { status: 500 });
+        }
+      } else {
+        const { error } = await supabase.from("wo_priorities").insert(payload);
+        if (error) {
+          console.error("[Settings] Priority insert error:", error);
+          return NextResponse.json({ error: "Failed to save priorities", details: error.message }, { status: 500 });
+        }
+      }
     }
   }
 

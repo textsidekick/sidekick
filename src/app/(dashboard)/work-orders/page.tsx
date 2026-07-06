@@ -456,7 +456,7 @@ export default function WorkOrdersPage() {
                         <TableCell className="font-medium">
                           <Link
                             href={`/work-orders/${wo.id}`}
-                            className="text-[#C96442] hover:underline"
+                            className="text-black/60 hover:text-black/80 hover:underline"
                           >
                             {wo.short_id}
                           </Link>
