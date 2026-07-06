@@ -20,7 +20,15 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const body = (await request.json()) as { patch: UpdateWorkOrder };
     if (!body?.patch) return NextResponse.json({ error: "patch_required" }, { status: 400 });
 
-    const wo = await updateWorkOrder(id, body.patch);
+    const patch: UpdateWorkOrder = { ...body.patch };
+    if (patch.status === "completed" && !patch.completed_at) {
+      patch.completed_at = new Date().toISOString();
+    }
+    if (patch.status === "in_progress" && !patch.started_at) {
+      patch.started_at = new Date().toISOString();
+    }
+
+    const wo = await updateWorkOrder(id, patch);
     return NextResponse.json({ workOrder: wo });
   } catch (error) {
     console.error("[api/operations/work-orders/:id][PATCH]", error);

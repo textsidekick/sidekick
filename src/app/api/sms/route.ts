@@ -16,6 +16,13 @@ import {
 } from "@/lib/work-order-manager";
 import type { Asset as OpsAsset, UUID } from "@/types/operations";
 import { detectLanguage, translateText } from "@/lib/language";
+import {
+  getTrainingCoachFollowUpKind,
+  isTrainingCoachRequest,
+  TRAINING_COACH_FOLLOW_UP_TOPIC,
+  TRAINING_COACH_TOPIC,
+} from "@/lib/training-coach";
+import { detectWarRoom, getWarRoomMeta } from "@/lib/war-room";
 import { isWhatsAppMessage, stripWhatsAppPrefix, sendMessage } from "@/lib/whatsapp";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || 'placeholder' });
@@ -430,6 +437,48 @@ function twimlResponse(message: string): NextResponse {
 async function translatedTwimlResponse(message: string, lang: string): Promise<NextResponse> {
   const translated = lang !== "en" ? await translateText(message, lang) : message;
   return twimlResponse(translated);
+}
+
+function truncateForSms(message: string, max = 480): string {
+  const trimmed = (message || "").trim();
+  if (trimmed.length <= max) return trimmed;
+  return `${trimmed.slice(0, Math.max(0, max - 1)).trimEnd()}…`;
+}
+
+function buildKnowledgeContextFromArticles(articles: any[]): string {
+  if (!articles || articles.length === 0) return "";
+  return articles
+    .map((article: any) => {
+      const title = article.title ? `[${article.title}] ` : "";
+      const problem = article.problem ? `Problem: ${article.problem} ` : "";
+      const solution = article.solution ? `Solution: ${article.solution}` : "";
+      return `${title}${problem}${solution}`.trim();
+    })
+    .filter(Boolean)
+    .join("\n");
+}
+
+function withTrainingCoachTail(message: string): string {
+  const base = truncateForSms(message, 430);
+  return truncateForSms(`${base}\n\nReply HELP if you're stuck or DONE when finished.`);
+}
+
+async function findRecentTrainingCoachQuestion(companyId: string, workerPhone: string) {
+  const { data } = await supabase
+    .from("questions")
+    .select("id, question, answer, topic, created_at")
+    .eq("company_id", companyId)
+    .eq("worker_phone", workerPhone)
+    .in("topic", [TRAINING_COACH_TOPIC, TRAINING_COACH_FOLLOW_UP_TOPIC])
+    .order("created_at", { ascending: false })
+    .limit(5);
+
+  const recent = (data || []).find((row: any) => {
+    const ageMs = Date.now() - new Date(row.created_at).getTime();
+    return ageMs <= 2 * 60 * 60 * 1000;
+  });
+
+  return recent || null;
 }
 
 export async function POST(request: NextRequest) {
@@ -1037,6 +1086,168 @@ IF YOU DON'T KNOW:
     // ============================================
 
     // ============================================
+    // FRONTLINE TRAINING COACH
+    // ============================================
+    const trainingFollowUpKind = getTrainingCoachFollowUpKind(body);
+    if (trainingFollowUpKind) {
+      const recentCoachQuestion = await findRecentTrainingCoachQuestion(worker.company_id, from);
+
+      if (recentCoachQuestion) {
+        if (trainingFollowUpKind === "done") {
+          const doneMessage = detectedLang === "en"
+            ? "Nice work — I’ve marked that coaching flow complete. Text me if you want another procedure or run into a problem."
+            : await translateText("Nice work — I’ve marked that coaching flow complete. Text me if you want another procedure or run into a problem.", detectedLang);
+
+          await supabase.from("questions").insert({
+            company_id: worker.company_id,
+            worker_phone: from,
+            worker_name: worker.name,
+            question: `[COACH DONE] ${recentCoachQuestion.question}`,
+            answer: doneMessage,
+            confidence: 100,
+            response_time_ms: Date.now() - startTime,
+            manager_notified: false,
+            language: detectedLang,
+            channel: incomingChannel,
+            topic: TRAINING_COACH_FOLLOW_UP_TOPIC,
+          });
+
+          return twimlResponse(doneMessage);
+        }
+
+        let followUpKnowledge: any[] = [];
+        try {
+          const { searchKnowledge } = require("@/lib/knowledge-engine");
+          followUpKnowledge = await searchKnowledge(`${recentCoachQuestion.question} ${body}`, worker.company_id, 4);
+        } catch { /* knowledge engine not critical */ }
+
+        const followUpChunks = await searchDocuments(`${recentCoachQuestion.question} ${body}`, worker.company_id);
+        const knowledgeContext = buildKnowledgeContextFromArticles(followUpKnowledge);
+        const docsContext = followUpChunks.map((chunk: any) => chunk.content).join("\n\n");
+        const isSafetyQuestion = containsSafetyTopic(recentCoachQuestion.question) || containsSafetyTopic(body);
+
+        const followUpPrompt = `You are Sidekick, coaching a frontline worker over text.
+
+Task they originally asked about: ${recentCoachQuestion.question}
+Your last coaching reply: ${recentCoachQuestion.answer}
+The worker just replied: ${body}
+
+Rules:
+- Give the next most helpful coaching response for this exact task.
+- Keep it under 420 characters.
+- Use direct step-by-step language.
+- ${trainingFollowUpKind === "help" ? "Help them get unstuck on the task." : "Continue the coaching flow with the next useful step."}
+- ${isSafetyQuestion ? "Lead with safety and PPE/LOTO reminders if relevant." : "Mention safety only if it matters to the task."}
+- Respond entirely in ${detectedLang === "en" ? "English" : detectedLang}.
+- End naturally; do not mention being an AI.`;
+
+        const followUpAnswer = withTrainingCoachTail(await getAIResponse(
+          followUpPrompt,
+          docsContext || knowledgeContext
+            ? `COMPANY KNOWLEDGE:\n${knowledgeContext}\n\nCOMPANY DOCS:\n${docsContext}\n\nWorker follow-up: ${body}`
+            : `Worker follow-up: ${body}\n\nNo company context was found. Give practical general guidance and offer to ask the manager if uncertain.`
+        ));
+
+        const followUpSimilarity = followUpChunks.length > 0
+          ? Math.round(Math.max(...followUpChunks.map((chunk: any) => Number(chunk.similarity) || 0)) * 100)
+          : (followUpKnowledge.length > 0 ? 70 : 25);
+        const followUpLowConfidence = isLowConfidenceAnswer(followUpAnswer) || followUpSimilarity < 45;
+
+        const { data: followUpRecord } = await supabase.from("questions").insert({
+          company_id: worker.company_id,
+          worker_phone: from,
+          worker_name: worker.name,
+          question: `[COACH FOLLOW-UP] ${body}`,
+          answer: followUpAnswer,
+          confidence: followUpSimilarity,
+          response_time_ms: Date.now() - startTime,
+          manager_notified: false,
+          language: detectedLang,
+          channel: incomingChannel,
+          topic: TRAINING_COACH_FOLLOW_UP_TOPIC,
+        }).select().single();
+
+        if (followUpLowConfidence && company?.manager_phone && followUpRecord) {
+          await supabase
+            .from("workers")
+            .update({ pending_escalation_question_id: followUpRecord.id })
+            .eq("phone", from);
+
+          return twimlResponse(`${followUpAnswer}\n\n---\nWant me to notify ${company.manager_name || "your manager"} about this?\n\nReply Y for Yes, N for No`);
+        }
+
+        return twimlResponse(followUpAnswer);
+      }
+    }
+
+    const isTrainingRequest = isTrainingCoachRequest(body);
+    if (isTrainingRequest) {
+      let knowledgeResults: any[] = [];
+      try {
+        const { searchKnowledge } = require("@/lib/knowledge-engine");
+        knowledgeResults = await searchKnowledge(body, worker.company_id, 5);
+      } catch { /* knowledge engine not critical */ }
+
+      const relevantChunks = await searchDocuments(body, worker.company_id);
+      const knowledgeContext = buildKnowledgeContextFromArticles(knowledgeResults);
+      const docsContext = relevantChunks.map((chunk: any) => chunk.content).join("\n\n");
+      const isSafetyQuestion = containsSafetyTopic(body);
+      const imageContext = imageAnalysisForTriage
+        ? `\n\nIMAGE CONTEXT:\n${JSON.stringify(imageAnalysisForTriage)}`
+        : "";
+
+      const coachingPrompt = `You are Sidekick, a frontline training coach texting with ${worker.name || "a team member"} at ${company?.name || "their company"}.
+
+Goal: coach them through a task or procedure by text.
+
+Rules:
+- Keep the reply under 420 characters.
+- Give 3-5 concrete steps max.
+- Use the company's SOPs, fixes, and documents when available.
+- ${isSafetyQuestion ? "Lead with safety, PPE, and LOTO warnings before steps." : "Mention safety only if the task needs it."}
+- If the docs are weak, still give the best practical answer you can and offer to ask ${company?.manager_name || "their manager"}.
+- Respond entirely in ${detectedLang === "en" ? "English" : detectedLang}.
+- End with a natural coaching tone; do not mention being an AI.`;
+
+      const coachingAnswer = withTrainingCoachTail(await getAIResponse(
+        coachingPrompt,
+        docsContext || knowledgeContext
+          ? `COMPANY KNOWLEDGE:\n${knowledgeContext}\n\nCOMPANY DOCS:\n${docsContext}${imageContext}\n\nWorker request: ${body}`
+          : `Worker request: ${body}${imageContext}\n\nNo company documents were found. Give practical general guidance and offer manager escalation if uncertain.`
+      ));
+
+      const coachingSimilarity = relevantChunks.length > 0
+        ? Math.round(Math.max(...relevantChunks.map((chunk: any) => Number(chunk.similarity) || 0)) * 100)
+        : (knowledgeResults.length > 0 ? 70 : 25);
+      const coachingLowConfidence = isLowConfidenceAnswer(coachingAnswer) || coachingSimilarity < 45;
+
+      const { data: coachingRecord } = await supabase.from("questions").insert({
+        company_id: worker.company_id,
+        worker_phone: from,
+        worker_name: worker.name,
+        question: `[COACH] ${body}`,
+        answer: coachingAnswer,
+        confidence: coachingSimilarity,
+        response_time_ms: Date.now() - startTime,
+        manager_notified: false,
+        language: detectedLang,
+        channel: incomingChannel,
+        topic: TRAINING_COACH_TOPIC,
+      }).select().single();
+
+      if (coachingLowConfidence && company?.manager_phone && coachingRecord) {
+        await supabase
+          .from("workers")
+          .update({ pending_escalation_question_id: coachingRecord.id })
+          .eq("phone", from);
+
+        return twimlResponse(`${coachingAnswer}\n\n---\nWant me to notify ${company.manager_name || "your manager"} about this?\n\nReply Y for Yes, N for No`);
+      }
+
+      return twimlResponse(coachingAnswer);
+    }
+
+    // ============================================
     // AI TRIAGE (replaces regex issue detection)
     // ============================================
     const { data: assets } = await supabase
@@ -1047,7 +1258,7 @@ IF YOU DON'T KNOW:
 
     const { data: activeWorkOrders } = await supabase
       .from("work_orders")
-      .select("id, status, assigned_to, assigned_to_phone, technician_id, worker_phone, created_at")
+      .select("id, short_id, title, status, assigned_to, assigned_to_phone, technician_id, worker_phone, asset_name, ai_triage, created_at")
       .eq("company_id", worker.company_id)
       .eq("worker_phone", from)
       .in("status", ["open", "assigned", "in_progress", "on_hold"])
@@ -1077,6 +1288,15 @@ IF YOU DON'T KNOW:
           console.error("[SMS] Direct START update error:", error);
           return twimlResponse("Sorry, couldn't update the work order. Please try again.");
         }
+
+        const warRoomMeta = getWarRoomMeta((targetWo as any).ai_triage || null);
+        if (warRoomMeta && company?.manager_phone) {
+          await sendSMS(
+            company.manager_phone,
+            truncateForSms(`WAR ROOM UPDATE ${targetWo.short_id || targetWo.id.slice(0, 8)}\n${worker.name || "Assigned tech"} started on ${targetWo.asset_name || targetWo.title || "the incident"}.`)
+          );
+        }
+
         return twimlResponse("OK Work order started. Good luck out there!");
       } else {
         const { error } = await supabase.from("work_orders")
@@ -1086,6 +1306,15 @@ IF YOU DON'T KNOW:
           console.error("[SMS] Direct COMPLETE update error:", error);
           return twimlResponse("Sorry, couldn't update the work order. Please try again.");
         }
+
+        const warRoomMeta = getWarRoomMeta((targetWo as any).ai_triage || null);
+        if (warRoomMeta && company?.manager_phone) {
+          await sendSMS(
+            company.manager_phone,
+            truncateForSms(`WAR ROOM RESOLVED ${targetWo.short_id || targetWo.id.slice(0, 8)}\n${worker.name || "Assigned tech"} marked ${targetWo.asset_name || targetWo.title || "the incident"} complete.`)
+          );
+        }
+
         return twimlResponse("OK Work order marked complete. Nice work!");
       }
     }
@@ -1177,7 +1406,12 @@ IF YOU DON'T KNOW:
     // Branch based on messageType
     if (triage.messageType === "issue_report") {
       try {
-        const wo = await createWorkOrderFromTriage(triage as any, worker.company_id, from);
+        const warRoomMeta = detectWarRoom(body, triage as any);
+        const wo = await createWorkOrderFromTriage(triage as any, worker.company_id, from, {
+          originalMessage: body,
+          source: imageAnalysisForTriage ? "photo" : "sms",
+          aiTriageExtra: warRoomMeta ? { war_room: warRoomMeta } : undefined,
+        });
 
         // Best-effort load WO for short_id + asset location
         const woFull = (await supabase
@@ -1203,6 +1437,8 @@ IF YOU DON'T KNOW:
           assignedToName = (bestTech as any).name || null;
           assignedToPhone = (bestTech as any).phone || null;
 
+          await supabase.from("work_orders").update({ assigned_to_phone: assignedToPhone || null }).eq("id", wo.id);
+
           if (assignedToPhone) {
             const assetName = triage.issue?.assetName || woFull?.asset_name || "(unknown asset)";
             const assetLoc = woFull?.asset_id
@@ -1210,15 +1446,13 @@ IF YOU DON'T KNOW:
               : null;
 
             const steps = (triage.issue?.suggestedActions || []).slice(0, 3).join("; ");
-            const techMsg = `NEW WO ${woFull?.short_id || wo.id.slice(0, 8)}\n${assetName}${assetLoc ? ` @ ${assetLoc}` : ""}\nIssue: ${triage.issue?.symptomSummary || "Reported issue"}${steps ? `\nTry: ${steps}` : ""}\nReply START when you begin.`.slice(
-              0,
-              480
-            );
+            const techLead = warRoomMeta ? `WAR ROOM ${woFull?.short_id || wo.id.slice(0, 8)}` : `NEW WO ${woFull?.short_id || wo.id.slice(0, 8)}`;
+            const techMsg = truncateForSms(`${techLead}\n${assetName}${assetLoc ? ` @ ${assetLoc}` : ""}\nIssue: ${triage.issue?.symptomSummary || "Reported issue"}${steps ? `\nTry: ${steps}` : ""}\nReply START when you begin.`);
             await sendSMS(assignedToPhone, techMsg);
           }
         }
 
-        if (triage.escalate && company?.manager_phone) {
+        if ((triage.escalate || warRoomMeta) && company?.manager_phone) {
           const assetName = triage.issue?.assetName || "(unknown asset)";
           const assigned = assignedToName || "UNASSIGNED";
 
@@ -1229,19 +1463,21 @@ IF YOU DON'T KNOW:
             const costEst = await calculateDowntimeCost(wo.id);
             if (costEst && costEst.totalEstimatedCost > 0) {
               costLine = `\n💰 Est. cost: ${formatCost(costEst.totalEstimatedCost)} (${formatCost(costEst.costPerMinute)}/min)`;
-              // Store on work order
               await supabase.from("work_orders").update({ downtime_cost_estimate: costEst.totalEstimatedCost }).eq("id", wo.id);
             }
           } catch { /* cost engine not critical */ }
 
-          const mgrMsg = `⚠️ ALERT WO ${woFull?.short_id || wo.id.slice(0, 8)}\nPriority: ${triage.issue?.priority || "unknown"}\n${triage.issue?.priorityReasoning || ""}\nAsset: ${assetName}\nFrom: ${worker.name || from}\nAssigned: ${assigned}${costLine}`.slice(
-            0,
-            480
-          );
+          const header = warRoomMeta ? `🚨 WAR ROOM ${woFull?.short_id || wo.id.slice(0, 8)}` : `⚠️ ALERT WO ${woFull?.short_id || wo.id.slice(0, 8)}`;
+          const incidentLine = warRoomMeta ? `\nMode: ${warRoomMeta.kind.replaceAll("_", " ")}` : "";
+          const mgrMsg = truncateForSms(`${header}\nPriority: ${triage.issue?.priority || "unknown"}\n${triage.issue?.priorityReasoning || ""}${incidentLine}\nAsset: ${assetName}\nFrom: ${worker.name || from}\nAssigned: ${assigned}${costLine}`);
           await sendSMS(company.manager_phone, mgrMsg);
         }
 
-        return twimlResponse((triage.workerResponse || "OK ").slice(0, 480));
+        const workerReply = warRoomMeta
+          ? truncateForSms(`${triage.workerResponse || "Got it."}\n\nI opened a live incident and kicked off a war room for this so the team can coordinate fast.`)
+          : truncateForSms(triage.workerResponse || "OK");
+
+        return twimlResponse(workerReply);
       } catch (e) {
         console.error("[SMS] Work order create/assign failed:", e);
         return twimlResponse("Sorry, I couldn't open a work order right now. Please notify your manager.");
@@ -1275,18 +1511,31 @@ IF YOU DON'T KNOW:
         : query.eq("id", resolvedWoId);
 
       if (resolvedAction === "start") {
+        const { data: startedWo } = await woFilter(
+          supabase.from("work_orders").select("id, short_id, title, asset_name, ai_triage")
+        ).single();
+
         const { error: startErr } = await woFilter(supabase.from("work_orders").update({ status: "in_progress", started_at: new Date().toISOString() }));
         if (startErr) {
           console.error("[SMS] WO start update error:", startErr);
           return twimlResponse("Sorry, couldn't update that work order. Please try again.");
         }
+
+        const warRoomMeta = getWarRoomMeta((startedWo as any)?.ai_triage || null);
+        if (warRoomMeta && company?.manager_phone) {
+          await sendSMS(
+            company.manager_phone,
+            truncateForSms(`WAR ROOM UPDATE ${(startedWo as any)?.short_id || resolvedWoId}\n${worker.name || "Assigned tech"} started on ${(startedWo as any)?.asset_name || (startedWo as any)?.title || "the incident"}.`)
+          );
+        }
+
         return twimlResponse("OK Marked started.");
       }
 
       if (resolvedAction === "complete") {
         // Pull WO for asset context
         const { data: woFullForUpdate } = await woFilter(
-          supabase.from("work_orders").select("id, asset_id")
+          supabase.from("work_orders").select("id, short_id, title, asset_id, asset_name, ai_triage")
         ).single();
 
         const { error: completeErr } = await woFilter(
@@ -1324,6 +1573,14 @@ IF YOU DON'T KNOW:
           const { captureKnowledge } = require("@/lib/knowledge-engine");
           captureKnowledge(resolvedWoId).catch((err: any) => console.error("[SMS] Knowledge capture error:", err));
         } catch { /* knowledge engine not critical */ }
+
+        const warRoomMeta = getWarRoomMeta((woFullForUpdate as any)?.ai_triage || null);
+        if (warRoomMeta && company?.manager_phone) {
+          await sendSMS(
+            company.manager_phone,
+            truncateForSms(`WAR ROOM RESOLVED ${(woFullForUpdate as any)?.short_id || resolvedWoId}\n${worker.name || "Assigned tech"} marked ${(woFullForUpdate as any)?.asset_name || (woFullForUpdate as any)?.title || "the incident"} complete.`)
+          );
+        }
 
         return twimlResponse("OK Marked complete. Thanks!");
       }

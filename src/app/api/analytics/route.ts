@@ -122,6 +122,7 @@ export async function GET(request: NextRequest) {
       worker_name: q.worker_name,
       confidence: q.confidence,
       created_at: q.created_at,
+      topic: q.topic || "general",
     }));
 
     return NextResponse.json({

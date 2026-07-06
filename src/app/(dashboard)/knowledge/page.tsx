@@ -333,6 +333,20 @@ export default function KnowledgePage() {
       {/* ── Header ── */}
       <SectionHeader title="Operational Knowledge" subtitle="Your crew's operating memory — everything they've learned, documented, and captured" />
 
+      <div className="mt-6 rounded-2xl border border-[#C96442]/15 bg-[#FBF7F1] p-5">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white">
+            <MessageSquare className="h-5 w-5 text-[#C96442]" />
+          </div>
+          <div>
+            <div className="text-sm font-semibold text-[#1C1A16]">Frontline Training Coach is live</div>
+            <p className="mt-1 text-sm text-black/55">
+              Workers can now text Sidekick things like “how do I do startup on Line 2?” and get step-by-step coaching from the SOPs, fixes, and docs you keep here.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* ══════════════════════════════════════════════════════════════════════
           ADD KNOWLEDGE — always visible, top of page, impossible to miss
           ══════════════════════════════════════════════════════════════════════ */}

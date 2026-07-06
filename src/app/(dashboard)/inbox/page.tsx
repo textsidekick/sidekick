@@ -8,6 +8,7 @@ import { PriorityBadge } from "@/components/dashboard/shared/PriorityBadge";
 import { StatusBadge } from "@/components/dashboard/shared/StatusBadge";
 import { IssueDetailModal } from "@/components/dashboard/modals";
 import { formatTimeAgo } from "@/lib/format";
+import { isTrainingCoachTopic } from "@/lib/training-coach";
 import { cn } from "@/lib/utils";
 
 type Question = {
@@ -18,6 +19,7 @@ type Question = {
   worker_phone?: string;
   confidence: number;
   created_at: string;
+  topic?: string;
 };
 
 type Issue = {
@@ -143,7 +145,9 @@ export default function InboxPage() {
       sourceId: q.id,
       kind: "question" as const,
       title: q.question,
-      detail: q.answer ? "Answered from knowledge" : "Needs a manager answer or better knowledge",
+      detail: isTrainingCoachTopic(q.topic)
+        ? (q.answer ? "Training Coach guided this from SOPs / knowledge" : "Training Coach needs a better answer")
+        : (q.answer ? "Answered from knowledge" : "Needs a manager answer or better knowledge"),
       workerLabel: q.worker_name || q.worker_phone || "Worker",
       createdAt: q.created_at,
       needsManager: !q.answer || q.confidence < 50,

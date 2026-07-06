@@ -18,6 +18,7 @@ import DemoMode from "@/components/dashboard/DemoMode";
 import UpgradeBanner from "@/components/dashboard/UpgradeBanner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { isWarRoomWorkOrder } from "@/lib/war-room";
 
 interface Question {
   id: string; question: string; answer: string; worker_phone: string;
@@ -40,6 +41,7 @@ interface WorkOrder {
   id: string; short_id: string; title: string; status: string;
   priority: string; created_at: string; completed_at?: string | null;
   assigned_to?: string | null;
+  ai_triage?: Record<string, unknown> | null;
 }
 interface Company {
   id: string; name: string; access_code?: string;
@@ -188,6 +190,8 @@ export default function ManagerDashboard() {
     .slice(0, 6);
 
   const unansweredCount = unansweredQuestions.length;
+  const activeWarRooms = openWOs.filter((wo) => isWarRoomWorkOrder((wo.ai_triage || {}) as Record<string, unknown>)).length;
+  const trainingCoachCount = (stats?.byTopic?.training_coach || 0) + (stats?.byTopic?.training_coach_followup || 0);
   const inboxQueues = [
     {
       label: "Needs manager",
@@ -389,6 +393,30 @@ export default function ManagerDashboard() {
           />
         </div>
 
+        <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div className="rounded-2xl border border-red-200 bg-red-50/60 p-5">
+            <div className="flex items-center gap-2 text-sm font-semibold text-[#1C1A16]">
+              <ShieldAlert className="h-4 w-4 text-red-600" /> Line-Down War Room
+            </div>
+            <div className="mt-2 text-2xl font-semibold text-[#1C1A16]">{activeWarRooms}</div>
+            <p className="mt-1 text-sm text-black/55">
+              {activeWarRooms > 0
+                ? `${activeWarRooms} active incident${activeWarRooms === 1 ? " is" : "s are"} being coordinated through Sidekick right now.`
+                : "Ready for the next critical incident — one text can open a live war room, assign an owner, and track downtime."}
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-[#C96442]/15 bg-[#FBF7F1] p-5">
+            <div className="flex items-center gap-2 text-sm font-semibold text-[#1C1A16]">
+              <BookOpen className="h-4 w-4 text-[#C96442]" /> Frontline Training Coach
+            </div>
+            <div className="mt-2 text-2xl font-semibold text-[#1C1A16]">{trainingCoachCount}</div>
+            <p className="mt-1 text-sm text-black/55">
+              Workers can now text how-to questions and get step-by-step SOP guidance, then reply HELP or DONE to keep moving.
+            </p>
+          </div>
+        </div>
+
         {/* ══ 3. TWO-COLUMN: Recent Work Orders + Inbox Queues ═══════════════ */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Recent Work Orders */}
@@ -409,22 +437,32 @@ export default function ManagerDashboard() {
                   onAction={() => window.location.href = "/work-orders"}
                 />
               )}
-              {!loadingWorkOrders && recentWOs.map(wo => (
-                <a
-                  key={wo.id}
-                  href={`/work-orders/${wo.id}`}
-                  className="flex items-start justify-between gap-3 rounded-xl border border-black/5 p-3 hover:bg-[#F7F3EC] transition-colors"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="text-sm font-medium text-[#1C1A16] truncate">{wo.short_id} · {wo.title}</div>
-                    <div className="mt-1 flex items-center gap-2 flex-wrap">
-                      <span className="text-xs text-black/40">{formatTimeAgo(wo.created_at)}</span>
-                      <PriorityBadge priority={wo.priority} />
-                      <StatusBadge status={wo.status} />
+              {!loadingWorkOrders && recentWOs.map(wo => {
+                const isWarRoom = isWarRoomWorkOrder((wo.ai_triage || {}) as Record<string, unknown>);
+                return (
+                  <a
+                    key={wo.id}
+                    href={`/work-orders/${wo.id}`}
+                    className="flex items-start justify-between gap-3 rounded-xl border border-black/5 p-3 hover:bg-[#F7F3EC] transition-colors"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="text-sm font-medium text-[#1C1A16] truncate">{wo.short_id} · {wo.title}</div>
+                        {isWarRoom && (
+                          <span className="shrink-0 rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-red-700">
+                            War room
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-1 flex items-center gap-2 flex-wrap">
+                        <span className="text-xs text-black/40">{formatTimeAgo(wo.created_at)}</span>
+                        <PriorityBadge priority={wo.priority} />
+                        <StatusBadge status={wo.status} />
+                      </div>
                     </div>
-                  </div>
-                </a>
-              ))}
+                  </a>
+                );
+              })}
             </div>
           </div>
 
@@ -470,9 +508,9 @@ export default function ManagerDashboard() {
               <Smartphone className="w-5 h-5 text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold text-[#1C1A16]">Capture knowledge from your phone</div>
+              <div className="text-sm font-semibold text-[#1C1A16]">Capture knowledge that powers Training Coach</div>
               <div className="text-xs text-black/45 mt-0.5">
-                Text tips, voice memos, or photos to your Sidekick number — they become searchable knowledge for your whole crew.
+                Text tips, voice memos, or photos to your Sidekick number — they become searchable knowledge your crew can use for step-by-step coaching by text.
               </div>
             </div>
             <a href="/knowledge" className="inline-flex items-center gap-1.5 text-sm font-medium text-[#C96442] hover:underline flex-shrink-0">

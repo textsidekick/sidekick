@@ -36,10 +36,29 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || "placeholder",
 });
 
+function buildStoredAITriage(triage: TriageResult, extra?: Record<string, unknown>) {
+  return {
+    priority: triage.issue?.priority,
+    reason: triage.issue?.priorityReasoning,
+    suspected_cause: triage.issue?.rootCauseHypothesis,
+    suggested_parts: triage.issue?.partsLikelyNeeded || [],
+    confidence: triage.confidence,
+    issue: triage.issue || null,
+    escalate: triage.escalate,
+    escalation_reason: triage.escalationReason,
+    ...extra,
+  };
+}
+
 export async function createWorkOrderFromTriage(
   triage: TriageResult,
   companyId: string,
-  reportedBy: string
+  reportedBy: string,
+  options?: {
+    originalMessage?: string;
+    source?: string;
+    aiTriageExtra?: Record<string, unknown>;
+  }
 ): Promise<WorkOrder> {
   if (triage.messageType !== "issue_report" || !triage.issue) {
     throw new Error("createWorkOrderFromTriage requires messageType=issue_report");
@@ -69,9 +88,13 @@ export async function createWorkOrderFromTriage(
       priority: triage.issue.priority,
       title,
       description: descriptionLines.join("\n"),
+      original_message: options?.originalMessage || null,
+      ai_triage: buildStoredAITriage(triage, options?.aiTriageExtra),
       status: "open",
       reported_by: reportedBy,
       worker_phone: reportedBy,
+      source: (options?.source || "sms") as any,
+      estimated_time_minutes: triage.issue.estimatedRepairMinutes || null,
     })
     .select()
     .single();

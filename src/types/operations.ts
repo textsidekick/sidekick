@@ -1,6 +1,6 @@
 export type UUID = string;
 
-export type AssetStatus = "operational" | "degraded" | "down" | "decommissioned";
+export type AssetStatus = "operational" | "degraded" | "down" | "decommissioned" | "active" | "unverified";
 export type WorkOrderPriority = "critical" | "high" | "medium" | "low";
 export type WorkOrderStatus =
   | "open"
@@ -56,8 +56,13 @@ export interface WorkOrder {
   company_id: UUID;
   short_id: string; // e.g. WO-0001
   asset_id: UUID | null;
+  asset_name?: string | null;
+  asset_tag?: string | null;
   reported_by: string;
+  worker_phone?: string | null;
   assigned_to: UUID | null;
+  assigned_to_phone?: string | null;
+  technician_id?: UUID | null;
   title: string;
   description: string;
   original_message: string | null;
@@ -68,6 +73,7 @@ export interface WorkOrder {
   source: WorkOrderSource;
   estimated_time_minutes: number | null;
   actual_time_minutes: number | null;
+  downtime_cost_estimate?: number | null;
   started_at: string | null;
   completed_at: string | null;
   resolution_notes: string | null;

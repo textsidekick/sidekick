@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { PriorityBadge } from "@/components/dashboard/shared/PriorityBadge";
 import { StatusBadge } from "@/components/dashboard/shared/StatusBadge";
 import { formatTimeAgo } from "@/lib/format";
+import { formatCompactCost, formatDurationMinutes, getWarRoomMeta, getWarRoomStatus } from "@/lib/war-room";
 import type { WorkOrderPriority, WorkOrderStatus } from "@/types/operations";
 
 type WorkOrderDetail = {
@@ -29,6 +30,7 @@ type WorkOrderDetail = {
   completed_at?: string | null;
   resolution_notes?: string | null;
   photos?: string[];
+  downtime_cost_estimate?: number | null;
   created_at: string;
   updated_at: string;
   worker_phone?: string | null;
@@ -43,6 +45,7 @@ type AITriage = {
   suspected_cause?: string;
   suggested_parts?: string[];
   confidence?: number;
+  war_room?: Record<string, unknown>;
 };
 
 function AITriageCard({ triage }: { triage: AITriage | null | undefined }) {
@@ -78,6 +81,72 @@ function AITriageCard({ triage }: { triage: AITriage | null | undefined }) {
               </span>
             ))}
           </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function WarRoomCard({ workOrder, techName }: { workOrder: WorkOrderDetail; techName: (techId: string | null | undefined) => string }) {
+  const meta = getWarRoomMeta((workOrder.ai_triage || {}) as Record<string, unknown>);
+  if (!meta) return null;
+
+  const status = getWarRoomStatus(workOrder.status);
+  const startTime = meta.startedAt || workOrder.created_at;
+  const endTime = workOrder.completed_at || undefined;
+  const elapsedMinutes = Math.max(
+    0,
+    Math.round(
+      ((endTime ? new Date(endTime).getTime() : Date.now()) - new Date(startTime).getTime()) / 60000
+    )
+  );
+  const cost = formatCompactCost(workOrder.downtime_cost_estimate || null);
+
+  return (
+    <div className="rounded-2xl border border-red-200 bg-red-50/70 p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2 text-sm font-semibold text-[#1C1A16]">
+            <ShieldAlert className="h-4 w-4 text-red-600" /> Line-Down War Room
+          </div>
+          <p className="mt-1 text-sm text-black/65">{meta.summary}</p>
+        </div>
+        <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-red-700">
+          {status.label}
+        </span>
+      </div>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+        <div className="rounded-xl bg-white/80 p-3">
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-black/35">Owner</div>
+          <div className="mt-1 text-sm text-[#1C1A16]">{techName(workOrder.assigned_to)}</div>
+        </div>
+        <div className="rounded-xl bg-white/80 p-3">
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-black/35">Downtime</div>
+          <div className="mt-1 text-sm text-[#1C1A16]">{formatDurationMinutes(elapsedMinutes)}</div>
+        </div>
+        <div className="rounded-xl bg-white/80 p-3">
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-black/35">Estimated cost</div>
+          <div className="mt-1 text-sm text-[#1C1A16]">{cost || "Calculating…"}</div>
+        </div>
+      </div>
+
+      <div className="mt-4 rounded-xl bg-white/80 p-3">
+        <div className="text-[11px] font-semibold uppercase tracking-wide text-black/35">Next action</div>
+        <div className="mt-1 text-sm text-[#1C1A16]">{status.nextAction || meta.nextAction}</div>
+      </div>
+
+      {!!meta.playbook?.length && (
+        <div className="mt-4">
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-black/35">War room playbook</div>
+          <ul className="mt-2 space-y-2 text-sm text-black/65">
+            {meta.playbook.map((step) => (
+              <li key={step} className="flex items-start gap-2">
+                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-red-500" />
+                <span>{step}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
@@ -171,6 +240,7 @@ export default function WorkOrderDetailPage() {
   const threadEvents = useMemo(() => {
     if (!workOrder) return [];
     const triage = (workOrder.ai_triage || {}) as AITriage;
+    const warRoom = getWarRoomMeta((workOrder.ai_triage || {}) as Record<string, unknown>);
     const events = [
       {
         id: "worker-message",
@@ -196,6 +266,16 @@ export default function WorkOrderDetailPage() {
         body: `Current status: ${workOrder.status.replaceAll("_", " ")}${workOrder.assigned_to ? ` · Assigned to ${techName(workOrder.assigned_to)}` : ""}`,
       },
     ];
+
+    if (warRoom) {
+      events.push({
+        id: "war-room-opened",
+        author: "Sidekick",
+        kind: "assistant",
+        time: warRoom.startedAt || workOrder.created_at,
+        body: `Opened a live war room for this incident. ${warRoom.nextAction}`,
+      });
+    }
 
     if (workOrder.started_at) {
       events.push({
@@ -296,6 +376,11 @@ export default function WorkOrderDetailPage() {
             <h1 className="text-2xl font-semibold tracking-tight text-[#1C1A16]">{workOrder.short_id}</h1>
             <PriorityBadge priority={workOrder.priority} />
             <StatusBadge status={workOrder.status} />
+            {getWarRoomMeta((workOrder.ai_triage || {}) as Record<string, unknown>) && (
+              <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-red-700">
+                War room
+              </span>
+            )}
           </div>
           <p className="mt-2 text-sm text-black/55">{workOrder.title}</p>
         </div>
@@ -329,6 +414,8 @@ export default function WorkOrderDetailPage() {
               ))}
             </div>
           </div>
+
+          <WarRoomCard workOrder={workOrder} techName={techName} />
 
           <AITriageCard triage={(workOrder.ai_triage || {}) as AITriage} />
 
