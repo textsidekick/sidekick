@@ -115,142 +115,13 @@ export default function SuccessScreen({
                 margin: "0 auto 24px",
               }}
             >
-              <CheckCircle2 size={48} color="#A74D30" />
+              <CheckCircle2 size={48} color="white" />
             </div>
-            <h1 style={{ fontSize: "32px", fontWeight: "bold", color: "#1C1A16", marginBottom: "12px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>You're all set <Sparkles size={28} color="#C96442" /></h1>
+            <h1 style={{ fontSize: "32px", fontWeight: "bold", color: "#1C1A16", marginBottom: "12px" }}>You're all set</h1>
             <p style={{ fontSize: "16px", color: "rgba(28,26,22,0.5)" }}>{onboardingResult.companyName}'s operating memory is live. Your crew can start texting questions now.</p>
           </div>
 
-          {/* Access Code Card */}
-          <div style={{ background: "white", border: "1px solid rgba(28,26,22,0.1)", borderRadius: "12px", padding: "32px", marginBottom: "24px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-              <label style={{ fontWeight: 600, color: "#1C1A16", fontSize: "14px" }}>
-                <Lock size={16} style={{ display: "inline", marginRight: "6px" }} />
-                Your Access Code
-              </label>
-              {!editingCode && (
-                <button
-                  onClick={() => {
-                    setEditingCode(true);
-                    setCustomCode(currentAccessCode);
-                  }}
-                  style={{
-                    background: "#F0EBE3",
-                    border: "none",
-                    borderRadius: "6px",
-                    padding: "6px 12px",
-                    color: "#1C1A16",
-                    cursor: "pointer",
-                    fontSize: "12px",
-                    fontWeight: "500",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
-                  }}
-                >
-                  <Pencil size={14} />
-                  Customize
-                </button>
-              )}
-            </div>
 
-            {!editingCode ? (
-              <div
-                style={{
-                  background: "#F7F3EC",
-                  borderRadius: "8px",
-                  padding: "20px",
-                  textAlign: "center",
-                  border: "1px solid rgba(28,26,22,0.1)",
-                }}
-              >
-                <div style={{ fontSize: "36px", fontWeight: "bold", color: "#1C1A16", fontFamily: "monospace", letterSpacing: "4px", marginBottom: "16px" }}>
-                  {currentAccessCode}
-                </div>
-                <button
-                  onClick={() => handleCopy(currentAccessCode, "code")}
-                  style={{
-                    background: "rgba(201,100,66,0.12)",
-                    border: "1px solid rgba(201,100,66,0.25)",
-                    borderRadius: "6px",
-                    padding: "8px 16px",
-                    color: "#A74D30",
-                    cursor: "pointer",
-                    fontSize: "13px",
-                    fontWeight: "500",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    margin: "0 auto",
-                  }}
-                >
-                  {copiedField === "code" ? <Check size={14} /> : <Copy size={14} />}
-                  {copiedField === "code" ? "Copied!" : "Copy"}
-                </button>
-              </div>
-            ) : (
-              <div style={{ background: "#F7F3EC", borderRadius: "8px", padding: "16px", border: "1px solid rgba(28,26,22,0.1)" }}>
-                <input
-                  type="text"
-                  value={customCode}
-                  onChange={(e) => {
-                    setCustomCode(e.target.value.toUpperCase());
-                    setCodeError(null);
-                  }}
-                  maxLength={12}
-                  style={{
-                    width: "100%",
-                    padding: "12px",
-                    borderRadius: "6px",
-                    border: "1px solid #d1d5db",
-                    fontSize: "18px",
-                    fontFamily: "monospace",
-                    fontWeight: "bold",
-                    letterSpacing: "4px",
-                    textAlign: "center",
-                    marginBottom: "12px",
-                  }}
-                />
-                <div style={{ display: "flex", gap: "8px" }}>
-                  <button
-                    onClick={handleSaveCode}
-                    style={{
-                      flex: 1,
-                      padding: "8px",
-                      borderRadius: "6px",
-                      background: "rgba(201,100,66,0.12)",
-                      color: "#A74D30",
-                      border: "1px solid rgba(201,100,66,0.25)",
-                      cursor: "pointer",
-                      fontSize: "13px",
-                      fontWeight: "500",
-                    }}
-                  >
-                    {savingCode ? "Saving…" : "Save"}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setEditingCode(false);
-                      setCustomCode("");
-                      setCodeError(null);
-                    }}
-                    style={{
-                      flex: 1,
-                      padding: "8px",
-                      borderRadius: "6px",
-                      background: "#F0EBE3",
-                      color: "#1C1A16",
-                      border: "1px solid rgba(28,26,22,0.1)",
-                      cursor: "pointer",
-                      fontSize: "13px",
-                    }}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
 
           {/* QR Code */}
           <div style={{ background: "white", border: "1px solid rgba(28,26,22,0.1)", borderRadius: "12px", padding: "32px", marginBottom: "24px", textAlign: "center" }}>
@@ -315,97 +186,24 @@ export default function SuccessScreen({
             </a>
           </div>
 
-          {/* Manager Credentials */}
-          {managerCredentials && (
-            <div style={{ background: "#ecfdf5", border: "1px solid #86efac", borderRadius: "12px", padding: "32px" }}>
-              <h3 style={{ fontWeight: 600, color: "#15803d", fontSize: "16px", marginBottom: "16px" }}>Your Manager Login</h3>
-              <div style={{ marginBottom: "16px" }}>
-                <label style={{ fontSize: "13px", color: "rgba(28,26,22,0.5)", display: "block", marginBottom: "6px" }}>Username</label>
-                <div style={{ display: "flex", gap: "8px" }}>
-                  <input
-                    type="text"
-                    value={managerCredentials.username}
-                    readOnly
-                    style={{
-                      flex: 1,
-                      padding: "8px 12px",
-                      borderRadius: "6px",
-                      border: "1px solid #d1d5db",
-                      background: "white",
-                      fontSize: "14px",
-                      fontFamily: "monospace",
-                    }}
-                  />
-                  <button
-                    onClick={() => handleCopy(managerCredentials.username, "username")}
-                    style={{
-                      padding: "8px 12px",
-                      borderRadius: "6px",
-                      background: "white",
-                      border: "1px solid #d1d5db",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {copiedField === "username" ? <Check size={16} /> : <Copy size={16} />}
-                  </button>
-                </div>
-              </div>
-              <div style={{ marginBottom: "16px" }}>
-                <label style={{ fontSize: "13px", color: "rgba(28,26,22,0.5)", display: "block", marginBottom: "6px" }}>Password</label>
-                <div style={{ display: "flex", gap: "8px" }}>
-                  <input
-                    type="password"
-                    value={managerCredentials.password}
-                    readOnly
-                    style={{
-                      flex: 1,
-                      padding: "8px 12px",
-                      borderRadius: "6px",
-                      border: "1px solid #d1d5db",
-                      background: "white",
-                      fontSize: "14px",
-                      fontFamily: "monospace",
-                    }}
-                  />
-                  <button
-                    onClick={() => handleCopy(managerCredentials.password, "password")}
-                    style={{
-                      padding: "8px 12px",
-                      borderRadius: "6px",
-                      background: "white",
-                      border: "1px solid #d1d5db",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {copiedField === "password" ? <Check size={16} /> : <Copy size={16} />}
-                  </button>
-                </div>
-              </div>
-              <Link
-                href="/login"
-                style={{
-                  display: "block",
-                  background: "#15803d",
-                  color: "white",
-                  padding: "12px",
-                  borderRadius: "8px",
-                  fontWeight: "600",
-                  fontSize: "14px",
-                  textDecoration: "none",
-                  textAlign: "center",
-                  marginTop: "16px",
-                }}
-              >
-                Go to Dashboard
-              </Link>
-            </div>
-          )}
-
-          {generatingCredentials && (
-            <div style={{ background: "#fef3c7", border: "1px solid #fcd34d", borderRadius: "12px", padding: "16px", textAlign: "center", color: "#92400e", fontSize: "14px" }}>
-              Setting up your manager account...
-            </div>
-          )}
+          {/* Go to Dashboard */}
+          <div style={{ textAlign: "center", marginTop: "8px" }}>
+            <Link
+              href="/today"
+              style={{
+                display: "inline-block",
+                background: "#1C1A16",
+                color: "#F7F3EC",
+                padding: "14px 32px",
+                borderRadius: "10px",
+                fontWeight: "600",
+                fontSize: "15px",
+                textDecoration: "none",
+              }}
+            >
+              Go to Dashboard →
+            </Link>
+          </div>
         </div>
       </main>
     </div>
