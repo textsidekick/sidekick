@@ -11,8 +11,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Auto-paid phone numbers
-    const PAID_PHONES = ["+14088285979", "+12243348775", "+14083049470", "+17813252655"];
-    const isPaidUser = PAID_PHONES.some(p => phone.endsWith(p.slice(-10)));
+    const adminPhones = (process.env.NEXT_PUBLIC_ADMIN_PHONES || "").split(",").map(p => p.trim()).filter(Boolean);
+    const isPaidUser = adminPhones.some(p => phone.endsWith(p.slice(-10)) || phone.includes(p));
 
     // Verify code from verification_codes table
     const { data: verification, error: verifyError } = await supabase
@@ -97,6 +97,19 @@ export async function POST(request: NextRequest) {
     }
 
     const isNewUser = !companyId;
+
+    // Clean up old sessions for this company (keep last 5)
+    if (companyId) {
+      const { data: oldSessions } = await supabase
+        .from("manager_sessions")
+        .select("id")
+        .eq("company_id", companyId)
+        .order("created_at", { ascending: false });
+      if (oldSessions && oldSessions.length > 5) {
+        const toDelete = oldSessions.slice(5).map((s: any) => s.id);
+        await supabase.from("manager_sessions").delete().in("id", toDelete);
+      }
+    }
 
     // Generate session token
     const token = crypto.randomBytes(32).toString("hex");

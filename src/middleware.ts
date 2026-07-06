@@ -3,36 +3,37 @@ import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  
+
   // Allow access to public pages, API routes, and static files
   if (
-    pathname === "/" || // Landing page
+    pathname === "/" ||
     pathname === "/login" ||
     pathname === "/choose" ||
     pathname.startsWith("/api/") ||
     pathname.startsWith("/_next/") ||
     pathname.startsWith("/images/") ||
-    pathname.startsWith("/onboarding") || // Onboarding flow (signup)
+    pathname.startsWith("/onboarding") ||
     pathname === "/privacy" ||
     pathname === "/terms" ||
     pathname === "/sms-consent" ||
     pathname === "/sms-terms" ||
     pathname === "/contact" ||
     pathname === "/about" ||
-    pathname.includes(".") // static files like .png, .ico, etc.
+    pathname.includes(".")
   ) {
     return NextResponse.next();
   }
 
-  // Check for auth cookie/token (support both cookie names)
-  const authCookie = request.cookies.get("sidekick_auth");
+  // Require the httpOnly session cookie (not the client-settable sidekick_auth)
   const sessionCookie = request.cookies.get("sidekick_session");
-  
-  // If no auth, redirect to login
-  if (!authCookie && !sessionCookie) {
+
+  if (!sessionCookie?.value) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
+  // Note: Full session validation (expiry, DB check) happens in getCompanyId()
+  // at the API layer. Middleware just ensures the cookie exists to prevent
+  // rendering dashboard pages without any session at all.
   return NextResponse.next();
 }
 

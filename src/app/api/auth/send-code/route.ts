@@ -14,8 +14,9 @@ export async function POST(request: NextRequest) {
     const normalizedPhone = cleanPhone.startsWith("+") ? cleanPhone : "+1" + cleanPhone;
 
     // Rate limit: max 3 codes per hour per phone (bypass for test numbers)
-    const RATE_LIMIT_BYPASS = ["+14088285979", "+17813252655", "+12243348775"];
-    if (!RATE_LIMIT_BYPASS.includes(normalizedPhone)) {
+    const adminPhones = (process.env.NEXT_PUBLIC_ADMIN_PHONES || "").split(",").map(p => p.trim()).filter(Boolean);
+    const isAdmin = adminPhones.some(p => normalizedPhone.endsWith(p.slice(-10)) || normalizedPhone.includes(p));
+    if (!isAdmin) {
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
       const { count } = await supabase
         .from("verification_codes")

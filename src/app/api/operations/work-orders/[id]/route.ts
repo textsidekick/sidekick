@@ -8,8 +8,9 @@ import { handleWorkOrderCompletion } from "@/lib/work-order-manager";
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const companyId = await getCompanyId(_request);
     const { id } = await params;
-    const wo = await getWorkOrder(id);
+    const wo = await getWorkOrder(id, companyId || undefined);
     if (!wo) return NextResponse.json({ error: "not_found" }, { status: 404 });
     return NextResponse.json({ workOrder: wo });
   } catch (error) {

@@ -746,8 +746,9 @@ function hasValidTwilioSignature(request: NextRequest, params: URLSearchParams):
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   const signature = request.headers.get("x-twilio-signature");
 
-  if (process.env.NODE_ENV !== "production" && (!authToken || !signature)) {
-    console.warn("[SMS] Skipping Twilio signature validation outside production.");
+  // Only skip validation if explicitly opted in via env var (for local dev only)
+  if (process.env.SKIP_TWILIO_VALIDATION === "true" && (!authToken || !signature)) {
+    console.warn("[SMS] Skipping Twilio signature validation (SKIP_TWILIO_VALIDATION=true).");
     return true;
   }
 
@@ -1044,7 +1045,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Rate limiting: max 60 SMS per minute per phone number
-    if (!checkRateLimit(`sms:${from}`, 60, 60_000)) {
+    if (!checkRateLimit(`sms:${from}`, 60, 60_000).allowed) {
       return twimlResponse("Too many messages. Please wait a moment and try again.");
     }
     
@@ -1418,11 +1419,16 @@ export async function POST(request: NextRequest) {
           return twimlResponse("⏳ Your company\'s free trial has ended. Ask your manager to upgrade at textsidekick.com to continue using Sidekick!");
         }
 
-        // Increment questions_used
-        await supabase
-          .from("manager_accounts")
-          .update({ questions_used: managerAccount.questions_used + 1 })
-          .eq("company_id", worker.company_id);
+        // Increment questions_used atomically to avoid race conditions
+        await supabase.rpc("increment_questions_used", { cid: worker.company_id }).then(r => {
+          // Fallback if RPC doesn't exist yet
+          if (r.error) {
+            return supabase
+              .from("manager_accounts")
+              .update({ questions_used: managerAccount.questions_used + 1 })
+              .eq("company_id", worker.company_id);
+          }
+        });
       }
     }
 

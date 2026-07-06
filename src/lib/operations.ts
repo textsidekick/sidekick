@@ -42,8 +42,10 @@ export async function listAssets(companyId: UUID, opts?: { locationId?: UUID | "
   return (data || []) as Asset[];
 }
 
-export async function getAsset(id: UUID): Promise<Asset | null> {
-  const { data, error } = await supabase.from("assets").select("*").eq("id", id).single();
+export async function getAsset(id: UUID, companyId?: UUID): Promise<Asset | null> {
+  let q = supabase.from("assets").select("*").eq("id", id);
+  if (companyId) q = q.eq("company_id", companyId);
+  const { data, error } = await q.single();
   if (error) return null;
   return data as Asset;
 }
@@ -54,14 +56,18 @@ export async function createAsset(asset: InsertAsset): Promise<Asset> {
   return data as Asset;
 }
 
-export async function updateAsset(id: UUID, patch: UpdateAsset): Promise<Asset> {
-  const { data, error } = await supabase.from("assets").update(patch).eq("id", id).select("*").single();
+export async function updateAsset(id: UUID, patch: UpdateAsset, companyId?: UUID): Promise<Asset> {
+  let q = supabase.from("assets").update(patch).eq("id", id);
+  if (companyId) q = q.eq("company_id", companyId);
+  const { data, error } = await q.select("*").single();
   if (error) throw error;
   return data as Asset;
 }
 
-export async function deleteAsset(id: UUID): Promise<void> {
-  const { error } = await supabase.from("assets").delete().eq("id", id);
+export async function deleteAsset(id: UUID, companyId?: UUID): Promise<void> {
+  let q = supabase.from("assets").delete().eq("id", id);
+  if (companyId) q = q.eq("company_id", companyId);
+  const { error } = await q;
   if (error) throw error;
 }
 
@@ -80,8 +86,10 @@ export async function listWorkOrders(companyId: UUID, opts?: { status?: string; 
   return (data || []) as WorkOrder[];
 }
 
-export async function getWorkOrder(id: UUID): Promise<WorkOrder | null> {
-  const { data, error } = await supabase.from("work_orders").select("*").eq("id", id).single();
+export async function getWorkOrder(id: UUID, companyId?: UUID): Promise<WorkOrder | null> {
+  let q = supabase.from("work_orders").select("*").eq("id", id);
+  if (companyId) q = q.eq("company_id", companyId);
+  const { data, error } = await q.single();
   if (error) return null;
   return data as WorkOrder;
 }
@@ -92,19 +100,18 @@ export async function createWorkOrder(workOrder: InsertWorkOrder): Promise<WorkO
   return data as WorkOrder;
 }
 
-export async function updateWorkOrder(id: UUID, patch: UpdateWorkOrder): Promise<WorkOrder> {
-  const { data, error } = await supabase
-    .from("work_orders")
-    .update(patch)
-    .eq("id", id)
-    .select("*")
-    .single();
+export async function updateWorkOrder(id: UUID, patch: UpdateWorkOrder, companyId?: UUID): Promise<WorkOrder> {
+  let q = supabase.from("work_orders").update(patch).eq("id", id);
+  if (companyId) q = q.eq("company_id", companyId);
+  const { data, error } = await q.select("*").single();
   if (error) throw error;
   return data as WorkOrder;
 }
 
-export async function deleteWorkOrder(id: UUID): Promise<void> {
-  const { error } = await supabase.from("work_orders").delete().eq("id", id);
+export async function deleteWorkOrder(id: UUID, companyId?: UUID): Promise<void> {
+  let q = supabase.from("work_orders").delete().eq("id", id);
+  if (companyId) q = q.eq("company_id", companyId);
+  const { error } = await q;
   if (error) throw error;
 }
 
