@@ -62,32 +62,44 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Method 2: If only one company exists, use it (demo/single-tenant mode)
+    // Method 2: Check if phone belongs to a manager_profile
     if (!companyId) {
-      const { data: allCompanies } = await supabase.from("companies").select("id, name").limit(2);
-      if (allCompanies && allCompanies.length === 1) {
-        companyId = allCompanies[0].id;
-        // Find any manager user for this company
-        const { data: user } = await supabase
-          .from("manager_users")
-          .select("id, username")
-          .eq("company_id", companyId)
-          .limit(1)
-          .single();
-        if (user) {
-          userId = user.id;
-          username = user.username;
-        }
+      const { data: profile } = await supabase
+        .from("manager_profiles")
+        .select("company_id")
+        .eq("phone", phone)
+        .limit(1)
+        .single();
+      if (profile?.company_id) {
+        companyId = profile.company_id;
       }
     }
 
-    // Method 3: Check PAID_PHONES mapping
-    if (!companyId && isPaidUser) {
-      const { data: allCompanies } = await supabase.from("companies").select("id").limit(1);
-      if (allCompanies && allCompanies.length > 0) {
+    // Method 3: Check PAID_PHONES mapping or single-company demo mode
+    if (!companyId) {
+      const { data: allCompanies } = await supabase.from("companies").select("id, name").limit(2);
+      if (isPaidUser && allCompanies && allCompanies.length > 0) {
+        companyId = allCompanies[0].id;
+      } else if (allCompanies && allCompanies.length === 1) {
+        // Single-company demo mode
         companyId = allCompanies[0].id;
       }
     }
+
+    if (companyId && !userId) {
+      const { data: user } = await supabase
+        .from("manager_users")
+        .select("id, username")
+        .eq("company_id", companyId)
+        .limit(1)
+        .single();
+      if (user) {
+        userId = user.id;
+        username = user.username;
+      }
+    }
+
+    const isNewUser = !companyId;
 
     // Generate session token
     const token = crypto.randomBytes(32).toString("hex");
@@ -110,7 +122,7 @@ export async function POST(request: NextRequest) {
       accountId: userId,
       companyId,
       username: username || phone,
-      isNewUser: false,
+      isNewUser,
       plan: isPaidUser ? "paid" : "trial",
       trialExpired: false,
       questionsExhausted: false,
