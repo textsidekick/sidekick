@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import { supabase } from "@/lib/supabase";
 import { normalizePhoneNumber } from "@/lib/phone";
 import { createCompanyLocations } from "@/lib/location-utils";
+import { createManagerSession } from "@/lib/create-session";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || "sk-placeholder",
@@ -308,14 +309,25 @@ Return ONLY valid JSON, no markdown. Include all fields that have data.`;
       console.warn("[Complete] Email notification failed:", emailErr);
     }
 
-    return NextResponse.json({
+    const session = await createManagerSession(companyId);
+
+    const payload = {
       success: true,
       companyId,
       companyName: extractedData.companyName,
       accessCode,
       twilioNumber,
       joinCommand: "JOIN " + accessCode,
-    });
+      sessionToken: session?.token || null,
+    };
+
+    if (session) {
+      const res = new NextResponse(JSON.stringify(payload), { status: 200, headers: { "Content-Type": "application/json" } });
+      for (const c of session.cookieHeaders) res.headers.append("Set-Cookie", c);
+      return res;
+    }
+
+    return NextResponse.json(payload);
   } catch (error) {
     console.error("[Complete] FATAL ERROR:", error);
     const message = error instanceof Error ? error.message : String(error);

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { supabase } from "@/lib/supabase";
 import { createEmbedding } from "@/lib/embeddings";
+import { checkRateLimit, rateLimitKey } from "@/lib/rate-limit";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -62,6 +63,10 @@ async function searchDocuments(question: string, companyId: string) {
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limit: 30 requests per minute per IP
+  const rl = checkRateLimit(rateLimitKey("ask", request), 30);
+  if (!rl.allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   const { question, companyId = "default" } = await request.json();
   console.log("[Ask] Question:", question);
 

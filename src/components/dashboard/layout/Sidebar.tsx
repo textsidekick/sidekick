@@ -253,9 +253,11 @@ export function Sidebar() {
 function BottomActions({ onNavigate }: { onNavigate?: () => void }) {
   const router = useRouter();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try { await fetch("/api/auth/logout", { method: "POST" }); } catch {}
     localStorage.removeItem("sidekick_auth");
     document.cookie = "sidekick_auth=; path=/; max-age=0";
+    document.cookie = "sidekick_session=; path=/; max-age=0";
     router.push("/login");
   };
 

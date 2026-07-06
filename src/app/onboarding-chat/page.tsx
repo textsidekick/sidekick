@@ -389,6 +389,15 @@ export default function OnboardingChat() {
       setOnboardingResult(data);
       setLoading(false);
       if (data.companyId) {
+        // Store auth data so dashboard works immediately
+        try {
+          const authData = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
+          authData.companyId = data.companyId;
+          authData.loggedIn = true;
+          if (data.sessionToken) authData.token = data.sessionToken;
+          localStorage.setItem("sidekick_auth", JSON.stringify(authData));
+          document.cookie = "sidekick_auth=true; path=/; max-age=2592000";
+        } catch {}
         setGeneratingCredentials(true);
         fetch("/api/auth/generate-credentials", {
           method: "POST",
