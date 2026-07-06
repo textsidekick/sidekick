@@ -1,6 +1,6 @@
 "use client";
 
-import { ClipboardList, Wrench, Users, BookOpen, Settings, Home, LogOut, LayoutDashboard, Menu, X, ChevronDown, Building2, MessageSquare } from "lucide-react";
+import { ClipboardList, Wrench, Users, BookOpen, Settings, Home, LogOut, LayoutDashboard, Menu, X, ChevronDown, Building2, MessageSquare, RefreshCw } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { id: "work-orders", label: "Work Orders", icon: ClipboardList, href: "/work-orders" },
   { id: "assets", label: "Assets", icon: Wrench, href: "/assets" },
   { id: "team", label: "Team", icon: Users, href: "/team" },
+  { id: "updates", label: "Updates", icon: RefreshCw, href: "/updates" },
   { id: "knowledge", label: "Knowledge", icon: BookOpen, href: "/knowledge" },
   { id: "settings", label: "Settings", icon: Settings, href: "/settings" },
 ];

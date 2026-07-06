@@ -200,7 +200,7 @@ export default function SettingsPage() {
 
             <section className="bg-white rounded-xl border border-gray-200 p-5">
               <h2 className="text-sm font-semibold text-gray-700 mb-1">Working Hours</h2>
-              <p className="text-xs text-gray-500 mb-4">These are live. Non-critical manager SMS alerts only go out during these hours; critical incidents still break through immediately.</p>
+              <p className="text-xs text-gray-500 mb-4">Non-critical manager SMS alerts only go out during these hours; critical incidents still break through immediately.</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs text-gray-500 block mb-1">Start Time</label>
@@ -225,7 +225,7 @@ export default function SettingsPage() {
 
             <section className="bg-white rounded-xl border border-gray-200 p-5">
               <h2 className="text-sm font-semibold text-gray-700 mb-1">Notification Preferences</h2>
-              <p className="text-xs text-gray-500 mb-4">These are live. They control manager SMS alerts for work orders and whether daily digests are sent.</p>
+              <p className="text-xs text-gray-500 mb-4">These control manager SMS alerts for work orders and whether daily digests are sent.</p>
               <div className="space-y-3">
                 {[
                   { key: "sms_on_critical", label: "SMS alert on critical WO" },
@@ -255,7 +255,7 @@ export default function SettingsPage() {
 
             <section className="bg-white rounded-xl border border-gray-200 p-5">
               <h2 className="text-sm font-semibold text-gray-700 mb-1">Work Order Categories</h2>
-              <p className="text-xs text-gray-500 mb-4">These are live. AI triage now prefers these category names for new issues, and technician routing uses the chosen category string when matching skills.</p>
+              <p className="text-xs text-gray-500 mb-4">AI triage now prefers these category names for new issues, and technician routing uses the chosen category string when matching skills.</p>
               <div className="space-y-2 mb-4">
                 {categories.length === 0 ? (
                   <div className="text-sm text-gray-400">No categories added yet.</div>
@@ -292,7 +292,7 @@ export default function SettingsPage() {
 
             <section className="bg-white rounded-xl border border-gray-200 p-5">
               <h2 className="text-sm font-semibold text-gray-700 mb-1">Work Order Priorities</h2>
-              <p className="text-xs text-gray-500 mb-4">These are live. Display labels drive what the UI shows, while SLA hours are saved to the backend, guide AI urgency classification, and get attached to new work-order alerting.</p>
+              <p className="text-xs text-gray-500 mb-4">Display labels drive what the UI shows, while SLA hours are saved to the backend, guide AI urgency classification, and get attached to new work-order alerting.</p>
               <div className="space-y-3">
                 {priorities.map((priority) => (
                   <div key={priority.name} className="grid grid-cols-1 sm:grid-cols-[120px_1fr_100px_120px] gap-3 items-center rounded-lg border border-gray-200 p-3">
