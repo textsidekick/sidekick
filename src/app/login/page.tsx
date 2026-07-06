@@ -73,13 +73,8 @@ export default function LoginPage() {
           isNewUser: data.isNewUser,
           loggedIn: true,
         }));
-        if (data.isNewUser) {
-          router.push("/onboarding-chat");
-        } else if (data.trialExpired || data.questionsExhausted) {
-          router.push("/choose");
-        } else {
-          router.push("/today");
-        }
+        // Always go to choose page (new or existing company)
+        router.push("/choose");
       } else {
         setError(data.error || "Invalid code.");
       }
