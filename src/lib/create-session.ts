@@ -9,9 +9,8 @@ export async function createManagerSession(companyId: string): Promise<{
 } | null> {
   try {
     // Generate a random hex token
-    const arr = new Uint8Array(32);
-    for (let i = 0; i < arr.length; i++) arr[i] = Math.floor(Math.random() * 256);
-    const token = Array.from(arr, (b) => b.toString(16).padStart(2, "0")).join("");
+    const { randomBytes } = await import("crypto");
+    const token = randomBytes(32).toString("hex");
 
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 

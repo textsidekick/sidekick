@@ -43,8 +43,8 @@ export async function listAssets(companyId: UUID, opts?: { locationId?: UUID | "
 }
 
 export async function getAsset(id: UUID, companyId?: UUID): Promise<Asset | null> {
-  let q = supabase.from("assets").select("*").eq("id", id);
-  if (companyId) q = q.eq("company_id", companyId);
+  const q = supabase.from("assets").select("*").eq("id", id);
+  if (companyId) q.eq("company_id", companyId);
   const { data, error } = await q.single();
   if (error) return null;
   return data as Asset;
@@ -57,16 +57,16 @@ export async function createAsset(asset: InsertAsset): Promise<Asset> {
 }
 
 export async function updateAsset(id: UUID, patch: UpdateAsset, companyId?: UUID): Promise<Asset> {
-  let q = supabase.from("assets").update(patch).eq("id", id);
-  if (companyId) q = q.eq("company_id", companyId);
+  const q = supabase.from("assets").update(patch).eq("id", id);
+  if (companyId) q.eq("company_id", companyId);
   const { data, error } = await q.select("*").single();
   if (error) throw error;
   return data as Asset;
 }
 
 export async function deleteAsset(id: UUID, companyId?: UUID): Promise<void> {
-  let q = supabase.from("assets").delete().eq("id", id);
-  if (companyId) q = q.eq("company_id", companyId);
+  const q = supabase.from("assets").delete().eq("id", id);
+  if (companyId) q.eq("company_id", companyId);
   const { error } = await q;
   if (error) throw error;
 }
@@ -87,8 +87,8 @@ export async function listWorkOrders(companyId: UUID, opts?: { status?: string; 
 }
 
 export async function getWorkOrder(id: UUID, companyId?: UUID): Promise<WorkOrder | null> {
-  let q = supabase.from("work_orders").select("*").eq("id", id);
-  if (companyId) q = q.eq("company_id", companyId);
+  const q = supabase.from("work_orders").select("*").eq("id", id);
+  if (companyId) q.eq("company_id", companyId);
   const { data, error } = await q.single();
   if (error) return null;
   return data as WorkOrder;
@@ -101,16 +101,16 @@ export async function createWorkOrder(workOrder: InsertWorkOrder): Promise<WorkO
 }
 
 export async function updateWorkOrder(id: UUID, patch: UpdateWorkOrder, companyId?: UUID): Promise<WorkOrder> {
-  let q = supabase.from("work_orders").update(patch).eq("id", id);
-  if (companyId) q = q.eq("company_id", companyId);
+  const q = supabase.from("work_orders").update(patch).eq("id", id);
+  if (companyId) q.eq("company_id", companyId);
   const { data, error } = await q.select("*").single();
   if (error) throw error;
   return data as WorkOrder;
 }
 
 export async function deleteWorkOrder(id: UUID, companyId?: UUID): Promise<void> {
-  let q = supabase.from("work_orders").delete().eq("id", id);
-  if (companyId) q = q.eq("company_id", companyId);
+  const q = supabase.from("work_orders").delete().eq("id", id);
+  if (companyId) q.eq("company_id", companyId);
   const { error } = await q;
   if (error) throw error;
 }
@@ -128,8 +128,10 @@ export async function listPMSchedules(companyId: UUID, opts?: { assetId?: UUID; 
   return (data || []) as PMSchedule[];
 }
 
-export async function getPMSchedule(id: UUID): Promise<PMSchedule | null> {
-  const { data, error } = await supabase.from("pm_schedules").select("*").eq("id", id).single();
+export async function getPMSchedule(id: UUID, companyId?: UUID): Promise<PMSchedule | null> {
+  const q = supabase.from("pm_schedules").select("*").eq("id", id);
+  if (companyId) q.eq("company_id", companyId);
+  const { data, error } = await q.single();
   if (error) return null;
   return data as PMSchedule;
 }
@@ -140,19 +142,18 @@ export async function createPMSchedule(schedule: InsertPMSchedule): Promise<PMSc
   return data as PMSchedule;
 }
 
-export async function updatePMSchedule(id: UUID, patch: UpdatePMSchedule): Promise<PMSchedule> {
-  const { data, error } = await supabase
-    .from("pm_schedules")
-    .update(patch)
-    .eq("id", id)
-    .select("*")
-    .single();
+export async function updatePMSchedule(id: UUID, patch: UpdatePMSchedule, companyId?: UUID): Promise<PMSchedule> {
+  const q = supabase.from("pm_schedules").update(patch).eq("id", id);
+  if (companyId) q.eq("company_id", companyId);
+  const { data, error } = await q.select("*").single();
   if (error) throw error;
   return data as PMSchedule;
 }
 
-export async function deletePMSchedule(id: UUID): Promise<void> {
-  const { error } = await supabase.from("pm_schedules").delete().eq("id", id);
+export async function deletePMSchedule(id: UUID, companyId?: UUID): Promise<void> {
+  const q = supabase.from("pm_schedules").delete().eq("id", id);
+  if (companyId) q.eq("company_id", companyId);
+  const { error } = await q;
   if (error) throw error;
 }
 
@@ -212,19 +213,18 @@ export async function createPart(part: InsertPartInventoryItem): Promise<PartInv
   return data as PartInventoryItem;
 }
 
-export async function updatePart(id: UUID, patch: UpdatePartInventoryItem): Promise<PartInventoryItem> {
-  const { data, error } = await supabase
-    .from("parts_inventory")
-    .update(patch)
-    .eq("id", id)
-    .select("*")
-    .single();
+export async function updatePart(id: UUID, patch: UpdatePartInventoryItem, companyId?: UUID): Promise<PartInventoryItem> {
+  const q = supabase.from("parts_inventory").update(patch).eq("id", id);
+  if (companyId) q.eq("company_id", companyId);
+  const { data, error } = await q.select("*").single();
   if (error) throw error;
   return data as PartInventoryItem;
 }
 
-export async function deletePart(id: UUID): Promise<void> {
-  const { error } = await supabase.from("parts_inventory").delete().eq("id", id);
+export async function deletePart(id: UUID, companyId?: UUID): Promise<void> {
+  const q = supabase.from("parts_inventory").delete().eq("id", id);
+  if (companyId) q.eq("company_id", companyId);
+  const { error } = await q;
   if (error) throw error;
 }
 
@@ -248,18 +248,17 @@ export async function createShiftHandoff(handoff: InsertShiftHandoff): Promise<S
   return data as ShiftHandoff;
 }
 
-export async function updateShiftHandoff(id: UUID, patch: UpdateShiftHandoff): Promise<ShiftHandoff> {
-  const { data, error } = await supabase
-    .from("shift_handoffs")
-    .update(patch)
-    .eq("id", id)
-    .select("*")
-    .single();
+export async function updateShiftHandoff(id: UUID, patch: UpdateShiftHandoff, companyId?: UUID): Promise<ShiftHandoff> {
+  const q = supabase.from("shift_handoffs").update(patch).eq("id", id);
+  if (companyId) q.eq("company_id", companyId);
+  const { data, error } = await q.select("*").single();
   if (error) throw error;
   return data as ShiftHandoff;
 }
 
-export async function deleteShiftHandoff(id: UUID): Promise<void> {
-  const { error } = await supabase.from("shift_handoffs").delete().eq("id", id);
+export async function deleteShiftHandoff(id: UUID, companyId?: UUID): Promise<void> {
+  const q = supabase.from("shift_handoffs").delete().eq("id", id);
+  if (companyId) q.eq("company_id", companyId);
+  const { error } = await q;
   if (error) throw error;
 }

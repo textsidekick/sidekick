@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import crypto from "crypto";
+import { checkRateLimit, rateLimitKey } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,6 +10,12 @@ export async function POST(request: NextRequest) {
     if (!phone || !code) {
       return NextResponse.json({ error: "Phone and code required" }, { status: 400 });
     }
+
+    // Rate limit: 5 attempts per minute per IP, 10 per phone
+    const ipRl = checkRateLimit(rateLimitKey("verify", request), 5);
+    if (!ipRl.allowed) return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
+    const phoneRl = checkRateLimit("verify:phone:" + phone, 10, 300_000); // 10 per 5 min
+    if (!phoneRl.allowed) return NextResponse.json({ error: "Too many attempts for this number." }, { status: 429 });
 
     // Auto-paid phone numbers
     const adminPhones = (process.env.NEXT_PUBLIC_ADMIN_PHONES || "").split(",").map(p => p.trim()).filter(Boolean);

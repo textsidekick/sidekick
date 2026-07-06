@@ -127,7 +127,16 @@ export async function PUT(req: NextRequest) {
 
       for (const location of safeLocations) {
         if (location.id) {
-          await supabase.from("locations").upsert({ ...location, updated_at: new Date().toISOString() } as any, { onConflict: "id" });
+          // Verify the location belongs to this company before upserting
+          const { data: existing } = await supabase.from("locations").select("id,company_id").eq("id", location.id).maybeSingle();
+          if (existing && existing.company_id !== companyId) {
+            // Skip — this location ID belongs to another company
+            continue;
+          }
+          await supabase.from("locations").upsert(
+            { ...location, company_id: companyId, updated_at: new Date().toISOString() } as any,
+            { onConflict: "id" }
+          );
         }
       }
     }
