@@ -39,9 +39,9 @@ export async function getCompanyRuntimeSettings(companyId: string): Promise<Comp
 
 export function shouldSendManagerWorkOrderAlert(
   settings: CompanyRuntimeSettings,
-  opts: { priority?: string | null; warRoom?: boolean }
+  opts: { priority?: string | null; criticalIncident?: boolean }
 ): boolean {
-  if (opts.warRoom || opts.priority === "critical") {
+  if (opts.criticalIncident || opts.priority === "critical") {
     return settings.notification_preferences.sms_on_critical;
   }
 

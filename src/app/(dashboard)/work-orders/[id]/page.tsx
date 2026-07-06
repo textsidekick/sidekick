@@ -44,7 +44,6 @@ type AITriage = {
   suspected_cause?: string;
   suggested_parts?: string[];
   confidence?: number;
-  war_room?: Record<string, unknown>;
 };
 
 function AITriageCard({ triage }: { triage: AITriage | null | undefined }) {

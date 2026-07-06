@@ -23,7 +23,7 @@ import {
   TRAINING_COACH_TOPIC,
 } from "@/lib/training-coach";
 import { getCompanyRuntimeSettings, shouldSendManagerWorkOrderAlert } from "@/lib/company-settings";
-import { detectWarRoom, getWarRoomMeta } from "@/lib/war-room";
+import { detectCriticalIncident, getCriticalIncidentMeta } from "@/lib/critical-incident";
 import { isWhatsAppMessage, stripWhatsAppPrefix, sendMessage } from "@/lib/whatsapp";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || 'placeholder' });
@@ -1304,11 +1304,11 @@ Rules:
           return twimlResponse("Sorry, couldn't update the work order. Please try again.");
         }
 
-        const warRoomMeta = getWarRoomMeta((targetWo as any).ai_triage || null);
-        if (warRoomMeta && criticalSmsEnabled && company?.manager_phone) {
+        const criticalIncidentMeta = getCriticalIncidentMeta((targetWo as any).ai_triage || null);
+        if (criticalIncidentMeta && criticalSmsEnabled && company?.manager_phone) {
           await sendSMS(
             company.manager_phone,
-            truncateForSms(`WAR ROOM UPDATE ${targetWo.short_id || targetWo.id.slice(0, 8)}\n${worker.name || "Assigned tech"} started on ${targetWo.asset_name || targetWo.title || "the incident"}.`)
+            truncateForSms(`CRITICAL UPDATE ${targetWo.short_id || targetWo.id.slice(0, 8)}\n${worker.name || "Assigned tech"} started on ${targetWo.asset_name || targetWo.title || "the incident"}.`)
           );
         }
 
@@ -1322,11 +1322,11 @@ Rules:
           return twimlResponse("Sorry, couldn't update the work order. Please try again.");
         }
 
-        const warRoomMeta = getWarRoomMeta((targetWo as any).ai_triage || null);
-        if (warRoomMeta && criticalSmsEnabled && company?.manager_phone) {
+        const criticalIncidentMeta = getCriticalIncidentMeta((targetWo as any).ai_triage || null);
+        if (criticalIncidentMeta && criticalSmsEnabled && company?.manager_phone) {
           await sendSMS(
             company.manager_phone,
-            truncateForSms(`WAR ROOM RESOLVED ${targetWo.short_id || targetWo.id.slice(0, 8)}\n${worker.name || "Assigned tech"} marked ${targetWo.asset_name || targetWo.title || "the incident"} complete.`)
+            truncateForSms(`CRITICAL RESOLVED ${targetWo.short_id || targetWo.id.slice(0, 8)}\n${worker.name || "Assigned tech"} marked ${targetWo.asset_name || targetWo.title || "the incident"} complete.`)
           );
         }
 
@@ -1421,11 +1421,11 @@ Rules:
     // Branch based on messageType
     if (triage.messageType === "issue_report") {
       try {
-        const warRoomMeta = detectWarRoom(body, triage as any);
+        const criticalIncidentMeta = detectCriticalIncident(body, triage as any);
         const wo = await createWorkOrderFromTriage(triage as any, worker.company_id, from, {
           originalMessage: body,
           source: imageAnalysisForTriage ? "photo" : "sms",
-          aiTriageExtra: warRoomMeta ? { war_room: warRoomMeta } : undefined,
+          aiTriageExtra: criticalIncidentMeta ? { critical_incident: criticalIncidentMeta } : undefined,
         });
 
         // Best-effort load WO for short_id + asset location
@@ -1461,7 +1461,7 @@ Rules:
               : null;
 
             const steps = (triage.issue?.suggestedActions || []).slice(0, 3).join("; ");
-            const techLead = warRoomMeta ? `WAR ROOM ${woFull?.short_id || wo.id.slice(0, 8)}` : `NEW WO ${woFull?.short_id || wo.id.slice(0, 8)}`;
+            const techLead = criticalIncidentMeta ? `CRITICAL WO ${woFull?.short_id || wo.id.slice(0, 8)}` : `NEW WO ${woFull?.short_id || wo.id.slice(0, 8)}`;
             const techMsg = truncateForSms(`${techLead}\n${assetName}${assetLoc ? ` @ ${assetLoc}` : ""}\nIssue: ${triage.issue?.symptomSummary || "Reported issue"}${steps ? `\nTry: ${steps}` : ""}\nReply START when you begin.`);
             await sendSMS(assignedToPhone, techMsg);
           }
@@ -1469,7 +1469,7 @@ Rules:
 
         const shouldNotifyManagerForWorkOrder = shouldSendManagerWorkOrderAlert(companyRuntimeSettings, {
           priority: triage.issue?.priority || null,
-          warRoom: Boolean(warRoomMeta),
+          criticalIncident: Boolean(criticalIncidentMeta),
         });
 
         if (shouldNotifyManagerForWorkOrder && company?.manager_phone) {
@@ -1487,14 +1487,14 @@ Rules:
             }
           } catch { /* cost engine not critical */ }
 
-          const header = warRoomMeta ? `🚨 WAR ROOM ${woFull?.short_id || wo.id.slice(0, 8)}` : `⚠️ ALERT WO ${woFull?.short_id || wo.id.slice(0, 8)}`;
-          const incidentLine = warRoomMeta ? `\nMode: ${warRoomMeta.kind.replaceAll("_", " ")}` : "";
+          const header = criticalIncidentMeta ? `🚨 CRITICAL WO ${woFull?.short_id || wo.id.slice(0, 8)}` : `⚠️ ALERT WO ${woFull?.short_id || wo.id.slice(0, 8)}`;
+          const incidentLine = criticalIncidentMeta ? `\nIncident: ${criticalIncidentMeta.kind.replaceAll("_", " ")}` : "";
           const mgrMsg = truncateForSms(`${header}\nPriority: ${triage.issue?.priority || "unknown"}\n${triage.issue?.priorityReasoning || ""}${incidentLine}\nAsset: ${assetName}\nFrom: ${worker.name || from}\nAssigned: ${assigned}${costLine}`);
           await sendSMS(company.manager_phone, mgrMsg);
         }
 
-        const workerReply = warRoomMeta
-          ? truncateForSms(`${triage.workerResponse || "Got it."}\n\nI opened a live incident and kicked off a war room for this so the team can coordinate fast.`)
+        const workerReply = criticalIncidentMeta
+          ? truncateForSms(`${triage.workerResponse || "Got it."}\n\nI flagged this as a critical incident and alerted the team.`)
           : truncateForSms(triage.workerResponse || "OK");
 
         return twimlResponse(workerReply);
@@ -1541,11 +1541,11 @@ Rules:
           return twimlResponse("Sorry, couldn't update that work order. Please try again.");
         }
 
-        const warRoomMeta = getWarRoomMeta((startedWo as any)?.ai_triage || null);
-        if (warRoomMeta && criticalSmsEnabled && company?.manager_phone) {
+        const criticalIncidentMeta = getCriticalIncidentMeta((startedWo as any)?.ai_triage || null);
+        if (criticalIncidentMeta && criticalSmsEnabled && company?.manager_phone) {
           await sendSMS(
             company.manager_phone,
-            truncateForSms(`WAR ROOM UPDATE ${(startedWo as any)?.short_id || resolvedWoId}\n${worker.name || "Assigned tech"} started on ${(startedWo as any)?.asset_name || (startedWo as any)?.title || "the incident"}.`)
+            truncateForSms(`CRITICAL UPDATE ${(startedWo as any)?.short_id || resolvedWoId}\n${worker.name || "Assigned tech"} started on ${(startedWo as any)?.asset_name || (startedWo as any)?.title || "the incident"}.`)
           );
         }
 
@@ -1594,11 +1594,11 @@ Rules:
           captureKnowledge(resolvedWoId).catch((err: any) => console.error("[SMS] Knowledge capture error:", err));
         } catch { /* knowledge engine not critical */ }
 
-        const warRoomMeta = getWarRoomMeta((woFullForUpdate as any)?.ai_triage || null);
-        if (warRoomMeta && criticalSmsEnabled && company?.manager_phone) {
+        const criticalIncidentMeta = getCriticalIncidentMeta((woFullForUpdate as any)?.ai_triage || null);
+        if (criticalIncidentMeta && criticalSmsEnabled && company?.manager_phone) {
           await sendSMS(
             company.manager_phone,
-            truncateForSms(`WAR ROOM RESOLVED ${(woFullForUpdate as any)?.short_id || resolvedWoId}\n${worker.name || "Assigned tech"} marked ${(woFullForUpdate as any)?.asset_name || (woFullForUpdate as any)?.title || "the incident"} complete.`)
+            truncateForSms(`CRITICAL RESOLVED ${(woFullForUpdate as any)?.short_id || resolvedWoId}\n${worker.name || "Assigned tech"} marked ${(woFullForUpdate as any)?.asset_name || (woFullForUpdate as any)?.title || "the incident"} complete.`)
           );
         }
 
