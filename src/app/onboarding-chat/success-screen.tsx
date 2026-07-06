@@ -115,7 +115,7 @@ export default function SuccessScreen({
                 margin: "0 auto 24px",
               }}
             >
-              <CheckCircle2 size={48} color="white" />
+              <CheckCircle2 size={48} color="#9CA3AF" />
             </div>
             <h1 style={{ fontSize: "32px", fontWeight: "bold", color: "#1C1A16", marginBottom: "12px" }}>You're all set</h1>
             <p style={{ fontSize: "16px", color: "rgba(28,26,22,0.5)" }}>{onboardingResult.companyName}'s operating memory is live. Your crew can start texting questions now.</p>
