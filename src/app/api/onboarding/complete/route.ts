@@ -313,25 +313,24 @@ Return ONLY valid JSON, no markdown. Include all fields that have data.`;
       console.warn("[Complete] Email notification failed:", emailErr);
     }
 
-    const session = await createManagerSession(companyId);
+    // If user already has a session, just update it to the new company
+    // Don't create a new session — this preserves the existing cookie
+    const existingToken = request.cookies.get("sidekick_session")?.value;
+    if (existingToken) {
+      await supabase.from("manager_sessions").update({ company_id: companyId }).eq("token", existingToken);
+    } else {
+      // No session yet — create one
+      await createManagerSession(companyId);
+    }
 
-    const payload = {
+    return NextResponse.json({
       success: true,
       companyId,
       companyName: extractedData.companyName,
       accessCode,
       twilioNumber,
       joinCommand: "JOIN " + accessCode,
-      sessionToken: session?.token || null,
-    };
-
-    if (session) {
-      const res = new NextResponse(JSON.stringify(payload), { status: 200, headers: { "Content-Type": "application/json" } });
-      for (const c of session.cookieHeaders) res.headers.append("Set-Cookie", c);
-      return res;
-    }
-
-    return NextResponse.json(payload);
+    });
   } catch (error) {
     console.error("[Complete] FATAL ERROR:", error);
     const message = error instanceof Error ? error.message : String(error);

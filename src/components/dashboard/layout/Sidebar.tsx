@@ -70,7 +70,8 @@ export function Sidebar() {
       authData.companyId = companyId;
       authData.locationId = nextLocationId;
       localStorage.setItem("sidekick_auth", JSON.stringify(authData));
-      window.dispatchEvent(new StorageEvent("storage", { key: "sidekick_auth" }));
+      // Reload page so all data re-fetches with new company
+      window.location.reload();
     } catch {}
   };
 
