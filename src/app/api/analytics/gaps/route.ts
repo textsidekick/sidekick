@@ -2,11 +2,13 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { supabase } from "@/lib/supabase";
+import { getCompanyId } from "@/lib/dashboard-auth";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function GET(request: NextRequest) {
-  const companyId = request.nextUrl.searchParams.get("companyId") || "default";
+  const companyId = await getCompanyId(request);
+  if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   
   const { data: gaps, error } = await supabase
     .from("knowledge_gaps")

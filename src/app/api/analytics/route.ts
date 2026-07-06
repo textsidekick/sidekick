@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getCompanyPhonesForLocation } from "@/lib/location-scope";
+import { getCompanyId } from "@/lib/dashboard-auth";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const companyId = searchParams.get("companyId");
+  const companyId = await getCompanyId(request);
   const locationId = searchParams.get("locationId");
   const timeRange = searchParams.get("timeRange") || "all";
 
   if (!companyId) {
-    return NextResponse.json({ error: "Company ID required" }, { status: 400 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {

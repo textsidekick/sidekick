@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getDocumentsByCompany } from "@/lib/documentClassifier";
+import { getCompanyId } from "@/lib/dashboard-auth";
 
 export const runtime = "nodejs";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const companyId = searchParams.get("companyId") || "demo";
+    const companyId = await getCompanyId(req) || "demo";
 
     const documents = getDocumentsByCompany(companyId);
 

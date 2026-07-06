@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { createEmbedding, chunkText } from "@/lib/embeddings";
+import { getCompanyId } from "@/lib/dashboard-auth";
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File;
-    const companyId = (formData.get("companyId") as string) || "default";
+    const companyId = (formData.get("companyId") as string) || await getCompanyId(request) || "default";
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const companyId = request.nextUrl.searchParams.get("companyId") || "default";
+  const companyId = await getCompanyId(request) || "default";
   const { data: documents, error } = await supabase
     .from("documents")
     .select("*")

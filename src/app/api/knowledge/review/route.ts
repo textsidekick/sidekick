@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { auditLog } from "@/lib/audit";
+import { getCompanyId } from "@/lib/dashboard-auth";
 
 /**
  * GET  — fetch items needing review, sorted by risk (no asset = higher risk) then age (oldest first)
@@ -13,14 +14,8 @@ async function knowledgeMetadataAvailable() {
 }
 
 export async function GET(request: NextRequest) {
-  const companyId = request.nextUrl.searchParams.get("companyId");
-  if (!companyId) {
-    const token = request.cookies.get("sidekick_session")?.value;
-    if (!token) return NextResponse.json({ error: "auth required" }, { status: 401 });
-    const { data: session } = await supabase.from("manager_sessions").select("company_id").eq("token", token).single();
-    if (!session) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    return fetchReviewQueue(session.company_id);
-  }
+  const companyId = await getCompanyId(request);
+  if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   return fetchReviewQueue(companyId);
 }
 
