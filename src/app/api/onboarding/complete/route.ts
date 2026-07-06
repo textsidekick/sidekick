@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { supabase } from "@/lib/supabase";
 import { normalizePhoneNumber } from "@/lib/phone";
+import { createCompanyLocations } from "@/lib/location-utils";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || "sk-placeholder",
@@ -68,6 +69,7 @@ OPTIONAL (include if mentioned):
 - industry: industry or event type (string or null)
 - workerCount: approximate number of workers/attendees (number or null)
 - locations: number of locations/sites (number or null)
+- locationNames: list of named locations/sites if mentioned (string[] or null)
 - painPoints: main challenges or needs mentioned (string[] or null)
 - commonQuestions: types of questions workers/attendees commonly ask (string[] or null)
 - wishKnew: what the manager wishes their team just knew (string or null)
@@ -174,6 +176,7 @@ Return ONLY valid JSON, no markdown. Include all fields that have data.`;
       worker_count: extractedData.workerCount || null,
       metadata: JSON.stringify({
         locations: extractedData.locations,
+        locationNames: extractedData.locationNames,
         painPoints: extractedData.painPoints,
         commonQuestions: extractedData.commonQuestions,
         wishKnew: extractedData.wishKnew,
@@ -201,6 +204,20 @@ Return ONLY valid JSON, no markdown. Include all fields that have data.`;
     }
 
     console.log("[Complete] Company created successfully:", insertResult[0]);
+
+    try {
+      const locationNames = Array.isArray(extractedData.locationNames)
+        ? extractedData.locationNames.map((name: unknown) => typeof name === "string" ? name.trim() : "").filter(Boolean)
+        : [];
+
+      const locationSeeds = locationNames.length > 0
+        ? locationNames.map((name: string, index: number) => ({ name, isPrimary: index === 0 }))
+        : [{ name: `${extractedData.companyName} - Main site`, isPrimary: true }];
+
+      await createCompanyLocations(companyId, locationSeeds);
+    } catch (locationError) {
+      console.warn("[Complete] Location creation failed:", locationError);
+    }
 
     const twilioNumber = "+1 (888) 707-4659";
 

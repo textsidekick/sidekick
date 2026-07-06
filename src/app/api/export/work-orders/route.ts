@@ -6,11 +6,14 @@ export async function GET(req: NextRequest) {
   const companyId = await getCompanyId(req);
   if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data, error } = await supabase
+  const locationId = req.nextUrl.searchParams.get("locationId");
+  let query = supabase
     .from("work_orders")
-    .select("short_id,title,description,status,priority,created_at,completed_at,asset_id,assigned_to")
+    .select("short_id,title,description,status,priority,created_at,completed_at,asset_id,assigned_to,location_id")
     .eq("company_id", companyId)
     .order("created_at", { ascending: false });
+  if (locationId && locationId !== "all") query = query.eq("location_id", locationId);
+  const { data, error } = await query;
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 

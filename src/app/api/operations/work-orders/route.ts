@@ -8,10 +8,11 @@ export async function GET(request: NextRequest) {
     const status = request.nextUrl.searchParams.get("status") || undefined;
     const priority = request.nextUrl.searchParams.get("priority") || undefined;
     const assetId = request.nextUrl.searchParams.get("assetId") || undefined;
+    const locationId = request.nextUrl.searchParams.get("locationId") || undefined;
 
     if (!companyId) return NextResponse.json({ error: "companyId_required" }, { status: 400 });
 
-    const workOrders = await listWorkOrders(companyId, { status, priority, assetId: assetId as any });
+    const workOrders = await listWorkOrders(companyId, { status, priority, assetId: assetId as any, locationId: locationId as any });
     return NextResponse.json({ workOrders });
   } catch (error) {
     console.error("[api/operations/work-orders][GET]", error);

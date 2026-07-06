@@ -5,21 +5,51 @@ import { getCompanyId } from "@/lib/dashboard-auth";
 export async function GET(req: NextRequest) {
   const companyId = await getCompanyId(req);
   if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const locationId = req.nextUrl.searchParams.get("locationId");
 
   const days = parseInt(req.nextUrl.searchParams.get("days") || "30", 10);
   const since = new Date(Date.now() - days * 86400_000).toISOString();
 
+  let workOrdersQuery = supabase
+    .from("work_orders")
+    .select("id,status,priority,created_at,resolved_at,asset_id,location_id")
+    .eq("company_id", companyId)
+    .gte("created_at", since);
+  let assetsQuery = supabase
+    .from("assets")
+    .select("id,name,health_score,status,location_id")
+    .eq("company_id", companyId);
+  let pmCompletionsQuery = supabase
+    .from("pm_completions")
+    .select("id,completed_at,scheduled_date,work_order_id")
+    .eq("company_id", companyId)
+    .gte("completed_at", since);
+  let healthHistoryQuery = supabase
+    .from("asset_health_history")
+    .select("asset_id,health_score,recorded_at")
+    .eq("company_id", companyId)
+    .gte("recorded_at", new Date(Date.now() - 90 * 86400_000).toISOString())
+    .order("recorded_at");
+
+  if (locationId && locationId !== "all") {
+    workOrdersQuery = workOrdersQuery.eq("location_id", locationId);
+    assetsQuery = assetsQuery.eq("location_id", locationId);
+  }
+
   const [woRes, assetsRes, pmRes, healthRes] = await Promise.all([
-    supabase.from("work_orders").select("id,status,priority,created_at,resolved_at,asset_id").eq("company_id", companyId).gte("created_at", since),
-    supabase.from("assets").select("id,name,health_score,status").eq("company_id", companyId),
-    supabase.from("pm_completions").select("id,completed_at,scheduled_date").eq("company_id", companyId).gte("completed_at", since),
-    supabase.from("asset_health_history").select("asset_id,health_score,recorded_at").eq("company_id", companyId).gte("recorded_at", new Date(Date.now() - 90 * 86400_000).toISOString()).order("recorded_at"),
+    workOrdersQuery,
+    assetsQuery,
+    pmCompletionsQuery,
+    healthHistoryQuery,
   ]);
 
   const wos = woRes.data || [];
   const assets = assetsRes.data || [];
-  const pmCompletions = pmRes.data || [];
-  const healthHistory = healthRes.data || [];
+  const pmCompletions = (locationId && locationId !== "all")
+    ? (pmRes.data || []).filter((pm: Record<string, unknown>) => wos.some((wo: Record<string, unknown>) => wo.id === pm.work_order_id))
+    : (pmRes.data || []);
+  const assetIds = new Set(assets.map((a: Record<string, unknown>) => a.id as string));
+  const healthHistory = (healthRes.data || []).filter((h: Record<string, unknown>) => !locationId || locationId === "all" || assetIds.has(h.asset_id as string));
 
   // MTTR: mean time to resolve (hours)
   const resolved = wos.filter((w: Record<string, unknown>) => w.resolved_at && w.created_at);

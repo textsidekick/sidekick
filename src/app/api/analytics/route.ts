@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { getCompanyPhonesForLocation } from "@/lib/location-scope";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const companyId = searchParams.get("companyId");
+  const locationId = searchParams.get("locationId");
   const timeRange = searchParams.get("timeRange") || "all";
 
   if (!companyId) {
@@ -38,6 +40,27 @@ export async function GET(request: NextRequest) {
       .select("*")
       .eq("company_id", companyId)
       .order("created_at", { ascending: false });
+
+    if (locationId && locationId !== "all") {
+      const phones = await getCompanyPhonesForLocation(companyId, locationId);
+      if (!phones?.length) {
+        return NextResponse.json({
+          totalQuestions: 0,
+          todayCount: 0,
+          weekCount: 0,
+          avgConfidence: 0,
+          avgResponseTime: 0,
+          answeredRate: 0,
+          byHour: Object.fromEntries(Array.from({ length: 24 }, (_, i) => [i, 0])),
+          byLanguage: {},
+          byTopic: {},
+          knowledgeGaps: [],
+          recentQuestions: [],
+          timeRange,
+        });
+      }
+      query = query.in("worker_phone", phones);
+    }
 
     if (dateFilter) {
       query = query.gte("created_at", dateFilter);

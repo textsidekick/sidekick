@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { getCompanyId } from "@/lib/dashboard-auth";
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const companyId = searchParams.get("companyId");
-
-  if (!companyId) {
-    return NextResponse.json({ error: "companyId required" }, { status: 400 });
-  }
+  const companyId = await getCompanyId(request);
+  if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
     // Get all documents for this company

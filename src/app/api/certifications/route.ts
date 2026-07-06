@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { getCompanyId } from "@/lib/dashboard-auth";
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const companyId = searchParams.get("companyId");
-  const workerPhone = searchParams.get("workerPhone");
-
-  if (!companyId) {
-    return NextResponse.json({ error: "Company ID required" }, { status: 400 });
-  }
+  const companyId = await getCompanyId(request);
+  if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const workerPhone = request.nextUrl.searchParams.get("workerPhone");
 
   try {
     let query = supabase
@@ -77,9 +74,11 @@ export async function GET(request: NextRequest) {
 // Add new certification
 export async function POST(request: NextRequest) {
   try {
-    const { companyId, workerPhone, workerName, certType, certName, expiryDate, issuedDate, certNumber } = await request.json();
+    const companyId = await getCompanyId(request);
+    if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { workerPhone, workerName, certType, certName, expiryDate, issuedDate, certNumber } = await request.json();
 
-    if (!companyId || !workerPhone || !certType || !expiryDate) {
+    if (!workerPhone || !certType || !expiryDate) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 

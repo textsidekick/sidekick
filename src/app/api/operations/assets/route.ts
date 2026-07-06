@@ -5,9 +5,10 @@ import type { InsertAsset } from "@/types/operations";
 export async function GET(request: NextRequest) {
   try {
     const companyId = request.nextUrl.searchParams.get("companyId");
+    const locationId = request.nextUrl.searchParams.get("locationId") || undefined;
     if (!companyId) return NextResponse.json({ error: "companyId_required" }, { status: 400 });
 
-    const assets = await listAssets(companyId);
+    const assets = await listAssets(companyId, { locationId: locationId as any });
     return NextResponse.json({ assets });
   } catch (error) {
     console.error("[api/operations/assets][GET]", error);

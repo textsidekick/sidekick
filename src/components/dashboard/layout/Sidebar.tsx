@@ -1,6 +1,6 @@
 "use client";
 
-import { ClipboardList, Wrench, Users, BookOpen, Settings, Home, LogOut, LayoutDashboard, Menu, X, ChevronDown, Building2, MessageSquare, RefreshCw } from "lucide-react";
+import { ClipboardList, Wrench, Users, BookOpen, Settings, Home, LogOut, LayoutDashboard, Menu, X, ChevronDown, Building2, MessageSquare, RefreshCw, MapPin } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -18,26 +18,30 @@ const NAV_ITEMS = [
   { id: "settings", label: "Settings", icon: Settings, href: "/settings" },
 ];
 
-interface Company { id: string; name: string; }
+interface Location { id: string; name: string; city?: string; state?: string; }
+interface Company { id: string; name: string; locations?: Location[]; }
 
 export function Sidebar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>("");
+  const [selectedLocationId, setSelectedLocationId] = useState<string>("all");
   const [companyDropdownOpen, setCompanyDropdownOpen] = useState(false);
+  const [locationDropdownOpen, setLocationDropdownOpen] = useState(false);
 
   useEffect(() => {
     // Load saved company from localStorage
     try {
       const authData = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
       if (authData.companyId) setSelectedCompanyId(authData.companyId);
+      if (authData.locationId) setSelectedLocationId(authData.locationId);
     } catch {}
 
     fetch("/api/companies")
       .then(r => r.json())
       .then(d => {
-        const list: Company[] = (d.companies || []).map((c: any) => ({ id: c.id, name: c.name }));
+        const list: Company[] = (d.companies || []).map((c: any) => ({ id: c.id, name: c.name, locations: c.locations || [] }));
         setCompanies(list);
         // Set first company if none selected
         const saved = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
@@ -51,16 +55,33 @@ export function Sidebar() {
   const selectCompany = (companyId: string) => {
     setSelectedCompanyId(companyId);
     setCompanyDropdownOpen(false);
+    const company = companies.find(c => c.id === companyId);
+    const nextLocationId = company?.locations?.[0]?.id || "all";
+    setSelectedLocationId(nextLocationId);
+    setLocationDropdownOpen(false);
     try {
       const authData = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
       authData.companyId = companyId;
+      authData.locationId = nextLocationId;
       localStorage.setItem("sidekick_auth", JSON.stringify(authData));
       // Dispatch storage event so manager page can react
       window.dispatchEvent(new StorageEvent("storage", { key: "sidekick_auth" }));
     } catch {}
   };
 
+  const selectLocation = (locationId: string) => {
+    setSelectedLocationId(locationId);
+    setLocationDropdownOpen(false);
+    try {
+      const authData = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
+      authData.locationId = locationId;
+      localStorage.setItem("sidekick_auth", JSON.stringify(authData));
+      window.dispatchEvent(new StorageEvent("storage", { key: "sidekick_auth" }));
+    } catch {}
+  };
+
   const selectedCompany = companies.find(c => c.id === selectedCompanyId);
+  const selectedLocation = selectedCompany?.locations?.find(location => location.id === selectedLocationId);
 
   const sidebarContent = (
     <div className="fixed left-0 top-0 bottom-0 w-[220px] bg-white border-r border-[rgba(28,26,22,0.06)] flex flex-col z-50">
@@ -107,6 +128,51 @@ export function Sidebar() {
                   )}
                 >
                   {c.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Location Switcher */}
+      {selectedCompany && (
+        <div className="relative px-3 pt-2 pb-3 border-b border-[rgba(28,26,22,0.06)]">
+          <button
+            onClick={() => setLocationDropdownOpen(v => !v)}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-[rgba(28,26,22,0.08)] hover:bg-[#F7F3EC] transition-colors text-left"
+          >
+            <MapPin className="h-4 w-4 text-[#C96442] flex-shrink-0" />
+            <span className="flex-1 min-w-0 text-xs font-medium text-[#1C1A16] truncate">
+              {selectedLocation?.name || (selectedCompany.locations?.length ? "All locations" : "Single location")}
+            </span>
+            {(selectedCompany.locations?.length || 0) > 1 && <ChevronDown className="h-3 w-3 text-black/40 flex-shrink-0" />}
+          </button>
+          {locationDropdownOpen && (selectedCompany.locations?.length || 0) > 1 && (
+            <div className="absolute left-3 right-3 top-full mt-1 z-50 bg-white rounded-xl shadow-lg border border-[rgba(28,26,22,0.08)] overflow-hidden">
+              <button
+                onClick={() => selectLocation("all")}
+                className={cn(
+                  "w-full text-left px-3 py-2.5 text-xs font-medium transition-colors",
+                  selectedLocationId === "all"
+                    ? "bg-[#C96442]/10 text-[#1C1A16]"
+                    : "text-[#1C1A16] hover:bg-[#F7F3EC]"
+                )}
+              >
+                All locations
+              </button>
+              {selectedCompany.locations?.map(location => (
+                <button
+                  key={location.id}
+                  onClick={() => selectLocation(location.id)}
+                  className={cn(
+                    "w-full text-left px-3 py-2.5 text-xs font-medium transition-colors",
+                    location.id === selectedLocationId
+                      ? "bg-[#C96442]/10 text-[#1C1A16]"
+                      : "text-[#1C1A16] hover:bg-[#F7F3EC]"
+                  )}
+                >
+                  {location.name}
                 </button>
               ))}
             </div>

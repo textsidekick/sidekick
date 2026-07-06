@@ -1,21 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { normalizePhoneNumber } from "@/lib/phone";
+import { findLocationIdByName } from "@/lib/location-utils";
 
 export async function POST(req: NextRequest) {
   try {
     const { companyId, team } = await req.json();
     if (!companyId || !Array.isArray(team)) return NextResponse.json({ error: "invalid" }, { status: 400 });
 
-    const rows = team
+    const rows = (await Promise.all(team
       .filter((m: any) => m.phone?.trim())
-      .map((m: any) => ({
+      .map(async (m: any) => ({
         company_id: companyId,
         name: m.name?.trim() || null,
         phone: normalizePhoneNumber(m.phone.trim()),
         role: m.role || "operator",
+        location_id: await findLocationIdByName(companyId, m.location || m.site || null),
         verified: true,
-      }));
+      }))))
+      .filter(Boolean);
 
     if (rows.length === 0) return NextResponse.json({ created: 0 });
 

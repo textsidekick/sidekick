@@ -27,8 +27,12 @@ export async function getCompanyId(request: NextRequest): Promise<string | null>
   if (companyId) return companyId;
 
   // Method 3: If only one company exists, use it (demo mode)
-  const { data: companies } = await supabase.from("companies").select("id").limit(2);
-  if (companies && companies.length === 1) return companies[0].id;
+  // WARNING: Remove this fallback before going to production with real multi-tenant data.
+  // It allows unauthenticated access when only one company exists.
+  if (process.env.NODE_ENV !== "production" || process.env.ALLOW_DEMO_FALLBACK === "true") {
+    const { data: companies } = await supabase.from("companies").select("id").limit(2);
+    if (companies && companies.length === 1) return companies[0].id;
+  }
 
   return null;
 }

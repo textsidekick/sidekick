@@ -30,10 +30,11 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const companyId = searchParams.get("company_id");
   if (!companyId) return badRequest("company_id is required");
+  const locationId = searchParams.get("location_id") || searchParams.get("locationId");
 
   const nowIso = new Date().toISOString();
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("pm_schedules")
     .select(
       `
@@ -45,8 +46,9 @@ export async function GET(req: NextRequest) {
       )
     `.trim()
     )
-    .eq("company_id", companyId)
-    .order("next_due_at", { ascending: true });
+    .eq("company_id", companyId);
+  if (locationId && locationId !== "all") query = query.eq("location_id", locationId);
+  const { data, error } = await query.order("next_due_at", { ascending: true });
 
   if (error) return json({ error: error.message }, 500);
 

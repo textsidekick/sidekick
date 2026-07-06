@@ -16,8 +16,10 @@ export async function GET(req: NextRequest) {
   if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const status = req.nextUrl.searchParams.get("status");
+  const locationId = req.nextUrl.searchParams.get("locationId");
   let q = supabase.from("work_orders").select("*").eq("company_id", companyId).order("created_at", { ascending: false });
   if (status) q = q.eq("status", status);
+  if (locationId && locationId !== "all") q = q.eq("location_id", locationId);
 
   const { data, error } = await q;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -32,7 +34,7 @@ export async function POST(req: NextRequest) {
   try { body = await req.json(); } catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }); }
   if (!body.title) return NextResponse.json({ error: "title is required" }, { status: 400 });
 
-  const { data, error } = await supabase.from("work_orders").insert({ ...body, company_id: companyId, status: body.status || "open" }).select().single();
+  const { data, error } = await supabase.from("work_orders").insert({ ...body, company_id: companyId, status: body.status || "open", location_id: body.location_id || null }).select().single();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   await auditLog({ companyId, action: "work_order.created", entityType: "work_order", entityId: data.id });
   await fireWebhooks(companyId, "work_order.created", data);

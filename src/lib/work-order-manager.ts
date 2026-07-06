@@ -54,6 +54,7 @@ export async function createWorkOrderFromTriage(
     originalMessage?: string;
     source?: string;
     aiTriageExtra?: Record<string, unknown>;
+    locationId?: string | null;
   }
 ): Promise<WorkOrder> {
   if (triage.messageType !== "issue_report" || !triage.issue) {
@@ -77,6 +78,7 @@ export async function createWorkOrderFromTriage(
     .from("work_orders")
     .insert({
       company_id: companyId,
+      location_id: options?.locationId || null,
       asset_id: triage.issue.assetId,
       asset_tag: triage.issue.assetTag,
       asset_name: triage.issue.assetName,

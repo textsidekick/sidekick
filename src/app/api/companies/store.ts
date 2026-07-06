@@ -1,11 +1,7 @@
 import { supabase } from "@/lib/supabase";
+import type { CompanyLocation } from "@/lib/company-locations";
 
-export interface Location {
-  id: string;
-  name: string;
-  city: string;
-  state: string;
-}
+export type Location = CompanyLocation;
 
 export interface Company {
   id: string;
@@ -33,10 +29,34 @@ export async function getCompanies(): Promise<Company[]> {
     return [];
   }
 
+  const companyIds = (data || []).map((company: any) => company.id).filter(Boolean);
+  const { data: locationRows } = companyIds.length > 0
+    ? await supabase
+        .from("locations")
+        .select("id,company_id,name,city,state,address,is_primary")
+        .in("company_id", companyIds)
+        .order("is_primary", { ascending: false })
+        .order("name", { ascending: true })
+    : { data: [] as any[] };
+
+  const locationsByCompany = new Map<string, CompanyLocation[]>();
+  for (const row of locationRows || []) {
+    const list = locationsByCompany.get((row as any).company_id) || [];
+    list.push({
+      id: (row as any).id,
+      name: (row as any).name,
+      city: (row as any).city || undefined,
+      state: (row as any).state || undefined,
+      address: (row as any).address || undefined,
+      isPrimary: Boolean((row as any).is_primary),
+    });
+    locationsByCompany.set((row as any).company_id, list);
+  }
+
   return (data || []).map((c: any) => ({
     id: c.id,
     name: c.name,
-    locations: c.locations || [],
+    locations: locationsByCompany.get(c.id) || [],
     createdAt: c.created_at,
     access_code: c.access_code,
     manager_phone: c.manager_phone,

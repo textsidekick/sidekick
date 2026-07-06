@@ -9,6 +9,7 @@ import { StatusBadge } from "@/components/dashboard/shared/StatusBadge";
 import { IssueDetailModal } from "@/components/dashboard/modals";
 import { formatTimeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { buildScopedUrl, readDashboardScope } from "@/lib/dashboard-scope";
 
 type Question = {
   id: string;
@@ -65,6 +66,7 @@ type InboxItem = {
 export default function InboxPage() {
   const [companyId, setCompanyId] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [locationId, setLocationId] = useState("all");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [issues, setIssues] = useState<Issue[]>([]);
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
@@ -95,6 +97,7 @@ export default function InboxPage() {
         if (!ignore && data?.authenticated && data?.companyId) {
           setCompanyId(data.companyId);
           setCompanyName(data.company?.name || "");
+          setLocationId(readDashboardScope().locationId || "all");
         }
       } catch (error) {
         console.error("Failed to load session:", error);
@@ -105,16 +108,27 @@ export default function InboxPage() {
   }, []);
 
   useEffect(() => {
+    const handleStorage = () => {
+      const scope = readDashboardScope();
+      if (scope.companyId && scope.companyId !== companyId) setCompanyId(scope.companyId);
+      if ((scope.locationId || "all") !== locationId) setLocationId(scope.locationId || "all");
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, [companyId, locationId]);
+
+  useEffect(() => {
     if (!companyId) return;
     let ignore = false;
 
     async function load() {
       setLoading(true);
       try {
+        const scope = { companyId, locationId };
         const [analyticsRes, issuesRes, workOrdersRes] = await Promise.all([
-          fetch(`/api/analytics?companyId=${companyId}&timeRange=all`, { cache: "no-store" }),
-          fetch(`/api/issues?companyId=${companyId}`, { cache: "no-store" }),
-          fetch(`/api/operations/work-orders?companyId=${companyId}`, { cache: "no-store" }),
+          fetch(buildScopedUrl("/api/analytics", scope, { timeRange: "all" }), { cache: "no-store" }),
+          fetch(buildScopedUrl("/api/issues", scope), { cache: "no-store" }),
+          fetch(buildScopedUrl("/api/operations/work-orders", scope), { cache: "no-store" }),
         ]);
 
         const [analytics, issuesJson, workOrdersJson] = await Promise.all([
@@ -137,7 +151,7 @@ export default function InboxPage() {
 
     load();
     return () => { ignore = true; };
-  }, [companyId]);
+  }, [companyId, locationId]);
 
   const items = useMemo<InboxItem[]>(() => {
     const questionItems = questions.map((q) => ({

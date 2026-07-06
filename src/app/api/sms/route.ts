@@ -39,6 +39,48 @@ import { captureKnowledge } from "@/lib/knowledge-engine";
 import { handleSmsOnboarding } from "@/app/api/onboarding/sms-setup/route";
 import { isWhatsAppMessage, stripWhatsAppPrefix } from "@/lib/whatsapp";
 
+async function getPrimaryCompanyLocationId(companyId: string): Promise<string | null> {
+  const { data } = await supabase
+    .from("locations")
+    .select("id")
+    .eq("company_id", companyId)
+    .order("is_primary", { ascending: false })
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  return data?.id || null;
+}
+
+async function getCompanyLocations(companyId: string) {
+  const { data } = await supabase
+    .from("locations")
+    .select("id,name,is_primary")
+    .eq("company_id", companyId)
+    .order("is_primary", { ascending: false })
+    .order("name", { ascending: true });
+
+  return data || [];
+}
+
+function normalizeLocationText(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+async function resolveMessageLocationId(companyId: string, message: string, fallbackLocationId?: string | null): Promise<string | null> {
+  const locations = await getCompanyLocations(companyId);
+  if (!locations.length) return fallbackLocationId || null;
+
+  const normalizedMessage = normalizeLocationText(message);
+  const matched = locations.find((location: any) => {
+    const normalizedName = normalizeLocationText(String(location.name || ""));
+    return normalizedName && normalizedMessage.includes(normalizedName);
+  });
+
+  if (matched?.id) return matched.id;
+  return fallbackLocationId || locations.find((location: any) => location.is_primary)?.id || locations[0]?.id || null;
+}
+
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || 'placeholder' });
 const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID || 'AC00000000000000000000000000000000', process.env.TWILIO_AUTH_TOKEN || 'placeholder');
 
@@ -110,7 +152,7 @@ Schema:
     "worker_count": 0
   },
   "assets": [{ "name": "required", "asset_tag": "optional", "location": "optional", "type": "optional", "notes": "optional" }],
-  "team": [{ "name": "optional", "phone": "optional", "role": "operator|technician|supervisor|manager", "skills": ["optional"], "shift": "optional" }],
+  "team": [{ "name": "optional", "phone": "optional", "role": "operator|technician|supervisor|manager", "skills": ["optional"], "shift": "optional", "location": "optional" }],
   "knowledge": [{ "title": "required", "problem": "optional", "solution": "required", "asset_name": "optional", "equipment_type": "optional", "tags": ["optional"] }],
   "notes": ["short factual leftovers"]
 }`;
@@ -150,10 +192,12 @@ Schema:
     const name = cleanUpdateString(rawAsset?.name);
     if (!name) continue;
     const { data: existingAsset } = await supabase.from("assets").select("id").eq("company_id", params.companyId).ilike("name", name).limit(1).maybeSingle();
+    const locationId = await resolveMessageLocationId(params.companyId, cleanUpdateString(rawAsset?.location) || "", null);
     const payload = {
       name,
       type: cleanUpdateString(rawAsset?.type) || "equipment",
       location: cleanUpdateString(rawAsset?.location) || "Unassigned",
+      location_id: locationId,
       notes: cleanUpdateString(rawAsset?.notes),
     };
     if (existingAsset?.id) {
@@ -184,10 +228,14 @@ Schema:
         role: cleanUpdateString(member?.role) || "operator",
         skills: Array.isArray(member?.skills) ? member.skills.map((skill: unknown) => cleanUpdateString(skill)).filter(Boolean) : [],
         shift: cleanUpdateString(member?.shift),
+        location_id: cleanUpdateString(member?.location),
         verified: true,
       };
     })
     .filter(Boolean);
+  for (const row of teamRows as any[]) {
+    row.location_id = await resolveMessageLocationId(params.companyId, String(row.location_id || row.shift || ""), null);
+  }
   if (teamRows.length > 0) {
     const { data } = await supabase.from("workers").upsert(teamRows as any[], { onConflict: "phone" }).select("id");
     teamChanged = data?.length || teamRows.length;
@@ -747,27 +795,97 @@ function truncateForSms(message: string, max = 480): string {
   return `${trimmed.slice(0, Math.max(0, max - 1)).trimEnd()}…`;
 }
 
+function isIsoRecent(iso: string | null | undefined, maxAgeMs: number): boolean {
+  if (!iso) return false;
+  const time = new Date(iso).getTime();
+  if (!Number.isFinite(time)) return false;
+  return Date.now() - time <= maxAgeMs;
+}
+
+function normalizeManagerReply(text: string): string {
+  return text
+    .replace(/^reply\s*[:\-]?\s*/i, "")
+    .replace(/^answer\s*[:\-]?\s*/i, "")
+    .trim();
+}
+
+function classifyInventoryAvailability(bestMatch: any, requestedQty: number) {
+  if (!bestMatch) return { status: "missing", line: "Stock: no clear inventory match" } as const;
+  const onHand = Number(bestMatch.quantity_on_hand || 0);
+  if (onHand >= requestedQty) {
+    return {
+      status: "available",
+      line: `Stock: ${onHand} on hand${bestMatch.location ? ` at ${bestMatch.location}` : ""}`,
+    } as const;
+  }
+  if (onHand > 0) {
+    return {
+      status: "partial",
+      line: `Stock: only ${onHand} on hand${bestMatch.location ? ` at ${bestMatch.location}` : ""}`,
+    } as const;
+  }
+  return {
+    status: "out",
+    line: `Stock: 0 on hand${bestMatch.location ? ` at ${bestMatch.location}` : ""}`,
+  } as const;
+}
+
+function extractWorkOrderReference(text: string): string | null {
+  const trimmed = text.trim();
+  const woMatch = trimmed.match(/\b(WO-?\d+)\b/i);
+  if (woMatch) {
+    const digits = woMatch[1].replace(/[^\d]/g, "");
+    return digits ? `WO-${digits}` : woMatch[1].toUpperCase();
+  }
+
+  const hashMatch = trimmed.match(/#(\d{1,6})\b/);
+  if (hashMatch) return `WO-${hashMatch[1]}`;
+  return null;
+}
+
+function resolveWorkOrderForStatusUpdate(params: {
+  workOrders: any[];
+  body: string;
+  workerId?: string | null;
+  workerPhone?: string | null;
+}) {
+  const { workOrders, body, workerId, workerPhone } = params;
+  if (!workOrders || workOrders.length === 0) return { target: null, ambiguous: false, reason: "none" as const };
+
+  const explicitRef = extractWorkOrderReference(body);
+  if (explicitRef) {
+    const explicit = workOrders.find((wo) => `${wo.short_id || ""}`.toUpperCase() === explicitRef.toUpperCase() || wo.id === explicitRef);
+    if (explicit) return { target: explicit, ambiguous: false, reason: "explicit" as const };
+  }
+
+  const scored = [...workOrders]
+    .map((wo) => {
+      let value = 0;
+      if (wo.status === "in_progress") value += 100;
+      if (wo.assigned_to && workerId && wo.assigned_to === workerId) value += 80;
+      if (wo.status === "assigned") value += 40;
+      if (wo.worker_phone && workerPhone && wo.worker_phone === workerPhone) value += 20;
+      return { wo, value };
+    })
+    .sort((a, b) => {
+      const scoreDelta = b.value - a.value;
+      if (scoreDelta !== 0) return scoreDelta;
+      return new Date(b.wo.created_at || 0).getTime() - new Date(a.wo.created_at || 0).getTime();
+    });
+
+  const best = scored[0]?.wo || null;
+  const bestScore = scored[0]?.value || 0;
+  const secondScore = scored[1]?.value || -1;
+  const ambiguous = scored.length > 1 && bestScore < 100 && bestScore - secondScore < 30;
+  return { target: ambiguous ? null : best, ambiguous, reason: "heuristic" as const };
+}
+
 function pickTargetWorkOrderForStatusUpdate(
   workOrders: any[],
   workerId?: string | null,
   workerPhone?: string | null
 ) {
-  if (!workOrders || workOrders.length === 0) return null;
-
-  const score = (wo: any) => {
-    let value = 0;
-    if (wo.status === "in_progress") value += 100;
-    if (wo.assigned_to && workerId && wo.assigned_to === workerId) value += 80;
-    if (wo.status === "assigned") value += 40;
-    if (wo.worker_phone && workerPhone && wo.worker_phone === workerPhone) value += 20;
-    return value;
-  };
-
-  return [...workOrders].sort((a, b) => {
-    const scoreDelta = score(b) - score(a);
-    if (scoreDelta !== 0) return scoreDelta;
-    return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
-  })[0];
+  return resolveWorkOrderForStatusUpdate({ workOrders, body: "", workerId, workerPhone }).target;
 }
 
 async function finalizeCompletedWorkOrder(workOrderId: string): Promise<void> {
@@ -906,6 +1024,24 @@ export async function POST(request: NextRequest) {
     const rawFrom = formData.get("From")?.toString() || "";
     const incomingChannel: "sms" | "whatsapp" = isWhatsAppMessage(rawFrom) ? "whatsapp" : "sms";
     const from = normalizePhoneNumber(stripWhatsAppPrefix(rawFrom));
+    const messageSid = formData.get("MessageSid")?.toString() || "";
+
+    if (messageSid) {
+      const { error: inboundLogError } = await supabase.from("sms_inbound_messages").insert({
+        message_sid: messageSid,
+        from_phone: from,
+        channel: incomingChannel,
+        body,
+      } as any);
+
+      if (inboundLogError) {
+        if ((inboundLogError as any).code === "23505") {
+          console.log(`[${incomingChannel.toUpperCase()}] Duplicate MessageSid ignored:`, messageSid);
+          return twimlResponse("OK");
+        }
+        console.error("[SMS] Inbound dedupe insert failed:", inboundLogError);
+      }
+    }
 
     // Rate limiting: max 60 SMS per minute per phone number
     if (!checkRateLimit(`sms:${from}`, 60, 60_000)) {
@@ -925,7 +1061,7 @@ export async function POST(request: NextRequest) {
       .eq("phone", from)
       .single();
 
-    if (body.toUpperCase() === "SETUP" || (onboardingSession && onboardingSession.step < 5)) {
+    if (body.toUpperCase() === "SETUP" || (onboardingSession && onboardingSession.step < 7)) {
       const result = await handleSmsOnboarding(from, body, mediaUrl);
       return twimlResponse(result.message);
     }
@@ -941,6 +1077,12 @@ export async function POST(request: NextRequest) {
       .single();
     
     if (pendingQuestion) {
+      if (!isIsoRecent((pendingQuestion as any).created_at, 48 * 60 * 60 * 1000)) {
+        await supabase
+          .from("questions")
+          .update({ pending_manager_response_phone: null })
+          .eq("id", pendingQuestion.id);
+      } else {
       if (body.toUpperCase() === "SKIP") {
         await supabase
           .from("questions")
@@ -949,8 +1091,15 @@ export async function POST(request: NextRequest) {
         
         return twimlResponse("Got it, skipped. The worker will figure it out another way.");
       }
+
+      if (/^(help|\?)$/i.test(body.trim())) {
+        return twimlResponse("Reply with the answer you want sent to the worker. You can also reply SKIP to ignore this question.");
+      }
       
-      const managerAnswer = body;
+      const managerAnswer = normalizeManagerReply(body);
+      if (!managerAnswer || /^(y|yes|n|no|ok)$/i.test(managerAnswer)) {
+        return twimlResponse("I need the actual answer to send back. Reply with the answer text, or SKIP to ignore this question.");
+      }
       
       await supabase
         .from("questions")
@@ -962,7 +1111,7 @@ export async function POST(request: NextRequest) {
         .eq("id", pendingQuestion.id);
       
       const companyName = (pendingQuestion.companies as any)?.name || "Your manager";
-      await sendSMS(
+      const delivered = await sendSMS(
         pendingQuestion.worker_phone,
         `REPLY: ${companyName} replied to your question:\n\n"${pendingQuestion.question}"\n\n️ ${managerAnswer}`
       );
@@ -973,7 +1122,10 @@ export async function POST(request: NextRequest) {
         managerAnswer
       );
       
-      return twimlResponse(`Thanks! I've sent your answer to ${pendingQuestion.worker_name || "the worker"} and saved it for future questions. OK`);
+      return twimlResponse(delivered
+        ? `Thanks! I've sent your answer to ${pendingQuestion.worker_name || "the worker"} and saved it for future questions. OK`
+        : `Thanks! I saved your answer for future questions, but I couldn't deliver the SMS right now.`);
+      }
     }
 
     // Check if worker exists
@@ -994,14 +1146,20 @@ export async function POST(request: NextRequest) {
     // CASE 0: Check if this is a Y/N response to escalation prompt
     if (worker && worker.pending_escalation_question_id) {
       const response = body.toUpperCase().trim();
+      const { data: question } = await supabase
+        .from("questions")
+        .select("id, question, company_id, created_at")
+        .eq("id", worker.pending_escalation_question_id)
+        .single();
+
+      if (!question || !isIsoRecent((question as any).created_at, 24 * 60 * 60 * 1000)) {
+        await supabase
+          .from("workers")
+          .update({ pending_escalation_question_id: null })
+          .eq("phone", from);
+      } else {
       
       if (response === "Y" || response === "YES") {
-        const { data: question } = await supabase
-          .from("questions")
-          .select("id, question, company_id")
-          .eq("id", worker.pending_escalation_question_id)
-          .single();
-        
         if (question) {
           const { data: company } = await supabase
             .from("companies")
@@ -1044,6 +1202,7 @@ export async function POST(request: NextRequest) {
         .from("workers")
         .update({ pending_escalation_question_id: null })
         .eq("phone", from);
+      }
     }
 
     // CASE 1: New user trying to join with access code
@@ -1126,21 +1285,73 @@ export async function POST(request: NextRequest) {
         return await translatedTwimlResponse("Please reply with your first name to get started.", detectedLang);
       }
       
+      const companyLocations = await getCompanyLocations(worker.company_id);
+      const hasMultipleLocations = companyLocations.length > 1;
+      const primaryLocationId = companyLocations[0]?.id || null;
+
       await supabase
         .from("workers")
-        .update({ name: name, verified: true, pending_profile_step: 'role' })
+        .update({
+          name: name,
+          verified: false,
+          location_id: hasMultipleLocations ? null : primaryLocationId,
+          pending_profile_step: hasMultipleLocations ? 'location' : 'role'
+        })
         .eq("phone", from);
 
-      // Ask for role next
       const { data: companyForRole } = await supabase
         .from("companies")
         .select("name")
         .eq("id", worker.company_id)
         .single();
+
+      if (hasMultipleLocations) {
+        const locationChoices = companyLocations
+          .slice(0, 8)
+          .map((location: any, index: number) => `${index + 1}. ${location.name}`)
+          .join("\n");
+        return await translatedTwimlResponse(`Thanks ${name}! 👋 Welcome to ${companyForRole?.name || "Sidekick"}!\n\nWhich location do you work at? Reply with the number or location name:\n${locationChoices}`, detectedLang);
+      }
+
       return await translatedTwimlResponse(`Thanks ${name}! 👋 Welcome to ${companyForRole?.name || "Sidekick"}!\n\nWhat's your role? (e.g. Mechanic, Electrician, Operator, Supervisor)`, detectedLang);
     }
 
-    // CASE 3b: Worker has name but pending role collection
+    // CASE 3b: Worker has name but pending location collection
+    if (worker && worker.name && worker.pending_profile_step === 'location') {
+      const companyLocations = await getCompanyLocations(worker.company_id);
+      if (companyLocations.length === 0) {
+        await supabase.from("workers").update({ pending_profile_step: 'role' }).eq("phone", from);
+        return await translatedTwimlResponse("What's your role? (e.g. Mechanic, Electrician, Operator, Supervisor)", detectedLang);
+      }
+
+      const trimmed = body.trim();
+      const asNumber = Number(trimmed);
+      let selectedLocation: any = null;
+      if (Number.isInteger(asNumber) && asNumber >= 1 && asNumber <= companyLocations.length) {
+        selectedLocation = companyLocations[asNumber - 1];
+      } else {
+        const lowered = trimmed.toLowerCase();
+        selectedLocation = companyLocations.find((location: any) => location.name.toLowerCase() === lowered)
+          || companyLocations.find((location: any) => location.name.toLowerCase().includes(lowered));
+      }
+
+      if (!selectedLocation) {
+        const locationChoices = companyLocations
+          .slice(0, 8)
+          .map((location: any, index: number) => `${index + 1}. ${location.name}`)
+          .join("\n");
+        return await translatedTwimlResponse(`I couldn't match that location. Reply with the number or location name:\n${locationChoices}`, detectedLang);
+      }
+
+      await supabase
+        .from("workers")
+        .update({ location_id: selectedLocation.id, pending_profile_step: 'role' })
+        .eq("phone", from);
+
+      return await translatedTwimlResponse(`Got it — ${selectedLocation.name}.\n\nWhat's your role? (e.g. Mechanic, Electrician, Operator, Supervisor)`, detectedLang);
+    }
+
+    // CASE 3c: Worker has name but pending role collection
     if (worker && worker.name && worker.pending_profile_step === 'role' && body.trim().length >= 2 && body.trim().length <= 50) {
       const roleInput = body.trim().toLowerCase();
       const roleMap: Record<string, string> = {
@@ -1148,7 +1359,7 @@ export async function POST(request: NextRequest) {
         supervisor: "supervisor", manager: "manager", operator: "operator", electrician: "technician"
       };
       const mappedRole = roleMap[roleInput] || "operator";
-      await supabase.from("workers").update({ role: mappedRole, pending_profile_step: null }).eq("phone", from);
+      await supabase.from("workers").update({ role: mappedRole, verified: true, pending_profile_step: null }).eq("phone", from);
       return await translatedTwimlResponse(`Got it — ${body.trim()}! You're all set. 🔧\n\nText me any maintenance issue, question, or "HELP" to see what I can do!`, detectedLang);
     }
 
@@ -1769,7 +1980,17 @@ Rules:
       if ((worker as any).pending_asset_id) {
         await supabase.from("workers").update({ pending_asset_id: null } as any).eq("phone", from);
       }
-      const targetWo = pickTargetWorkOrderForStatusUpdate(activeWorkOrders, worker.id, from);
+      const targetResolution = resolveWorkOrderForStatusUpdate({
+        workOrders: activeWorkOrders,
+        body,
+        workerId: worker.id,
+        workerPhone: from,
+      });
+      const targetWo = targetResolution.target;
+      if (targetResolution.ambiguous) {
+        const choices = activeWorkOrders.slice(0, 3).map((wo: any) => wo.short_id || wo.id.slice(0, 8)).join(", ");
+        return twimlResponse(`I found more than one open work order. Reply with the WO number, like ${choices}.`);
+      }
       if (!targetWo) {
         return twimlResponse("I couldn't find the right open work order. Reply with the WO number if you have it.");
       }
@@ -1923,16 +2144,21 @@ Rules:
         const urgency = triage.supplyRequest?.urgency || "medium";
         const inventoryMatches = await findInventoryMatches(worker.company_id, itemName);
         const bestMatch = inventoryMatches[0] || null;
-
-        const stockLine = bestMatch
-          ? `Stock: ${bestMatch.quantity_on_hand} on hand${bestMatch.location ? ` at ${bestMatch.location}` : ""}`
-          : "Stock: no clear inventory match";
+        const availability = classifyInventoryAvailability(bestMatch, requestedQty);
+        const stockLine = availability.line;
+        const managerPhone = company?.manager_phone || null;
 
         const woTitle = `Supply request: ${itemName}`.slice(0, 120);
+        const resolvedLocationId = await resolveMessageLocationId(
+          worker.company_id,
+          [body, itemName, triage.supplyRequest?.neededFor, triage.supplyRequest?.notes].filter(Boolean).join("\n"),
+          (worker as any).location_id || await getPrimaryCompanyLocationId(worker.company_id)
+        );
         const { data: supplyWo, error: supplyErr } = await supabase
           .from("work_orders")
           .insert({
             company_id: worker.company_id,
+            location_id: resolvedLocationId,
             asset_id: null,
             asset_name: null,
             asset_tag: null,
@@ -1953,8 +2179,9 @@ Rules:
               confidence: triage.confidence,
               supply_request: triage.supplyRequest || null,
               inventory_matches: inventoryMatches,
+              inventory_availability: availability.status,
             },
-            status: "open",
+            status: availability.status === "available" ? "assigned" : "open",
             reported_by: from,
             worker_phone: from,
             source: "sms",
@@ -1964,15 +2191,23 @@ Rules:
 
         if (supplyErr) throw supplyErr;
 
-        if (company?.manager_phone) {
+        if (managerPhone) {
           const mgrMsg = truncateForSms(
             `📦 SUPPLY ${supplyWo?.short_id || "REQUEST"}\n${worker.name || from} requested ${requestedQty} × ${itemName}.\n${stockLine}${triage.supplyRequest?.neededFor ? `\nNeeded for: ${triage.supplyRequest.neededFor}` : ""}`
           );
-          await sendSMS(company.manager_phone, mgrMsg);
+          await sendSMS(managerPhone, mgrMsg);
         }
 
+        const stockHint = availability.status === "available"
+          ? "It looks like stock is available."
+          : availability.status === "partial"
+            ? "It looks like stock is low."
+            : availability.status === "out"
+              ? "It looks like that item is out of stock."
+              : "I couldn't confirm stock yet.";
+
         const workerMsg = truncateForSms(
-          `${triage.workerResponse || `Got it — I logged a supply request for ${requestedQty} × ${itemName}.`} ${supplyWo?.short_id ? `(${supplyWo.short_id})` : ""}\n${stockLine}\nI've alerted ${company?.manager_name || "your manager"}.`
+          `${triage.workerResponse || `Got it — I logged a supply request for ${requestedQty} × ${itemName}.`} ${supplyWo?.short_id ? `(${supplyWo.short_id})` : ""}\n${stockLine}\n${stockHint}${managerPhone ? `\nI've alerted ${company?.manager_name || "your manager"}.` : "\nI saved the request, but no manager phone is configured yet."}`
         );
         return twimlResponse(workerMsg);
       } catch (error) {
@@ -2016,10 +2251,17 @@ Rules:
           };
         }
 
+        const resolvedLocationId = await resolveMessageLocationId(
+          worker.company_id,
+          [body, triage.issue?.assetName].filter(Boolean).join("\n"),
+          (worker as any).location_id || await getPrimaryCompanyLocationId(worker.company_id)
+        );
+
         const wo = await createWorkOrderFromTriage(triage as any, worker.company_id, from, {
           originalMessage: body,
           source: imageAnalysisForTriage ? "photo" : "sms",
           aiTriageExtra: Object.keys(aiTriageExtra).length > 0 ? aiTriageExtra : undefined,
+          locationId: resolvedLocationId,
         });
 
         // Best-effort load WO for short_id + asset location
@@ -2116,8 +2358,21 @@ Rules:
       // Fallback: if AI didn't identify WO, use most recent active WO for this worker
       let resolvedWoId = woId;
       let resolvedAction = action;
+      if (!resolvedWoId) {
+        resolvedWoId = extractWorkOrderReference(body);
+      }
       if (!resolvedWoId && activeWorkOrders && activeWorkOrders.length > 0) {
-        resolvedWoId = pickTargetWorkOrderForStatusUpdate(activeWorkOrders, worker.id, from)?.id;
+        const targetResolution = resolveWorkOrderForStatusUpdate({
+          workOrders: activeWorkOrders,
+          body,
+          workerId: worker.id,
+          workerPhone: from,
+        });
+        if (targetResolution.ambiguous) {
+          const choices = activeWorkOrders.slice(0, 3).map((wo: any) => wo.short_id || wo.id.slice(0, 8)).join(", ");
+          return twimlResponse(`I found more than one open work order. Reply with the WO number, like ${choices}.`);
+        }
+        resolvedWoId = targetResolution.target?.id || null;
       }
       if (!resolvedAction) {
         const upperBody = body.toUpperCase().trim();
@@ -2178,9 +2433,15 @@ Rules:
 
         // Create follow-up WOs for any secondary issues
         const secondary = (triage.workOrderUpdate?.secondaryIssues || []).slice(0, 3);
+        const resolvedLocationId = await resolveMessageLocationId(
+          worker.company_id,
+          [body, (woFullForUpdate as any)?.title].filter(Boolean).join("\n"),
+          (worker as any)?.location_id || (woFullForUpdate as any)?.location_id || await getPrimaryCompanyLocationId(worker.company_id)
+        );
         for (const s of secondary) {
           await supabase.from("work_orders").insert({
             company_id: worker.company_id,
+            location_id: resolvedLocationId,
             asset_id: (woFullForUpdate as any)?.asset_id || null,
             title: `Follow-up: ${s}`.slice(0, 120),
             description: `Auto-created follow-up from completion of ${resolvedWoId}: ${s}`,

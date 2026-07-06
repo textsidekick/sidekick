@@ -17,6 +17,7 @@ import {
   Sparkles,
   Smartphone,
 } from "lucide-react";
+import { buildScopedUrl, readDashboardScope } from "@/lib/dashboard-scope";
 
 type UpdateRecord = {
   id: string;
@@ -218,6 +219,7 @@ function VoiceInline({ companyId }: { companyId: string }) {
 
 export default function UpdatesPage() {
   const [companyId, setCompanyId] = useState("");
+  const [companyPhone, setCompanyPhone] = useState("");
   const [updates, setUpdates] = useState<UpdateRecord[]>([]);
   const [loadingUpdates, setLoadingUpdates] = useState(true);
   const [input, setInput] = useState("");
@@ -225,29 +227,40 @@ export default function UpdatesPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    try {
-      const auth = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
-      if (auth.companyId) setCompanyId(auth.companyId);
-    } catch {}
+    let ignore = false;
 
-    const handleStorage = () => {
+    const loadSession = async () => {
       try {
-        const auth = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
-        if (auth.companyId) setCompanyId(auth.companyId);
+        const res = await fetch("/api/auth/session", { cache: "no-store" });
+        const data = await res.json();
+        if (!ignore && data?.authenticated) {
+          setCompanyId(data.companyId || "");
+          setCompanyPhone(data.company?.phone || data.company?.twilio_phone || data.company?.manager_phone || "");
+        }
       } catch {}
     };
 
+    loadSession();
+    const handleStorage = () => {
+      const scope = readDashboardScope();
+      if (scope.companyId) setCompanyId(scope.companyId);
+    };
     window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
+    return () => {
+      ignore = true;
+      window.removeEventListener("storage", handleStorage);
+    };
   }, []);
 
   useEffect(() => {
-    fetch("/api/company-updates")
+    if (!companyId) return;
+    setLoadingUpdates(true);
+    fetch(buildScopedUrl("/api/company-updates", { companyId, locationId: "all" }))
       .then((r) => r.json())
       .then((data) => setUpdates(data.updates || []))
       .catch(() => setUpdates([]))
       .finally(() => setLoadingUpdates(false));
-  }, []);
+  }, [companyId]);
 
   const sendUpdate = async (message: string) => {
     const trimmed = message.trim();
@@ -351,7 +364,11 @@ export default function UpdatesPage() {
                 </div>
                 <div>
                   <div className="text-sm font-medium text-gray-900">You can also text the Sidekick phone number from your phone to provide company updates.</div>
-                  <div className="mt-1 text-sm text-gray-500">That’s still the fastest way to capture quick fixes, tribal knowledge, and SOP notes while the work is fresh.</div>
+                  <div className="mt-1 text-sm text-gray-500">
+                    {companyPhone
+                      ? `Text ${companyPhone} when you want to capture quick fixes, tribal knowledge, and SOP notes while the work is fresh.`
+                      : "That’s still the fastest way to capture quick fixes, tribal knowledge, and SOP notes while the work is fresh."}
+                  </div>
                 </div>
               </div>
             </div>

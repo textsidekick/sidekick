@@ -18,6 +18,7 @@ type CompanySettings = {
 };
 
 type Company = { name: string; manager_phone: string; manager_name: string };
+type LocationRow = { id?: string; name: string; city?: string; state?: string; address?: string; is_primary?: boolean };
 type WoCategory = { id: string; name: string; color: string };
 type WoPriority = {
   id?: string;
@@ -93,6 +94,7 @@ export default function SettingsPage() {
   });
   const [categories, setCategories] = useState<WoCategory[]>([]);
   const [priorities, setPriorities] = useState<WoPriority[]>(DEFAULT_PRIORITIES);
+  const [locations, setLocations] = useState<LocationRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -114,6 +116,7 @@ export default function SettingsPage() {
         },
       });
       setCategories(json.categories || []);
+      setLocations(json.locations || []);
       const normalizedPriorities = normalizePriorities(json.priorities || []);
       setPriorities(normalizedPriorities);
       persistPriorityLabels(normalizedPriorities);
@@ -137,6 +140,7 @@ export default function SettingsPage() {
           escalation_rules: buildPriorityDisplayLabelRules(priorities, settings.escalation_rules),
         },
         company,
+        locations,
         priorities,
       }),
     });
@@ -171,6 +175,26 @@ export default function SettingsPage() {
     setPriorities((current) =>
       current.map((priority) => (priority.name === name ? { ...priority, ...patch } : priority))
     );
+  }
+
+  function updateLocation(index: number, patch: Partial<LocationRow>) {
+    setLocations((current) => current.map((location, i) => i === index ? { ...location, ...patch } : location));
+  }
+
+  function addLocation() {
+    setLocations((current) => [...current, { name: "", city: "", state: "", address: "", is_primary: current.length === 0 }]);
+  }
+
+  function removeLocation(index: number) {
+    setLocations((current) => {
+      const next = current.filter((_, i) => i !== index);
+      if (next.length > 0 && !next.some((location) => location.is_primary)) next[0].is_primary = true;
+      return next;
+    });
+  }
+
+  function setPrimaryLocation(index: number) {
+    setLocations((current) => current.map((location, i) => ({ ...location, is_primary: i === index })));
   }
 
   return (
@@ -249,6 +273,41 @@ export default function SettingsPage() {
                     />
                     <span className="text-sm text-gray-700">{label}</span>
                   </label>
+                ))}
+              </div>
+            </section>
+
+            <section className="bg-white rounded-xl border border-gray-200 p-5">
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <div>
+                  <h2 className="text-sm font-semibold text-gray-700 mb-1">Locations</h2>
+                  <p className="text-xs text-gray-500">Manage the sites your workers can join and switch between.</p>
+                </div>
+                <Button size="sm" variant="outline" onClick={addLocation}>
+                  <Plus className="h-3.5 w-3.5 mr-1" /> Add location
+                </Button>
+              </div>
+              <div className="space-y-3">
+                {locations.length === 0 ? (
+                  <div className="text-sm text-gray-400">No locations added yet.</div>
+                ) : locations.map((location, index) => (
+                  <div key={location.id || `location-${index}`} className="rounded-lg border border-gray-200 p-3 space-y-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <label className="flex items-center gap-2 text-xs text-gray-600">
+                        <input type="radio" name="primary-location" checked={!!location.is_primary} onChange={() => setPrimaryLocation(index)} />
+                        Primary location
+                      </label>
+                      <button onClick={() => removeLocation(index)} className="text-gray-400 hover:text-red-500" aria-label={`Delete ${location.name || "location"}`}>
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <Field label="Location Name" value={location.name} onChange={(v) => updateLocation(index, { name: v })} placeholder="San Jose plant" />
+                      <Field label="Address" value={location.address || ""} onChange={(v) => updateLocation(index, { address: v })} placeholder="123 Main St" />
+                      <Field label="City" value={location.city || ""} onChange={(v) => updateLocation(index, { city: v })} />
+                      <Field label="State" value={location.state || ""} onChange={(v) => updateLocation(index, { state: v })} />
+                    </div>
+                  </div>
                 ))}
               </div>
             </section>

@@ -28,12 +28,15 @@ import type {
 // -----------------------------------------------------------------------------
 // Assets
 // -----------------------------------------------------------------------------
-export async function listAssets(companyId: UUID): Promise<Asset[]> {
-  const { data, error } = await supabase
+export async function listAssets(companyId: UUID, opts?: { locationId?: UUID | "all" | null }): Promise<Asset[]> {
+  let q = supabase
     .from("assets")
     .select("*")
-    .eq("company_id", companyId)
-    .order("created_at", { ascending: false });
+    .eq("company_id", companyId);
+
+  if (opts?.locationId && opts.locationId !== "all") q = q.eq("location_id", opts.locationId);
+
+  const { data, error } = await q.order("created_at", { ascending: false });
 
   if (error) throw error;
   return (data || []) as Asset[];
@@ -65,11 +68,12 @@ export async function deleteAsset(id: UUID): Promise<void> {
 // -----------------------------------------------------------------------------
 // Work Orders
 // -----------------------------------------------------------------------------
-export async function listWorkOrders(companyId: UUID, opts?: { status?: string; priority?: string; assetId?: UUID }): Promise<WorkOrder[]> {
+export async function listWorkOrders(companyId: UUID, opts?: { status?: string; priority?: string; assetId?: UUID; locationId?: UUID | "all" | null }): Promise<WorkOrder[]> {
   let q = supabase.from("work_orders").select("*").eq("company_id", companyId);
   if (opts?.status) q = q.eq("status", opts.status);
   if (opts?.priority) q = q.eq("priority", opts.priority);
   if (opts?.assetId) q = q.eq("asset_id", opts.assetId);
+  if (opts?.locationId && opts.locationId !== "all") q = q.eq("location_id", opts.locationId);
 
   const { data, error } = await q.order("created_at", { ascending: false });
   if (error) throw error;

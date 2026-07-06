@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { normalizePhoneNumber } from "@/lib/phone";
 import { randomBytes } from "crypto";
 import { detectLanguage, translateText } from "@/lib/language";
+import { createCompanyLocations } from "@/lib/location-utils";
 
 const INDUSTRY_MAP: Record<string, string> = {
   "1": "Manufacturing",
@@ -119,6 +120,51 @@ export async function handleSmsOnboarding(
         .from("onboarding_sessions")
         .update({ step: 4, data: { ...sessionData, worker_count: count } })
         .eq("phone", normalizedPhone);
+      return { message: await t("How many locations do you operate? Reply with a number (reply 1 if you only have one site).") };
+    }
+
+    case 4: {
+      // Expecting location count
+      const locationCount = parseInt(text, 10);
+      if (isNaN(locationCount) || locationCount < 1) {
+        return { message: await t("Please enter a number of locations (for example: 1, 2, or 5).") };
+      }
+      await supabase
+        .from("onboarding_sessions")
+        .update({ step: 5, data: { ...sessionData, location_count: locationCount } })
+        .eq("phone", normalizedPhone);
+      if (locationCount === 1) {
+        return { message: await t("What should I call your location/site? For example: San Jose plant or Main warehouse.") };
+      }
+      return {
+        message: await t(
+          `Please send the ${locationCount} location names, separated by commas. For example: San Jose, Los Gatos, Saratoga.`
+        ),
+      };
+    }
+
+    case 5: {
+      // Expecting location names
+      const locationCount = Math.max(1, Number(sessionData.location_count || 1));
+      const locationNames = text
+        .split(",")
+        .map((name) => name.trim())
+        .filter(Boolean);
+
+      if (locationCount === 1) {
+        if (!text || text.length < 2) {
+          return { message: await t("Please send a location/site name, like Main warehouse or San Jose plant.") };
+        }
+      } else if (locationNames.length < locationCount) {
+        return { message: await t(`Please send all ${locationCount} location names, separated by commas.`) };
+      }
+
+      const normalizedNames = locationCount === 1 ? [text.trim()] : locationNames.slice(0, locationCount);
+      await supabase
+        .from("onboarding_sessions")
+        .update({ step: 6, data: { ...sessionData, location_names: normalizedNames } })
+        .eq("phone", normalizedPhone);
+
       return {
         message: await t(
           "Want to upload a photo of your floor or equipment so I can catalog it?\n\nReply PHOTO and send a picture, or SKIP to continue."
@@ -126,7 +172,7 @@ export async function handleSmsOnboarding(
       };
     }
 
-    case 4: {
+    case 6: {
       // Expecting PHOTO (with media), SKIP, or an MMS image
       if (upperText === "SKIP") {
         return await completeOnboarding(normalizedPhone, sessionData, lang);
@@ -149,7 +195,7 @@ export async function handleSmsOnboarding(
           await supabase
             .from("onboarding_sessions")
             .update({
-              step: 4, // stay on step 4 to allow more photos or SKIP
+              step: 6, // stay on photo step to allow more photos or SKIP
               data: {
                 ...sessionData,
                 floor_photo_urls: urls,
@@ -186,7 +232,7 @@ export async function handleSmsOnboarding(
       return { message: await t("Reply PHOTO to send a picture, DONE if finished, or SKIP to continue without photos.") };
     }
 
-    case 5: {
+    case 7: {
       // Already completed
       return {
         message: await t(`You're already set up! Your company: ${sessionData.company_name}. Workers can text this number with any question.`),
@@ -214,6 +260,9 @@ async function completeOnboarding(
     manager_phone: phone,
     worker_count: data.worker_count || 0,
     default_language: lang || "en",
+    metadata: {
+      location_count: Number(data.location_count || 1),
+    },
   };
 
   let companyResponse = await supabase
@@ -231,6 +280,9 @@ async function completeOnboarding(
         access_code: joinCode,
         manager_phone: phone,
         worker_count: data.worker_count || 0,
+        metadata: {
+          location_count: Number(data.location_count || 1),
+        },
       } as any)
       .select("id")
       .single();
@@ -242,6 +294,22 @@ async function completeOnboarding(
 
   if (companyError) {
     console.error("[sms-setup] Failed to create company:", companyError);
+  }
+
+  if (companyId) {
+    try {
+      const locationCount = Math.max(1, Number(data.location_count || 1));
+      const providedNames = Array.isArray(data.location_names)
+        ? data.location_names.map((name) => String(name || "").trim()).filter(Boolean)
+        : [];
+      const locationSeeds = Array.from({ length: locationCount }, (_, index) => ({
+        name: providedNames[index] || (locationCount === 1 ? `${companyName} - Main site` : `${companyName} - Location ${index + 1}`),
+        isPrimary: index === 0,
+      }));
+      await createCompanyLocations(companyId, locationSeeds);
+    } catch (locationError) {
+      console.warn("[sms-setup] Failed to create locations:", locationError);
+    }
   }
 
   // If we cataloged assets, insert them
@@ -267,7 +335,7 @@ async function completeOnboarding(
   await supabase
     .from("onboarding_sessions")
     .update({
-      step: 5,
+      step: 7,
       completed_at: new Date().toISOString(),
       company_id: companyId,
       data: { ...data, access_code: joinCode },

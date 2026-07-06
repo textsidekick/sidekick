@@ -53,6 +53,7 @@ export default function ManagerDashboard() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [selectedCompany, setSelectedCompany] = useState<string>("");
+  const [selectedLocationId, setSelectedLocationId] = useState<string>("all");
   const [stats, setStats] = useState<Stats | null>(null);
   const [issues, setIssues] = useState<Issue[]>([]);
   const [unansweredQuestions, setUnansweredQuestions] = useState<any[]>([]);
@@ -111,6 +112,7 @@ export default function ManagerDashboard() {
       } else if (allCompanies.length > 0 && !selectedCompany) {
         setSelectedCompany(allCompanies[0].id);
       }
+      setSelectedLocationId(savedAuth.locationId || "all");
       if (d.workers) setWorkers(d.workers);
     });
   }, []);
@@ -123,16 +125,27 @@ export default function ManagerDashboard() {
         if (authData.companyId && authData.companyId !== selectedCompany) {
           setSelectedCompany(authData.companyId);
         }
+        if ((authData.locationId || "all") !== selectedLocationId) {
+          setSelectedLocationId(authData.locationId || "all");
+        }
       } catch {}
     };
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
-  }, [selectedCompany]);
+  }, [selectedCompany, selectedLocationId]);
+
+  const scopedQuery = (path: string) => {
+    const params = new URLSearchParams();
+    params.set("companyId", selectedCompany);
+    if (selectedLocationId && selectedLocationId !== "all") params.set("locationId", selectedLocationId);
+    return `${path}?${params.toString()}`;
+  };
 
   const loadStats = async () => {
     if (!selectedCompany) return;
     setLoadingStats(true);
-    const res = await fetch(`/api/analytics?companyId=${selectedCompany}&timeRange=all`);
+    const analyticsUrl = scopedQuery("/api/analytics") + "&timeRange=all";
+    const res = await fetch(analyticsUrl);
     const data = await res.json();
     setStats(data);
     setLoadingStats(false);
@@ -142,10 +155,10 @@ export default function ManagerDashboard() {
     if (!selectedCompany) return;
     setLoadingIssues(true);
     try {
-      const res = await fetch(`/api/issues?companyId=${selectedCompany}`);
+      const res = await fetch(scopedQuery("/api/issues"));
       const data = await res.json();
       setIssues(data.issues || []);
-      const qRes = await fetch(`/api/analytics?companyId=${selectedCompany}&timeRange=all`);
+      const qRes = await fetch(scopedQuery("/api/analytics") + "&timeRange=all");
       const qData = await qRes.json();
       setUnansweredQuestions((qData.recentQuestions || []).filter((q: any) => !q.answer));
     } catch (error) { console.error("Failed to load issues:", error); }
@@ -156,7 +169,7 @@ export default function ManagerDashboard() {
     if (!selectedCompany) return;
     setLoadingWorkOrders(true);
     try {
-      const res = await fetch(`/api/operations/work-orders?companyId=${selectedCompany}`);
+      const res = await fetch(scopedQuery("/api/operations/work-orders"));
       const data = await res.json();
       setWorkOrders(data.workOrders || []);
     } catch (error) { console.error("Failed to load work orders:", error); }
@@ -169,7 +182,7 @@ export default function ManagerDashboard() {
       loadIssues();
       loadWorkOrders();
     }
-  }, [selectedCompany]);
+  }, [selectedCompany, selectedLocationId]);
 
   const currentCompany = companies.find(c => c.id === selectedCompany);
   const companyWorkers = workers.filter(w => w.company_id === selectedCompany);

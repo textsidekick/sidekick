@@ -1,10 +1,8 @@
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
 import { supabase } from "@/lib/supabase";
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+import { completeTextOpenAIFirst } from "@/lib/sms-ai";
 
 const LOW_CONFIDENCE_PHRASES = [
   "don't have information",
@@ -92,7 +90,7 @@ export async function GET(req: NextRequest) {
       const unansweredQuestions = (questions || [])
         .filter((q: any) => {
           const confidence = Number(q.confidence || 0);
-          return Boolean(q.manager_response) || confidence < 50 || isLowConfidenceAnswer(q.answer);
+          return !q.manager_response && (confidence < 50 || isLowConfidenceAnswer(q.answer));
         })
         .map((q: any) => q.question)
         .filter(Boolean);
@@ -104,17 +102,11 @@ export async function GET(req: NextRequest) {
 
       let topics = "various topics";
       try {
-        const response = await openai.chat.completions.create({
-          model: "gpt-4.1",
-          max_tokens: 300,
-          messages: [
-            {
-              role: "user",
-              content: `These are questions workers asked that Sidekick couldn't confidently answer. Group them into 2-4 topic categories.\n\nQuestions:\n${unansweredQuestions.slice(0, 20).map((q, i) => `${i + 1}. ${q}`).join("\n")}\n\nReturn a short comma-separated list of topic names (e.g. \"safety procedures, equipment maintenance, HR policies\"). Keep it brief. Respond with ONLY the comma-separated topics.`,
-            },
-          ],
+        topics = await completeTextOpenAIFirst({
+          openaiModel: process.env.OPENAI_SMS_MODEL || "gpt-4.1",
+          maxTokens: 300,
+          user: `These are questions workers asked that Sidekick couldn't confidently answer. Group them into 2-4 topic categories.\n\nQuestions:\n${unansweredQuestions.slice(0, 20).map((q, i) => `${i + 1}. ${q}`).join("\n")}\n\nReturn a short comma-separated list of topic names (e.g. \"safety procedures, equipment maintenance, HR policies\"). Keep it brief. Respond with ONLY the comma-separated topics.`,
         });
-        topics = response.choices[0]?.message?.content?.trim() || topics;
       } catch (error) {
         console.error("[unknown-questions][categorize]", error);
       }

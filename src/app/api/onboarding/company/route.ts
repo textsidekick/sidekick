@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { createCompanyLocations, parseAddressParts } from "@/lib/location-utils";
 
 function generateJoinCode(): string {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -7,7 +8,7 @@ function generateJoinCode(): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, industry, address } = await req.json();
+    const { name, industry, address, locations } = await req.json();
     if (!name?.trim()) return NextResponse.json({ error: "name required" }, { status: 400 });
 
     const joinCode = generateJoinCode();
@@ -45,6 +46,17 @@ export async function POST(req: NextRequest) {
       questions_used: 0,
       questions_limit: 100,
     } as any);
+
+    const locationSeeds = Array.isArray(locations) && locations.length > 0
+      ? locations
+      : [{
+          name: address?.trim() ? `${name.trim()} - Main location` : `${name.trim()} - Main site`,
+          address: address || null,
+          ...parseAddressParts(address || null),
+          isPrimary: true,
+        }];
+
+    await createCompanyLocations(company.id, locationSeeds);
 
     return NextResponse.json({ companyId: company.id, joinCode }, { status: 201 });
   } catch (e: any) {

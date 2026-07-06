@@ -4,6 +4,7 @@ import { getCompanyId } from "@/lib/dashboard-auth";
 import { normalizePhoneNumber } from "@/lib/phone";
 import { auditLog } from "@/lib/audit";
 import { completeJsonOpenAIFirst } from "@/lib/sms-ai";
+import { findLocationIdByName } from "@/lib/location-utils";
 
 const SYSTEM_PROMPT = `You are Sidekick's manager update parser.
 Turn a manager's freeform update into structured operational changes.
@@ -264,6 +265,7 @@ export async function POST(req: NextRequest) {
       name,
       type: cleanString(rawAsset.type) || "equipment",
       location: cleanString(rawAsset.location) || "Unassigned",
+      location_id: await findLocationIdByName(companyId, cleanString(rawAsset.location)),
       notes: cleanString(rawAsset.notes),
       metadata: {
         added_via: "updates_chat",
@@ -290,6 +292,7 @@ export async function POST(req: NextRequest) {
       asset_tag: cleanString(rawAsset.asset_tag) || makeAssetTag(name, index),
       type: payload.type,
       location: payload.location,
+      location_id: payload.location_id,
       notes: payload.notes,
       status: "operational",
       health_score: 100,
@@ -300,8 +303,8 @@ export async function POST(req: NextRequest) {
     if (!error) changes.assetsCreated = Number(changes.assetsCreated) + 1;
   }
 
-  const teamRows = (parsed.team || [])
-    .map((member) => {
+  const teamRows = (await Promise.all((parsed.team || [])
+    .map(async (member) => {
       const phoneRaw = cleanString(member.phone);
       if (!phoneRaw) return null;
       let phone = phoneRaw;
@@ -313,13 +316,14 @@ export async function POST(req: NextRequest) {
         name: cleanString(member.name),
         phone,
         role: cleanString(member.role) || "operator",
+        location_id: await findLocationIdByName(companyId, cleanString((member as any).location)),
         skills: Array.isArray(member.skills)
           ? member.skills.map((skill) => cleanString(skill)).filter(Boolean)
           : [],
         shift: cleanString(member.shift),
         verified: true,
       };
-    })
+    })))
     .filter(Boolean);
 
   if (teamRows.length > 0) {

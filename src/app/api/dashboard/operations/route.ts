@@ -22,15 +22,26 @@ export async function GET(request: NextRequest) {
   try {
     const companyId = await getCompanyId(request);
     if (!companyId) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    const locationId = request.nextUrl.searchParams.get("locationId");
 
     const weekStart = startOfWeekISO();
     const dayStart = startOfDayISO();
 
+    let workOrdersQuery = supabase.from("work_orders").select("*").eq("company_id", companyId);
+    let assetsQuery = supabase.from("assets").select("id, status, health_score").eq("company_id", companyId);
+    let pmSchedulesQuery = supabase.from("pm_schedules").select("id, next_due_at, status").eq("company_id", companyId);
+
+    if (locationId && locationId !== "all") {
+      workOrdersQuery = workOrdersQuery.eq("location_id", locationId);
+      assetsQuery = assetsQuery.eq("location_id", locationId);
+      pmSchedulesQuery = pmSchedulesQuery.eq("location_id", locationId);
+    }
+
     const [{ data: workOrders, error: woError }, { data: assets, error: assetError }, { data: pmSchedules, error: pmError }] =
       await Promise.all([
-        supabase.from("work_orders").select("*").eq("company_id", companyId).order("created_at", { ascending: false }),
-        supabase.from("assets").select("id, status, health_score").eq("company_id", companyId),
-        supabase.from("pm_schedules").select("id, next_due_at, status").eq("company_id", companyId),
+        workOrdersQuery.order("created_at", { ascending: false }),
+        assetsQuery,
+        pmSchedulesQuery,
       ]);
 
     if (woError) throw woError;

@@ -27,6 +27,7 @@ export type WorkerRole = "operator" | "technician" | "supervisor" | "manager";
 export interface Asset {
   id: UUID;
   company_id: UUID;
+  location_id?: UUID | null;
   name: string;
   asset_tag: string;
   type: string;
@@ -46,6 +47,7 @@ export interface Asset {
 export interface WorkOrder {
   id: UUID;
   company_id: UUID;
+  location_id?: UUID | null;
   short_id: string; // e.g. WO-0001
   asset_id: UUID | null;
   asset_name?: string | null;
@@ -80,6 +82,7 @@ export interface WorkOrder {
 export interface PMSchedule {
   id: UUID;
   company_id: UUID;
+  location_id?: UUID | null;
   asset_id: UUID;
   title: string;
   description: string;
@@ -108,6 +111,7 @@ export interface PMCompletion {
 export interface PartInventoryItem {
   id: UUID;
   company_id: UUID;
+  location_id?: UUID | null;
   name: string;
   part_number: string;
   location: string;
@@ -123,6 +127,7 @@ export interface PartInventoryItem {
 export interface ShiftHandoff {
   id: UUID;
   company_id: UUID;
+  location_id?: UUID | null;
   shift_name: string;
   outgoing_supervisor: string;
   incoming_supervisor: string | null;

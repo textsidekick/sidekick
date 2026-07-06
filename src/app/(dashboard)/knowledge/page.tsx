@@ -21,6 +21,7 @@ import {
 import GeneratedReports from "@/components/dashboard/documents/GeneratedReports";
 import KnowledgeBaseViewer from "@/components/dashboard/documents/KnowledgeBaseViewer";
 import { cn } from "@/lib/utils";
+import { buildScopedUrl, readDashboardScope } from "@/lib/dashboard-scope";
 
 interface KnowledgeArticle {
   id: string;
@@ -213,14 +214,14 @@ export default function KnowledgePage() {
 
   useEffect(() => {
     try {
-      const auth = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
-      if (auth.companyId) setCompanyId(auth.companyId);
+      const scope = readDashboardScope();
+      if (scope.companyId) setCompanyId(scope.companyId);
     } catch {}
 
     const handleStorage = () => {
       try {
-        const auth = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
-        if (auth.companyId) setCompanyId(auth.companyId);
+        const scope = readDashboardScope();
+        if (scope.companyId) setCompanyId(scope.companyId);
       } catch {}
     };
 
@@ -229,13 +230,14 @@ export default function KnowledgePage() {
   }, []);
 
   const loadArticles = useCallback(() => {
+    if (!companyId) return;
     setLoading(true);
-    fetch("/api/knowledge")
+    fetch(buildScopedUrl("/api/knowledge", { companyId, locationId: "all" }))
       .then((r) => r.json())
       .then((d) => setArticles(d.articles || []))
       .catch(() => setArticles([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [companyId]);
 
   const loadReviewItems = useCallback(() => {
     if (!companyId) return;
@@ -248,8 +250,9 @@ export default function KnowledgePage() {
   }, [companyId]);
 
   useEffect(() => {
+    if (!companyId) return;
     loadArticles();
-  }, [loadArticles]);
+  }, [companyId, loadArticles]);
 
   useEffect(() => {
     if (!companyId) return;

@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { SectionHeader } from "@/components/dashboard/shared/SectionHeader";
 import { EmptyState } from "@/components/dashboard/shared/EmptyState";
 import { AddCertificationModal } from "@/components/dashboard/modals";
+import { buildScopedUrl, readDashboardScope } from "@/lib/dashboard-scope";
 
 type Worker = {
   id: string;
@@ -86,6 +87,7 @@ function roleBadge(role?: string | null) {
 export default function TeamPage() {
   const [activeTab, setActiveTab] = useState<TabId>("team");
   const [companyId, setCompanyId] = useState<string>("");
+  const [locationId, setLocationId] = useState<string>("all");
 
   // Team state
   const [workers, setWorkers] = useState<Worker[]>([]);
@@ -119,13 +121,15 @@ export default function TeamPage() {
   // Read company from localStorage
   useEffect(() => {
     try {
-      const auth = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
-      if (auth.companyId) setCompanyId(auth.companyId);
+      const scope = readDashboardScope();
+      if (scope.companyId) setCompanyId(scope.companyId);
+      setLocationId(scope.locationId || "all");
     } catch {}
     const handleStorage = () => {
       try {
-        const auth = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
-        if (auth.companyId) setCompanyId(auth.companyId);
+        const scope = readDashboardScope();
+        if (scope.companyId) setCompanyId(scope.companyId);
+        setLocationId(scope.locationId || "all");
       } catch {}
     };
     window.addEventListener("storage", handleStorage);
@@ -134,8 +138,9 @@ export default function TeamPage() {
 
   async function loadTeam() {
     setLoading(true);
+    const scope = { companyId, locationId };
     const [teamRes, sessionRes] = await Promise.all([
-      fetch("/api/team", { cache: "no-store" }),
+      fetch(buildScopedUrl("/api/team", scope), { cache: "no-store" }),
       fetch("/api/auth/session", { cache: "no-store" }),
     ]);
     if (teamRes.ok) {
@@ -147,7 +152,7 @@ export default function TeamPage() {
       if (session.company?.access_code) setJoinCode(session.company.access_code);
       const cid = session.companyId || companyId;
       if (cid) {
-        const woRes = await fetch(`/api/operations/work-orders?companyId=${encodeURIComponent(cid)}`, { cache: "no-store" });
+        const woRes = await fetch(buildScopedUrl("/api/operations/work-orders", { companyId: cid, locationId }), { cache: "no-store" });
         if (woRes.ok) {
           const woJson = await woRes.json();
           setWorkOrders(woJson.workOrders || []);
@@ -202,8 +207,8 @@ export default function TeamPage() {
   };
 
   useEffect(() => {
-    loadTeam();
-  }, []);
+    if (companyId) loadTeam();
+  }, [companyId, locationId]);
 
   useEffect(() => {
     if (companyId) {
@@ -228,7 +233,7 @@ export default function TeamPage() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, location_id: locationId !== "all" ? locationId : null }),
       });
       if (!res.ok) {
         const j = await res.json();

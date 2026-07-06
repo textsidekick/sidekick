@@ -13,7 +13,10 @@ async function resolveCompany(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const companyId = await resolveCompany(req);
   if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const { data, error } = await supabase.from("workers").select("id,name,phone,role,verified,created_at").eq("company_id", companyId).order("name");
+  const locationId = req.nextUrl.searchParams.get("locationId");
+  let query = supabase.from("workers").select("id,name,phone,role,verified,location_id,created_at").eq("company_id", companyId);
+  if (locationId && locationId !== "all") query = query.eq("location_id", locationId);
+  const { data, error } = await query.order("name");
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ data, count: data?.length ?? 0 });
 }

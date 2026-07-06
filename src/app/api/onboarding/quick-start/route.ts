@@ -3,6 +3,7 @@ export const maxDuration = 30;
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { v4 as uuid } from "uuid";
+import { createCompanyLocations, locationIdFor } from "@/lib/location-utils";
 
 function generateJoinCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -21,6 +22,7 @@ export async function POST(req: NextRequest) {
 
     const companyId = uuid();
     const joinCode = generateJoinCode();
+    const primaryLocationName = `${name.trim()} - Main site`;
 
     // Create company
     const { error: compErr } = await supabase.from("companies").insert({
@@ -40,6 +42,10 @@ export async function POST(req: NextRequest) {
       if (compErr2) throw compErr2;
     }
 
+    await createCompanyLocations(companyId, [
+      { name: primaryLocationName, isPrimary: true },
+    ]);
+
     // Create manager worker if phone provided
     if (phone) {
       const cleanPhone = phone.replace(/[\s\-\(\)]/g, "");
@@ -47,6 +53,7 @@ export async function POST(req: NextRequest) {
 
       await supabase.from("workers").insert({
         company_id: companyId,
+        location_id: locationIdFor(companyId, primaryLocationName),
         name: "Manager",
         phone: normalizedPhone,
         role: "manager",

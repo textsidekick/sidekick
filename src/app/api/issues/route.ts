@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { getCompanyPhonesForLocation } from "@/lib/location-scope";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const companyId = searchParams.get("companyId");
+  const locationId = searchParams.get("locationId");
   const status = searchParams.get("status"); // "open", "resolved", or null for all
 
   if (!companyId) {
@@ -16,6 +18,17 @@ export async function GET(request: NextRequest) {
       .select("*")
       .eq("company_id", companyId)
       .order("created_at", { ascending: false });
+
+    if (locationId && locationId !== "all") {
+      const phones = await getCompanyPhonesForLocation(companyId, locationId);
+      if (!phones?.length) {
+        return NextResponse.json({
+          issues: [],
+          stats: { total: 0, open: 0, resolved: 0, highPriority: 0, mediumPriority: 0, lowPriority: 0, byEquipment: {} },
+        });
+      }
+      query = query.in("worker_phone", phones);
+    }
 
     if (status) {
       query = query.eq("status", status);

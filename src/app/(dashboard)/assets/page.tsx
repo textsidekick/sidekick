@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { Activity, Plus, TrendingDown, Wrench } from "lucide-react";
 import { SkeletonGrid } from "@/components/dashboard/shared/Skeleton";
 import { AssetPhotoGallery } from "@/components/dashboard/assets/AssetPhotoGallery";
+import { buildScopedUrl, readDashboardScope } from "@/lib/dashboard-scope";
 
 import type { Asset, AssetStatus, WorkOrder } from "@/types/operations";
 import { BookOpen } from "lucide-react";
@@ -83,6 +84,7 @@ function healthGradient(score: number) {
 
 export default function AssetsPage() {
   const [companyId, setCompanyId] = useState<string | null>(null);
+  const [locationId, setLocationId] = useState<string>("all");
   const [assets, setAssets] = useState<Asset[]>([]);
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
 
@@ -105,23 +107,32 @@ export default function AssetsPage() {
 
   useEffect(() => {
     let ignore = false;
-    async function loadSession() {
-      const res = await fetch("/api/auth/session", { cache: "no-store" });
-      if (!res.ok) throw new Error("Not authenticated");
-      const json = await res.json();
-      return json.companyId as string;
-    }
 
     async function run() {
       try {
         setLoading(true);
         setError(null);
-        const cid = await loadSession();
-        if (!ignore) setCompanyId(cid);
+
+        let cid = companyId;
+        let lid = locationId;
+        if (!cid) {
+          const res = await fetch("/api/auth/session", { cache: "no-store" });
+          if (!res.ok) throw new Error("Not authenticated");
+          const json = await res.json();
+          cid = json.companyId as string;
+          lid = readDashboardScope().locationId || "all";
+        }
+        if (!cid) throw new Error("No company selected");
+        if (!ignore) {
+          setCompanyId(cid);
+          setLocationId(lid || "all");
+        }
+
+        const scope = { companyId: cid, locationId: lid || "all" };
 
         const [aRes, woRes] = await Promise.all([
-          fetch(`/api/operations/assets?companyId=${encodeURIComponent(cid)}`, { cache: "no-store" }),
-          fetch(`/api/operations/work-orders?companyId=${encodeURIComponent(cid)}`, { cache: "no-store" }),
+          fetch(buildScopedUrl("/api/operations/assets", scope), { cache: "no-store" }),
+          fetch(buildScopedUrl("/api/operations/work-orders", scope), { cache: "no-store" }),
         ]);
 
         if (!aRes.ok) throw new Error(`Assets failed (${aRes.status})`);
@@ -144,7 +155,17 @@ export default function AssetsPage() {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [companyId, locationId]);
+
+  useEffect(() => {
+    const handleStorage = () => {
+      const scope = readDashboardScope();
+      if (scope.companyId && scope.companyId !== companyId) setCompanyId(scope.companyId);
+      if ((scope.locationId || "all") !== locationId) setLocationId(scope.locationId || "all");
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, [companyId, locationId]);
 
   const plantHealth = useMemo(() => {
     if (!assets.length) return 0;
@@ -203,6 +224,7 @@ export default function AssetsPage() {
         body: JSON.stringify({
           asset: {
             company_id: companyId,
+            location_id: locationId !== "all" ? locationId : null,
             name: form.name,
             asset_tag: form.name.replaceAll(" ", "-").toUpperCase().slice(0, 16) || "ASSET",
             type: form.type,
@@ -221,7 +243,7 @@ export default function AssetsPage() {
 
       if (!res.ok) throw new Error(`Create failed (${res.status})`);
 
-      const aRes = await fetch(`/api/operations/assets?companyId=${encodeURIComponent(companyId)}`, { cache: "no-store" });
+      const aRes = await fetch(buildScopedUrl("/api/operations/assets", { companyId, locationId }), { cache: "no-store" });
       if (aRes.ok) {
         const aJson = (await aRes.json()) as { assets: Asset[] };
         setAssets(aJson.assets || []);

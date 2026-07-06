@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { chooseDefaultLocationId } from "@/lib/company-locations";
 
 export async function GET(request: NextRequest) {
   try {
@@ -30,14 +31,34 @@ export async function GET(request: NextRequest) {
     // Get company info
     const { data: company } = await supabase
       .from("companies")
-      .select("id, name, access_code")
+      .select("id, name, access_code, metadata")
       .eq("id", session.company_id)
       .single();
+
+    const { data: locationRows } = await supabase
+      .from("locations")
+      .select("id,name,city,state,address,is_primary")
+      .eq("company_id", session.company_id)
+      .order("is_primary", { ascending: false })
+      .order("name", { ascending: true });
+
+    const locations = (locationRows || []).map((location: any) => ({
+      id: location.id,
+      name: location.name,
+      city: location.city || undefined,
+      state: location.state || undefined,
+      address: location.address || undefined,
+      isPrimary: Boolean(location.is_primary),
+    }));
+    const selectedLocationId = request.nextUrl.searchParams.get("locationId")
+      || chooseDefaultLocationId(locations);
 
     return NextResponse.json({
       authenticated: true,
       companyId: session.company_id,
       company: company || null,
+      locations,
+      selectedLocationId,
     });
   } catch (error) {
     console.error("[Session] Error:", error);

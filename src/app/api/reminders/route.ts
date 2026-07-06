@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { getCompanyId } from "@/lib/dashboard-auth";
 import twilio from "twilio";
 
 const twilioClient = twilio(
@@ -9,17 +10,21 @@ const twilioClient = twilio(
 
 export async function POST(request: NextRequest) {
   try {
-    const { companyId, message, sendAt, sendToAll } = await request.json();
+    const companyId = await getCompanyId(request);
+    if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { message, sendAt, sendToAll, locationId } = await request.json();
 
-    if (!companyId || !message) {
-      return NextResponse.json({ error: "Company ID and message required" }, { status: 400 });
+    if (!message) {
+      return NextResponse.json({ error: "Message required" }, { status: 400 });
     }
 
-    // Get workers for this company
-    const { data: workers } = await supabase
+    // Get workers for this company (optionally scoped by location)
+    let workersQuery = supabase
       .from("workers")
       .select("phone, name")
       .eq("company_id", companyId);
+    if (locationId && locationId !== "all") workersQuery = workersQuery.eq("location_id", locationId);
+    const { data: workers } = await workersQuery;
 
     if (!workers || workers.length === 0) {
       return NextResponse.json({ error: "No workers found" }, { status: 400 });
@@ -60,12 +65,8 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const companyId = searchParams.get("companyId");
-  
-  if (!companyId) {
-    return NextResponse.json({ error: "Company ID required" }, { status: 400 });
-  }
+  const companyId = await getCompanyId(request);
+  if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { data: reminders } = await supabase
     .from("scheduled_reminders")

@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabase";
 import { getCompanyId } from "@/lib/dashboard-auth";
 import { auditLog } from "@/lib/audit";
 import { extractPriorityDisplayLabels, normalizeCompanyPriorityProfiles } from "@/lib/company-settings";
+import { locationIdFor } from "@/lib/location-utils";
 
 export async function GET(req: NextRequest) {
   const companyId = await getCompanyId(req);
@@ -12,9 +13,10 @@ export async function GET(req: NextRequest) {
   const { data: cats } = await supabase.from("wo_categories").select("*").eq("company_id", companyId).order("name");
   const { data: pris } = await supabase.from("wo_priorities").select("*").eq("company_id", companyId).order("level");
   const { data: company } = await supabase.from("companies").select("name,manager_phone,manager_name").eq("id", companyId).single();
+  const { data: locations } = await supabase.from("locations").select("id,name,city,state,address,is_primary").eq("company_id", companyId).order("is_primary", { ascending: false }).order("name");
   const priorityDisplayLabels = extractPriorityDisplayLabels(data?.escalation_rules || []);
 
-  return NextResponse.json({ settings: data, categories: cats || [], priorities: normalizeCompanyPriorityProfiles(pris as any, priorityDisplayLabels), company });
+  return NextResponse.json({ settings: data, categories: cats || [], priorities: normalizeCompanyPriorityProfiles(pris as any, priorityDisplayLabels), company, locations: locations || [] });
 }
 
 export async function PUT(req: NextRequest) {
@@ -29,6 +31,7 @@ export async function PUT(req: NextRequest) {
     settings?: Record<string, unknown>;
     company?: Record<string, unknown>;
     priorities?: Array<{ id?: string; name?: string; level?: number; sla_hours?: number }>;
+    locations?: Array<{ id?: string; name?: string; city?: string; state?: string; address?: string; is_primary?: boolean }>;
   };
 
   if (settings) {
@@ -89,6 +92,42 @@ export async function PUT(req: NextRequest) {
         if (error) {
           console.error("[Settings] Priority insert error:", error);
           return NextResponse.json({ error: "Failed to save priorities", details: error.message }, { status: 500 });
+        }
+      }
+    }
+  }
+
+  if (Array.isArray((body as any).locations)) {
+    const rawLocations = (body as any).locations as Array<{ id?: string; name?: string; city?: string; state?: string; address?: string; is_primary?: boolean }>;
+    const normalizedLocations = rawLocations
+      .map((location) => ({
+        id: typeof location.id === "string" && location.id.trim() ? location.id.trim() : locationIdFor(companyId, typeof location.name === "string" ? location.name.trim() : "location"),
+        company_id: companyId,
+        name: typeof location.name === "string" ? location.name.trim() : "",
+        city: typeof location.city === "string" && location.city.trim() ? location.city.trim() : null,
+        state: typeof location.state === "string" && location.state.trim() ? location.state.trim() : null,
+        address: typeof location.address === "string" && location.address.trim() ? location.address.trim() : null,
+        is_primary: Boolean(location.is_primary),
+      }))
+      .filter((location) => location.name);
+
+    if (normalizedLocations.length > 0) {
+      const primaryIndex = normalizedLocations.findIndex((location) => location.is_primary);
+      const safeLocations = normalizedLocations.map((location, index) => ({
+        ...location,
+        is_primary: primaryIndex >= 0 ? index === primaryIndex : index === 0,
+      }));
+
+      const keepIds = new Set(safeLocations.map((location) => location.id).filter(Boolean));
+      const { data: existingLocations } = await supabase.from("locations").select("id").eq("company_id", companyId);
+      const staleIds = (existingLocations || []).map((location: any) => location.id).filter((id: string) => !keepIds.has(id));
+      if (staleIds.length > 0) {
+        await supabase.from("locations").delete().eq("company_id", companyId).in("id", staleIds);
+      }
+
+      for (const location of safeLocations) {
+        if (location.id) {
+          await supabase.from("locations").upsert({ ...location, updated_at: new Date().toISOString() } as any, { onConflict: "id" });
         }
       }
     }

@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { buildScopedUrl, readDashboardScope } from "@/lib/dashboard-scope";
 import {
   Calendar,
   Clock,
@@ -26,6 +27,11 @@ import {
 
 import type { WorkOrder, WorkOrderPriority, WorkOrderStatus } from "@/types/operations";
 import { SkeletonTable } from "@/components/dashboard/shared/Skeleton";
+
+function humanizeLabel(value: string | null | undefined) {
+  if (!value) return "—";
+  return value.replaceAll("_", " ").replace(/\b\w/g, (char) => char.toUpperCase());
+}
 
 function WORelatedKnowledge({ workOrderId, assetId }: { workOrderId: string; assetId: string | null }) {
   const [articles, setArticles] = useState<{ id: string; title: string; source_work_order_id?: string }[]>([]);
@@ -66,7 +72,7 @@ type OpsResponse = {
   };
 };
 
-type Technician = { id: string; name: string | null; phone?: string; role?: string };
+type Technician = { id: string; name: string | null; phone?: string; role?: string; skills?: string[]; shift?: string | null };
 
 
 function timeOpenMinutes(wo: WorkOrder): number {
@@ -125,6 +131,7 @@ function AITriageCard({ triage }: { triage: AITriage | null | undefined }) {
 
 export default function WorkOrdersPage() {
   const [companyId, setCompanyId] = useState<string | null>(null);
+  const [locationId, setLocationId] = useState<string>("all");
   const [stats, setStats] = useState<OpsResponse | null>(null);
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [assetsById, setAssetsById] = useState<Record<string, { name: string }>>({});
@@ -137,6 +144,7 @@ export default function WorkOrdersPage() {
   const [priorityFilter, setPriorityFilter] = useState<WorkOrderPriority | "all">("all");
   const [categoryFilter, setCategoryFilter] = useState<string | "all">("all");
   const [techFilter, setTechFilter] = useState<string | "all">("all");
+  const [search, setSearch] = useState("");
 
   const [sortKey, setSortKey] = useState<"priority" | "status" | "created_at">("created_at");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
@@ -150,25 +158,32 @@ export default function WorkOrdersPage() {
 
   useEffect(() => {
     let ignore = false;
-    async function loadSession() {
-      const res = await fetch("/api/auth/session", { cache: "no-store" });
-      if (!res.ok) throw new Error("Not authenticated");
-      const json = await res.json();
-      return json.companyId as string;
-    }
-
     async function run() {
       try {
         setLoading(true);
         setError(null);
 
-        const cid = await loadSession();
-        if (!ignore) setCompanyId(cid);
+        let cid = companyId;
+        let lid = locationId;
+        if (!cid) {
+          const res = await fetch("/api/auth/session", { cache: "no-store" });
+          if (!res.ok) throw new Error("Not authenticated");
+          const json = await res.json();
+          cid = json.companyId as string;
+          lid = readDashboardScope().locationId || "all";
+        }
+        if (!cid) throw new Error("No company selected");
+        if (!ignore) {
+          setCompanyId(cid);
+          setLocationId(lid || "all");
+        }
+
+        const scope = { companyId: cid, locationId: lid || "all" };
 
         const [statsRes, woRes, assetRes, teamRes] = await Promise.all([
-          fetch("/api/dashboard/operations", { cache: "no-store" }),
-          fetch(`/api/operations/work-orders?companyId=${encodeURIComponent(cid)}`, { cache: "no-store" }),
-          fetch(`/api/operations/assets?companyId=${encodeURIComponent(cid)}`, { cache: "no-store" }),
+          fetch(buildScopedUrl("/api/dashboard/operations", scope), { cache: "no-store" }),
+          fetch(buildScopedUrl("/api/operations/work-orders", scope), { cache: "no-store" }),
+          fetch(buildScopedUrl("/api/operations/assets", scope), { cache: "no-store" }),
           fetch("/api/team", { cache: "no-store" }),
         ]);
 
@@ -202,13 +217,25 @@ export default function WorkOrdersPage() {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [companyId, locationId]);
+
+  useEffect(() => {
+    const handleStorage = () => {
+      const scope = readDashboardScope();
+      if (scope.companyId && scope.companyId !== companyId) setCompanyId(scope.companyId);
+      if ((scope.locationId || "all") !== locationId) setLocationId(scope.locationId || "all");
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, [companyId, locationId]);
 
   const techName = (id: string | null | undefined) => {
     if (!id) return "Unassigned";
     const t = techs.find((t) => t.id === id);
-    return t?.name || "Tech";
+    return t?.name || t?.phone || `${id.slice(0, 8)}…`;
   };
+
+  const techOptionLabel = (tech: Technician) => tech.name || tech.phone || `${tech.id.slice(0, 8)}…`;
 
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -218,6 +245,16 @@ export default function WorkOrdersPage() {
 
   const filtered = useMemo(() => {
     return workOrders
+      .filter((w) => {
+        const query = search.trim().toLowerCase();
+        if (!query) return true;
+        const assetName = w.asset_id ? assetsById[w.asset_id]?.name || "" : (w.asset_name || "");
+        const assignedName = techName(w.assigned_to);
+        const haystack = [w.short_id, w.title, w.category, w.priority, w.status, assetName, assignedName]
+          .join(" ")
+          .toLowerCase();
+        return haystack.includes(query);
+      })
       .filter((w) => (statusFilter === "all" ? true : w.status === statusFilter))
       .filter((w) => (priorityFilter === "all" ? true : w.priority === priorityFilter))
       .filter((w) => (categoryFilter === "all" ? true : w.category === categoryFilter))
@@ -226,7 +263,23 @@ export default function WorkOrdersPage() {
         if (techFilter === "unassigned") return !w.assigned_to;
         return w.assigned_to === techFilter;
       });
-  }, [workOrders, statusFilter, priorityFilter, categoryFilter, techFilter]);
+  }, [workOrders, search, assetsById, statusFilter, priorityFilter, categoryFilter, techFilter]);
+
+  const recommendedTech = useMemo(() => {
+    if (!activeWO) return null;
+    const desired = (activeWO.category || "").toLowerCase();
+    return techs
+      .map((tech) => {
+        const skills = (tech.skills || []).map((skill) => skill.toLowerCase());
+        let score = 0;
+        if (tech.role === "technician") score += 30;
+        if (skills.some((skill) => skill === desired)) score += 45;
+        else if (skills.some((skill) => skill.includes(desired) || desired.includes(skill))) score += 25;
+        if (tech.shift) score += 5;
+        return { tech, score };
+      })
+      .sort((a, b) => b.score - a.score)[0]?.tech || null;
+  }, [activeWO, techs]);
 
   const sorted = useMemo(() => {
     const weightPriority: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 };
@@ -348,6 +401,15 @@ export default function WorkOrdersPage() {
         <div className="mt-8 rounded-2xl bg-white border border-black/5 p-6">
           <SectionHeader title="All work orders" subtitle="Filter, sort, and take quick actions" />
 
+          <div className="mt-4">
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search work orders, assets, categories, assignees..."
+              className="w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 text-sm text-[#1C1A16] outline-none focus:border-[#C96442]/35"
+            />
+          </div>
+
           <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-3">
             <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as WorkOrderStatus | "all")}>
               <SelectTrigger className="bg-white">
@@ -384,7 +446,7 @@ export default function WorkOrdersPage() {
                 <SelectItem value="all">All categories</SelectItem>
                 {categories.map((c) => (
                   <SelectItem key={c} value={c}>
-                    {c}
+                    {humanizeLabel(c)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -399,7 +461,7 @@ export default function WorkOrdersPage() {
                 <SelectItem value="unassigned">Unassigned</SelectItem>
                 {techs.map((t) => (
                   <SelectItem key={t.id} value={t.id}>
-                    {t.name || t.phone || t.id}
+                    {techOptionLabel(t)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -409,6 +471,7 @@ export default function WorkOrdersPage() {
           <div className="mt-4 flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-2 text-sm text-black/50 flex-wrap">
               <span>{sorted.length} results</span>
+              {search.trim() ? <span>· matching “{search.trim()}”</span> : null}
             </div>
             <div className="flex items-center gap-2">
               <Select value={sortKey} onValueChange={(v) => setSortKey(v as "priority" | "status" | "created_at")}>
@@ -416,7 +479,7 @@ export default function WorkOrdersPage() {
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="created_at">Created</SelectItem>
+                  <SelectItem value="created_at">Created time</SelectItem>
                   <SelectItem value="priority">Priority</SelectItem>
                   <SelectItem value="status">Status</SelectItem>
                 </SelectContent>
@@ -514,18 +577,52 @@ export default function WorkOrdersPage() {
             </DialogDescription>
           </DialogHeader>
 
+          {activeWO ? (
+            <div className="rounded-xl border border-black/5 bg-[#F7F3EC] px-4 py-3 text-sm text-black/65">
+              <div className="flex flex-wrap items-center gap-2">
+                <PriorityBadge priority={actionPriority} />
+                <StatusBadge status={actionStatus} />
+                <span>{activeWO.asset_name || (activeWO.asset_id ? assetsById[activeWO.asset_id]?.name : null) || "No asset linked"}</span>
+              </div>
+            </div>
+          ) : null}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {recommendedTech && actionAssignTo === "unassigned" ? (
+              <div className="md:col-span-2 rounded-xl border border-[#C96442]/15 bg-[#FFF7F1] p-3 text-sm text-black/65">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="font-medium text-[#1C1A16]">Suggested assignee: {recommendedTech.name || recommendedTech.phone || "Technician"}</div>
+                    <div className="mt-1 text-xs text-black/50">
+                      {recommendedTech.skills?.length ? `Skills: ${recommendedTech.skills.join(", ")}` : "Best available technician based on current team data."}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setActionAssignTo(recommendedTech.id)}
+                    className="rounded-lg border border-[#C96442]/20 bg-white px-3 py-2 text-xs font-medium text-[#1C1A16] hover:bg-[#FFF1E8]"
+                  >
+                    Use suggestion
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
             <div>
               <div className="text-xs uppercase tracking-wide text-black/40 mb-2">Assign</div>
               <Select value={actionAssignTo} onValueChange={(v) => setActionAssignTo(v)}>
                 <SelectTrigger className="bg-white">
-                  <SelectValue placeholder="Technician" />
+                  <SelectValue placeholder="Technician">
+                    {actionAssignTo === "unassigned"
+                      ? "Unassigned"
+                      : techName(actionAssignTo)}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="unassigned">Unassigned</SelectItem>
                   {techs.map((t) => (
                     <SelectItem key={t.id} value={t.id}>
-                      {t.name || t.phone || t.id}
+                      {techOptionLabel(t)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -551,7 +648,7 @@ export default function WorkOrdersPage() {
               <div className="text-xs uppercase tracking-wide text-black/40 mb-2">Status</div>
               <Select value={actionStatus} onValueChange={(v) => setActionStatus(v as WorkOrderStatus)}>
                 <SelectTrigger className="bg-white">
-                  <SelectValue placeholder="Status" />
+                  <SelectValue placeholder="Status">{humanizeLabel(actionStatus)}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="open">Open</SelectItem>

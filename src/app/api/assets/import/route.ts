@@ -29,6 +29,8 @@ export async function POST(req: NextRequest) {
   const rows = parseCSV(text);
   if (rows.length === 0) return NextResponse.json({ error: "Empty or invalid CSV" }, { status: 400 });
 
+  const locationId = formData.get("locationId") as string | null;
+
   const inserts = rows
     .filter((r) => r.name || r.asset_name)
     .map((r) => ({
@@ -42,6 +44,7 @@ export async function POST(req: NextRequest) {
       year: r.year ? parseInt(r.year, 10) || null : null,
       serial_number: r.serial_number || r.serial || null,
       location: r.location || null,
+      location_id: (locationId && locationId !== "all") ? locationId : null,
       status: (r.status as string) || "operational",
     }));
 
