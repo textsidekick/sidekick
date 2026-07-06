@@ -1,4 +1,5 @@
 "use client";
+import type { ReactNode } from "react";
 import { useState, useEffect, useCallback } from "react";
 import { RefreshCw, Database, FileText, Clock, ChevronDown, ChevronRight } from "lucide-react";
 
@@ -59,9 +60,10 @@ function formatSize(chars: number): string {
 
 interface Props {
   companyId: string;
+  approvedProcedures?: ReactNode;
 }
 
-export default function KnowledgeBaseViewer({ companyId }: Props) {
+export default function KnowledgeBaseViewer({ companyId, approvedProcedures }: Props) {
   const [data, setData] = useState<KnowledgeBaseData | null>(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState<string | null>(null);
@@ -159,73 +161,87 @@ export default function KnowledgeBaseViewer({ companyId }: Props) {
         </div>
       </div>
 
-      {/* Sources */}
-      <div className="divide-y divide-gray-100">
-        {Object.keys(sources).length === 0 ? (
-          <div className="p-8 text-center">
-            <FileText className="h-8 w-8 text-gray-300 mx-auto mb-3" />
-            <p className="text-sm font-medium text-gray-600">No documents imported yet</p>
-            <p className="text-xs text-gray-400 mt-1">Connect an integration above and import your company docs.</p>
-          </div>
-        ) : (
-          Object.entries(sources).map(([source, items]) => (
-            <div key={source}>
-              {/* Source header */}
-              <button
-                onClick={() => toggleSource(source)}
-                className="w-full flex items-center justify-between px-5 py-3 hover:bg-gray-50 transition-colors text-left"
-              >
-                <div className="flex items-center gap-2">
-                  {expandedSources.has(source) ? (
-                    <ChevronDown className="h-4 w-4 text-gray-400" />
-                  ) : (
-                    <ChevronRight className="h-4 w-4 text-gray-400" />
-                  )}
-                  <span className="text-sm font-medium text-gray-900">
-                    {SOURCE_LABELS[source] || source}
-                  </span>
-                  <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
-                    {items.length}
-                  </span>
-                </div>
-                {connections[source] && (
-                  <span className="text-xs text-gray-600 font-medium">Connected</span>
-                )}
-              </button>
+      <div className="border-t border-gray-100 px-5 py-5">
+        <div>
+          <h4 className="text-sm font-semibold text-gray-900">Approved procedures</h4>
+          <p className="mt-1 text-sm text-gray-500">Verified troubleshooting steps and SOPs Sidekick can confidently use across your team.</p>
+        </div>
+        <div className="mt-4">
+          {approvedProcedures}
+        </div>
+      </div>
 
-              {/* Items list */}
-              {expandedSources.has(source) && (
-                <div className="bg-gray-50 px-5 pb-3">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="text-xs text-gray-500 uppercase tracking-wide">
-                        <th className="text-left py-2 font-medium">Name</th>
-                        <th className="text-left py-2 font-medium">Type</th>
-                        <th className="text-right py-2 font-medium">Size</th>
-                        <th className="text-right py-2 font-medium">Imported</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      {items.slice(0, 50).map((item) => (
-                        <tr key={item.id} className="text-gray-700">
-                          <td className="py-2 pr-4 max-w-[300px] truncate">{item.name}</td>
-                          <td className="py-2 pr-4 text-gray-500">{item.type}</td>
-                          <td className="py-2 text-right text-gray-500">{item.size > 0 ? formatSize(item.size) : "--"}</td>
-                          <td className="py-2 text-right text-gray-500">{item.importedAt ? formatDate(item.importedAt) : "--"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  {items.length > 50 && (
-                    <p className="text-xs text-gray-400 mt-2 text-center">
-                      Showing 50 of {items.length} documents
-                    </p>
-                  )}
-                </div>
-              )}
+      {/* Sources */}
+      <div className="border-t border-gray-100">
+        <div className="px-5 py-5">
+          <h4 className="text-sm font-semibold text-gray-900">Imported docs and source material</h4>
+          <p className="mt-1 text-sm text-gray-500">The broader set of uploaded files and connected-source documents Sidekick can reference.</p>
+        </div>
+        <div className="divide-y divide-gray-100">
+          {Object.keys(sources).length === 0 ? (
+            <div className="p-8 text-center">
+              <FileText className="mx-auto mb-3 h-8 w-8 text-gray-300" />
+              <p className="text-sm font-medium text-gray-600">No documents imported yet</p>
+              <p className="mt-1 text-xs text-gray-400">Connect an integration above and import your company docs.</p>
             </div>
-          ))
-        )}
+          ) : (
+            Object.entries(sources).map(([source, items]) => (
+              <div key={source}>
+                <button
+                  onClick={() => toggleSource(source)}
+                  className="w-full flex items-center justify-between px-5 py-3 hover:bg-gray-50 transition-colors text-left"
+                >
+                  <div className="flex items-center gap-2">
+                    {expandedSources.has(source) ? (
+                      <ChevronDown className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4 text-gray-400" />
+                    )}
+                    <span className="text-sm font-medium text-gray-900">
+                      {SOURCE_LABELS[source] || source}
+                    </span>
+                    <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-400">
+                      {items.length}
+                    </span>
+                  </div>
+                  {connections[source] && (
+                    <span className="text-xs font-medium text-gray-600">Connected</span>
+                  )}
+                </button>
+
+                {expandedSources.has(source) && (
+                  <div className="bg-gray-50 px-5 pb-3">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="text-xs uppercase tracking-wide text-gray-500">
+                          <th className="py-2 text-left font-medium">Name</th>
+                          <th className="py-2 text-left font-medium">Type</th>
+                          <th className="py-2 text-right font-medium">Size</th>
+                          <th className="py-2 text-right font-medium">Imported</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {items.slice(0, 50).map((item) => (
+                          <tr key={item.id} className="text-gray-700">
+                            <td className="max-w-[300px] truncate py-2 pr-4">{item.name}</td>
+                            <td className="py-2 pr-4 text-gray-500">{item.type}</td>
+                            <td className="py-2 text-right text-gray-500">{item.size > 0 ? formatSize(item.size) : "--"}</td>
+                            <td className="py-2 text-right text-gray-500">{item.importedAt ? formatDate(item.importedAt) : "--"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {items.length > 50 && (
+                      <p className="mt-2 text-center text-xs text-gray-400">
+                        Showing 50 of {items.length} documents
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );

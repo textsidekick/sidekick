@@ -308,108 +308,90 @@ export default function KnowledgePage() {
     <div className="mx-auto min-h-screen max-w-7xl px-6 py-8">
       <SectionHeader title="Operational Knowledge" subtitle="Everything Sidekick knows right now: imported docs, approved procedures, items waiting for review, and generated reports." />
 
-      <section className="mt-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h2 className="text-base font-semibold text-gray-900">Knowledge base</h2>
-            <p className="mt-1 text-sm text-gray-500">This is the main library: approved procedures plus the imported docs and source material Sidekick has from your company.</p>
-          </div>
-          {!loading && <div className="text-sm text-gray-400">{visibleArticles.length} approved procedures</div>}
-        </div>
-
-        <div className="mt-5">
-          <div className="mb-3">
-            <h3 className="text-sm font-semibold text-gray-900">Approved procedures</h3>
-            <p className="mt-1 text-sm text-gray-500">Verified troubleshooting steps and SOPs Sidekick can confidently use across your team.</p>
-          </div>
-
-          <div className="space-y-3">
-            {loading ? (
-              <div className="py-12 text-center text-gray-400">Loading approved procedures…</div>
-            ) : visibleArticles.length === 0 ? (
-              <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
-                <BookOpen className="mx-auto mb-3 h-12 w-12 text-[#C96442]/30" />
-                <p className="font-semibold text-gray-700">No approved procedures captured yet</p>
-                <p className="mx-auto mt-1 max-w-sm text-sm text-gray-400">Once your team uploads docs, texts fixes in, or approves generated knowledge, it will show up here.</p>
-              </div>
-            ) : (
-              visibleArticles.map((article) => (
-                <div key={article.id} className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-                  <button onClick={() => setExpanded(expanded === article.id ? null : article.id)} className="flex w-full items-start justify-between px-5 py-4 text-left">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-semibold text-gray-900">{article.title}</span>
-                        {article.equipment_type && <Badge variant="outline" className="text-xs">{article.equipment_type}</Badge>}
-                      </div>
-                      <p className="mt-1 truncate text-sm text-gray-500">{article.problem}</p>
-                      <div className="mt-2 flex flex-wrap items-center gap-4 text-xs text-gray-400">
-                        {article.asset_name && (
-                          <span className="flex items-center gap-1">
-                            <Wrench className="h-3 w-3" />
-                            {article.asset_name}
-                          </span>
-                        )}
-                        {article.time_estimate_minutes && (
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {article.time_estimate_minutes}m
-                          </span>
-                        )}
-                        <span className="flex items-center gap-1">
-                          <Hash className="h-3 w-3" />
-                          Referenced {article.times_referenced || 0}x
-                        </span>
-                        <ProvenanceBadge article={article} />
-                      </div>
-                      {article.tags?.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-1">
-                          {article.tags.map((tag) => (
-                            <span key={tag} className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">{tag}</span>
-                          ))}
+      <div className="mt-6">
+        <KnowledgeBaseViewer
+          companyId={companyId}
+          approvedProcedures={
+            <div className="space-y-3">
+              {loading ? (
+                <div className="py-12 text-center text-gray-400">Loading approved procedures…</div>
+              ) : visibleArticles.length === 0 ? (
+                <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
+                  <BookOpen className="mx-auto mb-3 h-12 w-12 text-[#C96442]/30" />
+                  <p className="font-semibold text-gray-700">No approved procedures captured yet</p>
+                  <p className="mx-auto mt-1 max-w-sm text-sm text-gray-400">Once your team uploads docs, texts fixes in, or approves generated knowledge, it will show up here.</p>
+                </div>
+              ) : (
+                visibleArticles.map((article) => (
+                  <div key={article.id} className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+                    <button onClick={() => setExpanded(expanded === article.id ? null : article.id)} className="flex w-full items-start justify-between px-5 py-4 text-left">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm font-semibold text-gray-900">{article.title}</span>
+                          {article.equipment_type && <Badge variant="outline" className="text-xs">{article.equipment_type}</Badge>}
                         </div>
-                      )}
-                    </div>
-                    {expanded === article.id ? <ChevronUp className="mt-1 h-5 w-5 text-gray-400" /> : <ChevronDown className="mt-1 h-5 w-5 text-gray-400" />}
-                  </button>
-
-                  {expanded === article.id && (
-                    <div className="space-y-3 border-t border-gray-100 px-5 pb-5 pt-4">
-                      {article.symptoms && (
-                        <div>
-                          <div className="mb-1 text-xs font-semibold uppercase text-gray-500">Symptoms</div>
-                          <p className="text-sm text-gray-700">{article.symptoms}</p>
+                        <p className="mt-1 truncate text-sm text-gray-500">{article.problem}</p>
+                        <div className="mt-2 flex flex-wrap items-center gap-4 text-xs text-gray-400">
+                          {article.asset_name && (
+                            <span className="flex items-center gap-1">
+                              <Wrench className="h-3 w-3" />
+                              {article.asset_name}
+                            </span>
+                          )}
+                          {article.time_estimate_minutes && (
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {article.time_estimate_minutes}m
+                            </span>
+                          )}
+                          <span className="flex items-center gap-1">
+                            <Hash className="h-3 w-3" />
+                            Referenced {article.times_referenced || 0}x
+                          </span>
+                          <ProvenanceBadge article={article} />
                         </div>
-                      )}
-                      <div>
-                        <div className="mb-1 text-xs font-semibold uppercase text-gray-500">Solution</div>
-                        <p className="whitespace-pre-wrap text-sm text-gray-700">{article.solution}</p>
-                      </div>
-                      {article.parts_used?.length > 0 && (
-                        <div>
-                          <div className="mb-1 text-xs font-semibold uppercase text-gray-500">Parts used</div>
-                          <div className="flex flex-wrap gap-2">
-                            {article.parts_used.map((part) => (
-                              <span key={part} className="rounded bg-orange-50 px-2 py-1 text-xs text-gray-700">{part}</span>
+                        {article.tags?.length > 0 && (
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            {article.tags.map((tag) => (
+                              <span key={tag} className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">{tag}</span>
                             ))}
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
-        </div>
+                        )}
+                      </div>
+                      {expanded === article.id ? <ChevronUp className="mt-1 h-5 w-5 text-gray-400" /> : <ChevronDown className="mt-1 h-5 w-5 text-gray-400" />}
+                    </button>
 
-        <div className="mt-6 border-t border-gray-100 pt-6">
-          <div className="mb-3">
-            <h3 className="text-sm font-semibold text-gray-900">Imported docs and source material</h3>
-            <p className="mt-1 text-sm text-gray-500">The broader set of uploaded files and connected-source documents Sidekick can reference.</p>
-          </div>
-          <KnowledgeBaseViewer companyId={companyId} />
-        </div>
-      </section>
+                    {expanded === article.id && (
+                      <div className="space-y-3 border-t border-gray-100 px-5 pb-5 pt-4">
+                        {article.symptoms && (
+                          <div>
+                            <div className="mb-1 text-xs font-semibold uppercase text-gray-500">Symptoms</div>
+                            <p className="text-sm text-gray-700">{article.symptoms}</p>
+                          </div>
+                        )}
+                        <div>
+                          <div className="mb-1 text-xs font-semibold uppercase text-gray-500">Solution</div>
+                          <p className="whitespace-pre-wrap text-sm text-gray-700">{article.solution}</p>
+                        </div>
+                        {article.parts_used?.length > 0 && (
+                          <div>
+                            <div className="mb-1 text-xs font-semibold uppercase text-gray-500">Parts used</div>
+                            <div className="flex flex-wrap gap-2">
+                              {article.parts_used.map((part) => (
+                                <span key={part} className="rounded bg-orange-50 px-2 py-1 text-xs text-gray-700">{part}</span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          }
+        />
+      </div>
 
       {loadingReview ? (
         <div className="mt-6 rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-400 shadow-sm">Loading pending review…</div>

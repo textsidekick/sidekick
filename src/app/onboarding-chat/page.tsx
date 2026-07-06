@@ -41,6 +41,8 @@ interface SetupSection {
 
 const PRIMARY_SECTION_IDS: SectionId[] = ["company", "assets", "team", "knowledge"];
 const OPTIONAL_SECTION_IDS: SectionId[] = ["integrations", "workorders"];
+const LEFT_SIDEBAR_WIDTH = 360;
+const RIGHT_SIDEBAR_WIDTH = 320;
 
 const INITIAL_SECTIONS: SetupSection[] = [
   { id: "company", label: "Company Info", description: "Basic details about your facility", icon: Building2, status: "in_progress" },
@@ -449,7 +451,7 @@ export default function OnboardingChat() {
   return (
     <div style={{ minHeight: "100vh", display: "flex", fontFamily: "Inter, system-ui, sans-serif" }}>
       {/* ── Sidebar ─────────────────────────────────────────── */}
-      <div style={{ width: 320, background: "white", borderRight: "1px solid rgba(28,26,22,0.06)", display: "flex", flexDirection: "column", position: "fixed", top: 0, bottom: 0, zIndex: 50 }}>
+      <div style={{ width: LEFT_SIDEBAR_WIDTH, background: "white", borderRight: "1px solid rgba(28,26,22,0.06)", display: "flex", flexDirection: "column", position: "fixed", top: 0, bottom: 0, zIndex: 50 }}>
         {/* Logo */}
         <div style={{ height: 72, display: "flex", alignItems: "center", gap: 14, padding: "0 24px", borderBottom: "1px solid rgba(28,26,22,0.06)" }}>
           <div style={{ width: 40, height: 40, background: "#C96442", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", padding: 6 }}>
@@ -562,7 +564,7 @@ export default function OnboardingChat() {
       </div>
 
       {/* ── Main Content ────────────────────────────────────── */}
-      <div style={{ marginLeft: 320, marginRight: 400, flex: 1, background: "#F7F3EC", display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <div style={{ marginLeft: LEFT_SIDEBAR_WIDTH, marginRight: RIGHT_SIDEBAR_WIDTH, flex: 1, background: "#F7F3EC", display: "flex", flexDirection: "column", minHeight: "100vh" }}>
 
         {/* Chat area */}
         <div style={{ flex: 1, overflow: "auto", padding: "32px 24px", display: "flex", flexDirection: "column" }}>
@@ -606,7 +608,6 @@ export default function OnboardingChat() {
                 </div>
               </div>
               <div style={{ marginTop: 14, display: "flex", flexWrap: "wrap", gap: 8 }}>
-                <span style={{ fontSize: 13, color: "rgba(28,26,22,0.45)", background: "rgba(28,26,22,0.04)", padding: "8px 10px", borderRadius: 999 }}>Answer in plain English</span>
                 <span style={{ fontSize: 13, color: "rgba(28,26,22,0.45)", background: "rgba(28,26,22,0.04)", padding: "8px 10px", borderRadius: 999 }}>Upload docs or spreadsheets</span>
                 <span style={{ fontSize: 13, color: "rgba(28,26,22,0.45)", background: "rgba(28,26,22,0.04)", padding: "8px 10px", borderRadius: 999 }}>Use voice if that's faster</span>
               </div>
@@ -721,19 +722,6 @@ export default function OnboardingChat() {
                 <Upload size={14} /> Upload files
               </button>
               <button
-                onClick={isRecording ? stopRecording : startRecording}
-                disabled={loading || isComplete}
-                style={{
-                  display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 999,
-                  border: "1px solid rgba(28,26,22,0.08)", background: isRecording ? "rgba(239,68,68,0.1)" : "#FAF7F2",
-                  color: isRecording ? "#ef4444" : "rgba(28,26,22,0.6)",
-                  fontSize: 13, fontWeight: 600, cursor: loading || isComplete ? "default" : "pointer", opacity: loading || isComplete ? 0.6 : 1,
-                }}
-              >
-                {isRecording ? <MicOff size={14} /> : <Mic size={14} />}
-                {isRecording ? "Stop recording" : "Use voice"}
-              </button>
-              <button
                 onClick={() => goToSection("integrations")}
                 style={{
                   display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 999,
@@ -746,35 +734,52 @@ export default function OnboardingChat() {
             </div>
 
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder={isRecording ? "Listening..." : "Type or speak your answer..."}
-              disabled={loading || isRecording}
-              style={{
-                flex: 1, padding: "14px 18px", borderRadius: 14,
-                border: isRecording ? "2px solid #ef4444" : "1px solid rgba(28,26,22,0.15)",
-                fontSize: 15, outline: "none", color: "#1C1A16",
-                background: loading ? "#F0EBE3" : "white",
-                cursor: loading || isRecording ? "not-allowed" : "text",
-              }}
-            />
-            <button
-              onClick={handleSendMessage}
-              disabled={loading || !input.trim() || isComplete}
-              style={{
-                padding: "14px 22px", borderRadius: 14,
-                background: !loading && input.trim() && !isComplete ? "#C96442" : "#F0EBE3",
-                color: !loading && input.trim() && !isComplete ? "white" : "rgba(28,26,22,0.35)",
-                border: "1px solid rgba(28,26,22,0.1)",
-                cursor: !loading && input.trim() && !isComplete ? "pointer" : "not-allowed",
-                display: "flex", alignItems: "center", gap: 8, fontWeight: 600, flexShrink: 0,
-              }}
-            >
-              {loading || isComplete ? <Loader2 size={20} style={{ animation: "spin 1s linear infinite" }} /> : <Send size={20} />}
-            </button>
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder={isRecording ? "Listening... tap the mic again to stop" : "Type or speak your answer..."}
+                disabled={loading || isRecording}
+                style={{
+                  flex: 1, padding: "14px 18px", borderRadius: 14,
+                  border: isRecording ? "2px solid #ef4444" : "1px solid rgba(28,26,22,0.15)",
+                  fontSize: 15, outline: "none", color: "#1C1A16",
+                  background: loading ? "#F0EBE3" : "white",
+                  cursor: loading || isRecording ? "not-allowed" : "text",
+                }}
+              />
+              <button
+                onClick={isRecording ? stopRecording : startRecording}
+                disabled={loading || isComplete}
+                title={isRecording ? "Stop recording" : "Use voice input"}
+                aria-label={isRecording ? "Stop recording" : "Use voice input"}
+                style={{
+                  width: 52, height: 52, borderRadius: 14,
+                  border: isRecording ? "1px solid rgba(239,68,68,0.25)" : "1px solid rgba(28,26,22,0.1)",
+                  background: isRecording ? "rgba(239,68,68,0.12)" : "#FAF7F2",
+                  color: isRecording ? "#ef4444" : "rgba(28,26,22,0.6)",
+                  cursor: loading || isComplete ? "default" : "pointer",
+                  opacity: loading || isComplete ? 0.6 : 1,
+                  display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                }}
+              >
+                {isRecording ? <MicOff size={18} /> : <Mic size={18} />}
+              </button>
+              <button
+                onClick={handleSendMessage}
+                disabled={loading || !input.trim() || isComplete}
+                style={{
+                  padding: "14px 22px", borderRadius: 14,
+                  background: !loading && input.trim() && !isComplete ? "#C96442" : "#F0EBE3",
+                  color: !loading && input.trim() && !isComplete ? "white" : "rgba(28,26,22,0.35)",
+                  border: "1px solid rgba(28,26,22,0.1)",
+                  cursor: !loading && input.trim() && !isComplete ? "pointer" : "not-allowed",
+                  display: "flex", alignItems: "center", gap: 8, fontWeight: 600, flexShrink: 0,
+                }}
+              >
+                {loading || isComplete ? <Loader2 size={20} style={{ animation: "spin 1s linear infinite" }} /> : <Send size={20} />}
+              </button>
             </div>
           </div>
         </div>
@@ -784,6 +789,7 @@ export default function OnboardingChat() {
       <DataPanel
         activeSectionId={activeSectionId}
         data={sectionData}
+        width={RIGHT_SIDEBAR_WIDTH}
         integrationSelector={<IntegrationSelector companyId={sessionId} compact />}
       />
 

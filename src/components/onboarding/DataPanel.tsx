@@ -60,6 +60,7 @@ interface DataPanelProps {
   data: SectionData;
   sessionId?: string;
   integrationSelector?: React.ReactNode;
+  width?: number;
 }
 
 const SECTION_TITLES: Record<SectionId, string> = {
@@ -290,7 +291,7 @@ function IntegrationsPanel({ data }: { data: ConnectedIntegration[] }) {
   );
 }
 
-export default function DataPanel({ activeSectionId, data, integrationSelector }: DataPanelProps) {
+export default function DataPanel({ activeSectionId, data, integrationSelector, width = 400 }: DataPanelProps) {
   const Icon = SECTION_ICONS[activeSectionId];
   const itemCount = activeSectionId === "company"
     ? Object.values(data.company).filter(Boolean).length
@@ -298,7 +299,7 @@ export default function DataPanel({ activeSectionId, data, integrationSelector }
 
   return (
     <div style={{
-      width: 400, background: "white",
+      width, background: "white",
       borderLeft: "1px solid rgba(28,26,22,0.06)",
       display: "flex", flexDirection: "column",
       position: "fixed", top: 0, bottom: 0, right: 0, zIndex: 50,
