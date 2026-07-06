@@ -12,14 +12,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { isWarRoomWorkOrder } from "@/lib/war-room";
 import {
   Calendar,
   Clock,
   User,
   Wrench,
   AlertTriangle,
-  ShieldAlert,
   ChevronDown,
   ChevronUp,
   Save,
@@ -263,8 +261,6 @@ export default function WorkOrdersPage() {
   const completedToday = stats?.workOrders.completedTodayCount || 0;
   const mttrWeek = stats?.workOrders.mttrMinutesThisWeek || 0;
   const overdueCount = stats?.workOrders.overdueCount || 0;
-  const activeWarRooms = workOrders.filter((wo) => isWarRoomWorkOrder((wo.ai_triage || {}) as Record<string, unknown>) && wo.status !== "completed" && wo.status !== "cancelled").length;
-
   function openActions(wo: WorkOrder) {
     setActiveWO(wo);
     setActionAssignTo(wo.assigned_to || "unassigned");
@@ -329,10 +325,6 @@ export default function WorkOrdersPage() {
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Work Orders</h1>
             <p className="text-sm text-black/50 mt-1">Track, assign, and resolve work across the plant.</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => (window.location.href = "/today")}>Today</Button>
-            <Button onClick={() => (window.location.href = "/assets")}>Assets</Button>
           </div>
         </div>
 
@@ -417,10 +409,6 @@ export default function WorkOrdersPage() {
           <div className="mt-4 flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-2 text-sm text-black/50 flex-wrap">
               <span>{sorted.length} results</span>
-              <span className="hidden sm:inline text-black/20">•</span>
-              <span className="rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700">
-                {activeWarRooms} active war room{activeWarRooms === 1 ? "" : "s"}
-              </span>
             </div>
             <div className="flex items-center gap-2">
               <Select value={sortKey} onValueChange={(v) => setSortKey(v as "priority" | "status" | "created_at")}>
@@ -462,7 +450,6 @@ export default function WorkOrdersPage() {
                 {sorted.map((wo) => {
                   const assetName = wo.asset_id ? assetsById[wo.asset_id]?.name || "—" : (wo.asset_name || "—");
                   const minutes = timeOpenMinutes(wo);
-                  const isWarRoom = isWarRoomWorkOrder((wo.ai_triage || {}) as Record<string, unknown>);
 
                   return (
                     <TableRow key={wo.id}>
@@ -476,22 +463,8 @@ export default function WorkOrdersPage() {
                         </TableCell>
                         <TableCell><PriorityBadge priority={wo.priority} /></TableCell>
                         <TableCell>{assetName}</TableCell>
-                        <TableCell className="max-w-[340px]">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <span className="truncate">{wo.title}</span>
-                            {isWarRoom && (
-                              <span className="shrink-0 rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-red-700">
-                                War room
-                              </span>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <StatusBadge status={wo.status} />
-                            {isWarRoom && <ShieldAlert className="h-4 w-4 text-red-600" />}
-                          </div>
-                        </TableCell>
+                        <TableCell className="max-w-[340px]"><span className="truncate block">{wo.title}</span></TableCell>
+                        <TableCell><StatusBadge status={wo.status} /></TableCell>
                         <TableCell className="text-sm text-black/60">{techName(wo.assigned_to)}</TableCell>
                         <TableCell className="hidden md:table-cell text-sm text-black/60">{formatTimeAgo(wo.created_at)} ago</TableCell>
                         <TableCell className="hidden md:table-cell text-sm text-black/60">{Math.round(minutes / 60)}h</TableCell>

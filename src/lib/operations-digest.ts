@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { getCompanyRuntimeSettings, shouldSendDailyDigest } from "@/lib/company-settings";
 import { supabase } from "@/lib/supabase";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || "placeholder" });
@@ -111,6 +112,9 @@ JSON only.`,
 
 // Send digest via SMS to manager
 export async function sendDigestSMS(companyId: string, periodHours: number = 24): Promise<boolean> {
+  const settings = await getCompanyRuntimeSettings(companyId);
+  if (!shouldSendDailyDigest(settings)) return false;
+
   const { data: company } = await supabase.from("companies").select("manager_phone, name").eq("id", companyId).single();
   if (!company?.manager_phone) return false;
 

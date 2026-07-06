@@ -64,8 +64,8 @@ function QRCodeModal({ joinCode, smsNumber, open, onOpenChange }: QRCodeModalPro
           />
         </div>
 
-        <div className="text-center text-xs text-gray-500">
-          Opens a text to {smsNumber} with <span className="font-mono">JOIN {joinCode}</span>
+        <div className="text-center text-xs text-gray-700">
+          Opens a text to {smsNumber} with <span className="font-mono text-gray-700">JOIN {joinCode}</span>
         </div>
 
         <DialogFooter>

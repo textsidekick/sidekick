@@ -8,7 +8,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 
 const NAV_ITEMS = [
-  { id: "today", label: "Today", icon: LayoutDashboard, href: "/today" },
+  { id: "today", label: "Overview", icon: LayoutDashboard, href: "/today" },
   { id: "inbox", label: "Inbox", icon: MessageSquare, href: "/inbox" },
   { id: "work-orders", label: "Work Orders", icon: ClipboardList, href: "/work-orders" },
   { id: "assets", label: "Assets", icon: Wrench, href: "/assets" },

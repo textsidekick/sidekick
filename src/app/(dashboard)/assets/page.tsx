@@ -245,8 +245,6 @@ export default function AssetsPage() {
             <p className="text-sm text-black/50 mt-1">Asset health, history, repair time, and more.</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => (window.location.href = "/operations")}>Operations</Button>
-            <Button variant="outline" onClick={() => (window.location.href = "/work-orders")}>Work Orders</Button>
             <Button onClick={() => setShowAdd(true)}>
               <Plus className="h-4 w-4 mr-1" /> Add Asset
             </Button>
