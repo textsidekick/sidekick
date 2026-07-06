@@ -52,7 +52,7 @@ export function Sidebar() {
       .catch(() => {});
   }, []);
 
-  const selectCompany = (companyId: string) => {
+  const selectCompany = async (companyId: string) => {
     setSelectedCompanyId(companyId);
     setCompanyDropdownOpen(false);
     const company = companies.find(c => c.id === companyId);
@@ -60,11 +60,16 @@ export function Sidebar() {
     setSelectedLocationId(nextLocationId);
     setLocationDropdownOpen(false);
     try {
+      // Update server session to point to this company
+      await fetch("/api/auth/switch-company", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ companyId }),
+      });
       const authData = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
       authData.companyId = companyId;
       authData.locationId = nextLocationId;
       localStorage.setItem("sidekick_auth", JSON.stringify(authData));
-      // Dispatch storage event so manager page can react
       window.dispatchEvent(new StorageEvent("storage", { key: "sidekick_auth" }));
     } catch {}
   };
