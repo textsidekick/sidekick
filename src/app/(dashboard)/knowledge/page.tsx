@@ -20,7 +20,6 @@ import {
   XCircle,
 } from "lucide-react";
 import GeneratedReports from "@/components/dashboard/documents/GeneratedReports";
-import KnowledgeBaseViewer from "@/components/dashboard/documents/KnowledgeBaseViewer";
 import { cn } from "@/lib/utils";
 
 interface KnowledgeArticle {
@@ -54,6 +53,22 @@ function timeAgo(dateStr: string) {
   const hrs = Math.floor(diff / 3600000);
   if (hrs > 0) return `${hrs}h ago`;
   return "just now";
+}
+
+function matchesSearch(article: KnowledgeArticle, query: string) {
+  const term = query.trim().toLowerCase();
+  if (!term) return true;
+
+  return [
+    article.title,
+    article.problem,
+    article.symptoms,
+    article.solution,
+    article.equipment_type,
+    article.asset_name,
+    ...(article.parts_used || []),
+    ...(article.tags || []),
+  ].some((value) => value?.toLowerCase().includes(term));
 }
 
 function ProvenanceBadge({ article }: { article: KnowledgeArticle }) {
@@ -304,14 +319,9 @@ export default function KnowledgePage() {
     [articles],
   );
 
-  const filtered = visibleArticles.filter((article) =>
-    search.trim()
-      ? article.title?.toLowerCase().includes(search.toLowerCase()) ||
-        article.problem?.toLowerCase().includes(search.toLowerCase()) ||
-        article.solution?.toLowerCase().includes(search.toLowerCase()) ||
-        article.tags?.some((tag) => tag.toLowerCase().includes(search.toLowerCase()))
-      : true,
-  );
+  const filteredReviewItems = useMemo(() => reviewItems.filter((article) => matchesSearch(article, search)), [reviewItems, search]);
+
+  const filtered = useMemo(() => visibleArticles.filter((article) => matchesSearch(article, search)), [visibleArticles, search]);
 
   const lowRiskCount = reviewItems.filter((article) => reviewRisk(article) === "low").length;
 
@@ -329,6 +339,7 @@ export default function KnowledgePage() {
           className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-12 pr-4 text-sm text-gray-900 focus:border-[#C96442] focus:outline-none focus:ring-2 focus:ring-[#C96442]/30"
         />
       </div>
+      <p className="mt-2 text-sm text-gray-500">Searches titles, machine names, symptoms, solutions, parts, and tags across the knowledge on this page.</p>
 
       {loadingReview ? (
         <div className="mt-6 rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-400 shadow-sm">Loading pending review…</div>
@@ -362,7 +373,9 @@ export default function KnowledgePage() {
               </div>
 
               <div className="space-y-3">
-                {reviewItems.map((article) => {
+                {filteredReviewItems.length === 0 && search.trim() ? (
+                  <div className="rounded-xl border border-gray-200 bg-white px-4 py-5 text-sm text-gray-500">No pending review items match “{search.trim()}”.</div>
+                ) : filteredReviewItems.map((article) => {
                   const risk = reviewRisk(article);
                   const flags = flagExplanation(article);
                   const isOpen = reviewOpenId === article.id;
@@ -489,8 +502,8 @@ export default function KnowledgePage() {
         ) : filtered.length === 0 ? (
           <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
             <BookOpen className="mx-auto mb-3 h-12 w-12 text-[#C96442]/30" />
-            <p className="font-semibold text-gray-700">No approved procedures captured yet</p>
-            <p className="mx-auto mt-1 max-w-sm text-sm text-gray-400">Once your team uploads docs, texts fixes in, or approves generated knowledge, it will show up here.</p>
+            <p className="font-semibold text-gray-700">{search.trim() ? `No approved knowledge matches “${search.trim()}”` : "No approved procedures captured yet"}</p>
+            <p className="mx-auto mt-1 max-w-sm text-sm text-gray-400">{search.trim() ? "Try a machine name, symptom, part, or troubleshooting phrase instead." : "Once your team uploads docs, texts fixes in, or approves generated knowledge, it will show up here."}</p>
           </div>
         ) : (
           filtered.map((article) => (
@@ -565,15 +578,14 @@ export default function KnowledgePage() {
         <summary className="cursor-pointer list-none px-5 py-4 text-sm font-medium text-gray-900 [&::-webkit-details-marker]:hidden">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <div>Advanced knowledge tools</div>
-              <div className="mt-1 text-sm font-normal text-gray-500">Generate reports or inspect the full knowledge base without cluttering the main library view.</div>
+              <div>Reports</div>
+              <div className="mt-1 text-sm font-normal text-gray-500">Generate knowledge reports without cluttering the main library view.</div>
             </div>
             <ChevronDown className="h-5 w-5 text-gray-400" />
           </div>
         </summary>
         <div className="border-t border-gray-100 px-5 py-5">
           <GeneratedReports companyId={companyId} />
-          <KnowledgeBaseViewer companyId={companyId} />
         </div>
       </details>
 
