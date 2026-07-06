@@ -38,7 +38,7 @@ export default function DemoMode({ companyId, onSeeded }: Props) {
       {loading ? (
         <><Loader2 className="h-3 w-3 animate-spin" /> Loading...</>
       ) : done ? (
-        <>Done -- 5 docs added</>
+        <>Done -- demo data loaded</>
       ) : (
         <><Sparkles className="h-3 w-3" /> Load Demo Data</>
       )}

@@ -145,6 +145,57 @@ A: Yes, employees get a discounted membership at FitZone gym ($15/month vs $40/m
   },
 ];
 
+const SAMPLE_PROCEDURES = [
+  {
+    title: "Reset filler line after cap sensor fault",
+    problem: "The filler line stops mid-run when the cap presence sensor loses alignment and begins throwing repeated fault codes.",
+    symptoms: "HMI shows cap sensor fault, conveyor pauses after 2-3 bottles, and operators report intermittent restarts before the line trips again.",
+    solution: "1. Stop the line from the local HMI. 2. Clear any jammed caps in the infeed chute. 3. Clean the cap sensor lens with a dry lint-free wipe. 4. Loosen the mounting bracket slightly and realign the sensor to the reflector until the indicator stays solid. 5. Tighten bracket, clear the HMI fault, and run 10 empty bottles to confirm stable detection before resuming production.",
+    equipment_type: "Filler line",
+    asset_name: "Line 2 Bottle Filler",
+    parts_used: ["Lint-free wipe"],
+    time_estimate_minutes: 12,
+    times_referenced: 18,
+    tags: ["filler", "sensor", "caps", "line-reset"],
+  },
+  {
+    title: "Clear carton erector vacuum loss on startup",
+    problem: "The carton erector fails to pick blanks consistently at startup because the vacuum cups lose suction after idle periods.",
+    symptoms: "Cartons fail to open, suction alarm appears, and operators hear the vacuum pump cycling rapidly during the first few minutes of startup.",
+    solution: "1. Verify air supply is above operating minimum. 2. Inspect and reseat the vacuum lines at the cup manifold. 3. Wipe dust from cups and replace any cup with visible cracking. 4. Confirm the vacuum regulator is set to standard startup pressure. 5. Cycle the erector in manual mode for 5 cartons before switching back to auto.",
+    equipment_type: "Packaging",
+    asset_name: "Carton Erector 1",
+    parts_used: ["30 mm vacuum cup"],
+    time_estimate_minutes: 15,
+    times_referenced: 11,
+    tags: ["packaging", "vacuum", "startup", "cartons"],
+  },
+  {
+    title: "Recover palletizer after downstream photo-eye blockage",
+    problem: "The palletizer stops feeding layers when the downstream photo-eye is blocked by stretch-wrap tails or skewed cases.",
+    symptoms: "Downstream blocked alarm, layer build stalls, and the discharge conveyor remains occupied even after operators clear the lane visually.",
+    solution: "1. Lock out conveyor motion from the local station. 2. Remove any wrap tails or skewed cases blocking the photo-eye. 3. Wipe the lens and reflector. 4. Check the bracket position and confirm the beam clears the conveyor guard. 5. Restore power, reset the alarm, and jog one layer through before returning to automatic mode.",
+    equipment_type: "Palletizer",
+    asset_name: "End-of-Line Palletizer",
+    parts_used: ["Lint-free wipe"],
+    time_estimate_minutes: 10,
+    times_referenced: 14,
+    tags: ["palletizer", "photo-eye", "conveyor", "reset"],
+  },
+  {
+    title: "Restart air compressor after high temperature shutdown",
+    problem: "The backup air compressor shuts down during heavy load when the cooler fins clog and head temperature exceeds the shutdown threshold.",
+    symptoms: "High temperature shutdown on compressor panel, reduced plant air pressure, and maintenance reports visible dust buildup on the cooler intake.",
+    solution: "1. Isolate and lock out the compressor. 2. Blow out cooler fins from the clean side using low-pressure air. 3. Confirm the cooling fan spins freely and intake screen is clear. 4. Let the unit sit for 10 minutes, then restore power. 5. Restart unloaded and watch temperature for 5 minutes before returning it to service.",
+    equipment_type: "Utilities",
+    asset_name: "Backup Air Compressor",
+    parts_used: ["Compressed air hose"],
+    time_estimate_minutes: 20,
+    times_referenced: 7,
+    tags: ["compressor", "temperature", "utilities", "shutdown"],
+  },
+];
+
 export async function POST(request: NextRequest) {
   try {
     const { companyId } = await request.json();
@@ -152,8 +203,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "companyId required" }, { status: 400 });
     }
 
-    let created = 0;
+    let documentsCreated = 0;
     for (const doc of SAMPLE_DOCS) {
+      const { data: existing } = await supabase
+        .from("documents")
+        .select("id")
+        .eq("company_id", companyId)
+        .eq("filename", doc.filename)
+        .limit(1);
+
+      if (existing && existing.length > 0) continue;
+
       const { error } = await supabase.from("documents").insert({
         company_id: companyId,
         filename: doc.filename,
@@ -162,10 +222,40 @@ export async function POST(request: NextRequest) {
         source: "demo",
         created_at: new Date().toISOString(),
       });
-      if (!error) created++;
+      if (!error) documentsCreated++;
     }
 
-    return NextResponse.json({ success: true, documentsCreated: created });
+    let proceduresCreated = 0;
+    for (const procedure of SAMPLE_PROCEDURES) {
+      const { data: existing } = await supabase
+        .from("knowledge_articles")
+        .select("id")
+        .eq("company_id", companyId)
+        .eq("title", procedure.title)
+        .limit(1);
+
+      if (existing && existing.length > 0) continue;
+
+      const { error } = await supabase.from("knowledge_articles").insert({
+        company_id: companyId,
+        asset_id: null,
+        asset_name: procedure.asset_name,
+        equipment_type: procedure.equipment_type,
+        title: procedure.title,
+        problem: procedure.problem,
+        symptoms: procedure.symptoms,
+        solution: procedure.solution,
+        parts_used: procedure.parts_used,
+        time_estimate_minutes: procedure.time_estimate_minutes,
+        tags: procedure.tags,
+        times_referenced: procedure.times_referenced,
+        source_work_order_id: null,
+      });
+
+      if (!error) proceduresCreated++;
+    }
+
+    return NextResponse.json({ success: true, documentsCreated, proceduresCreated });
   } catch (error) {
     console.error("[Demo Seed] Error:", error);
     return NextResponse.json({ error: "Failed to seed demo data" }, { status: 500 });
