@@ -93,9 +93,9 @@ export default function ManagerDashboard() {
       const savedAuth = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
       if (savedAuth.companyId && allCompanies.some((c: any) => c.id === savedAuth.companyId)) {
         setSelectedCompany(savedAuth.companyId);
-      } else if (allCompanies.length > 0 && !selectedCompany) {
+      } else if (allCompanies.length > 0) {
+        // Saved company not found (deleted?) — use first available
         setSelectedCompany(allCompanies[0].id);
-        // Update localStorage with the company from the API
         try {
           savedAuth.companyId = allCompanies[0].id;
           localStorage.setItem("sidekick_auth", JSON.stringify(savedAuth));
