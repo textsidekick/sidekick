@@ -87,30 +87,19 @@ export default function ManagerDashboard() {
   // Load companies + workers
   useEffect(() => {
     fetch("/api/companies").then(r => r.json()).then(d => {
-      const fetchedCompanies = d.companies || [];
-      let allCompanies = fetchedCompanies;
-      try {
-        const authData = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
-        const savedCompanyId = authData.companyId || "";
-        const userPhone = authData.phone || "";
-        const adminList = process.env.NEXT_PUBLIC_ADMIN_PHONES?.split(",") || [];
-        const isAdmin = adminList.some(p => userPhone.includes(p.trim()));
-
-        if (!isAdmin && userPhone) {
-          const phoneMatched = fetchedCompanies.filter((c: any) => c.manager_phone === userPhone || c.manager_phone === userPhone.replace("+1", "+"));
-          allCompanies = phoneMatched.length > 0
-            ? phoneMatched
-            : (savedCompanyId ? fetchedCompanies.filter((c: any) => c.id === savedCompanyId) : fetchedCompanies);
-        } else if (savedCompanyId && !isAdmin) {
-          allCompanies = fetchedCompanies.filter((c: any) => c.id === savedCompanyId);
-        }
-      } catch {}
+      const allCompanies = d.companies || [];
       setCompanies(allCompanies);
+
       const savedAuth = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
       if (savedAuth.companyId && allCompanies.some((c: any) => c.id === savedAuth.companyId)) {
         setSelectedCompany(savedAuth.companyId);
       } else if (allCompanies.length > 0 && !selectedCompany) {
         setSelectedCompany(allCompanies[0].id);
+        // Update localStorage with the company from the API
+        try {
+          savedAuth.companyId = allCompanies[0].id;
+          localStorage.setItem("sidekick_auth", JSON.stringify(savedAuth));
+        } catch {}
       }
       setSelectedLocationId(savedAuth.locationId || "all");
       if (d.workers) setWorkers(d.workers);
