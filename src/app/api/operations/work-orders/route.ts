@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { listWorkOrders, createWorkOrder } from "@/lib/operations";
 import type { InsertWorkOrder } from "@/types/operations";
+import { getCompanyId } from "@/lib/dashboard-auth";
 
 export async function GET(request: NextRequest) {
   try {
-    const companyId = request.nextUrl.searchParams.get("companyId");
+    const companyId = await getCompanyId(request);
     const status = request.nextUrl.searchParams.get("status") || undefined;
     const priority = request.nextUrl.searchParams.get("priority") || undefined;
     const assetId = request.nextUrl.searchParams.get("assetId") || undefined;
     const locationId = request.nextUrl.searchParams.get("locationId") || undefined;
 
-    if (!companyId) return NextResponse.json({ error: "companyId_required" }, { status: 400 });
+    if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const workOrders = await listWorkOrders(companyId, { status, priority, assetId: assetId as any, locationId: locationId as any });
     return NextResponse.json({ workOrders });

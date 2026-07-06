@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { getCompanyId } from "@/lib/dashboard-auth";
 import type { InsertPMSchedule, PMScheduleFrequencyType, UUID } from "@/types/operations";
 
 function json(data: unknown, status = 200) {
@@ -28,7 +29,7 @@ function computeNextDueAt(frequencyType: PMScheduleFrequencyType, frequencyValue
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const companyId = searchParams.get("company_id");
+  const companyId = await getCompanyId(req) || searchParams.get("company_id");
   if (!companyId) return badRequest("company_id is required");
   const locationId = searchParams.get("location_id") || searchParams.get("locationId");
 

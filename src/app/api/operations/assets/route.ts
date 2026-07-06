@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAsset, listAssets } from "@/lib/operations";
 import type { InsertAsset } from "@/types/operations";
+import { getCompanyId } from "@/lib/dashboard-auth";
 
 export async function GET(request: NextRequest) {
   try {
-    const companyId = request.nextUrl.searchParams.get("companyId");
+    const companyId = await getCompanyId(request);
     const locationId = request.nextUrl.searchParams.get("locationId") || undefined;
-    if (!companyId) return NextResponse.json({ error: "companyId_required" }, { status: 400 });
+    if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const assets = await listAssets(companyId, { locationId: locationId as any });
     return NextResponse.json({ assets });
