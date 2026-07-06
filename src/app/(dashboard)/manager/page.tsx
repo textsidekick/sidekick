@@ -306,9 +306,7 @@ export default function ManagerDashboard() {
           </div>
         )}
 
-        {trialInfo?.plan === "trial" && (
-          <UpgradeBanner companyId={selectedCompany} plan={trialInfo.plan} />
-        )}
+
 
         {/* ── Header ───────────────────────────────────────────────────────── */}
         <div>
