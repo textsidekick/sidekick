@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
       id: companyId,
       name: name.trim(),
       industry: industry || null,
-      join_code: joinCode,
+      access_code: joinCode,
     });
 
     if (compErr) {

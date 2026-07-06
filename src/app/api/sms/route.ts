@@ -13,6 +13,7 @@ import {
   assignWorkOrder,
   createWorkOrderFromTriage,
   findBestTechnician,
+  handleWorkOrderCompletion,
 } from "@/lib/work-order-manager";
 import type { Asset as OpsAsset, UUID } from "@/types/operations";
 import { detectLanguage, translateText } from "@/lib/language";
@@ -29,7 +30,14 @@ import {
   shouldSendManagerWorkOrderAlert,
 } from "@/lib/company-settings";
 import { detectCriticalIncident, getCriticalIncidentMeta } from "@/lib/critical-incident";
-import { isWhatsAppMessage, stripWhatsAppPrefix, sendMessage } from "@/lib/whatsapp";
+import {
+  completeJsonOpenAIFirst,
+  completeTextOpenAIFirst,
+  completeVisionTextOpenAIFirst,
+} from "@/lib/sms-ai";
+import { captureKnowledge } from "@/lib/knowledge-engine";
+import { handleSmsOnboarding } from "@/app/api/onboarding/sms-setup/route";
+import { isWhatsAppMessage, stripWhatsAppPrefix } from "@/lib/whatsapp";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || 'placeholder' });
 const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID || 'AC00000000000000000000000000000000', process.env.TWILIO_AUTH_TOKEN || 'placeholder');
@@ -69,6 +77,220 @@ function isLowConfidenceAnswer(answer: string): boolean {
 function containsSafetyTopic(text: string): boolean {
   const lower = text.toLowerCase();
   return SAFETY_KEYWORDS.some(keyword => lower.includes(keyword));
+}
+
+function cleanUpdateString(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return trimmed.length ? trimmed : null;
+}
+
+function shouldTreatAsManagerUpdate(body: string, company: { manager_phone?: string | null } | null, from: string) {
+  if (!company?.manager_phone || company.manager_phone !== from) return false;
+  return /^(update|team|asset|knowledge|sop|policy|note)\b/i.test(body.trim());
+}
+
+async function applyManagerSmsUpdate(params: {
+  companyId: string;
+  company: any;
+  message: string;
+}) {
+  const system = `You are Sidekick's manager update parser.
+Turn a manager's freeform update into structured operational changes.
+Return JSON only.
+
+Schema:
+{
+  "summary": "short one-sentence summary of what changed",
+  "company": {
+    "name": "optional",
+    "industry": "optional",
+    "manager_name": "optional",
+    "manager_phone": "optional",
+    "worker_count": 0
+  },
+  "assets": [{ "name": "required", "asset_tag": "optional", "location": "optional", "type": "optional", "notes": "optional" }],
+  "team": [{ "name": "optional", "phone": "optional", "role": "operator|technician|supervisor|manager", "skills": ["optional"], "shift": "optional" }],
+  "knowledge": [{ "title": "required", "problem": "optional", "solution": "required", "asset_name": "optional", "equipment_type": "optional", "tags": ["optional"] }],
+  "notes": ["short factual leftovers"]
+}`;
+
+  const parsedText = await completeJsonOpenAIFirst({
+    system,
+    user: `Current company context:\n${JSON.stringify(params.company || {}, null, 2)}\n\nManager update:\n${params.message}`,
+    maxTokens: 900,
+  });
+
+  const match = parsedText.match(/\{[\s\S]*\}/);
+  const parsed = match ? JSON.parse(match[0]) : JSON.parse(parsedText);
+
+  const companyPatch: Record<string, unknown> = {};
+  const nextName = cleanUpdateString(parsed.company?.name);
+  const nextIndustry = cleanUpdateString(parsed.company?.industry);
+  const nextManagerName = cleanUpdateString(parsed.company?.manager_name);
+  const nextManagerPhoneRaw = cleanUpdateString(parsed.company?.manager_phone);
+  const nextWorkerCount = parsed.company?.worker_count;
+
+  if (nextName) companyPatch.name = nextName;
+  if (nextIndustry) companyPatch.industry = nextIndustry;
+  if (nextManagerName) companyPatch.manager_name = nextManagerName;
+  if (nextManagerPhoneRaw) {
+    try { companyPatch.manager_phone = normalizePhoneNumber(nextManagerPhoneRaw); } catch { companyPatch.manager_phone = nextManagerPhoneRaw; }
+  }
+  if (nextWorkerCount !== undefined && nextWorkerCount !== null && `${nextWorkerCount}`.trim() !== "") {
+    const numeric = Number(nextWorkerCount);
+    if (Number.isFinite(numeric)) companyPatch.worker_count = numeric;
+  }
+  if (Object.keys(companyPatch).length > 0) {
+    await supabase.from("companies").update(companyPatch).eq("id", params.companyId);
+  }
+
+  let assetsChanged = 0;
+  for (const [index, rawAsset] of ((parsed.assets || []) as any[]).entries()) {
+    const name = cleanUpdateString(rawAsset?.name);
+    if (!name) continue;
+    const { data: existingAsset } = await supabase.from("assets").select("id").eq("company_id", params.companyId).ilike("name", name).limit(1).maybeSingle();
+    const payload = {
+      name,
+      type: cleanUpdateString(rawAsset?.type) || "equipment",
+      location: cleanUpdateString(rawAsset?.location) || "Unassigned",
+      notes: cleanUpdateString(rawAsset?.notes),
+    };
+    if (existingAsset?.id) {
+      await supabase.from("assets").update(payload).eq("id", existingAsset.id);
+    } else {
+      await supabase.from("assets").insert({
+        company_id: params.companyId,
+        ...payload,
+        asset_tag: cleanUpdateString(rawAsset?.asset_tag) || `ASSET-${Date.now().toString().slice(-6)}-${index + 1}`,
+        status: "operational",
+        health_score: 100,
+      } as any);
+    }
+    assetsChanged += 1;
+  }
+
+  let teamChanged = 0;
+  const teamRows = ((parsed.team || []) as any[])
+    .map((member) => {
+      const phoneRaw = cleanUpdateString(member?.phone);
+      if (!phoneRaw) return null;
+      let phone = phoneRaw;
+      try { phone = normalizePhoneNumber(phoneRaw); } catch {}
+      return {
+        company_id: params.companyId,
+        name: cleanUpdateString(member?.name),
+        phone,
+        role: cleanUpdateString(member?.role) || "operator",
+        skills: Array.isArray(member?.skills) ? member.skills.map((skill: unknown) => cleanUpdateString(skill)).filter(Boolean) : [],
+        shift: cleanUpdateString(member?.shift),
+        verified: true,
+      };
+    })
+    .filter(Boolean);
+  if (teamRows.length > 0) {
+    const { data } = await supabase.from("workers").upsert(teamRows as any[], { onConflict: "phone" }).select("id");
+    teamChanged = data?.length || teamRows.length;
+  }
+
+  let knowledgeAdded = 0;
+  for (const rawKnowledge of (parsed.knowledge || []) as any[]) {
+    const solution = cleanUpdateString(rawKnowledge?.solution);
+    const title = cleanUpdateString(rawKnowledge?.title) || cleanUpdateString(rawKnowledge?.problem) || "Operational note";
+    if (!solution) continue;
+    const tags = Array.isArray(rawKnowledge?.tags) ? rawKnowledge.tags.map((tag: unknown) => cleanUpdateString(tag)).filter(Boolean) : [];
+    const { error } = await supabase.from("knowledge_articles").insert({
+      company_id: params.companyId,
+      title,
+      problem: cleanUpdateString(rawKnowledge?.problem) || title,
+      solution,
+      asset_name: cleanUpdateString(rawKnowledge?.asset_name),
+      equipment_type: cleanUpdateString(rawKnowledge?.equipment_type),
+      parts_used: [],
+      tags,
+    } as any);
+    if (!error) knowledgeAdded += 1;
+  }
+
+  return {
+    summary: cleanUpdateString(parsed.summary) || "Saved manager update.",
+    assetsChanged,
+    teamChanged,
+    knowledgeAdded,
+  };
+}
+
+function audioFilenameForMediaType(mediaType: string | null | undefined): string {
+  const normalized = (mediaType || "").toLowerCase();
+  if (normalized.includes("webm")) return "audio.webm";
+  if (normalized.includes("mpeg") || normalized.includes("mp3")) return "audio.mp3";
+  if (normalized.includes("wav")) return "audio.wav";
+  if (normalized.includes("m4a") || normalized.includes("mp4")) return "audio.m4a";
+  if (normalized.includes("ogg")) return "audio.ogg";
+  if (normalized.includes("amr")) return "audio.amr";
+  return "audio.bin";
+}
+
+async function transcribeAudio(buffer: Buffer, mediaType: string | null | undefined): Promise<string> {
+  const deepgramApiKey = process.env.DEEPGRAM_API_KEY;
+
+  try {
+    const transcription = await openai.audio.transcriptions.create({
+      file: new File([new Uint8Array(buffer)], audioFilenameForMediaType(mediaType), { type: mediaType || "application/octet-stream" }),
+      model: "whisper-1",
+    });
+
+    return transcription.text || "";
+  } catch (openAiError) {
+    console.error("[SMS] OpenAI transcription failed:", openAiError);
+
+    if (!deepgramApiKey || deepgramApiKey === "placeholder") {
+      throw openAiError;
+    }
+  }
+
+  const deepgramResponse = await fetch("https://api.deepgram.com/v1/listen?model=nova-2&smart_format=true", {
+    method: "POST",
+    headers: {
+      "Authorization": `Token ${deepgramApiKey}`,
+      "Content-Type": mediaType || "audio/amr",
+    },
+    body: new Uint8Array(buffer),
+  });
+
+  if (!deepgramResponse.ok) {
+    const errText = await deepgramResponse.text();
+    throw new Error(`Deepgram: ${errText.slice(0, 100)}`);
+  }
+
+  const deepgramResult = await deepgramResponse.json();
+  return deepgramResult?.results?.channels?.[0]?.alternatives?.[0]?.transcript || "";
+}
+
+async function insertQuestionRecord(payload: Record<string, unknown>) {
+  const firstAttempt = await supabase
+    .from("questions")
+    .insert(payload)
+    .select()
+    .single();
+
+  if (!firstAttempt.error) return firstAttempt;
+
+  const unsupportedFieldError =
+    firstAttempt.error.code === "42703" &&
+    /questions\.(channel|topic)/i.test(firstAttempt.error.message || "");
+
+  if (!unsupportedFieldError) return firstAttempt;
+
+  const fallbackPayload = { ...payload };
+  delete fallbackPayload.channel;
+  delete fallbackPayload.topic;
+
+  return supabase
+    .from("questions")
+    .insert(fallbackPayload)
+    .select()
+    .single();
 }
 
 // ============================================
@@ -139,17 +361,50 @@ function formatChecklistResult(results: { ppe: boolean | null; loto: boolean | n
 
 
 async function searchDocuments(question: string, companyId: string) {
-  const embedding = await createEmbedding(question);
-  
-  const { data, error } = await supabase.rpc("match_documents", {
-    query_embedding: embedding,
-    match_company_id: companyId,
-    match_count: 5,
-  });
+  let data: any[] | null = null;
 
-  if (error) {
-    console.error("Vector search error:", error);
-    return [];
+  try {
+    const embedding = await createEmbedding(question);
+    const vectorResult = await supabase.rpc("match_documents", {
+      query_embedding: embedding,
+      match_company_id: companyId,
+      match_count: 5,
+    });
+
+    if (vectorResult.error) {
+      console.error("Vector search error:", vectorResult.error);
+    } else {
+      data = vectorResult.data || [];
+    }
+  } catch (error) {
+    console.error("[SMS] Embedding search failed, falling back to text search:", error);
+  }
+
+  if (!data || data.length === 0) {
+    const searchTerms = question
+      .split(/\s+/)
+      .map((term) => term.trim())
+      .filter((term) => term.length > 2)
+      .join(" | ");
+
+    if (searchTerms) {
+      const fallbackResult = await supabase
+        .from("document_chunks")
+        .select("document_id, content")
+        .eq("company_id", companyId)
+        .textSearch("content", searchTerms)
+        .limit(5);
+
+      if (fallbackResult.error) {
+        console.error("[SMS] Text search fallback failed:", fallbackResult.error);
+        return [];
+      }
+
+      data = (fallbackResult.data || []).map((chunk: any) => ({
+        ...chunk,
+        similarity: 0,
+      }));
+    }
   }
 
   // Enrich with document names for source attribution
@@ -219,27 +474,12 @@ If you see warning labels, part numbers, or equipment names, include them.
 Respond ONLY with valid JSON, no markdown or explanation.`;
 
   try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4.1",
-      max_tokens: 500,
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "image_url",
-              image_url: { url: `data:${mediaType};base64,${base64}` },
-            },
-            {
-              type: "text",
-              text: analysisPrompt,
-            },
-          ],
-        },
-      ],
+    const text = await completeVisionTextOpenAIFirst({
+      prompt: analysisPrompt,
+      base64,
+      mediaType,
+      maxTokens: 500,
     });
-
-    const text = response.choices[0]?.message?.content || "";
     
     // Parse JSON response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -307,13 +547,10 @@ DO NOT ask clarifying questions - just answer based on what you see.${sourcesHin
 ${context ? `\nCompany docs that might help:\n${context}` : ""}`;
 
   try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4.1",
-      max_tokens: 300,
-      messages: [{ role: "user", content: systemPrompt }],
+    const answer = await completeTextOpenAIFirst({
+      user: systemPrompt,
+      maxTokens: 300,
     });
-
-    const answer = response.choices[0]?.message?.content || "";
     if (answer) {
       // If model still hedges, use our fallback
       if (answer.toLowerCase().includes("don't have") || answer.toLowerCase().includes("cannot identify")) {
@@ -362,18 +599,13 @@ function buildDirectResponse(imageAnalysis: ImageAnalysis, workerQuestion?: stri
 
 async function getAIResponse(systemPrompt: string, userMessage: string): Promise<string> {
   try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4.1",
-      max_tokens: 300,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userMessage }
-      ],
+    return await completeTextOpenAIFirst({
+      system: systemPrompt,
+      user: userMessage,
+      maxTokens: 300,
     });
-    
-    return response.choices[0]?.message?.content || "Sorry, I couldn't generate a response.";
   } catch (error) {
-    console.error("[SMS] OpenAI error:", error);
+    console.error("[SMS] AI response error:", error);
     return "Sorry, I'm having trouble right now. Please try again in a moment.";
   }
 }
@@ -434,9 +666,63 @@ async function saveToKnowledgeBase(companyId: string, question: string, answer: 
   }
 }
 
+function buildTwilioParams(params: URLSearchParams): Record<string, string> {
+  const values: Record<string, string> = {};
+  for (const [key, value] of params.entries()) {
+    values[key] = value;
+  }
+  return values;
+}
+
+function getTwilioCandidateUrls(request: NextRequest): string[] {
+  const urls = new Set<string>();
+  urls.add(request.url);
+
+  const requestUrl = new URL(request.url);
+  const hosts = [request.headers.get("x-forwarded-host"), request.headers.get("host")].filter(Boolean) as string[];
+  const protos = [request.headers.get("x-forwarded-proto"), requestUrl.protocol.replace(/:$/, "")].filter(Boolean) as string[];
+
+  for (const host of hosts) {
+    for (const proto of protos) {
+      const url = new URL(request.url);
+      url.protocol = `${proto}:`;
+      url.host = host;
+      urls.add(url.toString());
+    }
+  }
+
+  return Array.from(urls);
+}
+
+function hasValidTwilioSignature(request: NextRequest, params: URLSearchParams): boolean {
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const signature = request.headers.get("x-twilio-signature");
+
+  if (process.env.NODE_ENV !== "production" && (!authToken || !signature)) {
+    console.warn("[SMS] Skipping Twilio signature validation outside production.");
+    return true;
+  }
+
+  if (!authToken || !signature) {
+    console.error("[SMS] Missing Twilio auth token or signature header.");
+    return false;
+  }
+
+  const values = buildTwilioParams(params);
+  return getTwilioCandidateUrls(request).some((url) => {
+    try {
+      return twilio.validateRequest(authToken, signature, url, values);
+    } catch (error) {
+      console.error("[SMS] Twilio signature validation error:", error);
+      return false;
+    }
+  });
+}
+
 function twimlResponse(message: string): NextResponse {
-  const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response><Message>${message}</Message></Response>`;
-  return new NextResponse(twiml, { headers: { "Content-Type": "text/xml" } });
+  const response = new twilio.twiml.MessagingResponse();
+  response.message(message);
+  return new NextResponse(response.toString(), { headers: { "Content-Type": "text/xml" } });
 }
 
 /** Translate message if needed, then return TwiML response */
@@ -459,6 +745,114 @@ function truncateForSms(message: string, max = 480): string {
   const trimmed = (message || "").trim();
   if (trimmed.length <= max) return trimmed;
   return `${trimmed.slice(0, Math.max(0, max - 1)).trimEnd()}…`;
+}
+
+function pickTargetWorkOrderForStatusUpdate(
+  workOrders: any[],
+  workerId?: string | null,
+  workerPhone?: string | null
+) {
+  if (!workOrders || workOrders.length === 0) return null;
+
+  const score = (wo: any) => {
+    let value = 0;
+    if (wo.status === "in_progress") value += 100;
+    if (wo.assigned_to && workerId && wo.assigned_to === workerId) value += 80;
+    if (wo.status === "assigned") value += 40;
+    if (wo.worker_phone && workerPhone && wo.worker_phone === workerPhone) value += 20;
+    return value;
+  };
+
+  return [...workOrders].sort((a, b) => {
+    const scoreDelta = score(b) - score(a);
+    if (scoreDelta !== 0) return scoreDelta;
+    return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+  })[0];
+}
+
+async function finalizeCompletedWorkOrder(workOrderId: string): Promise<void> {
+  const results = await Promise.allSettled([
+    handleWorkOrderCompletion(workOrderId),
+    captureKnowledge(workOrderId),
+  ]);
+
+  if (results[0].status === "rejected") {
+    console.error("[SMS] Work order completion follow-up failed:", results[0].reason);
+  }
+  if (results[1].status === "rejected") {
+    console.error("[SMS] Knowledge capture error:", results[1].reason);
+  }
+}
+
+async function findSimilarCompletedWorkOrders(companyId: string, issue: {
+  assetId?: string | null;
+  assetName?: string | null;
+  category?: string | null;
+}) {
+  const lookbackIso = new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString();
+
+  let query = supabase
+    .from("work_orders")
+    .select("id, short_id, title, asset_id, asset_name, category, completed_at")
+    .eq("company_id", companyId)
+    .eq("status", "completed")
+    .gte("completed_at", lookbackIso)
+    .order("completed_at", { ascending: false })
+    .limit(5);
+
+  if (issue.assetId) {
+    query = query.eq("asset_id", issue.assetId);
+  } else if (issue.assetName) {
+    query = query.ilike("asset_name", issue.assetName);
+  } else if (issue.category) {
+    query = query.eq("category", issue.category);
+  } else {
+    return [];
+  }
+
+  if (issue.category) {
+    query = query.eq("category", issue.category);
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    console.error("[SMS] Similar work order lookup failed:", error);
+    return [];
+  }
+
+  return data || [];
+}
+
+async function findInventoryMatches(companyId: string, itemName: string) {
+  const needle = itemName.toLowerCase().trim();
+  if (!needle) return [];
+
+  const { data, error } = await supabase
+    .from("parts_inventory")
+    .select("id, name, part_number, location, quantity_on_hand, reorder_point, supplier")
+    .eq("company_id", companyId)
+    .order("quantity_on_hand", { ascending: false })
+    .limit(50);
+
+  if (error || !data) {
+    if (error) console.error("[SMS] Inventory lookup failed:", error);
+    return [];
+  }
+
+  return data
+    .map((item: any) => {
+      const hay = `${item.name || ""} ${item.part_number || ""}`.toLowerCase();
+      let score = 0;
+      if (hay.includes(needle)) score += 6;
+      if (needle.includes((item.part_number || "").toLowerCase())) score += 4;
+      for (const token of needle.split(/\s+/).filter(Boolean)) {
+        if (hay.includes(token)) score += 1;
+      }
+      return { ...item, score };
+    })
+    .filter((item: any) => item.score > 0)
+    .sort((a: any, b: any) => b.score - a.score)
+    .slice(0, 3);
 }
 
 function buildKnowledgeContextFromArticles(articles: any[]): string {
@@ -501,7 +895,13 @@ export async function POST(request: NextRequest) {
   const startTime = Date.now();
   
   try {
-    const formData = await request.formData();
+    const rawBody = await request.text();
+    const formData = new URLSearchParams(rawBody);
+
+    if (!hasValidTwilioSignature(request, formData)) {
+      return new NextResponse("Invalid Twilio signature", { status: 403 });
+    }
+
     const body = formData.get("Body")?.toString()?.trim() || "";
     const rawFrom = formData.get("From")?.toString() || "";
     const incomingChannel: "sms" | "whatsapp" = isWhatsAppMessage(rawFrom) ? "whatsapp" : "sms";
@@ -518,6 +918,17 @@ export async function POST(request: NextRequest) {
     const mediaType = formData.get("MediaContentType0")?.toString();
     
     console.log(`[${incomingChannel.toUpperCase()}] From:`, from, "Body:", body, "NumMedia:", numMedia);
+
+    const { data: onboardingSession } = await supabase
+      .from("onboarding_sessions")
+      .select("step")
+      .eq("phone", from)
+      .single();
+
+    if (body.toUpperCase() === "SETUP" || (onboardingSession && onboardingSession.step < 5)) {
+      const result = await handleSmsOnboarding(from, body, mediaUrl);
+      return twimlResponse(result.message);
+    }
 
     // Check if this is a manager responding to a question
     const { data: pendingQuestion } = await supabase
@@ -751,6 +1162,33 @@ export async function POST(request: NextRequest) {
     const companyRuntimeSettings = await getCompanyRuntimeSettings(worker.company_id);
     const criticalSmsEnabled = companyRuntimeSettings.notification_preferences.sms_on_critical;
 
+    if (shouldTreatAsManagerUpdate(body, company, from)) {
+      try {
+        const applied = await applyManagerSmsUpdate({
+          companyId: worker.company_id,
+          company,
+          message: body,
+        });
+
+        await auditLog({
+          companyId: worker.company_id,
+          action: "manager.sms_update",
+          entityType: "company",
+          entityId: worker.company_id,
+          details: applied,
+        });
+
+        return twimlResponse(
+          truncateForSms(
+            `${applied.summary}${applied.assetsChanged ? ` Added/updated ${applied.assetsChanged} asset${applied.assetsChanged === 1 ? "" : "s"}.` : ""}${applied.teamChanged ? ` Synced ${applied.teamChanged} team member${applied.teamChanged === 1 ? "" : "s"}.` : ""}${applied.knowledgeAdded ? ` Saved ${applied.knowledgeAdded} knowledge entr${applied.knowledgeAdded === 1 ? "y" : "ies"}.` : ""}`
+          )
+        );
+      } catch (error) {
+        console.error("[SMS] Manager update failed:", error);
+        return twimlResponse("Sorry, I couldn't apply that manager update right now. Try again with UPDATE: and a little more detail.");
+      }
+    }
+
     // ============================================
     // TRIAL LIMIT CHECK
     // ============================================
@@ -915,26 +1353,9 @@ export async function POST(request: NextRequest) {
         const audioBuffer = await response.arrayBuffer();
         console.log("[SMS] Audio buffer size:", audioBuffer.byteLength);
         
-        // Use Deepgram which supports AMR format natively
-        console.log("[SMS] Transcribing audio via Deepgram, mediaType:", mediaType);
-        
-        const deepgramResponse = await fetch("https://api.deepgram.com/v1/listen?model=nova-2&smart_format=true", {
-          method: "POST",
-          headers: {
-            "Authorization": `Token ${process.env.DEEPGRAM_API_KEY}`,
-            "Content-Type": mediaType || "audio/amr",
-          },
-          body: Buffer.from(audioBuffer),
-        });
-        
-        if (!deepgramResponse.ok) {
-          const errText = await deepgramResponse.text();
-          console.error("[SMS] Deepgram error:", errText);
-          throw new Error(`Deepgram: ${errText.slice(0, 100)}`);
-        }
-        
-        const deepgramResult = await deepgramResponse.json();
-        const transcribedText = deepgramResult?.results?.channels?.[0]?.alternatives?.[0]?.transcript || "";
+        console.log("[SMS] Transcribing audio, mediaType:", mediaType, "provider:", process.env.DEEPGRAM_API_KEY ? "deepgram" : "openai");
+
+        const transcribedText = await transcribeAudio(Buffer.from(audioBuffer), mediaType);
         console.log("[SMS] Transcribed audio:", transcribedText);
         
         if (!transcribedText || transcribedText.trim().length === 0) {
@@ -978,7 +1399,7 @@ IF YOU DON'T KNOW:
         const lowConfidence = isLowConfidenceAnswer(answer) || bestSimilarity < 40;
         
         // Log the question
-        const { data: questionRecord } = await supabase.from("questions").insert({
+        const { data: questionRecord } = await insertQuestionRecord({
           company_id: worker.company_id,
           worker_phone: from,
           worker_name: worker.name,
@@ -989,7 +1410,7 @@ IF YOU DON'T KNOW:
           manager_notified: false,
           language: detectedLang,
           channel: incomingChannel,
-        }).select().single();
+        });
         
         // Handle low confidence with escalation option
         if (lowConfidence && company?.manager_phone && questionRecord) {
@@ -1006,7 +1427,7 @@ IF YOU DON'T KNOW:
         console.error("[SMS] Audio processing error:", error?.message || error);
         console.error("[SMS] Audio error stack:", error?.stack);
         console.error("[SMS] Audio mediaType was:", mediaType);
-        return twimlResponse(`Audio error: mediaType=${mediaType}, err=${error?.message?.slice(0, 80) || "unknown"}`);
+        return twimlResponse("Sorry, I couldn't process that audio just now. Please try again or send it as text.");
       }
     }
 
@@ -1118,7 +1539,7 @@ IF YOU DON'T KNOW:
             ? "Nice work — I’ve marked that coaching flow complete. Text me if you want another procedure or run into a problem."
             : await translateText("Nice work — I’ve marked that coaching flow complete. Text me if you want another procedure or run into a problem.", detectedLang);
 
-          await supabase.from("questions").insert({
+          await insertQuestionRecord({
             company_id: worker.company_id,
             worker_phone: from,
             worker_name: worker.name,
@@ -1173,7 +1594,7 @@ Rules:
           : (followUpKnowledge.length > 0 ? 70 : 25);
         const followUpLowConfidence = isLowConfidenceAnswer(followUpAnswer) || followUpSimilarity < 45;
 
-        const { data: followUpRecord } = await supabase.from("questions").insert({
+        const { data: followUpRecord } = await insertQuestionRecord({
           company_id: worker.company_id,
           worker_phone: from,
           worker_name: worker.name,
@@ -1185,7 +1606,7 @@ Rules:
           language: detectedLang,
           channel: incomingChannel,
           topic: TRAINING_COACH_FOLLOW_UP_TOPIC,
-        }).select().single();
+        });
 
         if (followUpLowConfidence && company?.manager_phone && followUpRecord) {
           await supabase
@@ -1241,7 +1662,7 @@ Rules:
         : (knowledgeResults.length > 0 ? 70 : 25);
       const coachingLowConfidence = isLowConfidenceAnswer(coachingAnswer) || coachingSimilarity < 45;
 
-      const { data: coachingRecord } = await supabase.from("questions").insert({
+      const { data: coachingRecord } = await insertQuestionRecord({
         company_id: worker.company_id,
         worker_phone: from,
         worker_name: worker.name,
@@ -1253,7 +1674,7 @@ Rules:
         language: detectedLang,
         channel: incomingChannel,
         topic: TRAINING_COACH_TOPIC,
-      }).select().single();
+      });
 
       if (coachingLowConfidence && company?.manager_phone && coachingRecord) {
         await supabase
@@ -1270,9 +1691,40 @@ Rules:
     // ============================================
     // AI TRIAGE (replaces regex issue detection)
     // ============================================
+    const activeWorkOrdersPromise = (async () => {
+      const baseQuery = supabase
+        .from("work_orders")
+        .select("id, short_id, title, status, assigned_to, worker_phone, asset_name, ai_triage, created_at")
+        .eq("company_id", worker.company_id)
+        .in("status", ["open", "assigned", "in_progress", "on_hold"])
+        .order("created_at", { ascending: false })
+        .limit(20);
+
+      const [{ data: reportedWorkOrders }, assignedResult] = await Promise.all([
+        baseQuery.eq("worker_phone", from),
+        worker.id
+          ? supabase
+              .from("work_orders")
+              .select("id, short_id, title, status, assigned_to, worker_phone, asset_name, ai_triage, created_at")
+              .eq("company_id", worker.company_id)
+              .eq("assigned_to", worker.id)
+              .in("status", ["open", "assigned", "in_progress", "on_hold"])
+              .order("created_at", { ascending: false })
+              .limit(20)
+          : Promise.resolve({ data: [] as any[] }),
+      ]);
+
+      const merged = [...(reportedWorkOrders || []), ...((assignedResult as any)?.data || [])];
+      const deduped = Array.from(new Map(merged.map((wo: any) => [wo.id, wo])).values());
+
+      return deduped
+        .sort((a: any, b: any) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
+        .slice(0, 20);
+    })();
+
     const [
       { data: assets },
-      { data: activeWorkOrders },
+      activeWorkOrders,
       { data: categoryRows },
       { data: priorityRows },
     ] = await Promise.all([
@@ -1281,14 +1733,7 @@ Rules:
         .select("id, name, asset_tag")
         .eq("company_id", worker.company_id)
         .limit(200),
-      supabase
-        .from("work_orders")
-        .select("id, short_id, title, status, assigned_to, assigned_to_phone, technician_id, worker_phone, asset_name, ai_triage, created_at")
-        .eq("company_id", worker.company_id)
-        .eq("worker_phone", from)
-        .in("status", ["open", "assigned", "in_progress", "on_hold"])
-        .order("created_at", { ascending: false })
-        .limit(20),
+      activeWorkOrdersPromise,
       supabase
         .from("wo_categories")
         .select("name, color")
@@ -1324,7 +1769,10 @@ Rules:
       if ((worker as any).pending_asset_id) {
         await supabase.from("workers").update({ pending_asset_id: null } as any).eq("phone", from);
       }
-      const targetWo = activeWorkOrders[0];
+      const targetWo = pickTargetWorkOrderForStatusUpdate(activeWorkOrders, worker.id, from);
+      if (!targetWo) {
+        return twimlResponse("I couldn't find the right open work order. Reply with the WO number if you have it.");
+      }
       if (isDirectStart) {
         const { error } = await supabase.from("work_orders")
           .update({ status: "in_progress", started_at: new Date().toISOString() })
@@ -1351,6 +1799,8 @@ Rules:
           console.error("[SMS] Direct COMPLETE update error:", error);
           return twimlResponse("Sorry, couldn't update the work order. Please try again.");
         }
+
+        await finalizeCompletedWorkOrder(targetWo.id);
 
         const criticalIncidentMeta = getCriticalIncidentMeta((targetWo as any).ai_triage || null);
         if (criticalIncidentMeta && criticalSmsEnabled && company?.manager_phone) {
@@ -1397,7 +1847,14 @@ Rules:
             .insert({
               company_id: worker.company_id,
               name: triage.issue.assetName,
-              status: "unverified",
+              asset_tag: `AUTO-${Date.now().toString().slice(-6)}`,
+              type: "equipment",
+              location: "Unassigned",
+              status: "operational",
+              metadata: {
+                learned_via: "sms",
+                draft: true,
+              },
             } as any)
             .select()
             .single();
@@ -1441,7 +1898,15 @@ Rules:
         const assetLocation = parts[1] || null;
         await supabase
           .from("assets")
-          .update({ make: assetType, location: assetLocation, status: "active" } as any)
+          .update({
+            type: assetType || "equipment",
+            location: assetLocation || "Unassigned",
+            status: "operational",
+            metadata: {
+              learned_via: "sms",
+              draft: false,
+            },
+          } as any)
           .eq("id", (worker as any).pending_asset_id);
         await supabase.from("workers").update({ pending_asset_id: null } as any).eq("phone", from);
         return twimlResponse(`Thanks! I've added "${assetType || "the asset"}"${assetLocation ? ` at ${assetLocation}` : ""} to the equipment list.`);
@@ -1451,8 +1916,82 @@ Rules:
     }
 
     // Branch based on messageType
+    if (triage.messageType === "supply_request") {
+      try {
+        const itemName = triage.supplyRequest?.itemName || body.slice(0, 80);
+        const requestedQty = triage.supplyRequest?.quantity || 1;
+        const urgency = triage.supplyRequest?.urgency || "medium";
+        const inventoryMatches = await findInventoryMatches(worker.company_id, itemName);
+        const bestMatch = inventoryMatches[0] || null;
+
+        const stockLine = bestMatch
+          ? `Stock: ${bestMatch.quantity_on_hand} on hand${bestMatch.location ? ` at ${bestMatch.location}` : ""}`
+          : "Stock: no clear inventory match";
+
+        const woTitle = `Supply request: ${itemName}`.slice(0, 120);
+        const { data: supplyWo, error: supplyErr } = await supabase
+          .from("work_orders")
+          .insert({
+            company_id: worker.company_id,
+            asset_id: null,
+            asset_name: null,
+            asset_tag: null,
+            category: "other",
+            priority: urgency,
+            title: woTitle,
+            description: [
+              `Supply request from ${worker.name || from}`,
+              `Requested item: ${itemName}`,
+              `Requested quantity: ${requestedQty}`,
+              triage.supplyRequest?.neededFor ? `Needed for: ${triage.supplyRequest.neededFor}` : null,
+              triage.supplyRequest?.notes ? `Notes: ${triage.supplyRequest.notes}` : null,
+              stockLine,
+            ].filter(Boolean).join("\n"),
+            original_message: body,
+            ai_triage: {
+              type: "supply_request",
+              confidence: triage.confidence,
+              supply_request: triage.supplyRequest || null,
+              inventory_matches: inventoryMatches,
+            },
+            status: "open",
+            reported_by: from,
+            worker_phone: from,
+            source: "sms",
+          } as any)
+          .select("id, short_id")
+          .single();
+
+        if (supplyErr) throw supplyErr;
+
+        if (company?.manager_phone) {
+          const mgrMsg = truncateForSms(
+            `📦 SUPPLY ${supplyWo?.short_id || "REQUEST"}\n${worker.name || from} requested ${requestedQty} × ${itemName}.\n${stockLine}${triage.supplyRequest?.neededFor ? `\nNeeded for: ${triage.supplyRequest.neededFor}` : ""}`
+          );
+          await sendSMS(company.manager_phone, mgrMsg);
+        }
+
+        const workerMsg = truncateForSms(
+          `${triage.workerResponse || `Got it — I logged a supply request for ${requestedQty} × ${itemName}.`} ${supplyWo?.short_id ? `(${supplyWo.short_id})` : ""}\n${stockLine}\nI've alerted ${company?.manager_name || "your manager"}.`
+        );
+        return twimlResponse(workerMsg);
+      } catch (error) {
+        console.error("[SMS] Supply request handling failed:", error);
+        return twimlResponse("Sorry, I couldn't log that supply request right now. Please notify your manager.");
+      }
+    }
+
     if (triage.messageType === "issue_report") {
       try {
+        const similarCompletedWorkOrders = triage.issue
+          ? await findSimilarCompletedWorkOrders(worker.company_id, triage.issue)
+          : [];
+
+        if (triage.issue) {
+          triage.issue.similarPastIssues = similarCompletedWorkOrders.length;
+          triage.issue.isRecurring = similarCompletedWorkOrders.length > 0;
+        }
+
         const criticalIncidentMeta = detectCriticalIncident(body, triage as any);
         const priorityProfile = getPriorityProfile(
           triage.issue?.priority || null,
@@ -1465,6 +2004,17 @@ Rules:
           level: priorityProfile.level,
           sla_hours: priorityProfile.sla_hours,
         };
+        if (similarCompletedWorkOrders.length > 0) {
+          aiTriageExtra.recurring_issue = {
+            similar_past_issues: similarCompletedWorkOrders.length,
+            recent_work_orders: similarCompletedWorkOrders.map((wo: any) => ({
+              id: wo.id,
+              short_id: wo.short_id,
+              title: wo.title,
+              completed_at: wo.completed_at,
+            })),
+          };
+        }
 
         const wo = await createWorkOrderFromTriage(triage as any, worker.company_id, from, {
           originalMessage: body,
@@ -1496,7 +2046,13 @@ Rules:
           assignedToName = (bestTech as any).name || null;
           assignedToPhone = (bestTech as any).phone || null;
 
-          await supabase.from("work_orders").update({ assigned_to_phone: assignedToPhone || null }).eq("id", wo.id);
+          const { error: assignedPhoneError } = await supabase
+            .from("work_orders")
+            .update({ assigned_to_phone: assignedToPhone || null } as any)
+            .eq("id", wo.id);
+          if (assignedPhoneError && assignedPhoneError.code !== "42703") {
+            console.warn("[SMS] assigned_to_phone update warning:", assignedPhoneError?.message || null);
+          }
 
           if (assignedToPhone) {
             const assetName = triage.issue?.assetName || woFull?.asset_name || "(unknown asset)";
@@ -1531,11 +2087,14 @@ Rules:
             }
           } catch { /* cost engine not critical */ }
           const slaLine = priorityProfile ? `\nTarget SLA: ${priorityProfile.sla_hours}h` : "";
+          const recurrenceLine = similarCompletedWorkOrders.length > 0
+            ? `\nRecurring: ${similarCompletedWorkOrders.length} similar completed WO${similarCompletedWorkOrders.length === 1 ? "" : "s"} in last 180d`
+            : "";
 
           const header = criticalIncidentMeta ? `🚨 CRITICAL WO ${woFull?.short_id || wo.id.slice(0, 8)}` : `⚠️ ALERT WO ${woFull?.short_id || wo.id.slice(0, 8)}`;
           const incidentLine = criticalIncidentMeta ? `\nIncident: ${criticalIncidentMeta.kind.replaceAll("_", " ")}` : "";
           const priorityLabel = priorityProfile?.display_label || triage.issue?.priority || "unknown";
-          const mgrMsg = truncateForSms(`${header}\nPriority: ${priorityLabel}\n${triage.issue?.priorityReasoning || ""}${incidentLine}${slaLine}\nAsset: ${assetName}\nFrom: ${worker.name || from}\nAssigned: ${assigned}${costLine}`);
+          const mgrMsg = truncateForSms(`${header}\nPriority: ${priorityLabel}\n${triage.issue?.priorityReasoning || ""}${incidentLine}${slaLine}${recurrenceLine}\nAsset: ${assetName}\nFrom: ${worker.name || from}\nAssigned: ${assigned}${costLine}`);
           await sendSMS(company.manager_phone, mgrMsg);
         }
 
@@ -1558,7 +2117,7 @@ Rules:
       let resolvedWoId = woId;
       let resolvedAction = action;
       if (!resolvedWoId && activeWorkOrders && activeWorkOrders.length > 0) {
-        resolvedWoId = activeWorkOrders[0].id;
+        resolvedWoId = pickTargetWorkOrderForStatusUpdate(activeWorkOrders, worker.id, from)?.id;
       }
       if (!resolvedAction) {
         const upperBody = body.toUpperCase().trim();
@@ -1630,15 +2189,11 @@ Rules:
             priority: "medium",
             category: "other",
             source: "sms",
-            parent_wo_id: resolvedWoId,
+            parent_wo_id: (woFullForUpdate as any)?.id || resolvedWoId,
           } as any);
         }
 
-        // Auto-capture knowledge from completed work order
-        try {
-          const { captureKnowledge } = require("@/lib/knowledge-engine");
-          captureKnowledge(resolvedWoId).catch((err: any) => console.error("[SMS] Knowledge capture error:", err));
-        } catch { /* knowledge engine not critical */ }
+        await finalizeCompletedWorkOrder((woFullForUpdate as any)?.id || resolvedWoId);
 
         const criticalIncidentMeta = getCriticalIncidentMeta((woFullForUpdate as any)?.ai_triage || null);
         if (criticalIncidentMeta && criticalSmsEnabled && company?.manager_phone) {
@@ -1737,7 +2292,7 @@ HOW TO RESPOND:
     const responseTime = Date.now() - startTime;
     const lowConfidence = isLowConfidenceAnswer(answer);
 
-    const { data: questionRecord } = await supabase.from("questions").insert({
+    const { data: questionRecord } = await insertQuestionRecord({
       company_id: worker.company_id,
       worker_phone: from,
       worker_name: worker.name,
@@ -1748,7 +2303,7 @@ HOW TO RESPOND:
       manager_notified: false,
       language: detectedLang,
       channel: incomingChannel,
-    }).select().single();
+    });
 
     if (lowConfidence && company?.manager_phone && questionRecord) {
       await supabase

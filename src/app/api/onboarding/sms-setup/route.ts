@@ -207,18 +207,36 @@ async function completeOnboarding(
   const companyName = (data.company_name as string) || "Your Company";
 
   // Create the company in Supabase
-  const { data: company, error: companyError } = await supabase
+  const primaryCompanyInsert = {
+    name: companyName,
+    industry: data.industry || "Other",
+    access_code: joinCode,
+    manager_phone: phone,
+    worker_count: data.worker_count || 0,
+    default_language: lang || "en",
+  };
+
+  let companyResponse = await supabase
     .from("companies")
-    .insert({
-      name: companyName,
-      industry: data.industry || "Other",
-      join_code: joinCode,
-      manager_phone: phone,
-      worker_count: data.worker_count || 0,
-      default_language: lang || "en",
-    })
+    .insert(primaryCompanyInsert as any)
     .select("id")
     .single();
+
+  if (companyResponse.error?.code === "42703") {
+    companyResponse = await supabase
+      .from("companies")
+      .insert({
+        name: companyName,
+        industry: data.industry || "Other",
+        access_code: joinCode,
+        manager_phone: phone,
+        worker_count: data.worker_count || 0,
+      } as any)
+      .select("id")
+      .single();
+  }
+
+  const { data: company, error: companyError } = companyResponse;
 
   const companyId = company?.id || null;
 
@@ -236,8 +254,8 @@ async function completeOnboarding(
           type: asset.type || "Other",
           manufacturer: asset.manufacturer || null,
           model: asset.model || null,
-          location: asset.location || null,
-          tag: asset.tag || null,
+          location: asset.location || "Unassigned",
+          asset_tag: asset.tag || `ASSET-${Date.now().toString().slice(-6)}`,
         });
       } catch (e) {
         console.error("[sms-setup] Failed to insert asset:", e);
@@ -252,7 +270,7 @@ async function completeOnboarding(
       step: 5,
       completed_at: new Date().toISOString(),
       company_id: companyId,
-      data: { ...data, join_code: joinCode },
+      data: { ...data, access_code: joinCode },
     })
     .eq("phone", phone);
 

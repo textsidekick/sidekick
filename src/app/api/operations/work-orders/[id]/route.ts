@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getWorkOrder, updateWorkOrder, deleteWorkOrder } from "@/lib/operations";
 import type { UpdateWorkOrder } from "@/types/operations";
+import { supabase } from "@/lib/supabase";
+import { captureKnowledge } from "@/lib/knowledge-engine";
+import { handleWorkOrderCompletion } from "@/lib/work-order-manager";
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -28,7 +31,31 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       patch.started_at = new Date().toISOString();
     }
 
+    if (patch.assigned_to) {
+      const { data: assignedWorker } = await supabase
+        .from("workers")
+        .select("phone")
+        .eq("id", patch.assigned_to)
+        .single();
+      patch.assigned_to_phone = assignedWorker?.phone || null;
+      if (!patch.status || patch.status === "open") {
+        patch.status = "assigned";
+      }
+    }
+
+    if (patch.assigned_to === null && patch.status === undefined) {
+      patch.assigned_to_phone = null;
+    }
+
     const wo = await updateWorkOrder(id, patch);
+
+    if (wo.status === "completed") {
+      await Promise.allSettled([
+        handleWorkOrderCompletion(wo.id),
+        captureKnowledge(wo.id),
+      ]);
+    }
+
     return NextResponse.json({ workOrder: wo });
   } catch (error) {
     console.error("[api/operations/work-orders/:id][PATCH]", error);

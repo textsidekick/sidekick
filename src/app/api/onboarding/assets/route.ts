@@ -8,13 +8,13 @@ export async function POST(req: NextRequest) {
 
     const rows = assets
       .filter((a: any) => a.name?.trim())
-      .map((a: any) => ({
+      .map((a: any, index: number) => ({
         company_id: companyId,
         name: a.name.trim(),
-        asset_tag: a.tag?.trim() || null,
-        location: a.location?.trim() || null,
-        make: a.type?.trim() || null,
-        status: "active",
+        asset_tag: a.tag?.trim() || `ONBOARD-${String(index + 1).padStart(2, "0")}`,
+        location: a.location?.trim() || "Unassigned",
+        type: a.type?.trim() || "equipment",
+        status: "operational",
         health_score: 100,
       }));
 

@@ -35,7 +35,7 @@ type WorkOrderDetail = {
   worker_phone?: string | null;
 };
 
-type Technician = { id: string; name: string | null; phone?: string; role?: string };
+type Technician = { id: string; name: string | null; phone?: string; role?: string; skills?: string[]; shift?: string | null };
 type Asset = { id: string; name: string; type?: string; location?: string; health_score?: number };
 
 type AITriage = {
@@ -44,6 +44,17 @@ type AITriage = {
   suspected_cause?: string;
   suggested_parts?: string[];
   confidence?: number;
+  issue?: {
+    category?: string;
+    symptomSummary?: string;
+    rootCauseHypothesis?: string;
+    partsLikelyNeeded?: string[];
+  };
+  manager_corrections?: Array<{
+    at?: string;
+    note?: string | null;
+    changed?: Record<string, unknown>;
+  }>;
 };
 
 function AITriageCard({ triage }: { triage: AITriage | null | undefined }) {
@@ -97,11 +108,17 @@ export default function WorkOrderDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [correcting, setCorrecting] = useState(false);
 
   const [actionAssignTo, setActionAssignTo] = useState<string | "unassigned">("unassigned");
   const [actionPriority, setActionPriority] = useState<WorkOrderPriority>("medium");
   const [actionStatus, setActionStatus] = useState<WorkOrderStatus>("open");
   const [actionNote, setActionNote] = useState("");
+  const [correctionSummary, setCorrectionSummary] = useState("");
+  const [correctionCategory, setCorrectionCategory] = useState("");
+  const [correctionRootCause, setCorrectionRootCause] = useState("");
+  const [correctionParts, setCorrectionParts] = useState("");
+  const [correctionNote, setCorrectionNote] = useState("");
 
   useEffect(() => {
     if (!id) return;
@@ -121,6 +138,11 @@ export default function WorkOrderDetailPage() {
         setActionAssignTo(wo.assigned_to || "unassigned");
         setActionPriority(wo.priority);
         setActionStatus(wo.status);
+        const triage = (wo.ai_triage || {}) as AITriage;
+        setCorrectionSummary(triage.issue?.symptomSummary || wo.title || "");
+        setCorrectionCategory(triage.issue?.category || wo.category || "");
+        setCorrectionRootCause(triage.issue?.rootCauseHypothesis || triage.suspected_cause || "");
+        setCorrectionParts((triage.issue?.partsLikelyNeeded || triage.suggested_parts || []).join(", "));
 
         const requests: Promise<Response>[] = [
           fetch(`/api/team`, { cache: "no-store" }),
@@ -168,6 +190,22 @@ export default function WorkOrderDetailPage() {
     const match = techs.find((tech) => tech.id === techId);
     return match?.name || match?.phone || "Technician";
   };
+
+  const recommendedTech = useMemo(() => {
+    if (!workOrder) return null;
+    const desired = (correctionCategory || workOrder.category || "").toLowerCase();
+    return techs
+      .map((tech) => {
+        const skills = (tech.skills || []).map((skill) => skill.toLowerCase());
+        let score = 0;
+        if (tech.role === "technician") score += 30;
+        if (skills.some((skill) => skill === desired)) score += 45;
+        else if (skills.some((skill) => skill.includes(desired) || desired.includes(skill))) score += 25;
+        if (tech.shift) score += 5;
+        return { tech, score };
+      })
+      .sort((a, b) => b.score - a.score)[0]?.tech || null;
+  }, [correctionCategory, techs, workOrder]);
 
   const threadEvents = useMemo(() => {
     if (!workOrder) return [];
@@ -268,6 +306,37 @@ export default function WorkOrderDetailPage() {
     }
   }
 
+  async function saveCorrection() {
+    if (!workOrder) return;
+    try {
+      setCorrecting(true);
+      setError(null);
+      const res = await fetch(`/api/operations/work-orders/${workOrder.id}/manager-correction`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          note: correctionNote,
+          correction: {
+            summary: correctionSummary,
+            category: correctionCategory,
+            priority: actionPriority,
+            rootCause: correctionRootCause,
+            suggestedParts: correctionParts.split(",").map((part) => part.trim()).filter(Boolean),
+            assigned_to: actionAssignTo === "unassigned" ? null : actionAssignTo,
+          },
+        }),
+      });
+      if (!res.ok) throw new Error(`Correction failed (${res.status})`);
+      const json = await res.json();
+      setWorkOrder(json.workOrder);
+      setCorrectionNote("");
+    } catch (err: any) {
+      setError(err?.message || "Failed to save correction");
+    } finally {
+      setCorrecting(false);
+    }
+  }
+
   if (loading) {
     return <div className="max-w-6xl mx-auto px-6 py-12 text-sm text-black/45">Loading work order…</div>;
   }
@@ -333,9 +402,48 @@ export default function WorkOrderDetailPage() {
 
           <AITriageCard triage={(workOrder.ai_triage || {}) as AITriage} />
 
+          {((workOrder.ai_triage || {}) as AITriage).manager_corrections?.length ? (
+            <div className="rounded-2xl border border-black/5 bg-white p-5">
+              <div className="text-sm font-semibold text-[#1C1A16]">Manager correction history</div>
+              <div className="mt-4 space-y-3">
+                {(((workOrder.ai_triage || {}) as AITriage).manager_corrections || []).slice().reverse().map((entry, index) => (
+                  <div key={`${entry.at || index}`} className="rounded-xl bg-[#F7F3EC] px-4 py-3 text-sm text-black/65">
+                    <div className="text-xs font-semibold uppercase tracking-wide text-black/40">
+                      {entry.at ? new Date(entry.at).toLocaleString() : "Manager correction"}
+                    </div>
+                    {entry.note ? <p className="mt-1 text-sm text-[#1C1A16]">{entry.note}</p> : null}
+                    {entry.changed && Object.keys(entry.changed).length > 0 ? (
+                      <div className="mt-2 text-xs text-black/50">Updated: {Object.keys(entry.changed).join(", ")}</div>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
           <div className="rounded-2xl border border-black/5 bg-white p-5">
             <div className="text-sm font-semibold text-[#1C1A16]">Manager actions</div>
             <p className="mt-1 text-sm text-black/50">Update assignment, priority, and status from one place.</p>
+
+            {recommendedTech && actionAssignTo === "unassigned" ? (
+              <div className="mt-4 rounded-xl border border-[#C96442]/15 bg-[#FFF7F1] p-3 text-sm text-black/65">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="font-medium text-[#1C1A16]">Suggested assignee: {recommendedTech.name || recommendedTech.phone || "Technician"}</div>
+                    <div className="mt-1 text-xs text-black/50">
+                      {recommendedTech.skills?.length ? `Skills: ${recommendedTech.skills.join(", ")}` : "Best available technician based on current team data."}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setActionAssignTo(recommendedTech.id)}
+                    className="rounded-lg border border-[#C96442]/20 bg-white px-3 py-2 text-xs font-medium text-[#1C1A16] hover:bg-[#FFF1E8]"
+                  >
+                    Use suggestion
+                  </button>
+                </div>
+              </div>
+            ) : null}
 
             <div className="mt-5 grid gap-4 md:grid-cols-2">
               <div>
@@ -400,6 +508,42 @@ export default function WorkOrderDetailPage() {
               <Button onClick={saveActions} disabled={saving}>
                 <Save className="mr-1 h-4 w-4" />
                 {saving ? "Saving…" : "Save changes"}
+              </Button>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-black/5 bg-white p-5">
+            <div className="text-sm font-semibold text-[#1C1A16]">Correct Sidekick</div>
+            <p className="mt-1 text-sm text-black/50">Override the AI summary, cause, parts, priority, or assignment so future triage is grounded in the manager decision.</p>
+
+            <div className="mt-5 grid gap-4 md:grid-cols-2">
+              <div>
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-black/35">Corrected summary</div>
+                <textarea value={correctionSummary} onChange={(e) => setCorrectionSummary(e.target.value)} className="min-h-[92px] w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-black/20" />
+              </div>
+              <div>
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-black/35">Corrected category</div>
+                <input value={correctionCategory} onChange={(e) => setCorrectionCategory(e.target.value)} className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-black/20" placeholder="mechanical, electrical, safety..." />
+              </div>
+              <div>
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-black/35">Root cause</div>
+                <textarea value={correctionRootCause} onChange={(e) => setCorrectionRootCause(e.target.value)} className="min-h-[92px] w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-black/20" />
+              </div>
+              <div>
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-black/35">Suggested parts</div>
+                <textarea value={correctionParts} onChange={(e) => setCorrectionParts(e.target.value)} className="min-h-[92px] w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-black/20" placeholder="comma separated" />
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-black/35">Why this correction matters</div>
+              <textarea value={correctionNote} onChange={(e) => setCorrectionNote(e.target.value)} placeholder="What Sidekick got wrong, what the manager decided, or what future triage should notice..." className="min-h-[92px] w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-black/20" />
+            </div>
+
+            <div className="mt-4 flex justify-end">
+              <Button onClick={saveCorrection} disabled={correcting}>
+                <Save className="mr-1 h-4 w-4" />
+                {correcting ? "Saving…" : "Save AI correction"}
               </Button>
             </div>
           </div>

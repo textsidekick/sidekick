@@ -1,6 +1,6 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { supabase } from "@/lib/supabase";
 import type { TriageResult } from "@/lib/ai-triage";
+import { completeTextOpenAIFirst } from "@/lib/sms-ai";
 
 // NOTE: operations types are being added elsewhere (src/types/operations.ts).
 // Define minimal local interfaces for now; consolidate later.
@@ -31,10 +31,6 @@ export interface Worker {
   shift?: string | null;
   is_active?: boolean | null;
 }
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || "placeholder",
-});
 
 function buildStoredAITriage(triage: TriageResult, extra?: Record<string, unknown>) {
   return {
@@ -120,10 +116,6 @@ export async function findBestTechnician(
   category: string,
   assetId?: string
 ): Promise<Worker | null> {
-  void assetId;
-  // Minimal heuristic: pick an active worker with matching skill in their skills array.
-  // TODO: incorporate shift, workload (# assigned open WOs), proximity, role.
-
   const { data: workers, error } = await supabase
     .from("workers")
     .select("*")
@@ -133,16 +125,74 @@ export async function findBestTechnician(
   if (error) throw error;
   if (!workers || workers.length === 0) return null;
 
-  const desired = category.toLowerCase();
+  const list = workers as unknown as Worker[];
+  const desired = (category || "other").toLowerCase();
 
-  // Try to find skill match
-  const list = workers as unknown as Array<Record<string, unknown>>;
-  const skillMatched = list.find((w) => {
-    const skills = (Array.isArray(w.skills) ? w.skills : []) as unknown as string[];
-    return skills.some((s) => s.toLowerCase().includes(desired));
-  });
+  const activeStatuses = ["open", "assigned", "in_progress", "on_hold"];
+  const [openAssignmentsResult, historyResult] = await Promise.all([
+    supabase
+      .from("work_orders")
+      .select("assigned_to")
+      .eq("company_id", companyId)
+      .in("status", activeStatuses),
+    assetId
+      ? supabase
+          .from("work_orders")
+          .select("assigned_to, category, asset_id, completed_at")
+          .eq("company_id", companyId)
+          .eq("asset_id", assetId)
+          .eq("status", "completed")
+          .limit(200)
+      : supabase
+          .from("work_orders")
+          .select("assigned_to, category, asset_id, completed_at")
+          .eq("company_id", companyId)
+          .eq("category", desired)
+          .eq("status", "completed")
+          .limit(200),
+  ]);
 
-  return (skillMatched || list[0]) as unknown as Worker;
+  const openCounts = new Map<string, number>();
+  for (const wo of openAssignmentsResult.data || []) {
+    const key = (wo as any).assigned_to;
+    if (!key) continue;
+    openCounts.set(key, (openCounts.get(key) || 0) + 1);
+  }
+
+  const historyCounts = new Map<string, number>();
+  for (const wo of historyResult.data || []) {
+    const key = (wo as any).assigned_to;
+    if (!key) continue;
+    historyCounts.set(key, (historyCounts.get(key) || 0) + 1);
+  }
+
+  const ranked = list
+    .map((worker) => {
+      const skills = (Array.isArray(worker.skills) ? worker.skills : []) as string[];
+      const openCount = openCounts.get(worker.id) || 0;
+      const historyCount = historyCounts.get(worker.id) || 0;
+
+      let score = 0;
+      if (worker.role === "technician") score += 40;
+      else if (worker.role === "supervisor") score += 15;
+      else if (worker.role === "manager") score -= 30;
+      else score -= 10;
+
+      if (worker.is_active === false) score -= 100;
+
+      const normalizedSkills = skills.map((skill) => skill.toLowerCase());
+      if (normalizedSkills.some((skill) => skill === desired)) score += 45;
+      else if (normalizedSkills.some((skill) => skill.includes(desired) || desired.includes(skill))) score += 28;
+      else if (normalizedSkills.length > 0) score += 6;
+
+      score += Math.min(24, historyCount * 6);
+      score -= openCount * 8;
+
+      return { worker, score };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  return ranked[0]?.worker || null;
 }
 
 export async function updateWorkOrderStatus(
@@ -158,7 +208,7 @@ export async function updateWorkOrderStatus(
 }
 
 export async function generateTroubleshootingGuide(workOrderId: string): Promise<string> {
-  // Pull WO + basic asset context; then ask Claude to generate a short guide.
+  // Pull WO + basic asset context; then generate a short guide.
   const { data: wo, error } = await supabase
     .from("work_orders")
     .select("id, title, description, asset_id, asset_name, asset_tag, category, priority")
@@ -176,14 +226,12 @@ Return plain text (no markdown).`;
 
   const prompt = `Work order context:\n${JSON.stringify(wo, null, 2)}\n\nGenerate the guide.`;
 
-  const resp = await anthropic.messages.create({
-    model: "claude-sonnet-4-5",
-    max_tokens: 500,
+  const text = await completeTextOpenAIFirst({
+    openaiModel: process.env.OPENAI_SMS_MODEL || "gpt-4.1",
+    maxTokens: 500,
     system,
-    messages: [{ role: "user", content: prompt }],
+    user: prompt,
   });
-
-  const text = resp.content[0]?.type === "text" ? resp.content[0].text : "";
   return text.trim();
 }
 

@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
 import { supabase } from "@/lib/supabase";
 import { getCompanyId } from "@/lib/dashboard-auth";
 import { normalizePhoneNumber } from "@/lib/phone";
 import { auditLog } from "@/lib/audit";
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+import { completeJsonOpenAIFirst } from "@/lib/sms-ai";
 
 const SYSTEM_PROMPT = `You are Sidekick's manager update parser.
 Turn a manager's freeform update into structured operational changes.
@@ -34,7 +32,9 @@ Schema:
     {
       "name": "optional",
       "phone": "optional",
-      "role": "operator|technician|supervisor|manager"
+      "role": "operator|technician|supervisor|manager",
+      "skills": ["optional", "skills"],
+      "shift": "optional"
     }
   ],
   "knowledge": [
@@ -77,6 +77,8 @@ type ParsedUpdate = {
     name?: string;
     phone?: string;
     role?: string;
+    skills?: string[];
+    shift?: string;
   }>;
   knowledge?: Array<{
     title?: string;
@@ -93,6 +95,16 @@ function cleanString(value: unknown): string | null {
   if (typeof value !== "string") return null;
   const trimmed = value.trim();
   return trimmed.length ? trimmed : null;
+}
+
+async function companyUpdatesTableAvailable(): Promise<boolean> {
+  const probe = await supabase.from("company_updates").select("id").limit(1);
+  return !probe.error;
+}
+
+async function knowledgeMetadataAvailable(): Promise<boolean> {
+  const probe = await supabase.from("knowledge_articles").select("id,metadata").limit(1);
+  return !probe.error;
 }
 
 function safeJsonParse(text: string): ParsedUpdate | null {
@@ -141,6 +153,10 @@ export async function GET(req: NextRequest) {
   const companyId = await getCompanyId(req);
   if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  if (!(await companyUpdatesTableAvailable())) {
+    return NextResponse.json({ updates: [] });
+  }
+
   const { data, error } = await supabase
     .from("company_updates")
     .select("id,message,assistant_response,summary,applied_changes,created_at")
@@ -156,10 +172,10 @@ export async function POST(req: NextRequest) {
   const companyId = await getCompanyId(req);
   if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const preflight = await supabase.from("company_updates").select("id").limit(1);
-  if (preflight.error) {
-    return NextResponse.json({ error: preflight.error.message }, { status: 500 });
-  }
+  const [historyAvailable, supportsKnowledgeMetadata] = await Promise.all([
+    companyUpdatesTableAvailable(),
+    knowledgeMetadataAvailable(),
+  ]);
 
   let body: { message?: string };
   try {
@@ -181,19 +197,13 @@ export async function POST(req: NextRequest) {
 
   let parsed: ParsedUpdate | null = null;
   try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4.1",
-      temperature: 0.1,
-      max_tokens: 900,
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        {
-          role: "user",
-          content: `Current company context:\n${JSON.stringify(company || {}, null, 2)}\n\nManager update:\n${message}`,
-        },
-      ],
+    const response = await completeJsonOpenAIFirst({
+      system: SYSTEM_PROMPT,
+      user: `Current company context:\n${JSON.stringify(company || {}, null, 2)}\n\nManager update:\n${message}`,
+      maxTokens: 900,
+      openaiModel: process.env.OPENAI_SMS_MODEL || "gpt-4.1",
     });
-    parsed = safeJsonParse(response.choices[0]?.message?.content || "");
+    parsed = safeJsonParse(response || "");
   } catch (error) {
     console.error("[company-updates][parse]", error);
   }
@@ -281,7 +291,7 @@ export async function POST(req: NextRequest) {
       type: payload.type,
       location: payload.location,
       notes: payload.notes,
-      status: "active",
+      status: "operational",
       health_score: 100,
       metadata: payload.metadata,
     };
@@ -303,6 +313,10 @@ export async function POST(req: NextRequest) {
         name: cleanString(member.name),
         phone,
         role: cleanString(member.role) || "operator",
+        skills: Array.isArray(member.skills)
+          ? member.skills.map((skill) => cleanString(skill)).filter(Boolean)
+          : [],
+        shift: cleanString(member.shift),
         verified: true,
       };
     })
@@ -326,7 +340,7 @@ export async function POST(req: NextRequest) {
       ? rawKnowledge.tags.map((tag) => cleanString(tag)).filter(Boolean)
       : [];
 
-    const { error } = await supabase.from("knowledge_articles").insert({
+    const knowledgeInsert: Record<string, unknown> = {
       company_id: companyId,
       title,
       problem: cleanString(rawKnowledge.problem) || title,
@@ -335,13 +349,18 @@ export async function POST(req: NextRequest) {
       equipment_type: cleanString(rawKnowledge.equipment_type),
       parts_used: [],
       tags,
-      metadata: {
+    };
+
+    if (supportsKnowledgeMetadata) {
+      knowledgeInsert.metadata = {
         source: "updates_chat",
         review_status: "verified",
         verified_by: cleanString(parsed.company?.manager_name) || company?.manager_name || "Manager",
         verified_at: now,
-      },
-    } as any);
+      };
+    }
+
+    const { error } = await supabase.from("knowledge_articles").insert(knowledgeInsert as any);
 
     if (!error) changes.knowledgeAdded = Number(changes.knowledgeAdded) + 1;
   }
@@ -358,25 +377,38 @@ export async function POST(req: NextRequest) {
     applied_changes: changes,
   };
 
-  const { data: update, error: updateError } = await supabase
-    .from("company_updates")
-    .insert(updateInsert)
-    .select("id,message,assistant_response,summary,applied_changes,created_at")
-    .single();
+  let update: {
+    id?: string;
+    message?: string;
+    assistant_response?: string;
+    summary?: string | null;
+    applied_changes?: Record<string, unknown>;
+    created_at?: string;
+  } | null = null;
 
-  if (updateError) {
-    console.error("[company-updates][insert]", updateError);
-    return NextResponse.json({ error: updateError.message }, { status: 500 });
+  if (historyAvailable) {
+    const { data: insertedUpdate, error: updateError } = await supabase
+      .from("company_updates")
+      .insert(updateInsert)
+      .select("id,message,assistant_response,summary,applied_changes,created_at")
+      .single();
+
+    if (updateError) {
+      console.error("[company-updates][insert]", updateError);
+    } else {
+      update = insertedUpdate as typeof update;
+    }
   }
 
   await auditLog({
     companyId,
     action: "company.update_submitted",
     entityType: "company_update",
-    entityId: update.id,
+    entityId: update?.id || null,
     details: {
       responseTimeMs: Date.now() - startedAt,
       changes,
+      historyAvailable,
     },
   });
 

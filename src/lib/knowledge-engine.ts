@@ -1,7 +1,5 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { supabase } from "@/lib/supabase";
-
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || "placeholder" });
+import { completeJsonOpenAIFirst } from "@/lib/sms-ai";
 
 // ============================================
 // Auto-capture knowledge from completed work orders
@@ -31,13 +29,10 @@ export async function captureKnowledge(workOrderId: string): Promise<string | nu
     asset = a;
   }
 
-  // Use Claude to generate a clean knowledge article
-  const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-5",
-    max_tokens: 600,
-    messages: [{
-      role: "user",
-      content: `Generate a reusable knowledge article from this completed work order. This article will help future technicians solve similar problems.
+  // Use OpenAI first, Anthropic fallback via the shared SMS AI helper.
+  const text = await completeJsonOpenAIFirst({
+    maxTokens: 600,
+    user: `Generate a reusable knowledge article from this completed work order. This article will help future technicians solve similar problems.
 
 Work Order:
 - Title: ${wo.title}
@@ -61,10 +56,7 @@ Return JSON:
 }
 
 JSON only.`,
-    }],
   });
-
-  const text = response.content[0].type === "text" ? response.content[0].text : "";
   let article: any = {};
 
   try {

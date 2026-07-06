@@ -7,6 +7,11 @@ import { auditLog } from "@/lib/audit";
  * POST — perform review actions: verify, reject, snooze, edit_verify
  */
 
+async function knowledgeMetadataAvailable() {
+  const probe = await supabase.from("knowledge_articles").select("id,metadata").limit(1);
+  return !probe.error;
+}
+
 export async function GET(request: NextRequest) {
   const companyId = request.nextUrl.searchParams.get("companyId");
   if (!companyId) {
@@ -20,6 +25,8 @@ export async function GET(request: NextRequest) {
 }
 
 async function fetchReviewQueue(companyId: string) {
+  const schemaReady = await knowledgeMetadataAvailable();
+
   // Fetch articles that need review — those with source_work_order_id and not yet verified
   const { data: articles, error } = await supabase
     .from("knowledge_articles")
@@ -44,10 +51,14 @@ async function fetchReviewQueue(companyId: string) {
     return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
   });
 
-  return NextResponse.json({ items: pending });
+  return NextResponse.json({ items: pending, schemaReady });
 }
 
 export async function POST(request: NextRequest) {
+  if (!(await knowledgeMetadataAvailable())) {
+    return NextResponse.json({ error: "knowledge review schema is not applied yet" }, { status: 503 });
+  }
+
   const body = await request.json();
   const { articleId, action, reason, snoozeDuration, edits, reviewerName, companyId } = body;
 

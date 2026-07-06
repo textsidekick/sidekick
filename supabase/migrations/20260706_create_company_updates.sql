@@ -1,6 +1,6 @@
 create table if not exists public.company_updates (
   id uuid primary key default gen_random_uuid(),
-  company_id uuid not null references public.companies(id) on delete cascade,
+  company_id text not null,
   author_name text,
   source text not null default 'dashboard',
   message text not null,

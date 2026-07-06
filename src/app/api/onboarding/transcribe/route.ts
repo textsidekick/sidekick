@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import OpenAI from "openai";
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,40 +12,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No audio provided" }, { status: 400 });
     }
 
-    const apiKey = process.env.DEEPGRAM_API_KEY;
-    if (!apiKey || apiKey === "placeholder") {
-      return NextResponse.json(
-        { error: "Transcription service not configured" },
-        { status: 500 }
-      );
-    }
+    const transcription = await openai.audio.transcriptions.create({
+      file: audio,
+      model: "whisper-1",
+    });
 
-    // Send to Deepgram for transcription
-    const buffer = Buffer.from(await audio.arrayBuffer());
-
-    const response = await fetch(
-      "https://api.deepgram.com/v1/listen?model=nova-2&smart_format=true",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Token ${apiKey}`,
-          "Content-Type": audio.type || "audio/webm",
-        },
-        body: buffer,
-      }
-    );
-
-    if (!response.ok) {
-      console.error("[Transcribe] Deepgram error:", response.status);
-      return NextResponse.json(
-        { error: "Transcription failed" },
-        { status: 500 }
-      );
-    }
-
-    const result = await response.json();
-    const text =
-      result.results?.channels?.[0]?.alternatives?.[0]?.transcript || "";
+    const text = transcription.text || "";
 
     return NextResponse.json({ text });
   } catch (error) {

@@ -1,4 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { completeJsonOpenAIFirst } from "@/lib/sms-ai";
 
 // NOTE: operations types are being added elsewhere (src/types/operations.ts).
 // For now we define minimal shapes locally and should consolidate later.
@@ -32,8 +32,6 @@ export interface WorkOrder {
   id: string;
   status?: string | null;
   assigned_to?: string | null;
-  assigned_to_phone?: string | null;
-  technician_id?: string | null;
   worker_phone?: string | null;
   created_at?: string;
 }
@@ -41,6 +39,7 @@ export interface WorkOrder {
 export type TriageResult = {
   messageType:
     | "issue_report"
+    | "supply_request"
     | "question"
     | "status_update"
     | "pm_result"
@@ -76,6 +75,14 @@ export type TriageResult = {
     partsUsed: string[];
   };
 
+  supplyRequest?: {
+    itemName: string | null;
+    quantity: number | null;
+    urgency: "critical" | "high" | "medium" | "low";
+    neededFor: string | null;
+    notes: string | null;
+  };
+
   workerResponse: string;
 
   escalate: boolean;
@@ -83,10 +90,6 @@ export type TriageResult = {
 
   confidence: number;
 };
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || "placeholder",
-});
 
 function safeJsonParse(text: string): unknown | null {
   try {
@@ -190,8 +193,7 @@ export async function triageIncomingMessage(params: {
   const workOrdersForPrompt = (activeWorkOrders || []).slice(0, 20).map((wo) => ({
     id: wo.id,
     status: wo.status,
-    assignedTo: wo.technician_id || wo.assigned_to || null,
-    assignedToPhone: wo.assigned_to_phone || null,
+    assignedTo: wo.assigned_to || null,
     workerPhone: wo.worker_phone || null,
     createdAt: wo.created_at || null,
   }));
@@ -201,8 +203,9 @@ export async function triageIncomingMessage(params: {
 GOALS (in order):
 1) Classify the messageType.
 2) If issue_report: produce a full issue triage that can directly create a work order.
-3) If work_order_update: parse the action and associate to a work order if referenced; if none referenced, set workOrderId=null but still infer action.
-4) Produce a short SMS-friendly workerResponse (<=480 characters), in the SAME LANGUAGE as the worker.
+3) If supply_request: extract the requested item/quantity/urgency and a short workerResponse.
+4) If work_order_update: parse the action and associate to a work order if referenced; if none referenced, set workOrderId=null but still infer action.
+5) Produce a short SMS-friendly workerResponse (<=480 characters), in the SAME LANGUAGE as the worker.
 
 CONSTRAINTS:
 - Return ONLY valid JSON matching the required schema.
@@ -211,6 +214,7 @@ CONSTRAINTS:
 - If the message implies immediate danger (smoke, fire, injury, sparking, gas leak, chemical spill, energized electrical exposure), set priority=critical, escalate=true, include safetyWarnings.
 - If message is just "start"/"started"/"on it" => work_order_update action=start.
 - If message is "done"/"fixed"/"completed" => work_order_update action=complete.
+- If a worker is asking for parts, consumables, replacements, stock, re-order, or materials, prefer supply_request over question.
 - If uncertain between issue_report and question, prefer issue_report when there is a problem symptom.
 - priority must always be one of: critical, high, medium, low.
 
@@ -234,8 +238,9 @@ WORK ORDER CONTEXT:
 
 OUTPUT JSON SCHEMA:
 {
-  "messageType": "issue_report"|"question"|"status_update"|"pm_result"|"work_order_update"|"checklist_response"|"general",
+  "messageType": "issue_report"|"supply_request"|"question"|"status_update"|"pm_result"|"work_order_update"|"checklist_response"|"general",
   "issue": { ... } (only when messageType=="issue_report"),
+  "supplyRequest": { ... } (only when messageType=="supply_request"),
   "workOrderUpdate": { ... } (only when messageType=="work_order_update"),
   "workerResponse": string,
   "escalate": boolean,
@@ -257,15 +262,12 @@ OUTPUT JSON SCHEMA:
   let modelText = "";
 
   try {
-    const resp = await anthropic.messages.create({
-      // Use Haiku for speed; fallback would be handled by caller if needed.
-      model: "claude-sonnet-4-5",
-      max_tokens: 900,
+    modelText = await completeJsonOpenAIFirst({
+      openaiModel: process.env.OPENAI_SMS_TRIAGE_MODEL || "gpt-4.1",
+      maxTokens: 900,
       system,
-      messages: [{ role: "user", content: JSON.stringify(userPayload) }],
+      user: JSON.stringify(userPayload),
     });
-
-    modelText = resp.content[0]?.type === "text" ? resp.content[0].text : "";
   } catch {
     // Conservative fallback that won't break the SMS flow.
     return {
@@ -296,6 +298,7 @@ OUTPUT JSON SCHEMA:
   const result: TriageResult = {
     messageType: parsed.messageType,
     issue: parsed.issue,
+    supplyRequest: parsed.supplyRequest,
     workOrderUpdate: parsed.workOrderUpdate,
     workerResponse: ensureSmsLength(parsed.workerResponse || ""),
     escalate: Boolean(parsed.escalate),
@@ -332,7 +335,6 @@ OUTPUT JSON SCHEMA:
     // If model didn't pick workOrderId, try to map to most recent active WO for this worker.
     if (!result.workOrderUpdate.workOrderId && activeWorkOrders && activeWorkOrders.length > 0) {
       const recent = [...activeWorkOrders]
-        .filter((wo) => (wo.worker_phone || "") === workerPhone || (wo.assigned_to_phone || "") === workerPhone)
         .sort((a, b) => (new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()))[0]
         || activeWorkOrders[0]; // fallback to most recent WO for this company/worker
       if (recent) result.workOrderUpdate.workOrderId = recent.id;
