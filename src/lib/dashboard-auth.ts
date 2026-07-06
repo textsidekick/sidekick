@@ -21,14 +21,7 @@ export async function getCompanyId(request: NextRequest): Promise<string | null>
     return null;
   }
 
-  // Step 2: If a companyId query param is provided, verify the session owns it.
-  // For now, sessions are single-company, so just return the session's company.
-  // The query param is accepted only if it matches the session's company.
-  const paramCompanyId = request.nextUrl.searchParams.get("companyId");
-  if (paramCompanyId && paramCompanyId !== session.company_id) {
-    // The session doesn't own this company — deny.
-    return null;
-  }
-
+  // Always return the session's company. Ignore companyId query param
+  // if it doesn't match — the session is the source of truth.
   return session.company_id;
 }
