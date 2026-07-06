@@ -444,14 +444,22 @@ export default function OnboardingChat() {
     return (
       <div style={{ minHeight: "100vh", background: "#F7F3EC", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
         <div style={{ background: "white", borderRadius: 16, border: "1px solid rgba(239,68,68,0.2)", padding: 32, textAlign: "center", maxWidth: 480 }}>
-          <h2 style={{ color: "#ef4444", marginBottom: 8, fontSize: 20, fontWeight: 600 }}>Oops! Something went wrong</h2>
-          <p style={{ color: "#6b7280", marginBottom: 24, fontSize: 14 }}>{completionError}</p>
-          <button
-            onClick={() => { setCompletionError(null); setIsComplete(false); }}
-            style={{ background: "#C96442", color: "white", padding: "12px 24px", borderRadius: 10, border: "none", cursor: "pointer", fontWeight: 600, fontSize: 14 }}
-          >
-            Try Again
-          </button>
+          <h2 style={{ color: "#C96442", marginBottom: 8, fontSize: 20, fontWeight: 600 }}>Almost there!</h2>
+          <p style={{ color: "#6b7280", marginBottom: 24, fontSize: 14 }}>We had trouble finishing setup. You can try again or go straight to the dashboard.</p>
+          <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+            <button
+              onClick={() => { setCompletionError(null); setIsComplete(false); }}
+              style={{ background: "white", color: "#1C1A16", padding: "12px 24px", borderRadius: 10, border: "1px solid rgba(28,26,22,0.15)", cursor: "pointer", fontWeight: 600, fontSize: 14 }}
+            >
+              Try Again
+            </button>
+            <button
+              onClick={() => { window.location.href = "/today"; }}
+              style={{ background: "#C96442", color: "white", padding: "12px 24px", borderRadius: 10, border: "none", cursor: "pointer", fontWeight: 600, fontSize: 14 }}
+            >
+              Go to Dashboard
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -658,14 +666,14 @@ export default function OnboardingChat() {
                       <button
                         key={si}
                         onClick={() => handleSuggestionClick(s)}
-                        disabled={loading || isComplete || !isLastAssistant}
+                        disabled={loading || isComplete}
                         style={{
                           padding: '8px 16px', borderRadius: 20,
                           border: '1.5px solid rgba(201,100,66,0.35)',
                           background: 'rgba(201,100,66,0.06)',
                           color: '#C96442', fontSize: 14, fontWeight: 500,
-                          cursor: loading || isComplete || !isLastAssistant ? 'default' : 'pointer',
-                          opacity: !isLastAssistant ? 0.5 : 1,
+                          cursor: loading || isComplete ? 'default' : 'pointer',
+                          opacity: loading || isComplete ? 0.5 : 1,
                           transition: 'all 0.15s',
                         }}
                         onMouseEnter={e => { if (isLastAssistant && !loading && !isComplete) { (e.target as HTMLButtonElement).style.background = 'rgba(201,100,66,0.15)'; } }}
@@ -740,6 +748,20 @@ export default function OnboardingChat() {
               >
                 <LinkIcon size={14} /> Connect sources
               </button>
+              {messages.length >= 2 && !isComplete && (
+                <button
+                  onClick={() => { setIsComplete(true); handleCompleteInterview(messages); }}
+                  disabled={loading}
+                  style={{
+                    display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 16px", borderRadius: 999,
+                    border: "1px solid rgba(201,100,66,0.3)", background: "rgba(201,100,66,0.08)", color: "#C96442",
+                    fontSize: 13, fontWeight: 600, cursor: loading ? "default" : "pointer",
+                    opacity: loading ? 0.6 : 1, marginLeft: "auto",
+                  }}
+                >
+                  <CheckCircle2 size={14} /> Finish Setup
+                </button>
+              )}
             </div>
 
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>

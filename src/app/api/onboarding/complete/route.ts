@@ -119,13 +119,12 @@ Return ONLY valid JSON, no markdown. Include all fields that have data.`;
       );
     }
 
-    // Validate required field
+    // Fall back to a default company name if extraction missed it
     if (!extractedData.companyName) {
-      console.error("[Complete] No company name in extraction");
-      return NextResponse.json(
-        { error: "Could not extract company name from conversation" },
-        { status: 400 }
-      );
+      // Try to find a company name in the raw messages
+      const userMessages = messages.filter((m: any) => m.role === "user").map((m: any) => m.content);
+      extractedData.companyName = userMessages.find((m: string) => m.length > 1 && m.length < 60 && !m.match(/^(yes|no|hi|hello|hey|ok|sure|\d+)$/i)) || "My Company";
+      console.warn("[Complete] No company name from AI, using fallback:", extractedData.companyName);
     }
 
     // Generate access code based on company name
