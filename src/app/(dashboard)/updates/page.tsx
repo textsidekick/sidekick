@@ -14,10 +14,6 @@ import {
   X,
   MessageSquare,
   Send,
-  Building2,
-  Wrench,
-  Users,
-  BookOpen,
   Sparkles,
   Smartphone,
 } from "lucide-react";
@@ -38,31 +34,11 @@ type UpdateRecord = {
   created_at: string;
 };
 
-const UPDATE_CAPABILITIES = [
-  {
-    key: "company",
-    icon: Building2,
-    title: "Company details",
-    description: "Manager contact, industry, and high-level org context.",
-  },
-  {
-    key: "team",
-    icon: Users,
-    title: "Team changes",
-    description: "New hires, supervisors, technician contacts, and role changes.",
-  },
-  {
-    key: "assets",
-    icon: Wrench,
-    title: "Assets",
-    description: "New machines, location moves, and equipment notes.",
-  },
-  {
-    key: "knowledge",
-    icon: BookOpen,
-    title: "Knowledge",
-    description: "Reusable SOPs, troubleshooting notes, and tribal knowledge.",
-  },
+const UPDATE_EXAMPLES = [
+  "Company details: manager contact, industry, and high-level org context.",
+  "Team changes: new hires, supervisors, technician contacts, and role changes.",
+  "Assets: new machines, location moves, and equipment notes.",
+  "Knowledge: reusable SOPs, troubleshooting notes, and tribal knowledge.",
 ] as const;
 
 function formatRelative(dateStr: string) {
@@ -324,7 +300,7 @@ export default function UpdatesPage() {
         <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
           <div className="flex items-start gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F7F3EC]">
-              <MessageSquare className="h-5 w-5 text-[#C96442]" />
+              <MessageSquare className="h-5 w-5 text-gray-500" />
             </div>
             <div>
               <h2 className="text-base font-semibold text-gray-900">Tell Sidekick what changed</h2>
@@ -332,30 +308,18 @@ export default function UpdatesPage() {
             </div>
           </div>
 
-          <div className="mt-4 rounded-xl border border-[#F0E5DC] bg-[#FBF7F1] px-4 py-4">
-            <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white">
-                <Smartphone className="h-5 w-5 text-[#C96442]" />
-              </div>
-              <div>
-                <div className="text-sm font-semibold text-gray-900">You can also text the Sidekick phone number from your phone to provide company updates.</div>
-                <div className="mt-1 text-sm text-gray-500">That’s still the fastest way to capture quick fixes, tribal knowledge, and SOP notes while the work is fresh.</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            {UPDATE_CAPABILITIES.map(({ key, icon: Icon, title, description }) => (
-              <div key={key} className="rounded-xl border border-gray-200 bg-white p-4">
-                <div className="flex items-start gap-3">
-                  <Icon className="mt-0.5 h-5 w-5 text-[#C96442]" />
-                  <div>
-                    <div className="text-sm font-semibold text-gray-900">{title}</div>
-                    <div className="mt-1 text-sm text-gray-500">{description}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+            <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">Examples</div>
+            <ul className="mt-2 space-y-2 text-sm text-gray-600">
+              {UPDATE_EXAMPLES.map((example) => {
+                const [label, detail] = example.split(": ");
+                return (
+                  <li key={label}>
+                    <span className="font-medium text-gray-900">{label}:</span> {detail}
+                  </li>
+                );
+              })}
+            </ul>
           </div>
 
           <div className="mt-4">
@@ -366,6 +330,17 @@ export default function UpdatesPage() {
               className="min-h-[150px] w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 focus:border-[#C96442] focus:outline-none focus:ring-2 focus:ring-[#C96442]/20"
             />
             {error && <div className="mt-2 text-sm text-red-600">{error}</div>}
+            <div className="mt-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+              <div className="flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white">
+                  <Smartphone className="h-4 w-4 text-gray-500" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-gray-900">You can also text the Sidekick phone number from your phone to provide company updates.</div>
+                  <div className="mt-1 text-sm text-gray-500">That’s still the fastest way to capture quick fixes, tribal knowledge, and SOP notes while the work is fresh.</div>
+                </div>
+              </div>
+            </div>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               <VoiceInline companyId={companyId} />
               <UploadInline companyId={companyId} />

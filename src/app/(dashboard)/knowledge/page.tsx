@@ -20,6 +20,7 @@ import {
   XCircle,
 } from "lucide-react";
 import GeneratedReports from "@/components/dashboard/documents/GeneratedReports";
+import KnowledgeBaseViewer from "@/components/dashboard/documents/KnowledgeBaseViewer";
 import { cn } from "@/lib/utils";
 
 interface KnowledgeArticle {
@@ -578,14 +579,15 @@ export default function KnowledgePage() {
         <summary className="cursor-pointer list-none px-5 py-4 text-sm font-medium text-gray-900 [&::-webkit-details-marker]:hidden">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <div>Reports</div>
-              <div className="mt-1 text-sm font-normal text-gray-500">Generate knowledge reports without cluttering the main library view.</div>
+              <div>Reports & knowledge base</div>
+              <div className="mt-1 text-sm font-normal text-gray-500">Generate reports or inspect the imported knowledge base without cluttering the main library view.</div>
             </div>
             <ChevronDown className="h-5 w-5 text-gray-400" />
           </div>
         </summary>
-        <div className="border-t border-gray-100 px-5 py-5">
+        <div className="space-y-5 border-t border-gray-100 px-5 py-5">
           <GeneratedReports companyId={companyId} />
+          <KnowledgeBaseViewer companyId={companyId} />
         </div>
       </details>
 
