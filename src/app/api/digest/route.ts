@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { sendDigestEmail } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,10 +41,12 @@ export async function POST(request: NextRequest) {
       generatedAt: new Date().toISOString(),
     };
 
-    // If email provided, send the digest (would use Resend in production)
+    // Send email digest via Resend
     if (email) {
-      // TODO: Send email via Resend
-      digest.emailSent = true;
+      const company = await supabase.from("companies").select("name").eq("id", companyId).single();
+      const result = await sendDigestEmail(email, { ...digest, companyName: company.data?.name });
+      digest.emailSent = result.sent;
+      if (!result.sent) digest.emailError = result.reason;
     }
 
     return NextResponse.json(digest);
