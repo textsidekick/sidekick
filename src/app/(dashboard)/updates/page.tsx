@@ -8,12 +8,10 @@ import {
   Upload,
   Mic,
   MicOff,
-  Smartphone,
   FileText,
   Loader2,
   CheckCircle2,
   X,
-  Plus,
   MessageSquare,
   Send,
   Building2,
@@ -21,9 +19,8 @@ import {
   Users,
   BookOpen,
   Sparkles,
+  Smartphone,
 } from "lucide-react";
-
-type CaptureTab = "text" | "voice" | "upload";
 
 type UpdateRecord = {
   id: string;
@@ -79,29 +76,7 @@ function formatRelative(dateStr: string) {
   return `${days}d ago`;
 }
 
-function TextSidekickCard() {
-  return (
-    <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="flex items-start gap-3">
-        <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-[#F7F3EC]">
-          <Smartphone className="h-5 w-5 text-gray-700" />
-        </div>
-        <div>
-          <div className="text-sm font-semibold text-gray-900">Text Sidekick from the floor</div>
-          <div className="text-xs text-gray-500">Fastest way to capture quick fixes, tribal knowledge, and SOP notes while the work is still fresh.</div>
-        </div>
-      </div>
-
-      <div className="rounded-xl border border-[#F0E5DC] bg-[#FBF7F1] px-4 py-4">
-        <div className="text-xs font-medium uppercase tracking-wide text-gray-400">Example</div>
-        <div className="mt-1 text-sm font-medium leading-snug text-gray-800">“Packaging line reset is hold start + green button for 3 seconds.”</div>
-        <div className="mt-2 text-sm text-gray-500">Use the same Sidekick number your crew already texts.</div>
-      </div>
-    </div>
-  );
-}
-
-function UploadCard({ companyId }: { companyId: string }) {
+function UploadInline({ companyId }: { companyId: string }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState<{ ok: boolean; name?: string; error?: string } | null>(null);
@@ -126,62 +101,42 @@ function UploadCard({ companyId }: { companyId: string }) {
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[#F7F3EC]">
-            <Upload className="h-5 w-5 text-gray-700" />
-          </div>
-          <div>
-            <div className="text-sm font-semibold text-gray-900">Upload documents</div>
-            <div className="text-xs text-gray-500">PDFs, manuals, SOPs, checklists</div>
-          </div>
+      <input
+        ref={fileRef}
+        type="file"
+        accept=".pdf,.txt,.md,.doc,.docx"
+        className="hidden"
+        onChange={(e) => {
+          if (e.target.files?.[0]) handleFile(e.target.files[0]);
+        }}
+      />
+
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <div className="text-sm font-semibold text-gray-900">Manual upload</div>
+          <div className="mt-1 text-sm text-gray-500">Upload PDFs, manuals, SOPs, or checklists.</div>
         </div>
-
-        <input
-          ref={fileRef}
-          type="file"
-          accept=".pdf,.txt,.md,.doc,.docx"
-          className="hidden"
-          onChange={(e) => {
-            if (e.target.files?.[0]) handleFile(e.target.files[0]);
-          }}
-        />
-
         <button
           onClick={() => fileRef.current?.click()}
           disabled={uploading}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-gray-300 px-4 py-2.5 text-sm text-gray-600 transition-colors hover:border-[#C96442]/40 hover:bg-[#FBF7F1] disabled:opacity-50 sm:w-auto"
+          className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 hover:border-[#C96442]/40 hover:bg-[#FBF7F1] disabled:opacity-50"
         >
-          {uploading ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" /> Uploading…
-            </>
-          ) : (
-            <>
-              <Plus className="h-4 w-4" /> Choose file
-            </>
-          )}
+          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+          {uploading ? "Uploading…" : "Choose file"}
         </button>
       </div>
 
       {result && (
         <div className={cn("mt-3 flex items-center gap-2 rounded-lg px-3 py-2 text-xs", result.ok ? "bg-green-50 text-gray-700" : "bg-red-50 text-gray-700")}>
-          {result.ok ? (
-            <>
-              <CheckCircle2 className="h-3.5 w-3.5" /> Uploaded {result.name}
-            </>
-          ) : (
-            <>
-              <X className="h-3.5 w-3.5" /> {result.error}
-            </>
-          )}
+          {result.ok ? <CheckCircle2 className="h-3.5 w-3.5" /> : <X className="h-3.5 w-3.5" />}
+          {result.ok ? `Uploaded ${result.name}` : result.error}
         </div>
       )}
     </div>
   );
 }
 
-function VoiceInputCard({ companyId }: { companyId: string }) {
+function VoiceInline({ companyId }: { companyId: string }) {
   const [recording, setRecording] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState<{ ok: boolean; preview?: string; error?: string } | null>(null);
@@ -248,51 +203,37 @@ function VoiceInputCard({ companyId }: { companyId: string }) {
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[#F7F3EC]">
-            <Mic className="h-5 w-5 text-gray-700" />
-          </div>
-          <div>
-            <div className="text-sm font-semibold text-gray-900">Voice input</div>
-            <div className="text-xs text-gray-500">Dictate SOPs, tips, and procedures</div>
-          </div>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <div className="text-sm font-semibold text-gray-900">Voice input</div>
+          <div className="mt-1 text-sm text-gray-500">Dictate a quick SOP, operational note, or troubleshooting tip.</div>
         </div>
-
         {processing ? (
-          <div className="flex items-center justify-center gap-2 rounded-lg bg-gray-50 px-4 py-2.5 text-sm text-gray-700 sm:min-w-[210px]">
+          <div className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700">
             <Loader2 className="h-4 w-4 animate-spin" /> Transcribing…
           </div>
         ) : recording ? (
           <button
             onClick={stopRecording}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-red-500 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-red-600 sm:min-w-[210px] sm:w-auto"
+            className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-red-500 px-3 py-2 text-sm font-medium text-white hover:bg-red-600"
           >
-            <MicOff className="h-4 w-4" /> Stop Recording · {formatTime(seconds)}
+            <MicOff className="h-4 w-4" /> Stop · {formatTime(seconds)}
           </button>
         ) : (
           <button
             onClick={startRecording}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#1C1A16] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#2c2924] sm:min-w-[210px] sm:w-auto"
+            className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-[#1C1A16] px-3 py-2 text-sm font-medium text-white hover:bg-[#2c2924]"
           >
-            <Mic className="h-4 w-4" /> Start Recording
+            <Mic className="h-4 w-4" /> Record
           </button>
         )}
       </div>
 
       {result && (
         <div className={cn("mt-3 rounded-lg px-3 py-2 text-xs", result.ok ? "bg-green-50 text-gray-700" : "bg-red-50 text-gray-700")}>
-          {result.ok ? (
-            <>
-              <CheckCircle2 className="mr-1 inline h-3.5 w-3.5" />
-              Saved!{result.preview && <span className="mt-1 block italic text-gray-600">“{result.preview}…”</span>}
-            </>
-          ) : (
-            <>
-              <X className="mr-1 inline h-3.5 w-3.5" />
-              {result.error}
-            </>
-          )}
+          {result.ok ? <CheckCircle2 className="mr-1 inline h-3.5 w-3.5" /> : <X className="mr-1 inline h-3.5 w-3.5" />}
+          {result.ok ? "Saved!" : result.error}
+          {result.ok && result.preview && <span className="mt-1 block italic text-gray-600">“{result.preview}…”</span>}
         </div>
       )}
     </div>
@@ -305,7 +246,6 @@ export default function UpdatesPage() {
   const [loadingUpdates, setLoadingUpdates] = useState(true);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
-  const [activeCaptureTab, setActiveCaptureTab] = useState<CaptureTab>("text");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -333,19 +273,6 @@ export default function UpdatesPage() {
       .finally(() => setLoadingUpdates(false));
   }, []);
 
-  const suggestions = useMemo(
-    () => [
-      "Add a new technician: Maria Lopez, +1 415 555 0111, works nights.",
-      "We installed a new palletizer on Line 4 in Packaging.",
-      "New SOP: before startup, inspect belt tension and confirm guard latch is closed.",
-      "Justin is now the main escalation contact at +1 555 010 1000.",
-    ],
-    [],
-  );
-
-  const orderedUpdates = useMemo(() => [...updates].reverse(), [updates]);
-  const hasUpdates = updates.length > 0;
-
   const sendUpdate = async (message: string) => {
     const trimmed = message.trim();
     if (!trimmed || sending) return;
@@ -369,6 +296,7 @@ export default function UpdatesPage() {
     }
   };
 
+  const hasUpdates = updates.length > 0;
   const totalStructuredWrites = useMemo(
     () =>
       updates.reduce((acc, update) => {
@@ -400,56 +328,33 @@ export default function UpdatesPage() {
             </div>
             <div>
               <h2 className="text-base font-semibold text-gray-900">Tell Sidekick what changed</h2>
-              <p className="mt-1 text-sm text-gray-500">
-                Type updates naturally. Sidekick will turn them into structured company, team, asset, and knowledge changes when it can.
-              </p>
+              <p className="mt-1 text-sm text-gray-500">Type updates naturally. Sidekick will turn them into structured company, team, asset, and knowledge changes when it can.</p>
             </div>
           </div>
 
-          <div className="mt-4 space-y-3 rounded-2xl border border-gray-200 bg-gray-50 p-4">
-            {loadingUpdates ? (
-              <div className="py-10 text-center text-sm text-gray-400">Loading recent updates…</div>
-            ) : orderedUpdates.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-5">
-                <div className="text-sm font-medium text-gray-900">No updates yet</div>
-                <p className="mt-1 text-sm text-gray-500">You can add a contact, asset, SOP, or policy change here.</p>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  {UPDATE_CAPABILITIES.map(({ key, icon: Icon, title, description }) => (
-                    <div key={key} className="rounded-xl border border-gray-200 bg-[#FCFAF7] p-3">
-                      <div className="flex items-start gap-2.5">
-                        <Icon className="mt-0.5 h-4 w-4 text-[#C96442]" />
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{title}</div>
-                          <div className="mt-0.5 text-xs leading-5 text-gray-500">{description}</div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+          <div className="mt-4 rounded-xl border border-[#F0E5DC] bg-[#FBF7F1] px-4 py-4">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white">
+                <Smartphone className="h-5 w-5 text-[#C96442]" />
               </div>
-            ) : (
-              orderedUpdates.slice(-8).map((update) => (
-                <div key={update.id} className="space-y-2">
-                  <div className="ml-auto max-w-[90%] rounded-2xl rounded-br-md bg-[#1C1A16] px-4 py-3 text-sm text-white">
-                    {update.message}
-                  </div>
-                  <div className="max-w-[90%] rounded-2xl rounded-bl-md border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700">
-                    {update.assistant_response}
-                  </div>
-                </div>
-              ))
-            )}
+              <div>
+                <div className="text-sm font-semibold text-gray-900">You can also text the Sidekick phone number from your phone to provide company updates.</div>
+                <div className="mt-1 text-sm text-gray-500">That’s still the fastest way to capture quick fixes, tribal knowledge, and SOP notes while the work is fresh.</div>
+              </div>
+            </div>
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            {suggestions.map((suggestion) => (
-              <button
-                key={suggestion}
-                onClick={() => setInput(suggestion)}
-                className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-600 hover:border-[#C96442]/30 hover:bg-[#FBF7F1] hover:text-gray-900"
-              >
-                {suggestion}
-              </button>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {UPDATE_CAPABILITIES.map(({ key, icon: Icon, title, description }) => (
+              <div key={key} className="rounded-xl border border-gray-200 bg-white p-4">
+                <div className="flex items-start gap-3">
+                  <Icon className="mt-0.5 h-5 w-5 text-[#C96442]" />
+                  <div>
+                    <div className="text-sm font-semibold text-gray-900">{title}</div>
+                    <div className="mt-1 text-sm text-gray-500">{description}</div>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
 
@@ -458,10 +363,14 @@ export default function UpdatesPage() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Example: We hired Alex Kim as a daytime supervisor, phone +1 415 555 0119. Also the line reset SOP now requires a 10-second wait before restart."
-              className="min-h-[130px] w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm text-gray-900 focus:border-[#C96442] focus:outline-none focus:ring-2 focus:ring-[#C96442]/20"
+              className="min-h-[150px] w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 focus:border-[#C96442] focus:outline-none focus:ring-2 focus:ring-[#C96442]/20"
             />
             {error && <div className="mt-2 text-sm text-red-600">{error}</div>}
-            <div className="mt-3 flex items-center justify-end">
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              <VoiceInline companyId={companyId} />
+              <UploadInline companyId={companyId} />
+            </div>
+            <div className="mt-4 flex items-center justify-end">
               <button
                 onClick={() => sendUpdate(input)}
                 disabled={sending || !input.trim()}
@@ -517,9 +426,7 @@ export default function UpdatesPage() {
                         {chips.length > 0 && (
                           <div className="mt-2 flex flex-wrap gap-1.5">
                             {chips.map((chip) => (
-                              <span key={chip} className="rounded-full bg-[#F7F3EC] px-2 py-0.5 text-xs text-gray-700">
-                                {chip}
-                              </span>
+                              <span key={chip} className="rounded-full bg-[#F7F3EC] px-2 py-0.5 text-xs text-gray-700">{chip}</span>
                             ))}
                           </div>
                         )}
@@ -534,61 +441,14 @@ export default function UpdatesPage() {
       </div>
 
       <section className="mt-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-        <div className="max-w-xl">
-          <div className="flex items-center gap-2">
-            <Plus className="h-4 w-4 text-[#C96442]" />
-            <h2 className="text-base font-semibold text-gray-900">Add context in other formats</h2>
-          </div>
-          <p className="mt-2 text-sm text-gray-500">Use text, voice, or uploads when it’s faster than typing a structured manager update.</p>
-        </div>
-
-        <div className="mt-5 flex flex-wrap gap-2 rounded-2xl border border-gray-200 bg-gray-50 p-2">
-          {[
-            { id: "text", label: "Text", icon: Smartphone },
-            { id: "voice", label: "Voice", icon: Mic },
-            { id: "upload", label: "Upload", icon: Upload },
-          ].map(({ id, label, icon: Icon }) => {
-            const active = activeCaptureTab === id;
-            return (
-              <button
-                key={id}
-                onClick={() => setActiveCaptureTab(id as CaptureTab)}
-                className={cn(
-                  "flex min-w-[110px] flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium transition-colors",
-                  active ? "bg-white text-[#1C1A16] shadow-sm ring-1 ring-[#C96442]/20" : "text-gray-600 hover:bg-white hover:text-gray-900",
-                )}
-              >
-                <Icon className={cn("h-4 w-4", active ? "text-[#C96442]" : "text-gray-500")} />
-                {label}
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="mt-4">
-          {activeCaptureTab === "text" && <TextSidekickCard />}
-          {activeCaptureTab === "voice" && <VoiceInputCard companyId={companyId} />}
-          {activeCaptureTab === "upload" && <UploadCard companyId={companyId} />}
-        </div>
-      </section>
-
-      <section className="mt-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-2xl">
             <div className="flex items-center gap-2">
               <FileText className="h-4 w-4 text-[#C96442]" />
               <h2 className="text-base font-semibold text-gray-900">Connected sources</h2>
             </div>
-            <p className="mt-2 text-sm text-gray-500">
-              Keep every integration together here. This is where Sidekick pulls docs, team context, and operating knowledge from the tools you already use.
-            </p>
+            <p className="mt-2 text-sm text-gray-500">Keep every integration together here. This is where Sidekick pulls docs, team context, and operating knowledge from the tools you already use.</p>
           </div>
-          <a
-            href="/review-queue"
-            className="shrink-0 rounded-lg border border-black/10 bg-white px-3 py-2 text-sm font-medium text-[#1C1A16] hover:bg-black/[0.03]"
-          >
-            Review generated knowledge
-          </a>
         </div>
 
         <div className="mt-5">

@@ -568,15 +568,15 @@ export default function TeamPage() {
             {error && <p className="text-sm text-red-600">{error}</p>}
             <div>
               <label className="text-sm font-medium text-gray-700 block mb-1">Name</label>
-              <input className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="First Last" />
+              <input className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="First Last" />
             </div>
             <div>
               <label className="text-sm font-medium text-gray-700 block mb-1">Phone <span className="text-red-500">*</span></label>
-              <input className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="+1 555 000 0000" disabled={!!editWorker} />
+              <input className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-mono text-gray-900" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="+1 555 000 0000" disabled={!!editWorker} />
             </div>
             <div>
               <label className="text-sm font-medium text-gray-700 block mb-1">Role</label>
-              <select className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))}>
+              <select className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900" value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))}>
                 {ROLES.map(r => <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>)}
               </select>
             </div>
