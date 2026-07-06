@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { runPlantHealthCheck } from "@/lib/predictive-maintenance";
+import { verifyCronSecret } from "@/lib/cron-auth";
 
 export async function GET(request: NextRequest) {
-  // Auth check
-  const secret = request.nextUrl.searchParams.get("secret") || request.headers.get("x-cron-secret");
-  if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  if (!verifyCronSecret(request)) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   try {
     // Get all active companies

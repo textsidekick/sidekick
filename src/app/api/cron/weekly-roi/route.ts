@@ -4,15 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { auditLog } from "@/lib/audit";
 
-export async function GET(req: NextRequest) {
-  const secret =
-    req.nextUrl.searchParams.get("secret") ||
-    req.headers.get("x-cron-secret") ||
-    req.headers.get("authorization")?.replace("Bearer ", "");
+import { verifyCronSecret } from "@/lib/cron-auth";
 
-  if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+export async function GET(req: NextRequest) {
+  if (!verifyCronSecret(req)) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   try {
     const now = new Date();

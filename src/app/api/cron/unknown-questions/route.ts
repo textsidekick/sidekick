@@ -49,18 +49,11 @@ function isLowConfidenceAnswer(answer: string | null | undefined): boolean {
   return LOW_CONFIDENCE_PHRASES.some((phrase) => lower.includes(phrase));
 }
 
-export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get("secret") || req.headers.get("x-cron-secret");
-  const dryRun = req.nextUrl.searchParams.get("dryRun") === "1";
-  const authHeader = req.headers.get("authorization");
-  const authOk = Boolean(
-    process.env.CRON_SECRET &&
-      (secret === process.env.CRON_SECRET || authHeader === `Bearer ${process.env.CRON_SECRET}`)
-  );
+import { verifyCronSecret } from "@/lib/cron-auth";
 
-  if (!authOk) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+export async function GET(req: NextRequest) {
+  if (!verifyCronSecret(req)) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const dryRun = req.nextUrl.searchParams.get("dryRun") === "1";
 
   try {
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();

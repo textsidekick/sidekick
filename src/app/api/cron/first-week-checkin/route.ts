@@ -23,12 +23,10 @@ async function sendSMS(to: string, body: string) {
   return res.ok;
 }
 
+import { verifyCronSecret } from "@/lib/cron-auth";
+
 export async function GET(req: NextRequest) {
-  // Verify cron secret
-  const authHeader = req.headers.get("authorization");
-  if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  if (!verifyCronSecret(req)) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   try {
     const now = new Date();

@@ -3,11 +3,10 @@ import { supabase } from "@/lib/supabase";
 import { sendDigestSMS, generateOperationsDigest } from "@/lib/operations-digest";
 import { sendDigestEmail } from "@/lib/email";
 
+import { verifyCronSecret } from "@/lib/cron-auth";
+
 export async function GET(request: NextRequest) {
-  const secret = request.nextUrl.searchParams.get("secret") || request.headers.get("x-cron-secret");
-  if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  if (!verifyCronSecret(request)) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   try {
     const { data: companies } = await supabase.from("companies").select("id, name, manager_phone").limit(100);
