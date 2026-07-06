@@ -5,8 +5,8 @@ import React, { useState, useEffect } from "react";
 import {
   MessageSquare, AlertTriangle, Users, Clock, Info,
   AlertCircle, CheckCircle2, ClipboardList, TrendingUp,
-  Download, BarChart3, Smartphone, BookOpen, Wrench,
-  ArrowRight, ShieldAlert, CalendarClock,
+  Download, BarChart3, Wrench, ArrowRight,
+  ShieldAlert, CalendarClock,
 } from "lucide-react";
 
 import { MetricCard } from "@/components/dashboard/shared/MetricCard";
@@ -191,7 +191,6 @@ export default function ManagerDashboard() {
 
   const unansweredCount = unansweredQuestions.length;
   const activeWarRooms = openWOs.filter((wo) => isWarRoomWorkOrder((wo.ai_triage || {}) as Record<string, unknown>)).length;
-  const trainingCoachCount = (stats?.byTopic?.training_coach || 0) + (stats?.byTopic?.training_coach_followup || 0);
   const inboxQueues = [
     {
       label: "Needs manager",
@@ -393,7 +392,7 @@ export default function ManagerDashboard() {
           />
         </div>
 
-        <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="mt-4">
           <div className="rounded-2xl border border-red-200 bg-red-50/60 p-5">
             <div className="flex items-center gap-2 text-sm font-semibold text-[#1C1A16]">
               <ShieldAlert className="h-4 w-4 text-red-600" /> Line-Down War Room
@@ -403,16 +402,6 @@ export default function ManagerDashboard() {
               {activeWarRooms > 0
                 ? `${activeWarRooms} active incident${activeWarRooms === 1 ? " is" : "s are"} being coordinated through Sidekick right now.`
                 : "Ready for the next critical incident — one text can open a live war room, assign an owner, and track downtime."}
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-[#C96442]/15 bg-[#FBF7F1] p-5">
-            <div className="flex items-center gap-2 text-sm font-semibold text-[#1C1A16]">
-              <BookOpen className="h-4 w-4 text-[#C96442]" /> Frontline Training Coach
-            </div>
-            <div className="mt-2 text-2xl font-semibold text-[#1C1A16]">{trainingCoachCount}</div>
-            <p className="mt-1 text-sm text-black/55">
-              Workers can now text how-to questions and get step-by-step SOP guidance, then reply HELP or DONE to keep moving.
             </p>
           </div>
         </div>
@@ -501,23 +490,6 @@ export default function ManagerDashboard() {
           </div>
         </div>
 
-        {/* ══ 4. QUICK CAPTURE — phone-first CTA ═════════════════════════════ */}
-        <div className="rounded-2xl border border-[#C96442]/15 bg-gradient-to-r from-orange-50/60 to-white p-5">
-          <div className="flex items-center gap-4 flex-wrap">
-            <div className="w-11 h-11 rounded-xl bg-[#C96442] flex items-center justify-center flex-shrink-0">
-              <Smartphone className="w-5 h-5 text-white" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold text-[#1C1A16]">Capture knowledge that powers Training Coach</div>
-              <div className="text-xs text-black/45 mt-0.5">
-                Text tips, voice memos, or photos to your Sidekick number — they become searchable knowledge your crew can use for step-by-step coaching by text.
-              </div>
-            </div>
-            <a href="/knowledge" className="inline-flex items-center gap-1.5 text-sm font-medium text-[#C96442] hover:underline flex-shrink-0">
-              <BookOpen className="h-4 w-4" /> Go to Knowledge →
-            </a>
-          </div>
-        </div>
       </div>
     </div>
   );

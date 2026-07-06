@@ -8,7 +8,6 @@ import { PriorityBadge } from "@/components/dashboard/shared/PriorityBadge";
 import { StatusBadge } from "@/components/dashboard/shared/StatusBadge";
 import { IssueDetailModal } from "@/components/dashboard/modals";
 import { formatTimeAgo } from "@/lib/format";
-import { isTrainingCoachTopic } from "@/lib/training-coach";
 import { cn } from "@/lib/utils";
 
 type Question = {
@@ -145,9 +144,7 @@ export default function InboxPage() {
       sourceId: q.id,
       kind: "question" as const,
       title: q.question,
-      detail: isTrainingCoachTopic(q.topic)
-        ? (q.answer ? "Training Coach guided this from SOPs / knowledge" : "Training Coach needs a better answer")
-        : (q.answer ? "Answered from knowledge" : "Needs a manager answer or better knowledge"),
+      detail: q.answer ? "Answered from knowledge" : "Needs a manager answer or better knowledge",
       workerLabel: q.worker_name || q.worker_phone || "Worker",
       createdAt: q.created_at,
       needsManager: !q.answer || q.confidence < 50,
@@ -288,8 +285,8 @@ export default function InboxPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setSelectedQuestion(null)}>
           <div className="w-full max-w-2xl rounded-2xl bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
             <div className="border-b border-black/5 px-6 py-4">
-              <div className="text-sm font-semibold text-[#1C1A16]">Teach Sidekick</div>
-              <div className="mt-1 text-sm text-black/45">Save the manager answer so Sidekick can handle this question better next time.</div>
+              <div className="text-sm font-semibold text-[#1C1A16]">Save answer</div>
+              <div className="mt-1 text-sm text-black/45">Save the manager answer so this question is handled better next time.</div>
             </div>
             <div className="space-y-4 px-6 py-5">
               <div>
@@ -312,7 +309,7 @@ export default function InboxPage() {
               <div className="flex items-center gap-2">
                 <button onClick={() => setSelectedQuestion(null)} className="rounded-lg px-4 py-2 text-sm text-black/55 hover:bg-black/[0.04]">Cancel</button>
                 <button onClick={handleTeachSidekick} disabled={savingAnswer || !managerAnswer.trim()} className="rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white disabled:opacity-50">
-                  {savingAnswer ? "Saving…" : "Teach Sidekick"}
+                  {savingAnswer ? "Saving…" : "Save answer"}
                 </button>
               </div>
             </div>
@@ -329,7 +326,7 @@ export default function InboxPage() {
         <div className="rounded-2xl border border-black/5 bg-white p-5">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#F7F3EC]">
-              <MessageSquare className="h-5 w-5 text-[#C96442]" />
+              <MessageSquare className="h-5 w-5 text-gray-700" />
             </div>
             <div>
               <div className="text-2xl font-semibold text-[#1C1A16]">{items.length}</div>
@@ -337,25 +334,25 @@ export default function InboxPage() {
             </div>
           </div>
         </div>
-        <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5">
+        <div className="rounded-2xl border border-black/5 bg-white p-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/70">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#F7F3EC]">
               <ShieldAlert className="h-5 w-5 text-gray-700" />
             </div>
             <div>
               <div className="text-2xl font-semibold text-[#1C1A16]">{counts.needsManager}</div>
-              <div className="text-sm text-black/55">Need manager input</div>
+              <div className="text-sm text-black/45">Need manager input</div>
             </div>
           </div>
         </div>
         <div className="rounded-2xl border border-black/5 bg-white p-5">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#F7F3EC]">
-              <Bot className="h-5 w-5 text-[#C96442]" />
+              <Bot className="h-5 w-5 text-gray-700" />
             </div>
             <div>
               <div className="text-2xl font-semibold text-[#1C1A16]">{counts.questions}</div>
-              <div className="text-sm text-black/45">Questions managers can teach Sidekick from</div>
+              <div className="text-sm text-black/45">Questions needing answers or better knowledge</div>
             </div>
           </div>
         </div>
@@ -484,17 +481,6 @@ export default function InboxPage() {
         )}
       </div>
 
-      <div className="rounded-2xl border border-[#C96442]/15 bg-gradient-to-r from-orange-50/60 to-white p-5">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <div className="text-sm font-semibold text-[#1C1A16]">Inbox is the manager operating queue</div>
-            <p className="mt-1 max-w-3xl text-sm text-black/55">
-              Review worker questions, field issues, and live work in one place. Today should summarize urgency; Inbox should be where managers actually work through it.
-            </p>
-          </div>
-          <a href="/knowledge" className="text-sm font-medium text-[#C96442] hover:underline">Open Knowledge Sources →</a>
-        </div>
-      </div>
     </div>
   );
 }
