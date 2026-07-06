@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { getCompanyId } from "@/lib/dashboard-auth";
 
 const SAMPLE_DOCS = [
   {
@@ -198,10 +199,8 @@ const SAMPLE_PROCEDURES = [
 
 export async function POST(request: NextRequest) {
   try {
-    const { companyId } = await request.json();
-    if (!companyId) {
-      return NextResponse.json({ error: "companyId required" }, { status: 400 });
-    }
+    const companyId = await getCompanyId(request);
+    if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     let documentsCreated = 0;
     for (const doc of SAMPLE_DOCS) {

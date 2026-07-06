@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, rateLimitKey } from "@/lib/rate-limit";
 import OpenAI from "openai";
 import { supabase } from "@/lib/supabase";
 import { normalizePhoneNumber } from "@/lib/phone";
@@ -37,6 +38,9 @@ function generateNameBasedCode(name: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  const _rl = checkRateLimit(rateLimitKey("api", request as any), 5);
+  if (!_rl.allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   console.log("[Complete] ===== START =====");
 
   try {

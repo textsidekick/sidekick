@@ -1,6 +1,7 @@
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, rateLimitKey } from "@/lib/rate-limit";
 import OpenAI from "openai";
 import { supabase } from "@/lib/supabase";
 import { createEmbedding } from "@/lib/embeddings";
@@ -20,6 +21,9 @@ function chunkText(text: string, maxSize = 800, overlap = 100): string[] {
 }
 
 export async function POST(req: NextRequest) {
+  const _rl = checkRateLimit(rateLimitKey("api", req as any), 10);
+  if (!_rl.allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   try {
     const form = await req.formData();
     const file = form.get("file") as File | null;

@@ -1,11 +1,15 @@
 export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, rateLimitKey } from "@/lib/rate-limit";
 import { supabase } from "@/lib/supabase";
 import OpenAI from "openai";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function POST(request: NextRequest) {
+  const _rl = checkRateLimit(rateLimitKey("api", request as any), 5);
+  if (!_rl.allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   try {
     const { companyId } = await request.json();
     if (!companyId) {

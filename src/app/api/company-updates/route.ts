@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, rateLimitKey } from "@/lib/rate-limit";
+import { alertError } from "@/lib/error-alert";
 import { supabase } from "@/lib/supabase";
 import { getCompanyId } from "@/lib/dashboard-auth";
 import { normalizePhoneNumber } from "@/lib/phone";
@@ -170,6 +172,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const _rl = checkRateLimit(rateLimitKey("api", req as any), 10);
+  if (!_rl.allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   const companyId = await getCompanyId(req);
   if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 

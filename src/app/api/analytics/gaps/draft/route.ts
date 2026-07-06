@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, rateLimitKey } from "@/lib/rate-limit";
 import OpenAI from "openai";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function POST(request: NextRequest) {
+  const _rl = checkRateLimit(rateLimitKey("api", request as any), 10);
+  if (!_rl.allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   const { gap, companyName } = await request.json();
   if (!gap) return NextResponse.json({ error: "No gap provided" }, { status: 400 });
 

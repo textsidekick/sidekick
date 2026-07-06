@@ -2,6 +2,7 @@ export const maxDuration = 30;
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { createEmbedding } from "@/lib/embeddings";
+import { getCompanyId } from "@/lib/dashboard-auth";
 
 interface LearnRequest {
   company_id: string;
@@ -13,8 +14,10 @@ interface LearnRequest {
 
 export async function POST(request: NextRequest) {
   try {
+    const authCompanyId = await getCompanyId(request);
     const body: LearnRequest = await request.json();
-    const { company_id, original_question, manager_answer, worker_phone, source_conversation_id } = body;
+    const company_id = authCompanyId || body.company_id;
+    const { original_question, manager_answer, worker_phone, source_conversation_id } = body;
 
     if (!company_id || !original_question || !manager_answer) {
       return NextResponse.json(

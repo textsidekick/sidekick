@@ -1,5 +1,6 @@
 export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, rateLimitKey } from "@/lib/rate-limit";
 import OpenAI from "openai";
 import { supabase } from "@/lib/supabase";
 import { getCompanyId } from "@/lib/dashboard-auth";
@@ -7,6 +8,9 @@ import { getCompanyId } from "@/lib/dashboard-auth";
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function GET(request: NextRequest) {
+  const _rl = checkRateLimit(rateLimitKey("api", request as any), 10);
+  if (!_rl.allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   const companyId = await getCompanyId(request);
   if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   

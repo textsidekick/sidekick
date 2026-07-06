@@ -1,5 +1,6 @@
 export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, rateLimitKey } from "@/lib/rate-limit";
 import OpenAI from "openai";
 
 const openai = new OpenAI({
@@ -68,6 +69,9 @@ Possible fields:
 Only include sections where data was explicitly provided. Return {} if nothing extractable yet. Return ONLY valid JSON, no explanation.`;
 
 export async function POST(request: NextRequest) {
+  const _rl = checkRateLimit(rateLimitKey("api", request as any), 20);
+  if (!_rl.allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   try {
     const { messages, sessionId, section } = await request.json();
 
