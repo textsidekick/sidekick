@@ -330,17 +330,6 @@ export default function UpdatesPage() {
               className="min-h-[150px] w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 focus:border-[#C96442] focus:outline-none focus:ring-2 focus:ring-[#C96442]/20"
             />
             {error && <div className="mt-2 text-sm text-red-600">{error}</div>}
-            <div className="mt-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
-              <div className="flex items-start gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white">
-                  <Smartphone className="h-4 w-4 text-gray-500" />
-                </div>
-                <div>
-                  <div className="text-sm font-medium text-gray-900">You can also text the Sidekick phone number from your phone to provide company updates.</div>
-                  <div className="mt-1 text-sm text-gray-500">That’s still the fastest way to capture quick fixes, tribal knowledge, and SOP notes while the work is fresh.</div>
-                </div>
-              </div>
-            </div>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               <VoiceInline companyId={companyId} />
               <UploadInline companyId={companyId} />
@@ -354,6 +343,17 @@ export default function UpdatesPage() {
                 {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 Save update
               </button>
+            </div>
+            <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+              <div className="flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F7F3EC]">
+                  <Smartphone className="h-4 w-4 text-gray-500" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-gray-900">You can also text the Sidekick phone number from your phone to provide company updates.</div>
+                  <div className="mt-1 text-sm text-gray-500">That’s still the fastest way to capture quick fixes, tribal knowledge, and SOP notes while the work is fresh.</div>
+                </div>
+              </div>
             </div>
           </div>
         </section>

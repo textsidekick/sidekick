@@ -4,7 +4,6 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { SectionHeader } from "@/components/dashboard/shared/SectionHeader";
 import { Badge } from "@/components/ui/badge";
 import {
-  Search,
   BookOpen,
   Wrench,
   Clock,
@@ -54,22 +53,6 @@ function timeAgo(dateStr: string) {
   const hrs = Math.floor(diff / 3600000);
   if (hrs > 0) return `${hrs}h ago`;
   return "just now";
-}
-
-function matchesSearch(article: KnowledgeArticle, query: string) {
-  const term = query.trim().toLowerCase();
-  if (!term) return true;
-
-  return [
-    article.title,
-    article.problem,
-    article.symptoms,
-    article.solution,
-    article.equipment_type,
-    article.asset_name,
-    ...(article.parts_used || []),
-    ...(article.tags || []),
-  ].some((value) => value?.toLowerCase().includes(term));
 }
 
 function ProvenanceBadge({ article }: { article: KnowledgeArticle }) {
@@ -220,7 +203,6 @@ export default function KnowledgePage() {
   const [reviewItems, setReviewItems] = useState<KnowledgeArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingReview, setLoadingReview] = useState(true);
-  const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState<string | null>(null);
   const [reviewExpanded, setReviewExpanded] = useState(true);
   const [reviewOpenId, setReviewOpenId] = useState<string | null>(null);
@@ -320,27 +302,114 @@ export default function KnowledgePage() {
     [articles],
   );
 
-  const filteredReviewItems = useMemo(() => reviewItems.filter((article) => matchesSearch(article, search)), [reviewItems, search]);
-
-  const filtered = useMemo(() => visibleArticles.filter((article) => matchesSearch(article, search)), [visibleArticles, search]);
-
   const lowRiskCount = reviewItems.filter((article) => reviewRisk(article) === "low").length;
 
   return (
     <div className="mx-auto min-h-screen max-w-7xl px-6 py-8">
-      <SectionHeader title="Operational Knowledge" subtitle="Search your approved knowledge library and review new auto-generated items in one place." />
+      <SectionHeader title="Operational Knowledge" subtitle="Everything Sidekick knows right now: imported docs, approved procedures, items waiting for review, and generated reports." />
 
-      <div className="relative mt-6">
-        <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search procedures, fixes, SOPs — e.g. 'spindle vibration', 'hydraulic leak'..."
-          className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-12 pr-4 text-sm text-gray-900 focus:border-[#C96442] focus:outline-none focus:ring-2 focus:ring-[#C96442]/30"
-        />
-      </div>
-      <p className="mt-2 text-sm text-gray-500">Searches titles, machine names, symptoms, solutions, parts, and tags across the knowledge on this page.</p>
+      <section className="mt-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-base font-semibold text-gray-900">Knowledge base</h2>
+            <p className="mt-1 text-sm text-gray-500">This is the main library: approved procedures plus the imported docs and source material Sidekick has from your company.</p>
+          </div>
+          {!loading && <div className="text-sm text-gray-400">{visibleArticles.length} approved procedures</div>}
+        </div>
+
+        <div className="mt-5">
+          <div className="mb-3">
+            <h3 className="text-sm font-semibold text-gray-900">Approved procedures</h3>
+            <p className="mt-1 text-sm text-gray-500">Verified troubleshooting steps and SOPs Sidekick can confidently use across your team.</p>
+          </div>
+
+          <div className="space-y-3">
+            {loading ? (
+              <div className="py-12 text-center text-gray-400">Loading approved procedures…</div>
+            ) : visibleArticles.length === 0 ? (
+              <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
+                <BookOpen className="mx-auto mb-3 h-12 w-12 text-[#C96442]/30" />
+                <p className="font-semibold text-gray-700">No approved procedures captured yet</p>
+                <p className="mx-auto mt-1 max-w-sm text-sm text-gray-400">Once your team uploads docs, texts fixes in, or approves generated knowledge, it will show up here.</p>
+              </div>
+            ) : (
+              visibleArticles.map((article) => (
+                <div key={article.id} className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+                  <button onClick={() => setExpanded(expanded === article.id ? null : article.id)} className="flex w-full items-start justify-between px-5 py-4 text-left">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm font-semibold text-gray-900">{article.title}</span>
+                        {article.equipment_type && <Badge variant="outline" className="text-xs">{article.equipment_type}</Badge>}
+                      </div>
+                      <p className="mt-1 truncate text-sm text-gray-500">{article.problem}</p>
+                      <div className="mt-2 flex flex-wrap items-center gap-4 text-xs text-gray-400">
+                        {article.asset_name && (
+                          <span className="flex items-center gap-1">
+                            <Wrench className="h-3 w-3" />
+                            {article.asset_name}
+                          </span>
+                        )}
+                        {article.time_estimate_minutes && (
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {article.time_estimate_minutes}m
+                          </span>
+                        )}
+                        <span className="flex items-center gap-1">
+                          <Hash className="h-3 w-3" />
+                          Referenced {article.times_referenced || 0}x
+                        </span>
+                        <ProvenanceBadge article={article} />
+                      </div>
+                      {article.tags?.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {article.tags.map((tag) => (
+                            <span key={tag} className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">{tag}</span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    {expanded === article.id ? <ChevronUp className="mt-1 h-5 w-5 text-gray-400" /> : <ChevronDown className="mt-1 h-5 w-5 text-gray-400" />}
+                  </button>
+
+                  {expanded === article.id && (
+                    <div className="space-y-3 border-t border-gray-100 px-5 pb-5 pt-4">
+                      {article.symptoms && (
+                        <div>
+                          <div className="mb-1 text-xs font-semibold uppercase text-gray-500">Symptoms</div>
+                          <p className="text-sm text-gray-700">{article.symptoms}</p>
+                        </div>
+                      )}
+                      <div>
+                        <div className="mb-1 text-xs font-semibold uppercase text-gray-500">Solution</div>
+                        <p className="whitespace-pre-wrap text-sm text-gray-700">{article.solution}</p>
+                      </div>
+                      {article.parts_used?.length > 0 && (
+                        <div>
+                          <div className="mb-1 text-xs font-semibold uppercase text-gray-500">Parts used</div>
+                          <div className="flex flex-wrap gap-2">
+                            {article.parts_used.map((part) => (
+                              <span key={part} className="rounded bg-orange-50 px-2 py-1 text-xs text-gray-700">{part}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="mt-6 border-t border-gray-100 pt-6">
+          <div className="mb-3">
+            <h3 className="text-sm font-semibold text-gray-900">Imported docs and source material</h3>
+            <p className="mt-1 text-sm text-gray-500">The broader set of uploaded files and connected-source documents Sidekick can reference.</p>
+          </div>
+          <KnowledgeBaseViewer companyId={companyId} />
+        </div>
+      </section>
 
       {loadingReview ? (
         <div className="mt-6 rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-400 shadow-sm">Loading pending review…</div>
@@ -374,9 +443,7 @@ export default function KnowledgePage() {
               </div>
 
               <div className="space-y-3">
-                {filteredReviewItems.length === 0 && search.trim() ? (
-                  <div className="rounded-xl border border-gray-200 bg-white px-4 py-5 text-sm text-gray-500">No pending review items match “{search.trim()}”.</div>
-                ) : filteredReviewItems.map((article) => {
+                {reviewItems.map((article) => {
                   const risk = reviewRisk(article);
                   const flags = flagExplanation(article);
                   const isOpen = reviewOpenId === article.id;
@@ -489,107 +556,15 @@ export default function KnowledgePage() {
         </section>
       ) : null}
 
-      <div className="mt-8 flex items-center justify-between gap-3">
+      <section className="mt-8 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
         <div>
-          <h2 className="text-base font-semibold text-gray-900">Approved knowledge</h2>
-          <p className="mt-1 text-sm text-gray-500">This is the clean library Sidekick can search and use across your team.</p>
+          <h2 className="text-base font-semibold text-gray-900">AI-generated reports</h2>
+          <p className="mt-1 text-sm text-gray-500">Review generated summaries and reports after the main library and review queue.</p>
         </div>
-        {!loading && <div className="text-sm text-gray-400">{filtered.length} items</div>}
-      </div>
-
-      <div className="mt-4 space-y-3">
-        {loading ? (
-          <div className="py-12 text-center text-gray-400">Loading knowledge base...</div>
-        ) : filtered.length === 0 ? (
-          <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
-            <BookOpen className="mx-auto mb-3 h-12 w-12 text-[#C96442]/30" />
-            <p className="font-semibold text-gray-700">{search.trim() ? `No approved knowledge matches “${search.trim()}”` : "No approved procedures captured yet"}</p>
-            <p className="mx-auto mt-1 max-w-sm text-sm text-gray-400">{search.trim() ? "Try a machine name, symptom, part, or troubleshooting phrase instead." : "Once your team uploads docs, texts fixes in, or approves generated knowledge, it will show up here."}</p>
-          </div>
-        ) : (
-          filtered.map((article) => (
-            <div key={article.id} className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-              <button onClick={() => setExpanded(expanded === article.id ? null : article.id)} className="flex w-full items-start justify-between px-5 py-4 text-left">
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-sm font-semibold text-gray-900">{article.title}</span>
-                    {article.equipment_type && <Badge variant="outline" className="text-xs">{article.equipment_type}</Badge>}
-                  </div>
-                  <p className="mt-1 truncate text-sm text-gray-500">{article.problem}</p>
-                  <div className="mt-2 flex flex-wrap items-center gap-4 text-xs text-gray-400">
-                    {article.asset_name && (
-                      <span className="flex items-center gap-1">
-                        <Wrench className="h-3 w-3" />
-                        {article.asset_name}
-                      </span>
-                    )}
-                    {article.time_estimate_minutes && (
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {article.time_estimate_minutes}m
-                      </span>
-                    )}
-                    <span className="flex items-center gap-1">
-                      <Hash className="h-3 w-3" />
-                      Referenced {article.times_referenced || 0}x
-                    </span>
-                    <ProvenanceBadge article={article} />
-                  </div>
-                  {article.tags?.length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-1">
-                      {article.tags.map((tag) => (
-                        <span key={tag} className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">{tag}</span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                {expanded === article.id ? <ChevronUp className="mt-1 h-5 w-5 text-gray-400" /> : <ChevronDown className="mt-1 h-5 w-5 text-gray-400" />}
-              </button>
-
-              {expanded === article.id && (
-                <div className="space-y-3 border-t border-gray-100 px-5 pb-5 pt-4">
-                  {article.symptoms && (
-                    <div>
-                      <div className="mb-1 text-xs font-semibold uppercase text-gray-500">Symptoms</div>
-                      <p className="text-sm text-gray-700">{article.symptoms}</p>
-                    </div>
-                  )}
-                  <div>
-                    <div className="mb-1 text-xs font-semibold uppercase text-gray-500">Solution</div>
-                    <p className="whitespace-pre-wrap text-sm text-gray-700">{article.solution}</p>
-                  </div>
-                  {article.parts_used?.length > 0 && (
-                    <div>
-                      <div className="mb-1 text-xs font-semibold uppercase text-gray-500">Parts used</div>
-                      <div className="flex flex-wrap gap-2">
-                        {article.parts_used.map((part) => (
-                          <span key={part} className="rounded bg-orange-50 px-2 py-1 text-xs text-gray-700">{part}</span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          ))
-        )}
-      </div>
-
-      <details className="mt-8 rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <summary className="cursor-pointer list-none px-5 py-4 text-sm font-medium text-gray-900 [&::-webkit-details-marker]:hidden">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <div>Reports & knowledge base</div>
-              <div className="mt-1 text-sm font-normal text-gray-500">Generate reports or inspect the imported knowledge base without cluttering the main library view.</div>
-            </div>
-            <ChevronDown className="h-5 w-5 text-gray-400" />
-          </div>
-        </summary>
-        <div className="space-y-5 border-t border-gray-100 px-5 py-5">
+        <div className="mt-5">
           <GeneratedReports companyId={companyId} />
-          <KnowledgeBaseViewer companyId={companyId} />
         </div>
-      </details>
+      </section>
 
       {modal?.type === "reject" && <RejectModal onConfirm={(reason) => doAction("reject", modal.articleId, { reason })} onCancel={() => setModal(null)} />}
       {modal?.type === "snooze" && <SnoozeModal onConfirm={(days) => doAction("snooze", modal.articleId, { snoozeDuration: days })} onCancel={() => setModal(null)} />}
