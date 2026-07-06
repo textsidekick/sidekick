@@ -317,9 +317,9 @@ export default function KnowledgePage() {
                 <div className="py-12 text-center text-gray-400">Loading approved procedures…</div>
               ) : visibleArticles.length === 0 ? (
                 <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
-                  <BookOpen className="mx-auto mb-3 h-12 w-12 text-[#C96442]/30" />
-                  <p className="font-semibold text-gray-700">No approved procedures captured yet</p>
-                  <p className="mx-auto mt-1 max-w-sm text-sm text-gray-400">Once your team uploads docs, texts fixes in, or approves generated knowledge, it will show up here.</p>
+                  <BookOpen className="mx-auto mb-3 h-8 w-8 text-gray-300" />
+                  <p className="text-sm font-medium text-gray-600">No approved procedures added yet</p>
+                  <p className="mt-1 text-xs text-gray-400">Approved procedures will appear here once they’ve been added or verified.</p>
                 </div>
               ) : (
                 visibleArticles.map((article) => (
