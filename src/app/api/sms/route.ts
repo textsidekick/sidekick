@@ -2579,6 +2579,8 @@ HOW TO RESPOND:
 
   } catch (error) {
     console.error("[SMS] Error:", error);
+    // Fire-and-forget alert
+    import("@/lib/error-alert").then(m => m.alertError("SMS route crash", error)).catch(() => {});
     return twimlResponse("Sorry, I encountered an error. Please try again in a moment.");
   }
 }

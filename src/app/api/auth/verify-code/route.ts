@@ -75,13 +75,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Method 3: Check PAID_PHONES mapping or single-company demo mode
-    if (!companyId) {
-      const { data: allCompanies } = await supabase.from("companies").select("id, name").limit(2);
-      if (isPaidUser && allCompanies && allCompanies.length > 0) {
-        companyId = allCompanies[0].id;
-      } else if (allCompanies && allCompanies.length === 1) {
-        // Single-company demo mode
+    // Method 3: Check PAID_PHONES mapping
+    if (!companyId && isPaidUser) {
+      const { data: allCompanies } = await supabase.from("companies").select("id").limit(1);
+      if (allCompanies && allCompanies.length > 0) {
         companyId = allCompanies[0].id;
       }
     }
