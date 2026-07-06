@@ -123,6 +123,24 @@ export default function SuccessScreen({
 
 
 
+          {/* Worker Join Instructions — code + phone number */}
+          <div style={{ background: "white", border: "1px solid rgba(28,26,22,0.1)", borderRadius: "12px", padding: "32px", marginBottom: "24px" }}>
+            <h3 style={{ fontWeight: 600, color: "#1C1A16", fontSize: "16px", marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
+              <Smartphone size={18} />
+              Workers: Text to Join
+            </h3>
+            <p style={{ fontSize: "14px", color: "rgba(28,26,22,0.5)", marginBottom: "20px" }}>Workers text this command to the number below:</p>
+
+            <div style={{ background: "#F7F3EC", borderRadius: "8px", padding: "24px", border: "1px solid rgba(28,26,22,0.1)", textAlign: "center", marginBottom: "12px" }}>
+              <div style={{ fontSize: "36px", fontWeight: "bold", color: "#1C1A16", fontFamily: "monospace", letterSpacing: "4px", marginBottom: "16px" }}>
+                {currentJoinCommand}
+              </div>
+              <div style={{ fontSize: "36px", fontWeight: "bold", color: "#1C1A16", fontFamily: "monospace" }}>
+                {formatPhoneForDisplay(onboardingResult.twilioNumber)}
+              </div>
+            </div>
+          </div>
+
           {/* QR Code */}
           <div style={{ background: "white", border: "1px solid rgba(28,26,22,0.1)", borderRadius: "12px", padding: "32px", marginBottom: "24px", textAlign: "center" }}>
             <h3 style={{ fontWeight: 600, color: "#1C1A16", fontSize: "16px", marginBottom: "8px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
@@ -134,56 +152,8 @@ export default function SuccessScreen({
               <QRCodeSVG value={smsLink} size={200} level="M" />
             </div>
             <div style={{ marginTop: "12px" }}>
-              <a
-                href={smsLink}
-                style={{ fontSize: "13px", color: "#C96442", textDecoration: "none" }}
-              >
-                Or tap here to send via SMS →
-              </a>
+              <a href={smsLink} style={{ fontSize: "13px", color: "#C96442", textDecoration: "none" }}>Or tap here to send via SMS →</a>
             </div>
-          </div>
-
-          {/* Worker Join Instructions */}
-          <div style={{ background: "white", border: "1px solid rgba(28,26,22,0.1)", borderRadius: "12px", padding: "32px", marginBottom: "24px" }}>
-            <h3 style={{ fontWeight: 600, color: "#1C1A16", fontSize: "16px", marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
-              <Smartphone size={18} />
-              Workers: Text to Join
-            </h3>
-            <p style={{ fontSize: "14px", color: "rgba(28,26,22,0.5)", marginBottom: "12px" }}>Workers text this command to {formatPhoneForDisplay(onboardingResult.twilioNumber)}:</p>
-
-            <div
-              style={{
-                background: "#F7F3EC",
-                borderRadius: "8px",
-                padding: "16px",
-                border: "1px solid rgba(28,26,22,0.1)",
-                marginBottom: "16px",
-              }}
-            >
-              <div style={{ fontFamily: "monospace", fontSize: "16px", fontWeight: "bold", color: "#1C1A16", textAlign: "center" }}>
-                {currentJoinCommand}
-              </div>
-            </div>
-
-            <a
-              href={smsLink}
-              style={{
-                display: "block",
-                width: "100%",
-                background: "#A74D30",
-                color: "white",
-                padding: "12px",
-                borderRadius: "8px",
-                fontWeight: "600",
-                fontSize: "14px",
-                textDecoration: "none",
-                textAlign: "center",
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              Send Test Message
-            </a>
           </div>
 
           {/* Go to Dashboard */}
