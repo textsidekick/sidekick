@@ -337,7 +337,7 @@ export async function POST(request: NextRequest) {
     // -----------------------------------------------------------------------
     // 2. Rate limiting
     // -----------------------------------------------------------------------
-    const rateOk = await checkRateLimit(`sms:${from}`);
+    const rateOk = checkRateLimit(`sms:${from}`, 30);
     if (!rateOk) {
       return twimlResponse("You're sending messages too quickly. Please wait a moment and try again.");
     }
