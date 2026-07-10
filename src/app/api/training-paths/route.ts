@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     .from("training_paths")
     .select(`
       id, name, description, role, estimated_days, is_active, department_id, created_at,
-      training_path_steps(id, step_order, title, estimated_minutes)
+      training_steps(id, sort_order, title, estimated_minutes)
     `)
     .eq("company_id", companyId)
     .order("name");
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
 
   const result = (paths || []).map((p) => ({
     ...p,
-    step_count: (p.training_path_steps || []).length,
+    step_count: (p.training_steps || []).length,
     enrollment: countsByPath[p.id] || { total: 0, completed: 0, in_progress: 0 },
   }));
 

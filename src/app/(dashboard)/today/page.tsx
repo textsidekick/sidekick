@@ -79,7 +79,7 @@ function KmMetricsSection({ companyId }: { companyId: string }) {
     <div className="mb-8 rounded-2xl border border-gray-100 bg-gray-50/50 p-6">
       <div className="mb-4">
         <h2 className="text-sm font-semibold text-gray-900">Knowledge Management Overview</h2>
-        <p className="text-xs text-gray-400">지식 관리 현황</p>
+        <p className="text-xs text-gray-400">Knowledge base status</p>
       </div>
 
       {/* Primary stat cards */}

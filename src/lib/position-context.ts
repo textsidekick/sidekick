@@ -204,10 +204,10 @@ export async function autoEnrollWorkerInPositionPaths(opts: {
 
     if (opts.sendSmsNotifications !== false) {
       const { data: steps } = await supabase
-        .from("training_path_steps")
-        .select("title, content, step_order")
+        .from("training_steps")
+        .select("title, content, sort_order")
         .eq("training_path_id", pathId)
-        .order("step_order")
+        .order("sort_order")
         .limit(1);
       const first = steps?.[0];
       if (first) {

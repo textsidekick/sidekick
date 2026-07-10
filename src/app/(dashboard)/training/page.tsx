@@ -25,7 +25,8 @@ interface TrainingPath {
 
 interface TrainingStep {
   id: string;
-  step_order: number;
+  step_order?: number;
+  sort_order?: number;
   title: string;
   description: string;
   content: string;
@@ -108,7 +109,7 @@ function PathDetailModal({
   departments: Department[];
   onClose: () => void;
 }) {
-  const [path, setPath] = useState<{ name: string; description: string; role: string; department_id: string | null; training_path_steps: TrainingStep[] } | null>(null);
+  const [path, setPath] = useState<{ name: string; description: string; role: string; department_id: string | null; training_steps: TrainingStep[] } | null>(null);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [enrollPhone, setEnrollPhone] = useState("");
   const [enrollDept, setEnrollDept] = useState("");
@@ -232,9 +233,9 @@ function PathDetailModal({
           {/* Steps */}
           {path && (
             <div>
-              <h3 className="mb-3 text-sm font-semibold text-gray-700">Learning Steps ({path.training_path_steps?.length || 0})</h3>
+              <h3 className="mb-3 text-sm font-semibold text-gray-700">Learning Steps ({path.training_steps?.length || 0})</h3>
               <div className="space-y-2">
-                {(path.training_path_steps || []).sort((a, b) => a.step_order - b.step_order).map((step) => (
+                {(path.training_steps || []).sort((a, b) => (a.sort_order ?? a.step_order) - (b.sort_order ?? b.step_order)).map((step) => (
                   <div key={step.id} className="flex gap-3 rounded-lg border border-gray-100 bg-gray-50 p-3">
                     <div className="mt-0.5 flex-shrink-0 h-5 w-5 rounded-full bg-[#C96442] text-white flex items-center justify-center text-[10px] font-bold">{step.step_order}</div>
                     <div>
@@ -343,7 +344,7 @@ function PathDetailModal({
                         <p className="text-xs text-gray-400">Last active {timeAgo(e.last_activity_at)}</p>
                       </div>
                     </div>
-                    {statusPill(e.status, e.current_step, path?.training_path_steps?.length || 1)}
+                    {statusPill(e.status, e.current_step, path?.training_steps?.length || 1)}
                   </div>
                 ))}
               </div>

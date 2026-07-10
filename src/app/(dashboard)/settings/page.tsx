@@ -394,9 +394,82 @@ export default function SettingsPage() {
                 ))}
               </div>
             </section>
+
+            {/* Language Settings */}
+            <section className="bg-white rounded-xl border border-gray-200 p-5">
+              <h2 className="text-sm font-semibold text-gray-700 mb-1">Language</h2>
+              <p className="text-xs text-gray-500 mb-4">Set the dashboard display language. Worker-facing content (SOPs, training) remains in its original language.</p>
+              <LanguageSettings />
+            </section>
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+const LANGUAGES = [
+  { code: "en", label: "English" },
+  { code: "ko", label: "Korean (한국어)" },
+  { code: "es", label: "Spanish (Español)" },
+  { code: "zh-CN", label: "Chinese Simplified (简体中文)" },
+  { code: "zh-TW", label: "Chinese Traditional (繁體中文)" },
+  { code: "ja", label: "Japanese (日本語)" },
+  { code: "vi", label: "Vietnamese (Tiếng Việt)" },
+  { code: "th", label: "Thai (ภาษาไทย)" },
+  { code: "pt", label: "Portuguese (Português)" },
+  { code: "fr", label: "French (Français)" },
+  { code: "de", label: "German (Deutsch)" },
+  { code: "ar", label: "Arabic (العربية)" },
+];
+
+function LanguageSettings() {
+  const [selectedLang, setSelectedLang] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("sidekick_ui_language") || "en";
+    }
+    return "en";
+  });
+  const [customLang, setCustomLang] = useState("");
+  const [saved, setSaved] = useState(false);
+
+  const handleSave = () => {
+    const lang = customLang.trim() || selectedLang;
+    localStorage.setItem("sidekick_ui_language", lang);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="text-xs text-gray-500 block mb-1">Dashboard Language</label>
+        <select
+          value={selectedLang}
+          onChange={(e) => setSelectedLang(e.target.value)}
+          className="w-full max-w-xs border border-gray-200 rounded-lg px-3 py-2 text-sm"
+        >
+          {LANGUAGES.map((l) => (
+            <option key={l.code} value={l.code}>{l.label}</option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <label className="text-xs text-gray-500 block mb-1">Add custom language</label>
+        <input
+          type="text"
+          value={customLang}
+          onChange={(e) => setCustomLang(e.target.value)}
+          placeholder="e.g. Tagalog, Bahasa Indonesia"
+          className="w-full max-w-xs border border-gray-200 rounded-lg px-3 py-2 text-sm"
+        />
+      </div>
+      <button
+        onClick={handleSave}
+        className="inline-flex items-center gap-2 rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white hover:bg-[#B0532F]"
+      >
+        {saved ? "Saved" : "Save Language"}
+      </button>
     </div>
   );
 }

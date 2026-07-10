@@ -9,7 +9,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const { data, error } = await supabase
     .from("training_paths")
-    .select(`*, training_path_steps(* order by step_order asc)`)
+    .select(`*, training_steps(* order by sort_order asc)`)
     .eq("id", id)
     .single();
 

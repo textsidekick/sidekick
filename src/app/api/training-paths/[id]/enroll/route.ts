@@ -47,12 +47,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   try {
     const { data: path } = await supabase
       .from("training_paths")
-      .select("name, training_path_steps!inner(title, content, step_order)")
+      .select("name, training_steps!inner(title, content, sort_order)")
       .eq("id", id)
       .single();
 
     if (path) {
-      const steps = (path.training_path_steps || []).sort((a: any, b: any) => a.step_order - b.step_order);
+      const steps = (path.training_steps || []).sort((a: any, b: any) => a.sort_order - b.sort_order);
       const firstStep = steps[0];
       if (firstStep) {
         // Notify via internal SMS trigger (best-effort, table may not exist)

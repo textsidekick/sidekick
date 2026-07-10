@@ -86,9 +86,17 @@ function normalizeRole(role?: string | null): string | null {
 function roleBadge(role?: string | null) {
   const normalizedRole = normalizeRole(role);
   if (!normalizedRole) {
+    if (!role || !role.trim()) {
+      return (
+        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-50 text-gray-600">
+          Pending role
+        </span>
+      );
+    }
+    // Show raw role (may be in another language with English in parens)
     return (
-      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-50 text-gray-600">
-        Pending role
+      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-700" title={role}>
+        {role.length > 30 ? role.slice(0, 30) + "…" : role}
       </span>
     );
   }
