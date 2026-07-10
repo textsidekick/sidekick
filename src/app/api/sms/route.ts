@@ -613,14 +613,38 @@ export async function POST(request: NextRequest) {
       .eq("phone", from)
       .maybeSingle();
 
-    // Unknown number → SMS onboarding flow
+    // Unknown number → try JOIN code first, then SMS onboarding flow
     if (!worker) {
+      // Handle "JOIN <CODE>" — worker joining a company
+      const joinMatch = body.trim().toUpperCase().match(/^JOIN\s+(.+)$/);
+      if (joinMatch) {
+        const code = joinMatch[1].trim();
+        const { data: company } = await supabase
+          .from("companies")
+          .select("id, name")
+          .or(`access_code.ilike.${code},worker_join_code.ilike.${code},invite_code.ilike.${code}`)
+          .maybeSingle();
+        if (company) {
+          // Create worker record
+          const { data: newWorker } = await supabase
+            .from("workers")
+            .upsert({ phone: from, company_id: company.id, name: "", verified: true, status: "active" }, { onConflict: "phone" })
+            .select()
+            .single();
+          return twimlResponse(
+            `Welcome to ${company.name}! You're now registered with Sidekick. What's your name?`
+          );
+        } else {
+          return twimlResponse("That code wasn't recognized. Please check with your manager for the correct join code.");
+        }
+      }
+
       const onboardingReply = await handleSmsOnboarding(from, body);
       if (onboardingReply) {
-        return twimlResponse(onboardingReply);
+        return twimlResponse(onboardingReply.message || String(onboardingReply));
       }
       return twimlResponse(
-        "This number isn't registered with Sidekick yet. Ask your manager to add you, or reply START to set up a new company."
+        "This number isn't registered with Sidekick yet. Text JOIN followed by your company code, or reply SETUP to set up a new company."
       );
     }
 

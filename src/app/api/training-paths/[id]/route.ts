@@ -9,23 +9,36 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const { data, error } = await supabase
     .from("training_paths")
-    .select(`*, training_steps(* order by sort_order asc)`)
+    .select("*")
     .eq("id", id)
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 404 });
 
-  // Get worker progress for this path
-  const { data: progress } = await supabase
-    .from("worker_training_progress")
-    .select(`
-      id, worker_phone, status, current_step, started_at, completed_at, last_activity_at,
-      workers(name)
-    `)
+  // Fetch steps separately to avoid Supabase nested ordering issues
+  const { data: steps } = await supabase
+    .from("training_steps")
+    .select("*")
     .eq("training_path_id", id)
-    .order("last_activity_at", { ascending: false });
+    .order("sort_order", { ascending: true });
 
-  return NextResponse.json({ path: data, enrollments: progress || [] });
+  // Get enrollments for this path
+  const { data: enrollments } = await supabase
+    .from("training_enrollments")
+    .select("id, worker_id, status, current_step, enrolled_at, completed_at, workers(name)")
+    .eq("training_path_id", id)
+    .order("enrolled_at", { ascending: false });
+
+  const pathWithSteps = { ...data, training_steps: steps || [] };
+
+  // Normalize for UI (expects worker_phone, last_activity_at fields)
+  const normalizedEnrollments = (enrollments || []).map((e: any) => ({
+    ...e,
+    worker_phone: e.worker_id,
+    last_activity_at: e.completed_at || e.enrolled_at,
+  }));
+
+  return NextResponse.json({ path: pathWithSteps, enrollments: normalizedEnrollments });
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

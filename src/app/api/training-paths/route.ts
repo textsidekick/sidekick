@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
   // Attach enrollment counts
   const pathIds = (paths || []).map((p) => p.id);
   const { data: progress } = await supabase
-    .from("worker_training_progress")
+    .from("training_enrollments")
     .select("training_path_id, status")
     .in("training_path_id", pathIds.length ? pathIds : ["00000000-0000-0000-0000-000000000000"]);
 
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
     }
     countsByPath[row.training_path_id].total++;
     if (row.status === "completed") countsByPath[row.training_path_id].completed++;
-    if (row.status === "in_progress") countsByPath[row.training_path_id].in_progress++;
+    if (row.status === "in_progress" || row.status === "active") countsByPath[row.training_path_id].in_progress++;
   }
 
   const result = (paths || []).map((p) => ({
