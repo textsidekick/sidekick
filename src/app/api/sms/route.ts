@@ -989,7 +989,9 @@ ${knowledgeBlock || "(no relevant knowledge found)"}`,
 
     return twimlResponse(answer);
   } catch (error) {
-    console.error("[sms:POST] error:", error);
-    return twimlResponse("Sorry, something went wrong. Please try again in a moment.");
+    const errMsg = error instanceof Error ? error.message : String(error);
+    const errStack = error instanceof Error ? error.stack?.split('\n').slice(0,3).join(' | ') : '';
+    console.error("[sms:POST] error:", errMsg, errStack);
+    return twimlResponse(`Something went wrong: ${errMsg.slice(0, 100)}`);
   }
 }
