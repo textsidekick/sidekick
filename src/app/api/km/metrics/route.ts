@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
   ] = await Promise.all([
     supabase.from("sops").select("id,status,department_id").eq("company_id", companyId).eq("is_current", true),
     supabase.from("knowledge_gaps").select("id,status,department_id").eq("company_id", companyId),
-    supabase.from("worker_training_progress").select("status,training_path_id").in(
+    supabase.from("training_enrollments").select("status,training_path_id").in(
       "training_path_id",
       (await supabase.from("training_paths").select("id").eq("company_id", companyId)).data?.map((p) => p.id) || []
     ),

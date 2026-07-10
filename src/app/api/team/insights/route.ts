@@ -87,11 +87,11 @@ export async function GET(req: NextRequest) {
   // Fetch enrollments to know who is already enrolled
   const { data: enrollments } = await supabase
     .from("training_enrollments")
-    .select("worker_phone, training_path_id")
+    .select("worker_id, training_path_id")
     .eq("company_id", companyId);
 
   const enrollmentSet = new Set(
-    (enrollments || []).map((e: { worker_phone: string; training_path_id: string }) => `${e.worker_phone}:${e.training_path_id}`)
+    (enrollments || []).map((e: { worker_id: string; training_path_id: string }) => `${e.worker_id}:${e.training_path_id}`)
   );
 
   // Group questions by worker phone
@@ -156,7 +156,7 @@ export async function GET(req: NextRequest) {
       .filter((tp) => {
         if (!recommendedNames.includes(tp.name)) return false;
         // Exclude if already enrolled
-        return !enrollmentSet.has(`${worker.phone}:${tp.id}`);
+        return !enrollmentSet.has(`${worker.id}:${tp.id}`);
       })
       .map((tp) => ({ id: tp.id, name: tp.name, role: tp.role }));
 

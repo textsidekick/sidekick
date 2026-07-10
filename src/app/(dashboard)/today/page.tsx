@@ -115,13 +115,13 @@ function KmMetricsSection({ companyId }: { companyId: string }) {
       </div>
 
       {/* Department KM scores */}
-      {metrics.departmentScores.length > 0 && (
+      {metrics.departmentScores?.length > 0 && (
         <div className="mt-5">
           <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
             Department Scores
           </h3>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-            {metrics.departmentScores.map((dept) => (
+            {(metrics.departmentScores || []).map((dept) => (
               <div
                 key={dept.id}
                 className="rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm"

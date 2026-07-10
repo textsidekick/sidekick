@@ -16,16 +16,33 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!auth.ok) return auth.response;
 
   const body = await req.json();
-  const { worker_phone, company_id, assigned_by, reminder_frequency, reminder_time, due_date } = body;
+  const { worker_phone, worker_id: bodyWorkerId, company_id, assigned_by, reminder_frequency, reminder_time, due_date } = body;
 
-  if (!worker_phone || !company_id) {
-    return NextResponse.json({ error: "worker_phone and company_id required" }, { status: 400 });
+  if ((!worker_phone && !bodyWorkerId) || !company_id) {
+    return NextResponse.json({ error: "worker_id (or worker_phone) and company_id required" }, { status: 400 });
+  }
+
+  // Resolve worker_id — prefer explicit worker_id, fall back to phone lookup
+  let workerId: string | null = bodyWorkerId || null;
+  let workerPhone: string | null = worker_phone || null;
+  if (!workerId && workerPhone) {
+    const { data: workerRow } = await supabase
+      .from("workers")
+      .select("id, phone")
+      .eq("phone", workerPhone)
+      .eq("company_id", company_id)
+      .maybeSingle();
+    workerId = workerRow?.id || null;
+    workerPhone = workerRow?.phone || workerPhone;
+  }
+  if (!workerId) {
+    return NextResponse.json({ error: "Worker not found" }, { status: 404 });
   }
 
   const { data: existing } = await supabase
-    .from("worker_training_progress")
+    .from("training_enrollments")
     .select("id, status")
-    .eq("worker_phone", worker_phone)
+    .eq("worker_id", workerId)
     .eq("training_path_id", id)
     .maybeSingle();
 
@@ -41,10 +58,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     .single();
 
   const insertData: Record<string, unknown> = {
-    worker_phone,
+    worker_id: workerId,
     company_id,
     training_path_id: id,
-    current_step: 1,
+    current_step: 0,
     status: "not_started",
     assigned_by,
     started_at: null,
@@ -55,7 +72,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (due_date) insertData.due_date = due_date;
 
   const { data, error } = await supabase
-    .from("worker_training_progress")
+    .from("training_enrollments")
     .insert(insertData)
     .select()
     .single();
@@ -63,10 +80,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   // Send SMS notification to worker
-  if (path?.name && process.env.TWILIO_PHONE_NUMBER) {
+  if (path?.name && workerPhone && process.env.TWILIO_PHONE_NUMBER) {
     try {
       await twilioClient.messages.create({
-        to: worker_phone,
+        to: workerPhone,
         from: process.env.TWILIO_PHONE_NUMBER,
         body: `You've been assigned to: ${path.name}. Reply NEXT to start your first lesson.`,
       });

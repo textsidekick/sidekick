@@ -179,19 +179,29 @@ export async function autoEnrollWorkerInPositionPaths(opts: {
     const pathId = link.training_path_id;
     const pathName = (link as any).training_paths?.name || "교육 과정";
 
-    const { data: existing } = await supabase
-      .from("worker_training_progress")
+    // Resolve worker_id from phone if not already known
+    const { data: workerRow } = await supabase
+      .from("workers")
       .select("id")
-      .eq("worker_phone", workerPhone)
+      .eq("phone", workerPhone)
+      .eq("company_id", companyId)
+      .maybeSingle();
+    const resolvedWorkerId = workerRow?.id;
+    if (!resolvedWorkerId) continue;
+
+    const { data: existing } = await supabase
+      .from("training_enrollments")
+      .select("id")
+      .eq("worker_id", resolvedWorkerId)
       .eq("training_path_id", pathId)
       .maybeSingle();
     if (existing) continue;
 
-    const { error } = await supabase.from("worker_training_progress").insert({
-      worker_phone: workerPhone,
+    const { error } = await supabase.from("training_enrollments").insert({
+      worker_id: resolvedWorkerId,
       company_id: companyId,
       training_path_id: pathId,
-      current_step: 1,
+      current_step: 0,
       status: "not_started",
       assigned_by: assignedBy,
       started_at: null,

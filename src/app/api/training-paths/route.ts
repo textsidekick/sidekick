@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
   if (steps.length > 0) {
     const stepRows = steps.map((step: any, idx: number) => ({
       training_path_id: path.id,
-      step_order: step.step_order || idx + 1,
+      sort_order: step.sort_order ?? step.step_order ?? idx + 1,
       title: step.title,
       description: step.description,
       content: step.content,
@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
       estimated_minutes: step.estimated_minutes || 15,
     }));
 
-    const { error: stepsError } = await supabase.from("training_path_steps").insert(stepRows);
+    const { error: stepsError } = await supabase.from("training_steps").insert(stepRows);
     if (stepsError) console.error("Error inserting steps:", stepsError.message);
   }
 
