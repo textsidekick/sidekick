@@ -518,7 +518,7 @@ export default function TrainingPage() {
       <div className="mt-5 flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3">
         <Link2 className="h-4 w-4 flex-shrink-0 text-blue-500" />
         <p className="text-sm text-blue-700">
-          <span className="font-semibold">Connect Google Drive, SharePoint, or Notion</span> to automatically import training materials into your paths.
+          <span className="font-semibold">Connect your tools</span> to automatically import training materials. Google Drive, SharePoint, Notion, Dropbox, Slack, Confluence, Box, and more.
         </p>
         <div className="ml-auto flex items-center gap-2">
           <span className="rounded border border-blue-200 bg-white px-2 py-0.5 text-[11px] font-medium text-blue-600"><FolderOpen className="inline h-3 w-3 mr-0.5" />Drive</span>
