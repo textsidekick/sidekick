@@ -237,8 +237,8 @@ function PathDetailModal({
     try {
       const res = await fetch("/api/onboarding/upload", { method: "POST", body: formData });
       const data = await res.json();
-      if (data.url || data.path || res.ok) {
-        setUploadedFiles((prev) => [...prev, data.url || data.path || file.name]);
+      if (res.ok && (data.success || data.documentId)) {
+        setUploadedFiles((prev) => [...prev, file.name]);
         setUploadMsg(`"${file.name}" uploaded successfully.`);
       } else {
         setUploadMsg(`Upload failed: ${data.error || "unknown error"}`);
