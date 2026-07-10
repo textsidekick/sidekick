@@ -9,6 +9,7 @@ import {
   Upload, FileText, Building2, UserPlus, FolderOpen, Link2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { t } from "@/lib/i18n";
 
 interface TrainingPath {
   id: string;
@@ -42,6 +43,7 @@ interface Enrollment {
   started_at: string | null;
   completed_at: string | null;
   last_activity_at: string;
+  due_date?: string | null;
   workers: { name: string } | null;
 }
 
@@ -116,6 +118,9 @@ function PathDetailModal({
   const [enrolling, setEnrolling] = useState(false);
   const [enrollingDept, setEnrollingDept] = useState(false);
   const [enrollMsg, setEnrollMsg] = useState("");
+  const [reminderFrequency, setReminderFrequency] = useState("none");
+  const [reminderTime, setReminderTime] = useState("09:00");
+  const [dueDate, setDueDate] = useState("");
   const [uploadMsg, setUploadMsg] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
@@ -136,7 +141,7 @@ function PathDetailModal({
     const res = await fetch(`/api/training-paths/${pathId}/enroll`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ worker_phone: enrollPhone.trim(), company_id: companyId, assigned_by: "Manager" }),
+      body: JSON.stringify({ worker_phone: enrollPhone.trim(), company_id: companyId, assigned_by: "Manager", reminder_frequency: reminderFrequency, reminder_time: reminderTime, due_date: dueDate || undefined }),
     });
     const data = await res.json();
     setEnrolling(false);
@@ -285,7 +290,7 @@ function PathDetailModal({
 
           {/* Assign to individual worker */}
           <div>
-            <h3 className="mb-2 text-sm font-semibold text-gray-700">Assign to a Worker</h3>
+            <h3 className="mb-2 text-sm font-semibold text-gray-700">{t("Assign to a Worker")}</h3>
             <div className="flex gap-2">
               <input
                 value={enrollPhone}
@@ -299,8 +304,44 @@ function PathDetailModal({
                 className="inline-flex items-center gap-1.5 rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white hover:bg-[#B0532F] disabled:opacity-50"
               >
                 {enrolling ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
-                Assign
+                {t("Assign")}
               </button>
+            </div>
+
+            {/* Reminder settings */}
+            <div className="mt-3 rounded-lg border border-gray-100 bg-gray-50 p-3 space-y-2">
+              <p className="text-xs font-semibold text-gray-600">{t("Reminder")}</p>
+              <div className="flex gap-2">
+                <select
+                  value={reminderFrequency}
+                  onChange={(e) => setReminderFrequency(e.target.value)}
+                  className="flex-1 rounded border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#C96442]/30"
+                >
+                  <option value="none">{t("No reminders")}</option>
+                  <option value="daily">{t("Daily")}</option>
+                  <option value="weekly">{t("Weekly")}</option>
+                </select>
+                {reminderFrequency !== "none" && (
+                  <select
+                    value={reminderTime}
+                    onChange={(e) => setReminderTime(e.target.value)}
+                    className="rounded border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#C96442]/30"
+                  >
+                    {["06:00","07:00","08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00"].map((h) => (
+                      <option key={h} value={h}>{new Date(`2000-01-01T${h}`).toLocaleTimeString([], { hour: "numeric", hour12: true })}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-gray-500">{t("Due date")}:</label>
+                <input
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  className="rounded border border-gray-200 px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#C96442]/30"
+                />
+              </div>
             </div>
           </div>
 
@@ -342,6 +383,14 @@ function PathDetailModal({
                       <div>
                         <p className="text-sm font-medium text-gray-800">{e.workers?.name || e.worker_phone}</p>
                         <p className="text-xs text-gray-400">Last active {timeAgo(e.last_activity_at)}</p>
+                        {e.due_date && (
+                          <p className={cn("text-xs", new Date(e.due_date) < new Date() && e.status !== "completed" ? "text-red-500 font-semibold" : "text-gray-400")}>
+                            {t("Due date")}: {new Date(e.due_date).toLocaleDateString()}
+                            {new Date(e.due_date) < new Date() && e.status !== "completed" && (
+                              <span className="ml-1.5 rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-bold text-red-700">{t("Overdue")}</span>
+                            )}
+                          </p>
+                        )}
                       </div>
                     </div>
                     {statusPill(e.status, e.current_step, path?.training_steps?.length || 1)}
@@ -464,6 +513,12 @@ export default function TrainingPage() {
   const [showForm, setShowForm] = useState(false);
   const [selectedPathId, setSelectedPathId] = useState<string | null>(null);
   const [filterDept, setFilterDept] = useState("");
+  const [, setLangTick] = useState(0);
+  useEffect(() => {
+    const onStorage = () => setLangTick(n => n + 1);
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   useEffect(() => {
     try {
@@ -510,7 +565,7 @@ export default function TrainingPage() {
   return (
     <div className="mx-auto min-h-screen max-w-7xl px-6 py-8">
       <SectionHeader
-        title="Training Paths"
+        title={t("Training Paths")}
         subtitle="Structured onboarding and skill-building programs. Workers are guided step-by-step over text — no app needed."
       />
 
@@ -532,10 +587,10 @@ export default function TrainingPage() {
         <>
           <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
-              { label: "Workers Enrolled", value: totalEnrolled, icon: Users, color: "text-blue-600" },
-              { label: "In Progress", value: totalInProgress, icon: PlayCircle, color: "text-amber-600" },
-              { label: "Completed", value: totalCompleted, icon: CheckCircle2, color: "text-green-600" },
-              { label: "Completion Rate", value: `${completionPct}%`, icon: Circle, color: "text-[#C96442]" },
+              { label: t("Workers Enrolled"), value: totalEnrolled, icon: Users, color: "text-blue-600" },
+              { label: t("In Progress"), value: totalInProgress, icon: PlayCircle, color: "text-amber-600" },
+              { label: t("Completed"), value: totalCompleted, icon: CheckCircle2, color: "text-green-600" },
+              { label: t("Completion Rate"), value: `${completionPct}%`, icon: Circle, color: "text-[#C96442]" },
             ].map((m) => (
               <div key={m.label} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
                 <div className="flex items-center gap-2">

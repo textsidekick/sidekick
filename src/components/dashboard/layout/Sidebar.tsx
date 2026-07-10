@@ -6,17 +6,29 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { t } from "@/lib/i18n";
+
+function NavItems() {
+  const [, setLang] = useState("");
+  useEffect(() => {
+    const check = () => setLang(localStorage.getItem("sidekick_ui_language") || "en");
+    check();
+    window.addEventListener("storage", check);
+    return () => window.removeEventListener("storage", check);
+  }, []);
+  return null;
+}
 
 const NAV_ITEMS = [
-  { id: "today", label: "Overview", icon: LayoutDashboard, href: "/today" },
-  { id: "inbox", label: "Inbox", icon: MessageSquare, href: "/inbox" },
-  { id: "training", label: "Training", icon: GraduationCap, href: "/training" },
-  { id: "knowledge", label: "Knowledge", icon: LibraryBig, href: "/knowledge" },
-  { id: "work-orders", label: "Work Orders", icon: ClipboardList, href: "/work-orders" },
-  { id: "assets", label: "Assets", icon: Wrench, href: "/assets" },
-  { id: "team", label: "Team", icon: Users, href: "/team" },
-  { id: "updates", label: "Updates", icon: RefreshCw, href: "/updates" },
-  { id: "settings", label: "Settings", icon: Settings, href: "/settings" },
+  { id: "today", labelKey: "Overview", icon: LayoutDashboard, href: "/today" },
+  { id: "inbox", labelKey: "Inbox", icon: MessageSquare, href: "/inbox" },
+  { id: "training", labelKey: "Training", icon: GraduationCap, href: "/training" },
+  { id: "knowledge", labelKey: "Knowledge", icon: LibraryBig, href: "/knowledge" },
+  { id: "work-orders", labelKey: "Work Orders", icon: ClipboardList, href: "/work-orders" },
+  { id: "assets", labelKey: "Assets", icon: Wrench, href: "/assets" },
+  { id: "team", labelKey: "Team", icon: Users, href: "/team" },
+  { id: "updates", labelKey: "Updates", icon: RefreshCw, href: "/updates" },
+  { id: "settings", labelKey: "Settings", icon: Settings, href: "/settings" },
 ];
 
 interface Location { id: string; name: string; city?: string; state?: string; }
@@ -25,6 +37,12 @@ interface Company { id: string; name: string; locations?: Location[]; }
 export function Sidebar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [, setLangTick] = useState(0);
+  useEffect(() => {
+    const onStorage = () => setLangTick(n => n + 1);
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>("");
   const [selectedLocationId, setSelectedLocationId] = useState<string>("all");
@@ -211,7 +229,7 @@ export function Sidebar() {
                 )}
               >
                 <item.icon className={cn("h-4 w-4 flex-shrink-0", isActive ? "text-[#C96442]" : "")} />
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             );
           })}
@@ -276,14 +294,14 @@ function BottomActions({ onNavigate }: { onNavigate?: () => void }) {
           className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors border border-[rgba(28,26,22,0.08)]"
         >
           <Home className="h-4 w-4" />
-          Home
+          {t("Home")}
         </button>
         <button
           onClick={() => { onNavigate?.(); handleLogout(); }}
           className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors border border-[rgba(28,26,22,0.08)]"
         >
           <LogOut className="h-4 w-4" />
-          Logout
+          {t("Logout")}
         </button>
       </div>
     </div>

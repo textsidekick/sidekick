@@ -436,6 +436,7 @@ function LanguageSettings() {
   const handleSave = () => {
     const lang = customLang.trim() || selectedLang;
     localStorage.setItem("sidekick_ui_language", lang);
+    window.dispatchEvent(new StorageEvent("storage", { key: "sidekick_ui_language", newValue: lang }));
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };

@@ -615,7 +615,7 @@ export async function POST(request: NextRequest) {
 
     // Unknown number → SMS onboarding flow
     if (!worker) {
-      const onboardingReply = await handleSmsOnboarding({ from, body, viaWhatsApp });
+      const onboardingReply = await handleSmsOnboarding(from, body);
       if (onboardingReply) {
         return twimlResponse(onboardingReply);
       }
