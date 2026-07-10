@@ -202,9 +202,10 @@ function PathDetailModal({
     setEnrollingDept(true);
     setEnrollMsg("");
     try {
-      const workersRes = await fetch(`/api/workers?companyId=${companyId}&departmentId=${enrollDept}`);
+      const workersRes = await fetch(`/api/team?companyId=${companyId}`);
       const workersData = await workersRes.json();
-      const workers: Worker[] = workersData.workers || [];
+      const allWorkers: Worker[] = workersData.workers || workersData.team || [];
+      const workers: Worker[] = allWorkers.filter((w) => !enrollDept || w.department_id === enrollDept);
       let enrolled = 0;
       for (const w of workers) {
         const res = await fetch(`/api/training-paths/${pathId}/enroll`, {

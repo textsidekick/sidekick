@@ -253,3 +253,125 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
+
+// ---------------------------------------------------------------------------
+// PATCH /api/positions
+// Body: { id, name?, name_en?, department?, description?, required_skills? }
+// ---------------------------------------------------------------------------
+export async function PATCH(request: NextRequest) {
+  try {
+    const companyId = await getCompanyId(request);
+    if (!companyId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== "object" || !body.id) {
+      return NextResponse.json({ error: "id is required" }, { status: 400 });
+    }
+
+    const positionId = String(body.id);
+
+    // Verify the position belongs to this company
+    const { data: existing } = await supabase
+      .from("positions")
+      .select("id")
+      .eq("id", positionId)
+      .eq("company_id", companyId)
+      .maybeSingle();
+
+    if (!existing) {
+      return NextResponse.json({ error: "Position not found" }, { status: 404 });
+    }
+
+    const updates: Record<string, unknown> = {};
+    if (typeof body.name === "string" && body.name.trim()) updates.name = body.name.trim();
+    if (typeof body.name_en === "string") updates.name_en = body.name_en.trim() || null;
+    if (typeof body.description === "string") updates.description = body.description.trim() || null;
+    if (Array.isArray(body.required_skills)) {
+      updates.required_skills = body.required_skills.filter((s: unknown) => typeof s === "string" && s.trim());
+    }
+    // department lookup by name if provided as string
+    if (typeof body.department === "string" && body.department.trim()) {
+      const { data: dept } = await supabase
+        .from("departments")
+        .select("id")
+        .eq("company_id", companyId)
+        .ilike("name", body.department.trim())
+        .maybeSingle();
+      if (dept) updates.department_id = dept.id;
+    } else if (body.department === null || body.department === "") {
+      updates.department_id = null;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json({ error: "No valid fields to update" }, { status: 400 });
+    }
+
+    const { data: updated, error: updateError } = await supabase
+      .from("positions")
+      .update(updates)
+      .eq("id", positionId)
+      .select()
+      .single();
+
+    if (updateError || !updated) {
+      console.error("[positions:PATCH] update failed:", updateError);
+      return NextResponse.json({ error: "Failed to update position" }, { status: 500 });
+    }
+
+    return NextResponse.json({ position: updated });
+  } catch (err) {
+    console.error("[positions:PATCH] unexpected error:", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+
+// ---------------------------------------------------------------------------
+// DELETE /api/positions?id=<positionId>
+// ---------------------------------------------------------------------------
+export async function DELETE(request: NextRequest) {
+  try {
+    const companyId = await getCompanyId(request);
+    if (!companyId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const positionId = searchParams.get("id");
+    if (!positionId) {
+      return NextResponse.json({ error: "id query param is required" }, { status: 400 });
+    }
+
+    // Verify ownership
+    const { data: existing } = await supabase
+      .from("positions")
+      .select("id")
+      .eq("id", positionId)
+      .eq("company_id", companyId)
+      .maybeSingle();
+
+    if (!existing) {
+      return NextResponse.json({ error: "Position not found" }, { status: 404 });
+    }
+
+    // Remove related rows first
+    await supabase.from("position_sops").delete().eq("position_id", positionId);
+    await supabase.from("position_training_paths").delete().eq("position_id", positionId);
+
+    const { error: deleteError } = await supabase
+      .from("positions")
+      .delete()
+      .eq("id", positionId);
+
+    if (deleteError) {
+      console.error("[positions:DELETE] delete failed:", deleteError);
+      return NextResponse.json({ error: "Failed to delete position" }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("[positions:DELETE] unexpected error:", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
