@@ -4,32 +4,43 @@ import { getCompanyId } from "@/lib/dashboard-auth";
 
 // Topic keyword → training path name mappings
 const TOPIC_TO_TRAINING: Record<string, string[]> = {
-  // Bonding / sewing
-  "본딩": ["봉제기술 전문과정"],
-  "봉제": ["봉제기술 전문과정"],
-  "재봉": ["봉제기술 전문과정"],
-  "필로우": ["봉제기술 전문과정"],
-  "bonding": ["봉제기술 전문과정"],
-  "sewing": ["봉제기술 전문과정"],
+  // Sewing
+  "sewing": ["Sewing Specialist Course"],
+  "needle": ["Sewing Specialist Course"],
+  "thread": ["Sewing Specialist Course"],
+  "quilting": ["Sewing Specialist Course"],
+  "pattern": ["Sewing Specialist Course"],
+  "stitch": ["Sewing Specialist Course"],
+  // Bonding
+  "bonding": ["Sewing Specialist Course", "Production Line New Hire Training"],
+  "temperature": ["Sewing Specialist Course"],
+  "adhesive": ["Production Line New Hire Training"],
   // Safety / new hire
-  "안전": ["생산라인 신입 교육"],
-  "소화기": ["생산라인 신입 교육"],
-  "지게차": ["생산라인 신입 교육"],
-  "forklift": ["생산라인 신입 교육"],
-  "safety": ["생산라인 신입 교육"],
-  "화재": ["생산라인 신입 교육"],
+  "safety": ["Production Line New Hire Training", "Night Shift Safety Training"],
+  "hazard": ["Production Line New Hire Training"],
+  "fire": ["Night Shift Safety Training"],
+  "evacuation": ["Night Shift Safety Training"],
+  // Forklift
+  "forklift": ["Forklift Certification"],
+  "charging": ["Forklift Certification"],
   // Equipment
-  "설비": ["설비관리 기초"],
-  "기계": ["설비관리 기초"],
-  "equipment": ["설비관리 기초"],
-  "스프링": ["설비관리 기초"],
-  "코일": ["설비관리 기초"],
+  "equipment": ["Equipment Maintenance Basics"],
+  "machine": ["Equipment Maintenance Basics"],
+  "conveyor": ["Equipment Maintenance Basics"],
+  "maintenance": ["Equipment Maintenance Basics"],
+  "compressor": ["Equipment Maintenance Basics"],
+  "startup": ["Equipment Maintenance Basics"],
+  "grinding": ["Equipment Maintenance Basics"],
   // Quality
-  "품질": ["품질검사원 양성"],
-  "색상": ["품질검사원 양성"],
-  "불량": ["품질검사원 양성"],
-  "quality": ["품질검사원 양성"],
-  "검사": ["품질검사원 양성"],
+  "quality": ["QC Inspector Training"],
+  "inspection": ["QC Inspector Training"],
+  "color": ["QC Inspector Training"],
+  "defect": ["QC Inspector Training"],
+  "delta": ["QC Inspector Training"],
+  "acceptance": ["QC Inspector Training"],
+  // Latex
+  "latex": ["Latex Processing Specialist"],
+  "foam": ["Latex Processing Specialist"],
 };
 
 function getRecommendedTrainingNames(topics: string[]): string[] {
@@ -52,7 +63,7 @@ export async function GET(req: NextRequest) {
   // Fetch all questions for the company
   const { data: questions, error: qErr } = await supabase
     .from("questions")
-    .select("worker_phone, worker_name, topic, answer, confidence")
+    .select("worker_phone, worker_name, question, topic, answer, confidence")
     .eq("company_id", companyId);
 
   if (qErr) return NextResponse.json({ error: qErr.message }, { status: 500 });
@@ -134,9 +145,12 @@ export async function GET(req: NextRequest) {
     const knowledgeLevel: "high" | "medium" | "low" =
       knowledgeScore >= 65 ? "high" : knowledgeScore >= 35 ? "medium" : "low";
 
-    // Recommended training: match topics to training paths, exclude already enrolled
+    // Recommended training: match topics AND question text to training paths
     const askedTopics = topTopics.map((t) => t.topic);
-    const recommendedNames = getRecommendedTrainingNames(askedTopics);
+    // Also extract keywords from actual question text
+    const questionTexts = workerQuestions.map((q) => (q as any).question || "").filter(Boolean);
+    const allMatchInputs = [...askedTopics, ...questionTexts];
+    const recommendedNames = getRecommendedTrainingNames(allMatchInputs);
 
     const recommendedTraining = (trainingPaths || [])
       .filter((tp) => {
