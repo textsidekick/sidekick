@@ -809,8 +809,8 @@ export async function POST(request: NextRequest) {
     // -----------------------------------------------------------------------
     // 10. Load position + SOP context (used for coaching AND Q&A below)
     // -----------------------------------------------------------------------
-    const positionContext = await getWorkerPositionContext(worker.id, companyId);
-    const positionBlock = buildPositionPromptBlock(positionContext);
+    const positionContext = await getWorkerPositionContext(companyId, worker.phone);
+    const positionBlock = positionContext ? buildPositionPromptBlock(positionContext, lang) : "";
 
     const sopContext = await getSopAnswerContext({
       companyId,
@@ -902,7 +902,7 @@ ${knowledgeBlock || "(no relevant knowledge found)"}`,
       answer = await completeVisionTextOpenAIFirst({
         system: systemPrompt,
         user: body || "What do you see in this image? Is anything wrong?",
-        imageUrl: mediaUrl,
+        imageUrl: mediaUrl!,
         maxTokens: 450,
       });
     } else {

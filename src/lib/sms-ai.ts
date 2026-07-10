@@ -140,17 +140,17 @@ export async function completeJsonOpenAIFirst(params: {
 }
 
 export async function completeVisionTextOpenAIFirst(params: {
-  prompt: string;
-  base64: string;
-  mediaType: string;
+  system?: string;
+  user: string;
+  imageUrl: string;
   maxTokens?: number;
   openaiModel?: string;
   anthropicModel?: string;
 }) {
   const {
-    prompt,
-    base64,
-    mediaType,
+    system,
+    user,
+    imageUrl,
     maxTokens = 500,
     openaiModel = process.env.OPENAI_SMS_VISION_MODEL || process.env.OPENAI_SMS_MODEL || "gpt-4.1",
     anthropicModel = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6",
@@ -158,11 +158,12 @@ export async function completeVisionTextOpenAIFirst(params: {
 
   let anthropicError: unknown = null;
 
-  // Primary: Anthropic (Claude)
+  // Primary: Anthropic (Claude) — supports image URLs directly
   try {
     const response = await anthropic.messages.create({
       model: anthropicModel,
       max_tokens: maxTokens,
+      system,
       messages: [
         {
           role: "user",
@@ -170,14 +171,13 @@ export async function completeVisionTextOpenAIFirst(params: {
             {
               type: "image",
               source: {
-                type: "base64",
-                media_type: toAnthropicImageMediaType(mediaType),
-                data: base64,
-              },
+                type: "url",
+                url: imageUrl,
+              } as any,
             },
             {
               type: "text",
-              text: prompt,
+              text: user,
             },
           ],
         },
@@ -192,22 +192,23 @@ export async function completeVisionTextOpenAIFirst(params: {
     console.error("[SMS-AI] Anthropic vision request failed, falling back to OpenAI:", error);
   }
 
-  // Fallback: OpenAI
+  // Fallback: OpenAI — also supports image URLs
   try {
     const response = await openai.chat.completions.create({
       model: openaiModel,
       max_tokens: maxTokens,
       messages: [
+        ...(system ? [{ role: "system" as const, content: system }] : []),
         {
           role: "user",
           content: [
             {
               type: "image_url",
-              image_url: { url: `data:${mediaType};base64,${base64}` },
+              image_url: { url: imageUrl },
             },
             {
               type: "text",
-              text: prompt,
+              text: user,
             },
           ],
         },
