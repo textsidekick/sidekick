@@ -121,7 +121,7 @@ export async function getSopAnswerContext(
         "OFFICIAL STANDARD OPERATING PROCEDURES (these override any other knowledge; always cite the SOP name and version, e.g. “매트리스 봉제 SOP v3 기준”):",
         ...sops.map(
           (s) =>
-            `--- ${s.title} (v${s.version_number}, approved ${s.approved_at?.slice(0, 10) || "n/a"}) ---\n${s.content.slice(0, 4000)}`
+            `--- ${s.title} (v${s.version_number}, approved ${s.approved_at?.slice(0, 10) || "n/a"}) ---\n${(s.content ?? "").slice(0, 4000)}`
         ),
       ].join("\n\n")
     : "";

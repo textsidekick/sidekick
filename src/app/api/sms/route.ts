@@ -573,10 +573,16 @@ function buildPositionPrompt(positions: any[], lang: string): string {
 }
 
 export async function POST(request: NextRequest) {
-  // Parse form data BEFORE try block so fallback can use it
-  const formData = await request.formData();
-  const _savedBody = String(formData.get("Body") || "").trim();
-  const _savedFrom = normalizePhoneNumber(String(formData.get("From") || "").replace(/^whatsapp:/, ""));
+  let _savedBody = "";
+  let _savedFrom = "";
+  let formData: FormData;
+  try {
+    formData = await request.formData();
+    _savedBody = String(formData.get("Body") || "").trim();
+    _savedFrom = normalizePhoneNumber(String(formData.get("From") || "").replace(/^whatsapp:/, ""));
+  } catch {
+    return twimlResponse("Could not process your message. Please try again.");
+  }
   try {
     // -----------------------------------------------------------------------
     // 1. Parse Twilio webhook payload (form-encoded)
