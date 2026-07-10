@@ -995,8 +995,28 @@ ${knowledgeBlock || "(no relevant knowledge found)"}`,
     return twimlResponse(answer);
   } catch (error) {
     const errMsg = error instanceof Error ? error.message : String(error);
-    const errStack = error instanceof Error ? error.stack?.split('\n').slice(0,3).join(' | ') : '';
-    console.error("[sms:POST] error:", errMsg, errStack);
+    console.error("[sms:POST] outer error:", errMsg);
+    // Last-resort fallback: try simple SOP Q&A directly
+    try {
+      const formData2 = await request.clone().formData().catch(() => null);
+      const body2 = formData2 ? String(formData2.get("Body") || "").trim() : "";
+      const rawFrom2 = formData2 ? String(formData2.get("From") || "") : "";
+      const from2 = normalizePhoneNumber(rawFrom2.replace(/^whatsapp:/, ""));
+      if (body2 && from2) {
+        const { data: w } = await supabase.from("workers").select("company_id").eq("phone", from2).maybeSingle();
+        if (w) {
+          const sopCtx = await getSopAnswerContext({ companyId: w.company_id, query: body2 });
+          const fallbackAnswer = await completeTextOpenAIFirst({
+            system: `You are Sidekick, a helpful assistant. Answer based on these SOPs:\n${sopCtx?.promptBlock || "(no SOPs found)"}`,
+            user: body2,
+            maxTokens: 400,
+          });
+          return twimlResponse(fallbackAnswer);
+        }
+      }
+    } catch (fallbackErr) {
+      console.error("[sms:POST] fallback also failed:", fallbackErr);
+    }
     return twimlResponse("Sorry, something went wrong. Please try again in a moment.");
   }
 }
