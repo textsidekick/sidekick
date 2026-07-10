@@ -18,8 +18,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Read file content
-    const text = await file.text();
+    // Determine if this is a text file or binary file
+    const textExtensions = [".txt", ".csv", ".md", ".json", ".xml", ".html", ".htm"];
+    const fileName = file.name.toLowerCase();
+    const isTextFile = textExtensions.some((ext) => fileName.endsWith(ext));
+
+    let content: string;
+    if (isTextFile) {
+      content = await file.text();
+    } else {
+      // Binary file (PDF, DOC, JPG, PNG, etc.) — store metadata placeholder
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+      const sizeStr = file.size < 1024 * 1024 ? `${(file.size / 1024).toFixed(0)}KB` : `${sizeMB}MB`;
+      content = `[Binary file: ${file.name}, size: ${sizeStr}, type: ${file.type || "unknown"}]`;
+    }
 
     // Save to documents table
     const { data, error } = await supabase
@@ -27,7 +39,7 @@ export async function POST(request: NextRequest) {
       .insert({
         company_id: companyId,
         name: file.name,
-        content: text,
+        content,
       })
       .select()
       .single();

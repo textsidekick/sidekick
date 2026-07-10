@@ -134,6 +134,9 @@ function PathDetailModal({
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [selectedWorkerId, setSelectedWorkerId] = useState("");
   const [loadingWorkers, setLoadingWorkers] = useState(false);
+  const [workerSearch, setWorkerSearch] = useState("");
+  const [workerDropdownOpen, setWorkerDropdownOpen] = useState(false);
+  const workerDropdownRef = useRef<HTMLDivElement>(null);
 
   const reload = useCallback(() => {
     fetch(`/api/training-paths/${pathId}`)
@@ -172,6 +175,17 @@ function PathDetailModal({
   }, [companyId]);
 
   const selectedWorker = workers.find((w) => w.id === selectedWorkerId);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (workerDropdownRef.current && !workerDropdownRef.current.contains(e.target as Node)) {
+        setWorkerDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
 
   const handleEnroll = async () => {
     const phone = selectedWorker?.phone || enrollPhone.trim();
@@ -401,52 +415,153 @@ function PathDetailModal({
           {/* Assign to individual worker */}
           <div>
             <h3 className="mb-2 text-sm font-semibold text-gray-700">{t("Assign to a Worker")}</h3>
-            {/* Worker dropdown */}
+            {/* Custom searchable worker dropdown */}
             {(() => {
+              // Sort workers: recommended first, then same-dept, then rest
+              const enrolledPhones = new Set(enrollments.map((e) => e.worker_phone));
               const recommendedWorkers = workers.filter((w) =>
+                !enrolledPhones.has(w.phone) &&
                 w.recommendedTraining?.some((rt) =>
                   path?.name?.toLowerCase().includes(rt.toLowerCase()) ||
+                  rt.toLowerCase().includes(path?.name?.toLowerCase() || "") ||
                   path?.description?.toLowerCase().includes(rt.toLowerCase())
                 )
               );
               const recommendedIds = new Set(recommendedWorkers.map((w) => w.id));
-              const otherWorkers = workers.filter((w) => !recommendedIds.has(w.id)).sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+              const sameDeptWorkers = workers.filter(
+                (w) => !recommendedIds.has(w.id) && !enrolledPhones.has(w.phone) && path?.department_id && w.department_id === path.department_id
+              ).sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+              const sameDeptIds = new Set(sameDeptWorkers.map((w) => w.id));
+              const otherWorkers = workers
+                .filter((w) => !recommendedIds.has(w.id) && !sameDeptIds.has(w.id))
+                .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+
+              const searchLower = workerSearch.toLowerCase();
+              const filterWorker = (w: Worker) =>
+                !workerSearch || (w.name || "").toLowerCase().includes(searchLower) || (w.role || "").toLowerCase().includes(searchLower);
+
+              const filteredRecommended = recommendedWorkers.filter(filterWorker);
+              const filteredSameDept = sameDeptWorkers.filter(filterWorker);
+              const filteredOther = otherWorkers.filter(filterWorker);
+              const hasAny = filteredRecommended.length + filteredSameDept.length + filteredOther.length > 0;
+
+              const knowledgeColor = (level?: string | null) => {
+                if (level === "high") return "text-green-600";
+                if (level === "low") return "text-red-500";
+                return "text-amber-600";
+              };
+
+              const renderWorkerRow = (w: Worker, isRecommended: boolean) => (
+                <button
+                  key={w.id}
+                  type="button"
+                  onClick={() => { setSelectedWorkerId(w.id); setWorkerDropdownOpen(false); setWorkerSearch(""); }}
+                  className={cn(
+                    "flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-gray-50",
+                    selectedWorkerId === w.id && "bg-[#F7F3EC]",
+                    isRecommended && "bg-amber-50/60 hover:bg-amber-50"
+                  )}
+                >
+                  {isRecommended && <Star className="h-3.5 w-3.5 flex-shrink-0 fill-amber-400 text-amber-400" />}
+                  {!isRecommended && <span className="w-3.5" />}
+                  <span className="flex-1 min-w-0">
+                    <span className="font-medium text-gray-800">{w.name}</span>
+                    {w.role && <span className="text-gray-400"> — {w.role}</span>}
+                    {w.knowledgeLevel && (
+                      <span className={cn("ml-1 text-xs font-medium", knowledgeColor(w.knowledgeLevel))}>
+                        — Knowledge: {w.knowledgeLevel.charAt(0).toUpperCase() + w.knowledgeLevel.slice(1)}
+                      </span>
+                    )}
+                  </span>
+                </button>
+              );
+
               return (
                 <div className="flex gap-2">
-                  <div className="flex-1 relative">
+                  <div className="flex-1 relative" ref={workerDropdownRef}>
                     {loadingWorkers ? (
                       <div className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-400">
                         <Loader2 className="h-4 w-4 animate-spin" /> Loading workers...
                       </div>
                     ) : (
-                      <select
-                        value={selectedWorkerId}
-                        onChange={(e) => setSelectedWorkerId(e.target.value)}
-                        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30 bg-white"
-                      >
-                        <option value="">Select a worker...</option>
-                        {recommendedWorkers.length > 0 && (
-                          <optgroup label="Recommended">
-                            {recommendedWorkers.map((w) => (
-                              <option key={w.id} value={w.id}>
-                                {w.name}{w.role ? ` — ${w.role}` : ""}{w.knowledgeLevel ? ` — Knowledge: ${w.knowledgeLevel}` : ""}
-                              </option>
-                            ))}
-                          </optgroup>
+                      <>
+                        {/* Search input / selected display */}
+                        <div
+                          className="flex cursor-text items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus-within:ring-2 focus-within:ring-[#C96442]/30"
+                          onClick={() => setWorkerDropdownOpen(true)}
+                        >
+                          {selectedWorker && !workerDropdownOpen ? (
+                            <>
+                              {recommendedIds.has(selectedWorker.id) && <Star className="h-3.5 w-3.5 flex-shrink-0 fill-amber-400 text-amber-400" />}
+                              <span className="flex-1 truncate text-gray-800">
+                                {selectedWorker.name}{selectedWorker.role ? ` — ${selectedWorker.role}` : ""}
+                                {selectedWorker.knowledgeLevel && (
+                                  <span className={cn("ml-1 text-xs", knowledgeColor(selectedWorker.knowledgeLevel))}>
+                                    — Knowledge: {selectedWorker.knowledgeLevel.charAt(0).toUpperCase() + selectedWorker.knowledgeLevel.slice(1)}
+                                  </span>
+                                )}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); setSelectedWorkerId(""); }}
+                                className="text-gray-300 hover:text-gray-500"
+                              >
+                                <X className="h-3.5 w-3.5" />
+                              </button>
+                            </>
+                          ) : (
+                            <input
+                              autoFocus={workerDropdownOpen}
+                              className="flex-1 bg-transparent outline-none placeholder-gray-400 text-sm"
+                              placeholder={selectedWorker ? selectedWorker.name : "Search workers..."}
+                              value={workerSearch}
+                              onChange={(e) => { setWorkerSearch(e.target.value); setWorkerDropdownOpen(true); }}
+                              onFocus={() => setWorkerDropdownOpen(true)}
+                            />
+                          )}
+                          <ChevronDown className="h-3.5 w-3.5 flex-shrink-0 text-gray-400" />
+                        </div>
+
+                        {/* Dropdown list */}
+                        {workerDropdownOpen && (
+                          <div className="absolute left-0 top-full z-50 mt-1 w-full rounded-xl border border-gray-100 bg-white shadow-lg overflow-hidden">
+                            <div className="max-h-60 overflow-y-auto">
+                              {!hasAny && (
+                                <div className="px-3 py-4 text-center text-sm text-gray-400">No workers found</div>
+                              )}
+                              {filteredRecommended.length > 0 && (
+                                <>
+                                  <div className="sticky top-0 bg-amber-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-amber-700 border-b border-amber-100">
+                                    Recommended
+                                  </div>
+                                  {filteredRecommended.map((w) => renderWorkerRow(w, true))}
+                                </>
+                              )}
+                              {filteredSameDept.length > 0 && (
+                                <>
+                                  <div className="sticky top-0 bg-gray-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-100">
+                                    Same Department
+                                  </div>
+                                  {filteredSameDept.map((w) => renderWorkerRow(w, false))}
+                                </>
+                              )}
+                              {filteredOther.length > 0 && (
+                                <>
+                                  {(filteredRecommended.length > 0 || filteredSameDept.length > 0) && (
+                                    <div className="sticky top-0 bg-gray-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-100">
+                                      All Workers
+                                    </div>
+                                  )}
+                                  {filteredOther.map((w) => renderWorkerRow(w, false))}
+                                </>
+                              )}
+                            </div>
+                          </div>
                         )}
-                        {otherWorkers.length > 0 && (
-                          <optgroup label={recommendedWorkers.length > 0 ? "All Workers" : "Workers"}>
-                            {otherWorkers.map((w) => (
-                              <option key={w.id} value={w.id}>
-                                {w.name}{w.role ? ` — ${w.role}` : ""}{w.knowledgeLevel ? ` — Knowledge: ${w.knowledgeLevel}` : ""}
-                              </option>
-                            ))}
-                          </optgroup>
-                        )}
-                      </select>
+                      </>
                     )}
                     {/* Recommended badge under dropdown */}
-                    {selectedWorkerId && recommendedIds.has(selectedWorkerId) && (
+                    {selectedWorkerId && recommendedIds.has(selectedWorkerId) && !workerDropdownOpen && (
                       <div className="mt-1 flex items-center gap-1 text-xs text-amber-700">
                         <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
                         Recommended for this training
