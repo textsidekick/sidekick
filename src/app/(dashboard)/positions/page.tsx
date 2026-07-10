@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import {
   Briefcase,
+  ChevronDown,
   Plus,
   Pencil,
   Trash2,
@@ -290,3 +291,64 @@ export default function PositionsPage() {
                           </span>
                         </div>
                         <div className="h-1.5 rounded-full bg-gray-100">
+                          <div
+                            className={`h-1.5 rounded-full ${
+                              pct >= 80
+                                ? "bg-green-500"
+                                : pct >= 50
+                                ? "bg-amber-500"
+                                : "bg-red-500"
+                            }`}
+                            style={{ width: `${Math.min(pct, 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Expand chevron */}
+                  <ChevronDown
+                    className={`h-5 w-5 text-gray-400 transition-transform ${
+                      expanded ? "rotate-180" : ""
+                    }`}
+                  />
+                </div>
+
+                {/* Expanded detail */}
+                {expanded && (
+                  <div className="border-t border-gray-100 px-5 py-4 bg-gray-50">
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-500">Department:</span>{" "}
+                        <span className="text-gray-900">{p.department_name || "—"}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Workers:</span>{" "}
+                        <span className="text-gray-900">{p.worker_count}명</span>
+                      </div>
+                    </div>
+                    {p.required_skills?.length > 0 && (
+                      <div className="mt-3">
+                        <span className="text-xs text-gray-500">Required Skills:</span>
+                        <div className="flex flex-wrap gap-1.5 mt-1">
+                          {p.required_skills.map((skill: string) => (
+                            <span
+                              key={skill}
+                              className="px-2 py-0.5 text-xs rounded-full bg-blue-50 text-blue-700"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}

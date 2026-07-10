@@ -246,3 +246,19 @@ export function buildSopAnswerResponse(
 // ─────────────────────────────────────────────────────────────
 
 export async function sendKakaoCallback(callbackUrl: string, response: KakaoSkillResponse): Promise<boolean> {
+  try {
+    const res = await fetch(callbackUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(response),
+    });
+    if (!res.ok) {
+      console.error(`[Kakao] Callback failed: ${res.status} ${res.statusText}`);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error("[Kakao] Callback delivery error:", error);
+    return false;
+  }
+}
