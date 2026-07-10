@@ -1,0 +1,78 @@
+import { supabase } from "@/lib/supabase";
+import { expandQuery, buildGlossaryPrompt } from "@/lib/terminology";
+
+export type SopMatch = {
+  id: string;
+  slug: string;
+  title: string;
+  content: string;
+  version_number: number;
+  approved_at: string | null;
+  department_id: string | null;
+  language: string;
+};
+
+/**
+ * SOP-first retrieval for the SMS answer pipeline.
+ *
+ * Rules for Ace Bed:
+ *  - Only CURRENT + ACTIVE SOP versions are ever surfaced.
+ *  - SOPs outrank tribal knowledge (they are the approved procedure).
+ *  - Answers cite the SOP title and version so workers know which
+ *    revision they're following.
+ *
+ * Usage in the SMS webhook (before building the LLM prompt):
+ *
+ *   const ctx = await getSopAnswerContext(companyId, incomingMessage);
+ *   if (ctx.promptBlock) systemPrompt += "\n\n" + ctx.promptBlock;
+ */
+export async function getSopAnswerContext(companyId: string, query: string, opts?: {
+  workerPhone?: string;
+  limit?: number;
+}) {
+  const { expandedQuery, matchedTerms } = await expandQuery(companyId, query);
+
+  const { data, error } = await supabase
+    .from("sops")
+    .select("id, slug, title, content, version_number, approved_at, department_id, language")
+    .eq("company_id", companyId)
+    .eq("is_current", true)
+    .eq("status", "active")
+    .textSearch("search_tsv", expandedQuery, { type: "websearch", config: "simple" })
+    .limit(opts?.limit ?? 3);
+
+  if (error) {
+    console.error("SOP retrieval error:", error);
+    return { sops: [] as SopMatch[], promptBlock: "", matchedTerms };
+  }
+
+  const sops = (data || []) as SopMatch[];
+
+  // Log usage — feeds KM metrics ("which SOPs actually get used")
+  if (sops.length > 0) {
+    await supabase.from("knowledge_events").insert(
+      sops.map((s) => ({
+        company_id: companyId,
+        source_type: "sop",
+        source_id: s.id,
+        event: "sms_answer",
+        worker_phone: opts?.workerPhone || null,
+        department_id: s.department_id,
+      }))
+    );
+  }
+
+  const glossary = buildGlossaryPrompt(matchedTerms);
+  const sopBlock = sops.length
+    ? [
+        "OFFICIAL STANDARD OPERATING PROCEDURES (these override any other knowledge; always cite the SOP name and version, e.g. “매트리스 봉제 SOP v3 기준”):",
+        ...sops.map(
+          (s) =>
+            `--- ${s.title} (v${s.version_number}, approved ${s.approved_at?.slice(0, 10) || "n/a"}) ---\n${s.content.slice(0, 4000)}`
+        ),
+      ].join("\n\n")
+    : "";
+
+  const promptBlock = [glossary, sopBlock].filter(Boolean).join("\n\n");
+  return { sops, promptBlock, matchedTerms };
+}

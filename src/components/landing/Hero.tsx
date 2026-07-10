@@ -5,7 +5,7 @@ import { ArrowIcon, CheckIcon } from "@/components/landing/icons";
 
 const HEADLINE = "Your workers text. Sidekick handles the rest.";
 const SUBHEAD =
-  "A machine acting up. A safety hazard on the floor. A part running low. Your workers see it all — now they can report it in 20 seconds by text. Sidekick triages, assigns, and tracks every issue automatically.";
+  "SOPs over text. Structured onboarding. Knowledge that doesn't walk out the door. Sidekick turns your frontline operations into a living knowledge system — no app, no training required.";
 
 export default function Hero() {
   return (

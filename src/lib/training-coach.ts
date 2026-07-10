@@ -1,3 +1,32 @@
+// SOP lookup patterns — "what's the SOP for X", "show me SOP", etc.
+const SOP_LOOKUP_PATTERNS = [
+  /\bsop\s+for\b/i,
+  /\bsop:\s/i,
+  /\bshow\s+(me\s+)?sop\b/i,
+  /\bget\s+sop\b/i,
+  /\bwhat'?s?\s+the\s+sop\b/i,
+  /\bwhats?\s+sop\b/i,
+  /\bfind\s+sop\b/i,
+  /\bsop\s+\w/i,
+  /\b표준\s*작업\b/i,      // Korean: standard work
+  /\b작업\s*지침\b/i,      // Korean: work instruction
+  /\bstandard\s+procedure\b/i,
+  /\bwork\s+instruction\b/i,
+];
+
+export function isSopLookupRequest(text: string): boolean {
+  return SOP_LOOKUP_PATTERNS.some((p) => p.test(text.trim()));
+}
+
+// Extract the topic from an SOP query, e.g. "SOP for machine startup" → "machine startup"
+export function extractSopTopic(text: string): string {
+  const cleaned = text.trim();
+  return cleaned
+    .replace(/^(what'?s?\s+the\s+sop\s+for|sop\s+for|show\s+me\s+sop\s+for|get\s+sop\s+for|sop:)\s*/i, "")
+    .replace(/^sop\s+/i, "")
+    .trim();
+}
+
 const TRAINING_REQUEST_PATTERNS = [
   /\bhow do i\b/i,
   /\bhow to\b/i,
@@ -45,6 +74,7 @@ const TRAINING_FOLLOW_UP_MAP: Array<{ kind: TrainingCoachFollowUpKind; patterns:
 
 export const TRAINING_COACH_TOPIC = "training_coach";
 export const TRAINING_COACH_FOLLOW_UP_TOPIC = "training_coach_followup";
+export const SOP_LOOKUP_TOPIC = "sop_lookup";
 
 export type TrainingCoachFollowUpKind = "done" | "help" | "next";
 

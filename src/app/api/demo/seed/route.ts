@@ -254,7 +254,104 @@ export async function POST(request: NextRequest) {
       if (!error) proceduresCreated++;
     }
 
-    return NextResponse.json({ success: true, documentsCreated, proceduresCreated });
+    // Seed SOPs for demo
+    const DEMO_SOPS = [
+      {
+        slug: "machine-a-startup",
+        title: "Machine A Startup Procedure",
+        description: "Daily startup checklist for Machine A",
+        content: "Step 1: Check coolant level in reservoir\nStep 2: Set pressure to 85 PSI\nStep 3: Run 30-second warm-up cycle\nStep 4: Verify all guards are in place\nStep 5: Sign startup log and begin production",
+        category: "Operations",
+        tags: ["startup", "machine-a", "daily"],
+        version_number: 3,
+        language: "en",
+        status: "active",
+        approved_by: "Plant Manager",
+        created_by: "Safety Team",
+      },
+      {
+        slug: "loto-procedure",
+        title: "Lockout/Tagout (LOTO) Procedure",
+        description: "Required before any maintenance or repair work",
+        content: "Step 1: Notify all affected workers\nStep 2: Identify all energy sources\nStep 3: Shut down equipment using normal stopping procedure\nStep 4: Isolate all energy sources\nStep 5: Apply lockout/tagout devices\nStep 6: Release or restrain stored energy\nStep 7: Verify isolation is complete",
+        category: "Safety",
+        tags: ["safety", "loto", "maintenance", "mandatory"],
+        version_number: 2,
+        language: "en",
+        status: "active",
+        approved_by: "EHS Manager",
+        created_by: "EHS Team",
+      },
+      {
+        slug: "quality-inspection",
+        title: "Quality Inspection Checklist",
+        description: "End-of-line quality check procedure",
+        content: "Step 1: Check dimensions against spec sheet\nStep 2: Visual inspection for surface defects\nStep 3: Verify labeling and packaging\nStep 4: Record batch number in QA system\nStep 5: Mark as PASS or FAIL and segregate rejects",
+        category: "Quality",
+        tags: ["quality", "inspection", "QA"],
+        version_number: 1,
+        language: "en",
+        status: "active",
+        approved_by: "QA Manager",
+        created_by: "QA Team",
+      },
+    ];
+
+    let sopsCreated = 0;
+    for (const sop of DEMO_SOPS) {
+      const { data: existingSop } = await supabase
+        .from("sops")
+        .select("id")
+        .eq("company_id", companyId)
+        .eq("slug", sop.slug)
+        .limit(1);
+
+      if (existingSop && existingSop.length > 0) continue;
+
+      const { error: sopError } = await supabase.from("sops").insert({
+        company_id: companyId,
+        ...sop,
+        is_current: true,
+        approved_at: new Date().toISOString(),
+      });
+      if (!sopError) sopsCreated++;
+    }
+
+    // Seed training paths for demo
+    let trainingCreated = 0;
+    const { data: existingPath } = await supabase
+      .from("training_paths")
+      .select("id")
+      .eq("company_id", companyId)
+      .limit(1);
+
+    if (!existingPath || existingPath.length === 0) {
+      const { data: newPath } = await supabase
+        .from("training_paths")
+        .insert({
+          company_id: companyId,
+          name: "New Production Worker Onboarding",
+          description: "5-day structured onboarding for new line operators",
+          role: "Line Operator",
+          estimated_days: 5,
+          is_active: true,
+        })
+        .select()
+        .single();
+
+      if (newPath) {
+        await supabase.from("training_path_steps").insert([
+          { training_path_id: newPath.id, step_order: 1, title: "Safety Orientation", content: "Welcome! Day 1 is all about safety.\n\nRequired PPE:\n- Hard hat\n- Safety glasses\n- Steel-toed boots\n- Hi-vis vest\n\nEmergency assembly point: front parking lot. Reply DONE when you've located your PPE.", estimated_minutes: 30 },
+          { training_path_id: newPath.id, step_order: 2, title: "Workstation Tour", content: "Today you'll walk the floor with your buddy.\n\nFind:\n1. Your assigned workstation\n2. Nearest fire exit\n3. First aid kit\n4. Emergency stop buttons\n\nReply DONE when complete.", estimated_minutes: 45 },
+          { training_path_id: newPath.id, step_order: 3, title: "Machine A Startup", content: "Time to learn Machine A startup.\n\n1. Check coolant level\n2. Set pressure to 85 PSI\n3. 30-sec warm-up\n4. Verify guards\n5. Sign startup log\n\nText 'SOP for machine a startup' anytime for the full procedure. Reply DONE when you've completed your first startup.", estimated_minutes: 60 },
+          { training_path_id: newPath.id, step_order: 4, title: "Quality Checks", content: "Quality is everyone's job.\n\nAfter each batch:\n1. Check dimensions vs spec sheet\n2. Visual inspection\n3. Record batch number\n\nText 'SOP for quality inspection' for the full checklist. Reply DONE after your first quality check.", estimated_minutes: 30 },
+          { training_path_id: newPath.id, step_order: 5, title: "LOTO Training", content: "Final step: Lockout/Tagout safety.\n\nBefore ANY repair or maintenance:\n1. Notify affected workers\n2. Isolate energy sources\n3. Apply your personal lock\n\nText 'SOP for LOTO' for full procedure. Reply DONE when you've reviewed with your supervisor.", estimated_minutes: 45, required_before_next: true },
+        ]);
+        trainingCreated++;
+      }
+    }
+
+    return NextResponse.json({ success: true, documentsCreated, proceduresCreated, sopsCreated, trainingPathsCreated: trainingCreated });
   } catch (error) {
     console.error("[Demo Seed] Error:", error);
     return NextResponse.json({ error: "Failed to seed demo data" }, { status: 500 });

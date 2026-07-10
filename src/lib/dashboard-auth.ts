@@ -1,5 +1,21 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+
+type AuthResult =
+  | { ok: true; companyId: string; response?: never }
+  | { ok: false; companyId?: never; response: NextResponse };
+
+/**
+ * Convenience wrapper: returns { ok: true, companyId } or { ok: false, response }
+ * Usage: const auth = await requireDashboardAuth(req); if (!auth.ok) return auth.response;
+ */
+export async function requireDashboardAuth(request: NextRequest): Promise<AuthResult> {
+  const companyId = await getCompanyId(request);
+  if (!companyId) {
+    return { ok: false, response: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
+  }
+  return { ok: true, companyId };
+}
 
 /**
  * Extract company_id from request. Session cookie is REQUIRED.

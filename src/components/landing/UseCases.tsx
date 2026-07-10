@@ -4,32 +4,32 @@ import { BookIcon, ShieldIcon, HardhatIcon } from "@/components/landing/icons";
 const CASES = [
   {
     Icon: BookIcon,
-    tag: "SOP LOOKUP",
-    title: "Answers from your own docs, not the internet.",
-    body: "Workers text questions. Sidekick pulls from the exact SOP, part manual, or safety sheet — and cites the source. Every answer is traceable.",
+    tag: "SOP VERSION MANAGEMENT",
+    title: "Always the latest SOP. Never the wrong version.",
+    body: "Upload, version, and deprecate SOPs from the dashboard. Workers text \"SOP for [procedure]\" and get the current version instantly. Old versions are archived, never deleted.",
     example: {
-      q: "what PSI do I set the CNC coolant at?",
-      a: "85 PSI for the Haas VF-2 (SOP-CNC-07, p3). Check sight-glass daily.",
-    },
-  },
-  {
-    Icon: ShieldIcon,
-    tag: "SAFETY & INCIDENTS",
-    title: "A calm, always-on first responder.",
-    body: "In an incident, Sidekick walks workers through the right steps, pages supervisors, and starts the OSHA-compliant paperwork before the worker puts their phone down.",
-    example: {
-      q: "small chemical spill at station 4",
-      a: "Stop work, clear the area. Don't rinse. I've paged Jenna + EHS. Spill kit is in cabinet 4B. What's the substance?",
+      q: "SOP for machine A startup",
+      a: "\ud83d\udccb Machine A Startup (v3)\n1. Check coolant level\n2. Set pressure to 85 PSI\n3. Run 30-sec warm-up cycle\nReply DONE when complete.",
     },
   },
   {
     Icon: HardhatIcon,
-    tag: "TRAINING & CERTS",
+    tag: "NEW HIRE ONBOARDING",
     title: "Onboarding from 4 weeks to 9 days.",
-    body: "New hires text Sidekick instead of interrupting a line lead. Certifications auto-renew on time. You get a dashboard showing who knows what.",
+    body: "Assign new hires to structured training paths. They receive each step over text, in their language. Managers see real-time progress without chasing people down.",
     example: {
       q: "how do I lock out the conveyor on line B?",
-      a: "6 steps — I'll send them one at a time. Reply DONE after each so I can verify. Ready?",
+      a: "Step 2 of 6 — Line B Lockout:\n1. Press E-stop\n2. Isolate energy source at panel C\nReply NEXT for step 3 or HELP if stuck.",
+    },
+  },
+  {
+    Icon: ShieldIcon,
+    tag: "KNOWLEDGE MANAGEMENT",
+    title: "Knowledge that doesn't walk out the door.",
+    body: "Every resolved issue, answered question, and completed procedure becomes searchable knowledge. Managers see what's being accessed, who asked what, and where the gaps are.",
+    example: {
+      q: "small chemical spill at station 4",
+      a: "Stop work, clear the area. Don't rinse. I've paged Jenna + EHS. Spill kit is in cabinet 4B. This has been logged.",
     },
   },
 ];

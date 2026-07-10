@@ -20,8 +20,11 @@ import { detectLanguage, translateText } from "@/lib/language";
 import {
   getTrainingCoachFollowUpKind,
   isTrainingCoachRequest,
+  isSopLookupRequest,
+  extractSopTopic,
   TRAINING_COACH_FOLLOW_UP_TOPIC,
   TRAINING_COACH_TOPIC,
+  SOP_LOOKUP_TOPIC,
 } from "@/lib/training-coach";
 import {
   getCompanyRuntimeSettings,
@@ -1837,6 +1840,78 @@ Rules:
         return twimlResponse(followUpAnswer);
       }
     }
+
+    // ── SOP LOOKUP ──────────────────────────────────────────────────────────
+    if (isSopLookupRequest(body)) {
+      const sopTopic = extractSopTopic(body);
+      let sopResult: any = null;
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+        const sopRes = await fetch(
+          `${baseUrl}/api/sops/search?companyId=${encodeURIComponent(worker.company_id)}&q=${encodeURIComponent(sopTopic)}&language=${encodeURIComponent(detectedLang)}`
+        );
+        if (sopRes.ok) {
+          const sopData = await sopRes.json();
+          sopResult = sopData.sops?.[0] || null;
+        }
+      } catch { /* fallback to knowledge engine */ }
+
+      let sopReply: string;
+      if (sopResult) {
+        // Log access
+        try {
+          await supabase.from("sop_access_log").insert({
+            sop_id: sopResult.id,
+            company_id: worker.company_id,
+            worker_phone: from,
+            worker_name: worker.name,
+            channel: incomingChannel,
+          });
+        } catch { /* best effort */ }
+
+        // Build a concise SMS-friendly SOP response
+        const summaryPrompt = `You are Sidekick, a frontline operations assistant. A worker texted asking for an SOP. Return a concise, numbered procedure in under 420 characters. The SOP is below. Respond in ${detectedLang === "en" ? "English" : detectedLang}.`;
+        const sopContent = `SOP: ${sopResult.title} (v${sopResult.version_number})\n\n${sopResult.content}`;
+        try {
+          sopReply = await completeTextOpenAIFirst({ system: summaryPrompt, user: sopContent, maxTokens: 200 });
+          sopReply = `📋 ${sopResult.title} (v${sopResult.version_number})\n${sopReply}`;
+        } catch {
+          // Fallback: first 380 chars of content
+          sopReply = `📋 ${sopResult.title} (v${sopResult.version_number})\n${sopResult.content.substring(0, 380)}`;
+        }
+      } else {
+        // No SOP found — try knowledge engine fallback
+        const relevantChunks = await searchDocuments(sopTopic, worker.company_id);
+        if (relevantChunks.length > 0) {
+          const docsContext = relevantChunks.map((c: any) => c.content).join("\n\n");
+          const fallbackPrompt = `You are Sidekick. A worker asked: "${body}". No SOP was found for "${sopTopic}". Using the docs below, answer as best you can in under 420 chars. Respond in ${detectedLang === "en" ? "English" : detectedLang}.`;
+          try {
+            sopReply = await completeTextOpenAIFirst({ system: fallbackPrompt, user: docsContext, maxTokens: 200 });
+          } catch {
+            sopReply = `No SOP found for "${sopTopic}". Ask your manager to add it.`;
+          }
+        } else {
+          sopReply = `No SOP found for "${sopTopic}". Ask your manager to create one in the Sidekick dashboard.`;
+        }
+      }
+
+      await insertQuestionRecord({
+        company_id: worker.company_id,
+        worker_phone: from,
+        worker_name: worker.name,
+        question: `[SOP] ${body}`,
+        answer: sopReply,
+        confidence: sopResult ? 90 : 30,
+        response_time_ms: Date.now() - startTime,
+        manager_notified: false,
+        language: detectedLang,
+        channel: incomingChannel,
+        topic: SOP_LOOKUP_TOPIC,
+      });
+
+      return twimlResponse(sopReply);
+    }
+    // ── END SOP LOOKUP ──────────────────────────────────────────────────────
 
     const isTrainingRequest = isTrainingCoachRequest(body);
     if (isTrainingRequest) {

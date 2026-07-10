@@ -1,6 +1,6 @@
 "use client";
 
-import { ClipboardList, Wrench, Users, BookOpen, Settings, Home, LogOut, LayoutDashboard, Menu, X, ChevronDown, Building2, MessageSquare, RefreshCw, MapPin } from "lucide-react";
+import { ClipboardList, Wrench, Users, BookOpen, Settings, Home, LogOut, LayoutDashboard, Menu, X, ChevronDown, Building2, MessageSquare, RefreshCw, MapPin, FileText, GraduationCap, LibraryBig } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -10,10 +10,12 @@ import { useState, useEffect } from "react";
 const NAV_ITEMS = [
   { id: "today", label: "Overview", icon: LayoutDashboard, href: "/today" },
   { id: "inbox", label: "Inbox", icon: MessageSquare, href: "/inbox" },
+  { id: "sops", label: "SOPs", icon: FileText, href: "/sops" },
+  { id: "training", label: "Training", icon: GraduationCap, href: "/training" },
+  { id: "knowledge", label: "Knowledge", icon: LibraryBig, href: "/knowledge" },
   { id: "work-orders", label: "Work Orders", icon: ClipboardList, href: "/work-orders" },
   { id: "assets", label: "Assets", icon: Wrench, href: "/assets" },
   { id: "team", label: "Team", icon: Users, href: "/team" },
-  { id: "knowledge", label: "Knowledge", icon: BookOpen, href: "/knowledge" },
   { id: "updates", label: "Updates", icon: RefreshCw, href: "/updates" },
   { id: "settings", label: "Settings", icon: Settings, href: "/settings" },
 ];

@@ -17,6 +17,11 @@ import {
   Loader2,
   Edit3,
   XCircle,
+  BarChart2,
+  TrendingUp,
+  Eye,
+  Users,
+  FileText,
 } from "lucide-react";
 import GeneratedReports from "@/components/dashboard/documents/GeneratedReports";
 import KnowledgeBaseViewer from "@/components/dashboard/documents/KnowledgeBaseViewer";
@@ -199,6 +204,109 @@ function EditVerifyModal({ article, onConfirm, onCancel }: { article: KnowledgeA
   );
 }
 
+interface KmStats {
+  totalArticles: number;
+  mostAccessed: { title: string; count: number }[];
+  topGaps: { question: string; count: number }[];
+  sopCount: number;
+  sopAccesses: number;
+  departmentBreakdown: { dept: string; count: number }[];
+}
+
+function KmAnalyticsPanel({ companyId }: { companyId: string }) {
+  const [stats, setStats] = useState<KmStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!companyId) return;
+    Promise.all([
+      fetch(`/api/knowledge?companyId=${companyId}`).then(r => r.json()),
+      fetch(`/api/sops?companyId=${companyId}&status=active`).then(r => r.json()).catch(() => ({ sops: [] })),
+      fetch(`/api/analytics/gaps?companyId=${companyId}`).then(r => r.json()).catch(() => ({ gaps: [] })),
+    ]).then(([knowledgeData, sopData, gapsData]) => {
+      const articles: KnowledgeArticle[] = knowledgeData.articles || [];
+      const topArticles = [...articles]
+        .sort((a, b) => (b.times_referenced || 0) - (a.times_referenced || 0))
+        .slice(0, 5)
+        .map(a => ({ title: a.title, count: a.times_referenced || 0 }));
+      setStats({
+        totalArticles: articles.length,
+        mostAccessed: topArticles,
+        topGaps: (gapsData.gaps || []).slice(0, 5),
+        sopCount: (sopData.sops || []).length,
+        sopAccesses: 0,
+        departmentBreakdown: [],
+      });
+    }).catch(() => {}).finally(() => setLoading(false));
+  }, [companyId]);
+
+  if (loading) return <div className="py-4 text-center text-sm text-gray-400">Loading analytics…</div>;
+  if (!stats) return null;
+
+  return (
+    <section className="mt-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="flex items-center gap-2 mb-4">
+        <BarChart2 className="h-5 w-5 text-[#C96442]" />
+        <h2 className="text-base font-semibold text-gray-900">Knowledge Analytics</h2>
+      </div>
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="rounded-xl border border-gray-100 bg-gray-50 p-4">
+          <p className="text-xs text-gray-500 font-medium">Knowledge Articles</p>
+          <p className="text-3xl font-bold text-gray-900 mt-1">{stats.totalArticles}</p>
+        </div>
+        <div className="rounded-xl border border-gray-100 bg-gray-50 p-4">
+          <p className="text-xs text-gray-500 font-medium">Active SOPs</p>
+          <p className="text-3xl font-bold text-gray-900 mt-1">{stats.sopCount}</p>
+          <a href="/sops" className="mt-1 text-xs text-[#C96442] hover:underline">Manage →</a>
+        </div>
+        <div className="rounded-xl border border-gray-100 bg-gray-50 p-4">
+          <p className="text-xs text-gray-500 font-medium">Knowledge Gaps</p>
+          <p className="text-3xl font-bold text-gray-900 mt-1">{stats.topGaps.length}</p>
+          <span className="mt-1 text-xs text-amber-600">unanswered questions</span>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-6">
+        <div>
+          <div className="flex items-center gap-1.5 mb-2">
+            <TrendingUp className="h-4 w-4 text-green-600" />
+            <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Most Referenced</p>
+          </div>
+          {stats.mostAccessed.length === 0 ? (
+            <p className="text-sm text-gray-400">No references yet</p>
+          ) : (
+            <div className="space-y-2">
+              {stats.mostAccessed.map((a, i) => (
+                <div key={i} className="flex items-center justify-between">
+                  <span className="text-sm text-gray-700 truncate flex-1">{a.title}</span>
+                  <span className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">{a.count}x</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <div>
+          <div className="flex items-center gap-1.5 mb-2">
+            <AlertTriangle className="h-4 w-4 text-amber-500" />
+            <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Knowledge Gaps</p>
+          </div>
+          {stats.topGaps.length === 0 ? (
+            <p className="text-sm text-gray-400">No gaps detected 🎉</p>
+          ) : (
+            <div className="space-y-2">
+              {stats.topGaps.map((g, i) => (
+                <div key={i} className="flex items-start justify-between gap-2">
+                  <span className="text-sm text-gray-700 flex-1 line-clamp-1">{g.question}</span>
+                  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 shrink-0">{g.count}x</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function KnowledgePage() {
   const [articles, setArticles] = useState<KnowledgeArticle[]>([]);
   const [reviewItems, setReviewItems] = useState<KnowledgeArticle[]>([]);
@@ -309,7 +417,30 @@ export default function KnowledgePage() {
 
   return (
     <div className="mx-auto min-h-screen max-w-7xl px-6 py-8">
-      <SectionHeader title="Operational Knowledge" subtitle="Everything Sidekick knows right now: imported docs, approved procedures, items waiting for review, and generated reports." />
+      <SectionHeader
+        title="Knowledge Management"
+        subtitle="All operational knowledge in one place — SOPs, procedures, Q&A, and documents your team can access over text."
+      />
+
+      {companyId && <KmAnalyticsPanel companyId={companyId} />}
+
+      {/* Quick links to related sections */}
+      <div className="mt-5 grid grid-cols-2 gap-3">
+        <a href="/sops" className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm hover:border-[#C96442]/40 hover:shadow-md transition-all">
+          <FileText className="h-5 w-5 text-[#C96442] flex-shrink-0" />
+          <div>
+            <p className="text-sm font-semibold text-gray-800">SOPs & Procedures</p>
+            <p className="text-xs text-gray-400">Upload, version, and surface via text</p>
+          </div>
+        </a>
+        <a href="/training" className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm hover:border-[#C96442]/40 hover:shadow-md transition-all">
+          <Users className="h-5 w-5 text-[#C96442] flex-shrink-0" />
+          <div>
+            <p className="text-sm font-semibold text-gray-800">Training Paths</p>
+            <p className="text-xs text-gray-400">Guide new hires step-by-step over SMS</p>
+          </div>
+        </a>
+      </div>
 
       <div className="mt-6">
         <KnowledgeBaseViewer
