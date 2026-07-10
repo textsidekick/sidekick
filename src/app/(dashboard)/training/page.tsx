@@ -6,6 +6,7 @@ import { readDashboardScope } from "@/lib/dashboard-scope";
 import {
   GraduationCap, Plus, ChevronDown, ChevronUp, Clock, Users,
   CheckCircle2, Circle, PlayCircle, X, Loader2, BookOpen, ArrowRight,
+  TrendingUp, AlertCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -286,6 +287,21 @@ interface Department {
   name: string;
 }
 
+interface RecommendedWorker {
+  workerId: string;
+  workerPhone: string;
+  workerName: string;
+  knowledgeScore: number;
+  knowledgeLevel: "high" | "medium" | "low";
+}
+
+interface TrainingRecommendation {
+  trainingPathId: string;
+  trainingPathName: string;
+  recommendedWorkers: RecommendedWorker[];
+  recommendedCount: number;
+}
+
 export default function TrainingPage() {
   const [companyId, setCompanyId] = useState("");
   const [paths, setPaths] = useState<TrainingPath[]>([]);
@@ -295,6 +311,10 @@ export default function TrainingPage() {
   const [selectedPathId, setSelectedPathId] = useState<string | null>(null);
   const [filterDept, setFilterDept] = useState("");
   const [filterNewHire, setFilterNewHire] = useState(false);
+  const [trainingRecommendations, setTrainingRecommendations] = useState<TrainingRecommendation[]>([]);
+  const [expandedRec, setExpandedRec] = useState<string | null>(null);
+  const [bulkAssigning, setBulkAssigning] = useState<string | null>(null);
+  const [bulkMsg, setBulkMsg] = useState<Record<string, string>>({});
 
   useEffect(() => {
     try {
@@ -309,14 +329,35 @@ export default function TrainingPage() {
     Promise.all([
       fetch(`/api/training-paths?companyId=${companyId}`).then((r) => r.json()),
       fetch(`/api/departments?companyId=${companyId}`).then((r) => r.json()),
+      fetch(`/api/team/insights?companyId=${companyId}`).then((r) => r.json()),
     ])
-      .then(([pathData, deptData]) => {
+      .then(([pathData, deptData, insightsData]) => {
         setPaths(pathData.paths || []);
         setDepartments(deptData.departments || []);
+        setTrainingRecommendations(insightsData.trainingRecommendations || []);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [companyId]);
+
+  async function bulkAssign(pathId: string, workers: RecommendedWorker[]) {
+    setBulkAssigning(pathId);
+    let count = 0;
+    for (const w of workers) {
+      try {
+        const res = await fetch(`/api/training-paths/${pathId}/enroll`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ worker_phone: w.workerPhone, company_id: companyId, assigned_by: "Manager" }),
+        });
+        const data = await res.json();
+        if (data.enrollment) count++;
+      } catch {}
+    }
+    setBulkAssigning(null);
+    setBulkMsg(m => ({ ...m, [pathId]: `Enrolled ${count} worker${count !== 1 ? "s" : ""}` }));
+    loadPaths();
+  }
 
   useEffect(() => { loadPaths(); }, [loadPaths]);
 
@@ -449,33 +490,103 @@ export default function TrainingPage() {
             <p className="mt-1 text-sm text-gray-400">Try adjusting your filters.</p>
           </div>
         ) : (
-          filteredPaths.map((path) => (
+              filteredPaths.map((path) => {
+            const rec = trainingRecommendations.find(r => r.trainingPathId === path.id);
+            const recCount = rec?.recommendedCount || 0;
+            const isRecExpanded = expandedRec === path.id;
+            return (
             <div
               key={path.id}
-              className="cursor-pointer rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:border-[#C96442]/30 hover:shadow-md transition-all"
-              onClick={() => setSelectedPathId(path.id)}
+              className="rounded-xl border border-gray-200 bg-white shadow-sm hover:border-[#C96442]/30 hover:shadow-md transition-all"
             >
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <GraduationCap className="h-4 w-4 text-[#C96442]" />
-                    <span className="font-semibold text-gray-900">{path.name}</span>
-                    {!path.is_active && <span className="rounded bg-gray-100 px-2 py-0.5 text-[10px] text-gray-500">Inactive</span>}
+              <div
+                className="cursor-pointer p-5"
+                onClick={() => setSelectedPathId(path.id)}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <GraduationCap className="h-4 w-4 text-[#C96442]" />
+                      <span className="font-semibold text-gray-900">{path.name}</span>
+                      {!path.is_active && <span className="rounded bg-gray-100 px-2 py-0.5 text-[10px] text-gray-500">Inactive</span>}
+                      {recCount > 0 && (
+                        <span className="flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-700">
+                          <TrendingUp className="h-3 w-3" /> {recCount} recommended
+                        </span>
+                      )}
+                    </div>
+                    {path.role && <p className="mt-0.5 text-sm text-gray-500">For: {path.role}</p>}
+                    {path.description && <p className="mt-1 text-sm text-gray-400 truncate">{path.description}</p>}
+                    <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-gray-400">
+                      <span className="flex items-center gap-1"><BookOpen className="h-3.5 w-3.5" /> {path.step_count} steps</span>
+                      <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> ~{path.estimated_days} days</span>
+                      <span className="flex items-center gap-1"><Users className="h-3.5 w-3.5" /> {path.enrollment.total} enrolled</span>
+                      {path.enrollment.in_progress > 0 && <span className="text-amber-600">{path.enrollment.in_progress} in progress</span>}
+                      {path.enrollment.completed > 0 && <span className="text-green-600">{path.enrollment.completed} completed</span>}
+                    </div>
                   </div>
-                  {path.role && <p className="mt-0.5 text-sm text-gray-500">For: {path.role}</p>}
-                  {path.description && <p className="mt-1 text-sm text-gray-400 truncate">{path.description}</p>}
-                  <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-gray-400">
-                    <span className="flex items-center gap-1"><BookOpen className="h-3.5 w-3.5" /> {path.step_count} steps</span>
-                    <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> ~{path.estimated_days} days</span>
-                    <span className="flex items-center gap-1"><Users className="h-3.5 w-3.5" /> {path.enrollment.total} enrolled</span>
-                    {path.enrollment.in_progress > 0 && <span className="text-amber-600">{path.enrollment.in_progress} in progress</span>}
-                    {path.enrollment.completed > 0 && <span className="text-green-600">{path.enrollment.completed} completed</span>}
-                  </div>
+                  <ArrowRight className="h-5 w-5 text-gray-300 flex-shrink-0 mt-1" />
                 </div>
-                <ArrowRight className="h-5 w-5 text-gray-300 flex-shrink-0 mt-1" />
               </div>
+
+              {/* Recommended workers section */}
+              {recCount > 0 && (
+                <div className="border-t border-gray-100 px-5 py-3">
+                  <button
+                    className="flex w-full items-center justify-between text-sm"
+                    onClick={() => setExpandedRec(isRecExpanded ? null : path.id)}
+                  >
+                    <span className="flex items-center gap-1.5 text-amber-700 font-medium">
+                      <TrendingUp className="h-3.5 w-3.5" />
+                      {recCount} worker{recCount !== 1 ? "s" : ""} recommended based on question patterns
+                    </span>
+                    {isRecExpanded ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
+                  </button>
+
+                  {isRecExpanded && rec && (
+                    <div className="mt-3 space-y-2">
+                      <div className="space-y-1.5">
+                        {rec.recommendedWorkers.map(w => (
+                          <div key={w.workerId} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2">
+                            <div>
+                              <p className="text-sm font-medium text-gray-800">{w.workerName}</p>
+                              <p className="text-xs text-gray-400">
+                                Knowledge: {w.knowledgeLevel === "high" ? "High" : w.knowledgeLevel === "medium" ? "Medium" : "Low"} · Score {w.knowledgeScore}%
+                              </p>
+                            </div>
+                            <div className={cn(
+                              "h-2 w-16 rounded-full",
+                              w.knowledgeLevel === "high" ? "bg-green-100" : w.knowledgeLevel === "medium" ? "bg-amber-100" : "bg-red-100"
+                            )}>
+                              <div
+                                className={cn("h-2 rounded-full", w.knowledgeLevel === "high" ? "bg-green-500" : w.knowledgeLevel === "medium" ? "bg-amber-500" : "bg-red-500")}
+                                style={{ width: `${w.knowledgeScore}%` }}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="pt-1">
+                        {bulkMsg[path.id] ? (
+                          <p className="text-sm text-green-600 font-medium">{bulkMsg[path.id]}</p>
+                        ) : (
+                          <button
+                            onClick={() => bulkAssign(path.id, rec.recommendedWorkers)}
+                            disabled={bulkAssigning === path.id}
+                            className="inline-flex items-center gap-2 rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white hover:bg-[#B0532F] disabled:opacity-50"
+                          >
+                            {bulkAssigning === path.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Users className="h-4 w-4" />}
+                            Assign all {recCount} to this path
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-          ))
+          );
+          })
         )}
       </div>
 
