@@ -72,11 +72,11 @@ function TermForm({ companyId, onSave, onClose }: {
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/40"
               value={term}
               onChange={e => setTerm(e.target.value)}
-              placeholder="예: 매트리스 스프링"
+              placeholder="e.g. Mattress Spring"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">정의 (Definition)</label>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Definition</label>
             <textarea
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/40 min-h-[80px]"
               value={definition}
@@ -85,7 +85,7 @@ function TermForm({ companyId, onSave, onClose }: {
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">동의어 (Synonyms) — 쉼표로 구분</label>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Synonyms — Comma separated</label>
             <input
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/40"
               value={synonymsRaw}
@@ -94,7 +94,7 @@ function TermForm({ companyId, onSave, onClose }: {
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">언어 (Language)</label>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Language</label>
             <select
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/40"
               value={language}
@@ -102,7 +102,7 @@ function TermForm({ companyId, onSave, onClose }: {
             >
               <option value="ko">한국어 (Korean)</option>
               <option value="en">English</option>
-              <option value="both">Both / 이중언어</option>
+              <option value="both">Both</option>
             </select>
           </div>
           {error && <p className="text-xs text-red-600">{error}</p>}

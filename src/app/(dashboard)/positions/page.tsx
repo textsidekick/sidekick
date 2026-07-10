@@ -230,7 +230,7 @@ export default function PositionsPage() {
           <Briefcase className="h-10 w-10 text-gray-300 mx-auto mb-3" />
           <p className="text-gray-600 font-medium">No positions yet</p>
           <p className="text-sm text-gray-400 mt-1">
-            Create positions like 매트리스 봉제 기사, 품질검사원, 포장기사 to power
+            Create positions like Sewing Technician, QC Inspector, Packaging Operator to power
             role-based onboarding and training.
           </p>
         </div>
@@ -267,7 +267,7 @@ export default function PositionsPage() {
                   <div className="flex items-center gap-1.5 text-sm text-gray-600 w-24">
                     <Users className="h-4 w-4 text-gray-400" />
                     {p.worker_count}
-                    <span className="text-gray-400">명</span>
+                    <span className="text-gray-400">workers</span>
                   </div>
 
                   {/* Training completion */}
