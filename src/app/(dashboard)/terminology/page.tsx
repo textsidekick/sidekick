@@ -112,7 +112,7 @@ function TermForm({ companyId, onSave, onClose }: {
               onClick={onClose}
               className="flex-1 px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50"
             >
-              취소
+              Cancel
             </button>
             <button
               type="submit"
@@ -120,7 +120,7 @@ function TermForm({ companyId, onSave, onClose }: {
               className="flex-1 px-4 py-2 rounded-lg bg-[#C96442] text-white text-sm font-medium hover:bg-[#b05538] disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {saving && <Loader2 className="h-3 w-3 animate-spin" />}
-              저장
+              Save
             </button>
           </div>
         </form>

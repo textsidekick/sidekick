@@ -292,7 +292,6 @@ function PathDetailModal({
 
         <div className="px-6 py-5 space-y-6 max-h-[80vh] overflow-y-auto">
           {/* Steps section removed for cleaner UI */}
-          )}
 
           {/* Training materials upload */}
           <div>
