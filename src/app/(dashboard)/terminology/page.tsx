@@ -30,7 +30,7 @@ function TermForm({ companyId, onSave, onClose }: {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!term.trim()) { setError("용어(Term)는 필수입니다."); return; }
+    if (!term.trim()) { setError("Term is required."); return; }
     setSaving(true);
     setError("");
     try {
@@ -46,7 +46,7 @@ function TermForm({ companyId, onSave, onClose }: {
       });
       if (!res.ok) {
         const d = await res.json();
-        throw new Error(d.error || "저장 실패");
+        throw new Error(d.error || "Save failed");
       }
       onSave();
     } catch (err: any) {
@@ -60,14 +60,14 @@ function TermForm({ companyId, onSave, onClose }: {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold text-[#1C1A16]">새 용어 추가 / Add Term</h2>
+          <h2 className="text-lg font-bold text-[#1C1A16]">Add New Term</h2>
           <button onClick={onClose} className="p-1 rounded hover:bg-gray-100">
             <X className="h-5 w-5 text-gray-500" />
           </button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">용어 (Term) *</label>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Term *</label>
             <input
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/40"
               value={term}
@@ -81,7 +81,7 @@ function TermForm({ companyId, onSave, onClose }: {
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/40 min-h-[80px]"
               value={definition}
               onChange={e => setDefinition(e.target.value)}
-              placeholder="용어에 대한 설명을 입력하세요..."
+              placeholder="Enter a definition for this term..."
             />
           </div>
           <div>
@@ -200,7 +200,7 @@ export default function TerminologyPage() {
     <div className="flex-1 min-h-screen bg-[#F7F3EC]">
       <SectionHeader
         title="Terminology"
-        subtitle={`용어집 · ${terms.length} terms`}
+        subtitle={`Terminology · ${terms.length} terms`}
         action={
           <button
             onClick={() => setShowForm(true)}
@@ -218,7 +218,7 @@ export default function TerminologyPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
             className="w-full pl-9 pr-4 py-2 bg-white border border-[rgba(28,26,22,0.08)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30"
-            placeholder="용어 검색 / Search terms..."
+            placeholder="Search terms..."
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -241,14 +241,14 @@ export default function TerminologyPage() {
           <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
             <BookOpen className="h-12 w-12 text-gray-300" />
             <p className="text-gray-500 font-medium">
-              {search ? `"${search}"에 대한 결과 없음` : "아직 등록된 용어가 없습니다."}
+              {search ? `"${search}" — no results found` : "No terms added yet."}
             </p>
             {!search && (
               <button
                 onClick={() => setShowForm(true)}
                 className="mt-2 px-4 py-2 bg-[#C96442] text-white text-sm font-medium rounded-lg hover:bg-[#b05538]"
               >
-                첫 용어 추가하기
+                Add your first term
               </button>
             )}
           </div>

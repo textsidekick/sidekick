@@ -816,7 +816,7 @@ function TerminologyTab({ companyId }: { companyId: string }) {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search terms / 용어 검색..."
+            placeholder="Search terms..."
             className="w-full rounded-lg border border-gray-200 pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30"
           />
         </div>
@@ -830,11 +830,11 @@ function TerminologyTab({ companyId }: { companyId: string }) {
 
       {showForm && (
         <form onSubmit={handleSave} className="mt-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <h3 className="mb-4 text-sm font-semibold text-gray-900">Add Term / 용어 추가</h3>
+          <h3 className="mb-4 text-sm font-semibold text-gray-900">Add Term</h3>
           {saveError && <p className="mb-3 rounded bg-red-50 px-3 py-2 text-sm text-red-700">{saveError}</p>}
           <div className="space-y-3">
             <div>
-              <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Term (용어) *</label>
+              <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Term *</label>
               <input value={newTerm} onChange={(e) => setNewTerm(e.target.value)} required className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" placeholder="e.g. 스프링 유닛" />
             </div>
             <div>
@@ -968,7 +968,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "sops", label: "SOPs" },
   { id: "articles", label: "Articles" },
   { id: "gaps", label: "Gaps" },
-  { id: "terminology", label: "Terminology / 용어집" },
+  { id: "terminology", label: "Terminology" },
 ];
 
 export default function KnowledgePage() {

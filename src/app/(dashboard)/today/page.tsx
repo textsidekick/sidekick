@@ -118,7 +118,7 @@ function KmMetricsSection({ companyId }: { companyId: string }) {
       {metrics.departmentScores.length > 0 && (
         <div className="mt-5">
           <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
-            Department Scores / 부서별 현황
+            Department Scores
           </h3>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
             {metrics.departmentScores.map((dept) => (
