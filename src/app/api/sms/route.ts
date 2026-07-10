@@ -662,34 +662,42 @@ export async function POST(request: NextRequest) {
     }
 
     // -----------------------------------------------------------------------
-    // 5. Position check — if worker has no position, ask them to choose
+    // 5. Skip position check — answer questions directly
     // -----------------------------------------------------------------------
-    if (!worker.position_id) {
-      const positions = await listCompanyPositions(companyId);
-      if (positions.length) {
-        // Is this reply a numeric selection?
-        const selection = parseInt(body, 10);
-        if (!isNaN(selection) && selection >= 1 && selection <= positions.length) {
-          const chosen = positions[selection - 1];
-          await supabase.from("workers").update({ position_id: chosen.id }).eq("id", worker.id);
-          await auditLog({
-            companyId,
-            actor: worker.id,
-            action: "worker.position_selected",
-            details: { position_id: chosen.id, position_name: chosen.name },
-          });
-          const confirm =
-            lang === "ko"
-              ? `좋습니다! "${chosen.name}" 직무로 설정했습니다. 이제 무엇이든 물어보세요.`
-              : `Got it! You're set as "${chosen.name}". Ask me anything.`;
-          return twimlResponse(confirm);
-        }
-        // Otherwise prompt them to pick
-        return twimlResponse(buildPositionPrompt(positions, lang));
-      }
-      // No positions defined — continue without one.
+
+    // -----------------------------------------------------------------------
+    // SIMPLIFIED: Skip all middleware, go straight to Claude with SOP context
+    // -----------------------------------------------------------------------
+    {
+      const { data: allSops } = await supabase
+        .from("sops")
+        .select("title, content, version_number")
+        .eq("company_id", companyId)
+        .eq("is_current", true)
+        .eq("status", "active")
+        .limit(10);
+
+      const sopBlock = (allSops || [])
+        .map((s: any) => `## ${s.title} (v${s.version_number})\n${s.content}`)
+        .join("\n\n");
+
+      const systemPrompt = `You are Sidekick, an AI assistant for frontline workers at ${company?.name || "Ace Bed"} (mattress manufacturing).
+Answer the worker's question using the SOPs below. Be concise (under 480 chars), practical, and cite the SOP name and version.
+If the SOPs don't cover the question, give your best practical answer and suggest asking a supervisor.
+Respond in the same language the worker uses.
+
+SOPs:\n${sopBlock || "(no SOPs loaded)"}`;
+
+      const answer = await completeTextOpenAIFirst({
+        system: systemPrompt,
+        user: body,
+        maxTokens: 450,
+      });
+
+      return twimlResponse(answer);
     }
 
+    /* DISABLED FOR DEMO - original sections 6-12 below
     // -----------------------------------------------------------------------
     // 6. Manager training queries (must come before freeform update parser)
     // -----------------------------------------------------------------------
@@ -996,6 +1004,7 @@ ${knowledgeBlock || "(no relevant knowledge found)"}`,
     });
 
     return twimlResponse(answer);
+    END OF DISABLED SECTION */
   } catch (error) {
     const errMsg = error instanceof Error ? error.message : String(error);
     console.error("[sms:POST] outer error:", errMsg);
