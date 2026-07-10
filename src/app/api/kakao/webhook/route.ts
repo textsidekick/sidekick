@@ -327,21 +327,29 @@ async function maybeHandleTrainingNav(
 // ─────────────────────────────────────────────────────────────
 
 async function buildAnswer(link: WorkerLink, question: string, lang: Lang) {
-  const [sopCtx, positionCtx] = await Promise.all([
-    getSopAnswerContext(link.company_id, question, { workerPhone: link.worker_phone }),
-    getWorkerPositionContext(link.company_id, link.worker_phone),
-  ]);
+  // Load ALL SOPs directly for reliable answers
+  const { data: allSops } = await supabase
+    .from("sops")
+    .select("id, slug, title, content, version_number")
+    .eq("company_id", link.company_id)
+    .eq("is_current", true)
+    .eq("status", "active")
+    .limit(10);
 
-  let system =
-    "You are Sidekick, a factory-floor assistant for Ace Bed (에이스침대). " +
+  const sopBlock = (allSops || [])
+    .map((s: any) => `## ${s.title} (v${s.version_number})\n${s.content}`)
+    .join("\n\n");
+
+  const langDirective = buildLanguageDirective(lang);
+
+  const system =
+    "You are Sidekick, a factory-floor assistant for Ace Bed. " +
     "Answer worker questions concisely and practically for a mobile chat message. " +
-    "SOPs are the source of truth — when an SOP is provided below, base your answer on it " +
-    "and cite it by name and version (e.g. \"매트리스 봉제 SOP v3 기준\"). " +
-    "If you don't know, say so and suggest asking a supervisor. Never invent procedures.";
-
-  if (sopCtx.promptBlock) system += "\n\n" + sopCtx.promptBlock;
-  if (positionCtx) system += "\n\n" + buildPositionPromptBlock(positionCtx, lang);
-  system += "\n\n" + buildLanguageDirective(lang);
+    "SOPs are the source of truth — base your answer on them " +
+    "and cite by name and version. " +
+    "If you don't know, say so and suggest asking a supervisor. Never invent procedures.\n\n" +
+    langDirective + "\n\n" +
+    "SOPs:\n" + (sopBlock || "(no SOPs loaded)");
 
   const answer = await completeTextOpenAIFirst({
     system,
@@ -349,10 +357,8 @@ async function buildAnswer(link: WorkerLink, question: string, lang: Lang) {
     maxTokens: 700,
   });
 
-  // Log for KM loop (captureKnowledge signature mismatch — log for now)
-  console.log(`[Kakao KM] company=${link.company_id} worker=${link.worker_phone} q="${question.slice(0,80)}" sops=${sopCtx.sops.length}`);
-
-  return { answer, sops: sopCtx.sops };
+  const sops = (allSops || []).map((s: any) => ({ title: s.title, version_number: s.version_number }));
+  return { answer, sops };
 }
 
 // ─────────────────────────────────────────────────────────────
