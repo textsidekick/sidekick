@@ -718,7 +718,7 @@ export async function POST(request: NextRequest) {
     // 7. Company runtime settings + critical incident detection
     // -----------------------------------------------------------------------
     const runtimeSettings = await getCompanyRuntimeSettings(companyId);
-    const priorityProfiles = normalizeCompanyPriorityProfiles(company);
+    const priorityProfiles = normalizeCompanyPriorityProfiles(runtimeSettings?.priority_profiles || []);
 
     const incident = detectCriticalIncident(body);
     if (incident) {
@@ -992,6 +992,6 @@ ${knowledgeBlock || "(no relevant knowledge found)"}`,
     const errMsg = error instanceof Error ? error.message : String(error);
     const errStack = error instanceof Error ? error.stack?.split('\n').slice(0,3).join(' | ') : '';
     console.error("[sms:POST] error:", errMsg, errStack);
-    return twimlResponse(`Something went wrong: ${errMsg.slice(0, 100)}`);
+    return twimlResponse("Sorry, something went wrong. Please try again in a moment.");
   }
 }
