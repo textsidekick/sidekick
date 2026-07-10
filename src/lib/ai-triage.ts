@@ -296,7 +296,7 @@ OUTPUT JSON SCHEMA:
 
   // Basic normalization + asset matching post-process (no extra model call)
   const result: TriageResult = {
-    messageType: parsed.messageType,
+    messageType: parsed.messageType || "general",
     issue: parsed.issue,
     supplyRequest: parsed.supplyRequest,
     workOrderUpdate: parsed.workOrderUpdate,
