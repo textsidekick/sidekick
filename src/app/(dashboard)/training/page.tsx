@@ -291,23 +291,7 @@ function PathDetailModal({
         </div>
 
         <div className="px-6 py-5 space-y-6 max-h-[80vh] overflow-y-auto">
-          {/* Steps */}
-          {path && (
-            <div>
-              <h3 className="mb-3 text-sm font-semibold text-gray-700">Learning Steps ({path.training_steps?.length || 0})</h3>
-              <div className="space-y-2">
-                {(path.training_steps || []).sort((a, b) => (a.sort_order ?? a.step_order) - (b.sort_order ?? b.step_order)).map((step) => (
-                  <div key={step.id} className="flex gap-3 rounded-lg border border-gray-100 bg-gray-50 p-3">
-                    <div className="mt-0.5 flex-shrink-0 h-5 w-5 rounded-full bg-[#C96442] text-white flex items-center justify-center text-[10px] font-bold">{step.step_order}</div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-800">{step.title}</p>
-                      {step.description && <p className="mt-0.5 text-xs text-gray-500">{step.description}</p>}
-                      {step.estimated_minutes && <p className="mt-1 text-[11px] text-gray-400"><Clock className="inline h-3 w-3" /> {step.estimated_minutes} min</p>}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+          {/* Steps section removed for cleaner UI */}
           )}
 
           {/* Training materials upload */}
