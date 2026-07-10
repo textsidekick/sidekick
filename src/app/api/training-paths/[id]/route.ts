@@ -31,10 +31,21 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const pathWithSteps = { ...data, training_steps: steps || [] };
 
-  // Normalize for UI (expects worker_phone, last_activity_at fields)
+  // Look up worker details for enrollments
+  const workerIds = [...new Set((enrollments || []).map((e: any) => e.worker_id).filter(Boolean))];
+  let workerMap: Record<string, any> = {};
+  if (workerIds.length > 0) {
+    const { data: workers } = await supabase
+      .from("workers")
+      .select("id, phone, name")
+      .in("id", workerIds);
+    workerMap = Object.fromEntries((workers || []).map((w: any) => [w.id, w]));
+  }
+
   const normalizedEnrollments = (enrollments || []).map((e: any) => ({
     ...e,
-    worker_phone: e.worker_id,
+    worker_phone: workerMap[e.worker_id]?.phone || e.worker_id,
+    workers: workerMap[e.worker_id] ? { name: workerMap[e.worker_id].name } : null,
     last_activity_at: e.completed_at || e.enrolled_at,
   }));
 
