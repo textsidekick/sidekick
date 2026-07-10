@@ -2,14 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { requireDashboardAuth } from "@/lib/dashboard-auth";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const auth = await requireDashboardAuth(req);
   if (!auth.ok) return auth.response;
 
   const { data, error } = await supabase
     .from("training_paths")
     .select(`*, training_path_steps(* order by step_order asc)`)
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 404 });
@@ -21,13 +22,14 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       id, worker_phone, status, current_step, started_at, completed_at, last_activity_at,
       workers(name)
     `)
-    .eq("training_path_id", params.id)
+    .eq("training_path_id", id)
     .order("last_activity_at", { ascending: false });
 
   return NextResponse.json({ path: data, enrollments: progress || [] });
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const auth = await requireDashboardAuth(req);
   if (!auth.ok) return auth.response;
 
@@ -41,7 +43,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const { data, error } = await supabase
     .from("training_paths")
     .update(updates)
-    .eq("id", params.id)
+    .eq("id", id)
     .select()
     .single();
 
@@ -49,11 +51,12 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   return NextResponse.json({ path: data });
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const auth = await requireDashboardAuth(req);
   if (!auth.ok) return auth.response;
 
-  const { error } = await supabase.from("training_paths").delete().eq("id", params.id);
+  const { error } = await supabase.from("training_paths").delete().eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ ok: true });
 }

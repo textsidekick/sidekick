@@ -4,7 +4,8 @@ import { requireDashboardAuth } from "@/lib/dashboard-auth";
 
 // POST /api/training-paths/:id/enroll
 // Assign a worker to a training path
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const auth = await requireDashboardAuth(req);
   if (!auth.ok) return auth.response;
 
@@ -19,7 +20,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     .from("worker_training_progress")
     .select("id, status")
     .eq("worker_phone", worker_phone)
-    .eq("training_path_id", params.id)
+    .eq("training_path_id", id)
     .maybeSingle();
 
   if (existing) {
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     .insert({
       worker_phone,
       company_id,
-      training_path_id: params.id,
+      training_path_id: id,
       current_step: 1,
       status: "not_started",
       assigned_by,
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     const { data: path } = await supabase
       .from("training_paths")
       .select("name, training_path_steps!inner(title, content, step_order)")
-      .eq("id", params.id)
+      .eq("id", id)
       .single();
 
     if (path) {
