@@ -7,6 +7,7 @@ import {
   GraduationCap, Plus, Clock, Users,
   CheckCircle2, Circle, PlayCircle, X, Loader2, BookOpen, ArrowRight,
   Upload, FileText, Building2, UserPlus, FolderOpen, Link2,
+  ChevronDown, HardDrive, BookMarked, Archive, MessageSquare, Database,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
@@ -124,6 +125,8 @@ function PathDetailModal({
   const [uploadMsg, setUploadMsg] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
+  const [showImportMenu, setShowImportMenu] = useState(false);
+  const [importTooltip, setImportTooltip] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const reload = useCallback(() => {
@@ -265,14 +268,53 @@ function PathDetailModal({
                 className="hidden"
                 onChange={handleFileUpload}
               />
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploading}
-                className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-              >
-                {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                {uploading ? "Uploading..." : "Upload PDF or Image"}
-              </button>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                  {uploading ? "Uploading..." : "Upload PDF or Image"}
+                </button>
+                <div className="relative">
+                  <button
+                    onClick={() => { setShowImportMenu((v) => !v); setImportTooltip(""); }}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    <Link2 className="h-4 w-4" />
+                    Import from...
+                    <ChevronDown className="h-3.5 w-3.5" />
+                  </button>
+                  {showImportMenu && (
+                    <div className="absolute left-0 top-full z-50 mt-1 w-52 rounded-xl border border-gray-100 bg-white shadow-lg" onMouseLeave={() => setImportTooltip("")}>
+                      {[
+                        { label: "Google Drive", icon: HardDrive },
+                        { label: "SharePoint", icon: FolderOpen },
+                        { label: "Notion", icon: BookMarked },
+                        { label: "Dropbox", icon: Archive },
+                        { label: "Slack", icon: MessageSquare },
+                        { label: "Confluence", icon: Database },
+                        { label: "Box", icon: Archive },
+                      ].map(({ label, icon: Icon }) => (
+                        <button
+                          key={label}
+                          className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 first:rounded-t-xl last:rounded-b-xl"
+                          onClick={() => { setImportTooltip(label); setShowImportMenu(false); }}
+                        >
+                          <Icon className="h-4 w-4 text-gray-400" />
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {importTooltip && (
+                    <div className="absolute left-0 top-full z-50 mt-1 rounded-lg border border-blue-100 bg-blue-50 px-3 py-2 text-xs text-blue-700 shadow whitespace-nowrap">
+                      {importTooltip} integration — connect in Settings to enable
+                    </div>
+                  )}
+                </div>
+              </div>
               <p className="mt-1.5 text-xs text-gray-400">PDF, DOC, PNG, JPG supported</p>
               {uploadMsg && <p className="mt-2 text-sm text-gray-600">{uploadMsg}</p>}
               {uploadedFiles.length > 0 && (
