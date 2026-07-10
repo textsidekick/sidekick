@@ -382,15 +382,15 @@ export async function POST(request: NextRequest) {
     if (link) {
       return json(
         textResponse(
-          "✅ 등록되었습니다! 이제 작업 관련 질문을 자유롭게 물어보세요.\n" +
+          "등록되었습니다. 이제 작업 관련 질문을 자유롭게 물어보세요.\n" +
             "예: \"본딩기 청소 방법 알려줘\", \"매트리스 봉제 SOP 보여줘\"\n\n" +
-            "✅ You're registered! Ask me anything about your work."
+            "You're registered. Ask me anything about your work."
         )
       );
     }
     return json(
       textResponse(
-        "안녕하세요! 사이드킥입니다. 👋\n" +
+        "안녕하세요! 사이드킥입니다.\n" +
           "등록을 위해 회사에 등록된 휴대폰 번호를 보내주세요. (예: 010-1234-5678)\n\n" +
           "Hi! Please send your registered phone number to link your account."
       )
