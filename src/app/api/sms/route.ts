@@ -573,11 +573,14 @@ function buildPositionPrompt(positions: any[], lang: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  // Parse form data BEFORE try block so fallback can use it
+  const formData = await request.formData();
+  const _savedBody = String(formData.get("Body") || "").trim();
+  const _savedFrom = normalizePhoneNumber(String(formData.get("From") || "").replace(/^whatsapp:/, ""));
   try {
     // -----------------------------------------------------------------------
     // 1. Parse Twilio webhook payload (form-encoded)
     // -----------------------------------------------------------------------
-    const formData = await request.formData();
     const rawFrom = String(formData.get("From") || "");
     let body = String(formData.get("Body") || "").trim();
     const numMedia = parseInt(String(formData.get("NumMedia") || "0"), 10) || 0;
@@ -998,24 +1001,20 @@ ${knowledgeBlock || "(no relevant knowledge found)"}`,
     console.error("[sms:POST] outer error:", errMsg);
     // Last-resort fallback: try simple SOP Q&A directly
     try {
-      const formData2 = await request.clone().formData().catch(() => null);
-      const body2 = formData2 ? String(formData2.get("Body") || "").trim() : "";
-      const rawFrom2 = formData2 ? String(formData2.get("From") || "") : "";
-      const from2 = normalizePhoneNumber(rawFrom2.replace(/^whatsapp:/, ""));
-      if (body2 && from2) {
-        const { data: w } = await supabase.from("workers").select("company_id").eq("phone", from2).maybeSingle();
+      if (_savedBody && _savedFrom) {
+        const { data: w } = await supabase.from("workers").select("company_id").eq("phone", _savedFrom).maybeSingle();
         if (w) {
-          const sopCtx = await getSopAnswerContext({ companyId: w.company_id, query: body2 });
+          const sopCtx = await getSopAnswerContext({ companyId: w.company_id, query: _savedBody });
           const fallbackAnswer = await completeTextOpenAIFirst({
-            system: `You are Sidekick, a helpful assistant. Answer based on these SOPs:\n${sopCtx?.promptBlock || "(no SOPs found)"}`,
-            user: body2,
+            system: `You are Sidekick, a helpful assistant for frontline workers. Answer using these SOPs:\n${sopCtx?.promptBlock || "(no SOPs found)"}`,
+            user: _savedBody,
             maxTokens: 400,
           });
           return twimlResponse(fallbackAnswer);
         }
       }
     } catch (fallbackErr) {
-      console.error("[sms:POST] fallback also failed:", fallbackErr);
+      console.error("[sms:POST] fallback also failed:", String(fallbackErr));
     }
     return twimlResponse("Sorry, something went wrong. Please try again in a moment.");
   }
