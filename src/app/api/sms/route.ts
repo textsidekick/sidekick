@@ -282,6 +282,263 @@ Schema:
   };
 }
 
+// ---------------------------------------------------------------------------
+// Manager training query handler
+// ---------------------------------------------------------------------------
+function isTrainingQuery(body: string): boolean {
+  const lower = body.toLowerCase();
+  const keywords = [
+    "training", "교육", "progress", "진행", "assign", "배정",
+    "completed", "완료", "who needs", "누가 필요", "enrollment", "수강",
+    "training status", "교육 현황", "who completed", "완료한 사람",
+  ];
+  return keywords.some((kw) => lower.includes(kw));
+}
+
+async function handleManagerTrainingQuery(
+  companyId: string,
+  body: string,
+  lang: string
+): Promise<string | null> {
+  if (!isTrainingQuery(body)) return null;
+
+  // Use Claude to parse intent and extract entities
+  const intentJson = await completeJsonOpenAIFirst({
+    system: `You are a training management query parser for a workforce SMS app.
+Parse the manager's message and return JSON with:
+{
+  "intent": "status_overview" | "who_completed" | "who_needs_training" | "individual_progress" | "assign_training" | "unknown",
+  "training_path_name": "name of training path if mentioned, or null",
+  "worker_name": "worker name if mentioned, or null",
+  "department_name": "department name if mentioned, or null"
+}
+Examples:
+- "Show training status" → intent: status_overview
+- "Who completed forklift training?" → intent: who_completed, training_path_name: "forklift"
+- "Who needs more training?" → intent: who_needs_training
+- "What's 박민준's training progress?" → intent: individual_progress, worker_name: "박민준"
+- "Assign forklift training to 물류부" → intent: assign_training, training_path_name: "forklift", department_name: "물류부"`,
+    user: body,
+    maxTokens: 300,
+  });
+
+  let parsed: any = {};
+  try {
+    const match = intentJson.match(/\{[\s\S]*\}/);
+    if (match) parsed = JSON.parse(match[0]);
+  } catch {
+    return null;
+  }
+
+  const { intent, training_path_name, worker_name, department_name } = parsed;
+  if (!intent || intent === "unknown") return null;
+
+  if (intent === "status_overview") {
+    const { data: paths } = await supabase
+      .from("training_paths")
+      .select("id")
+      .eq("company_id", companyId);
+
+    const { data: enrollments } = await supabase
+      .from("training_enrollments")
+      .select("status")
+      .eq("company_id", companyId);
+
+    const total = paths?.length || 0;
+    const enrolled = enrollments?.length || 0;
+    const completed = enrollments?.filter((e: any) => e.status === "completed").length || 0;
+    const pct = enrolled > 0 ? Math.round((completed / enrolled) * 100) : 0;
+
+    return lang === "ko"
+      ? `📊 교육 현황:\n경로: ${total}개\n수강: ${enrolled}명\n완료: ${completed}명\n완료율: ${pct}%`
+      : `📊 Training Status:\nPaths: ${total}\nEnrolled: ${enrolled}\nCompleted: ${completed}\nCompletion: ${pct}%`;
+  }
+
+  if (intent === "who_completed") {
+    let pathId: string | null = null;
+    if (training_path_name) {
+      const { data: paths } = await supabase
+        .from("training_paths")
+        .select("id,name")
+        .eq("company_id", companyId)
+        .ilike("name", `%${training_path_name}%`);
+      pathId = paths?.[0]?.id || null;
+    }
+
+    let query = supabase
+      .from("training_enrollments")
+      .select("worker_id, workers(name)")
+      .eq("company_id", companyId)
+      .eq("status", "completed");
+
+    if (pathId) query = query.eq("training_path_id", pathId);
+
+    const { data: completions } = await query;
+    const names = (completions || []).map((e: any) => e.workers?.name || "Unknown");
+
+    if (!names.length) {
+      return lang === "ko"
+        ? `${training_path_name || "해당 교육"} 완료자가 없습니다.`
+        : `No one has completed ${training_path_name || "that training"} yet.`;
+    }
+    const label = training_path_name ? `"${training_path_name}"` : "training";
+    return lang === "ko"
+      ? `✅ ${label} 완료자 (${names.length}명):\n${names.join(", ")}`
+      : `✅ Completed ${label} (${names.length}):\n${names.join(", ")}`;
+  }
+
+  if (intent === "who_needs_training") {
+    // Workers with enrollments in_progress or not enrolled at all
+    const { data: enrolled } = await supabase
+      .from("training_enrollments")
+      .select("worker_id, status")
+      .eq("company_id", companyId)
+      .neq("status", "completed");
+
+    const { data: allWorkers } = await supabase
+      .from("workers")
+      .select("id,name")
+      .eq("company_id", companyId);
+
+    const enrolledWorkerIds = new Set((enrolled || []).map((e: any) => e.worker_id));
+    const notStarted = (allWorkers || []).filter((w: any) => !enrolledWorkerIds.has(w.id));
+    const inProgress = (enrolled || []);
+
+    const needsTraining = [
+      ...notStarted.map((w: any) => `${w.name} (not started)`),
+      ...inProgress.map((e: any) => {
+        const worker = (allWorkers || []).find((w: any) => w.id === e.worker_id);
+        return worker ? `${worker.name} (in progress)` : null;
+      }).filter(Boolean),
+    ];
+
+    if (!needsTraining.length) {
+      return lang === "ko" ? "모든 직원이 교육을 완료했습니다! 🎉" : "All workers have completed training! 🎉";
+    }
+
+    const lines = needsTraining.slice(0, 10).join("\n");
+    const more = needsTraining.length > 10 ? `\n...and ${needsTraining.length - 10} more` : "";
+    return lang === "ko"
+      ? `📋 교육 필요 직원 (${needsTraining.length}명):\n${lines}${more}`
+      : `📋 Needs training (${needsTraining.length}):\n${lines}${more}`;
+  }
+
+  if (intent === "individual_progress") {
+    if (!worker_name) {
+      return lang === "ko" ? "직원 이름을 알려주세요." : "Please provide the worker's name.";
+    }
+    const { data: workers } = await supabase
+      .from("workers")
+      .select("id,name")
+      .eq("company_id", companyId)
+      .ilike("name", `%${worker_name}%`);
+
+    if (!workers?.length) {
+      return lang === "ko" ? `"${worker_name}"을(를) 찾을 수 없습니다.` : `Worker "${worker_name}" not found.`;
+    }
+
+    const w = workers[0];
+    const { data: enrollments } = await supabase
+      .from("training_enrollments")
+      .select("status, current_step, completed_at, training_paths(name)")
+      .eq("company_id", companyId)
+      .eq("worker_id", w.id);
+
+    if (!enrollments?.length) {
+      return lang === "ko" ? `${w.name}: 등록된 교육이 없습니다.` : `${w.name}: No training enrollments found.`;
+    }
+
+    const lines = enrollments.map((e: any) => {
+      const pathName = (e as any).training_paths?.name || "Unknown path";
+      if (e.status === "completed") return `✅ ${pathName}`;
+      return `🔄 ${pathName} (step ${e.current_step || 1})`;
+    }).join("\n");
+
+    return lang === "ko"
+      ? `📚 ${w.name} 교육 진행 현황:\n${lines}`
+      : `📚 ${w.name}'s training:\n${lines}`;
+  }
+
+  if (intent === "assign_training") {
+    if (!training_path_name) {
+      return lang === "ko" ? "교육 경로명을 알려주세요." : "Please specify the training path name.";
+    }
+
+    const { data: paths } = await supabase
+      .from("training_paths")
+      .select("id,name")
+      .eq("company_id", companyId)
+      .ilike("name", `%${training_path_name}%`);
+
+    if (!paths?.length) {
+      return lang === "ko"
+        ? `"${training_path_name}" 교육 경로를 찾을 수 없습니다.`
+        : `Training path "${training_path_name}" not found.`;
+    }
+    const path = paths[0];
+
+    let targetWorkers: any[] = [];
+
+    if (department_name) {
+      // Try to resolve department by name
+      const { data: depts } = await supabase
+        .from("departments")
+        .select("id")
+        .eq("company_id", companyId)
+        .ilike("name", `%${department_name}%`);
+
+      if (depts?.length) {
+        const { data: ws } = await supabase
+          .from("workers")
+          .select("id,name")
+          .eq("company_id", companyId)
+          .eq("department_id", depts[0].id);
+        targetWorkers = ws || [];
+      }
+    } else if (worker_name) {
+      const { data: ws } = await supabase
+        .from("workers")
+        .select("id,name")
+        .eq("company_id", companyId)
+        .ilike("name", `%${worker_name}%`);
+      targetWorkers = ws || [];
+    }
+
+    if (!targetWorkers.length) {
+      return lang === "ko" ? "배정할 직원을 찾을 수 없습니다." : "No workers found to assign training to.";
+    }
+
+    let assigned = 0;
+    for (const w of targetWorkers) {
+      const { data: existing } = await supabase
+        .from("training_enrollments")
+        .select("id")
+        .eq("company_id", companyId)
+        .eq("worker_id", w.id)
+        .eq("training_path_id", path.id)
+        .maybeSingle();
+
+      if (!existing) {
+        await supabase.from("training_enrollments").insert({
+          company_id: companyId,
+          worker_id: w.id,
+          training_path_id: path.id,
+          status: "not_started",
+          current_step: 0,
+        });
+        assigned += 1;
+      }
+    }
+
+    const target = department_name || worker_name || "workers";
+    return lang === "ko"
+      ? `✅ "${path.name}" 교육을 ${target}에게 배정했습니다. (${assigned}명 신규 배정)`
+      : `✅ Assigned "${path.name}" to ${target}. (${assigned} new enrollment${assigned === 1 ? "" : "s"})`;
+  }
+
+  return null;
+}
+
 function twimlResponse(message: string) {
   const twiml = new twilio.twiml.MessagingResponse();
   twiml.message(message);
@@ -407,7 +664,16 @@ export async function POST(request: NextRequest) {
     }
 
     // -----------------------------------------------------------------------
-    // 6. Manager freeform updates ("update: new mixer in kitchen 2...")
+    // 6. Manager training queries (must come before freeform update parser)
+    // -----------------------------------------------------------------------
+    const isManager = company?.manager_phone && company.manager_phone === from;
+    if (isManager) {
+      const trainingReply = await handleManagerTrainingQuery(companyId, body, lang);
+      if (trainingReply) return twimlResponse(trainingReply);
+    }
+
+    // -----------------------------------------------------------------------
+    // 6b. Manager freeform updates ("update: new mixer in kitchen 2...")
     // -----------------------------------------------------------------------
     if (shouldTreatAsManagerUpdate(body, company, from)) {
       const result = await applyManagerSmsUpdate({ companyId, company, message: body });
@@ -621,7 +887,7 @@ Summarize the relevant procedure step-by-step from the SOP context above. If no 
       positionBlock,
       // SOP context: retrieved procedure steps relevant to the question
       sopContext?.promptBlock || "",
-      `You are Sidekick, an SMS assistant for frontline workers at ${company?.name || "this company"}${company?.industry ? ` (${company.industry})` : ""}.
+      `You are Sidekick, an SMS assistant for frontline workers at ${company?.name || "this company"}${company?.industry ? ` (${company.industry})` : ""}.${isManager ? "\nYou are speaking with the MANAGER. Managers can ask about training status, who completed training, worker progress, and training assignments — e.g. \"Show training status\", \"Who needs training?\", \"Assign forklift training to logistics team\"." : ""}
 Answer using ONLY the knowledge, SOPs, and position context provided. If the answer isn't there, say you don't have that information and suggest asking their manager.
 Keep answers under 480 characters, plain text (no markdown). Prioritize safety warnings when relevant.
 

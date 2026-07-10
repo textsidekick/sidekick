@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Users, Plus, Trash2, Edit2, CheckCircle, Clock, Award, ClipboardList, CheckCircle2, XCircle, Minus, ChevronDown, ChevronUp } from "lucide-react";
+import { Users, Plus, Trash2, Edit2, CheckCircle, Clock, Award, ClipboardList, CheckCircle2, XCircle, Minus, ChevronDown, ChevronUp, Brain, TrendingUp, AlertTriangle, BookOpen, Loader2 } from "lucide-react";
 import { RegistrationCard } from "@/components/dashboard/workers/RegistrationCard";
 import { cn } from "@/lib/utils";
 import { SectionHeader } from "@/components/dashboard/shared/SectionHeader";
@@ -39,12 +39,34 @@ interface ChecklistStats {
   workerCompliance: { name: string; total: number; passed: number }[];
 }
 
+interface TopicCount {
+  topic: string;
+  count: number;
+}
+
+interface RecommendedTraining {
+  id: string;
+  name: string;
+  role: string;
+}
+
+interface WorkerInsight {
+  workerId: string;
+  workerPhone: string;
+  workerName: string;
+  workerRole: string | null;
+  totalQuestions: number;
+  topTopics: TopicCount[];
+  knowledgeScore: number;
+  knowledgeLevel: "high" | "medium" | "low";
+  gapsTriggered: number;
+  recommendedTraining: RecommendedTraining[];
+}
+
 type TabId = "team" | "certifications" | "safety";
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "team", label: "Team" },
-  
-  
 ];
 
 const ROLE_SKILLS: Record<string, string[]> = {
@@ -84,6 +106,24 @@ function roleBadge(role?: string | null) {
   );
 }
 
+function KnowledgeScoreBadge({ level, score }: { level: "high" | "medium" | "low"; score: number }) {
+  const config = {
+    high: { label: "High", bar: "bg-green-500", bg: "bg-green-50", text: "text-green-700", track: "bg-green-100" },
+    medium: { label: "Medium", bar: "bg-amber-500", bg: "bg-amber-50", text: "text-amber-700", track: "bg-amber-100" },
+    low: { label: "Low", bar: "bg-red-500", bg: "bg-red-50", text: "text-red-700", track: "bg-red-100" },
+  }[level];
+  return (
+    <div className="flex items-center gap-2">
+      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${config.bg} ${config.text}`}>
+        {config.label}
+      </span>
+      <div className={`w-16 h-1.5 rounded-full ${config.track}`}>
+        <div className={`h-1.5 rounded-full ${config.bar}`} style={{ width: `${score}%` }} />
+      </div>
+    </div>
+  );
+}
+
 export default function TeamPage() {
   const [activeTab, setActiveTab] = useState<TabId>("team");
   const [companyId, setCompanyId] = useState<string>("");
@@ -117,6 +157,12 @@ export default function TeamPage() {
   const [checklists, setChecklists] = useState<Checklist[]>([]);
   const [checklistStats, setChecklistStats] = useState<ChecklistStats | null>(null);
   const [loadingChecklists, setLoadingChecklists] = useState(false);
+
+  // Insights state
+  const [insights, setInsights] = useState<WorkerInsight[]>([]);
+  const [workersNeedingTraining, setWorkersNeedingTraining] = useState(0);
+  const [assigningTraining, setAssigningTraining] = useState<string | null>(null);
+  const [assignMsg, setAssignMsg] = useState<Record<string, string>>({});
 
   // Read company from localStorage
   useEffect(() => {
@@ -160,6 +206,18 @@ export default function TeamPage() {
       }
     }
     setLoading(false);
+  }
+
+  async function loadInsights() {
+    if (!companyId) return;
+    try {
+      const res = await fetch(`/api/team/insights?companyId=${companyId}`, { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        setInsights(data.insights || []);
+        setWorkersNeedingTraining(data.workersNeedingTraining || 0);
+      }
+    } catch {}
   }
 
   const loadCertifications = async () => {
@@ -206,6 +264,30 @@ export default function TeamPage() {
     } catch (error) { console.error("Failed to delete certification:", error); }
   };
 
+  async function assignTraining(workerPhone: string, trainingPathId: string, trainingName: string) {
+    const key = `${workerPhone}:${trainingPathId}`;
+    setAssigningTraining(key);
+    try {
+      const res = await fetch(`/api/training-paths/${trainingPathId}/enroll`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ worker_phone: workerPhone, company_id: companyId, assigned_by: "Manager" }),
+      });
+      const data = await res.json();
+      if (data.already_enrolled) {
+        setAssignMsg(m => ({ ...m, [key]: "Already enrolled" }));
+      } else if (data.enrollment) {
+        setAssignMsg(m => ({ ...m, [key]: "Enrolled" }));
+        loadInsights();
+      } else {
+        setAssignMsg(m => ({ ...m, [key]: "Error" }));
+      }
+    } catch {
+      setAssignMsg(m => ({ ...m, [key]: "Error" }));
+    }
+    setAssigningTraining(null);
+  }
+
   useEffect(() => {
     if (companyId) loadTeam();
   }, [companyId, locationId]);
@@ -214,6 +296,7 @@ export default function TeamPage() {
     if (companyId) {
       loadCertifications();
       loadChecklists();
+      loadInsights();
     }
   }, [companyId]);
 
@@ -287,6 +370,11 @@ export default function TeamPage() {
     : v === false ? <XCircle className="h-4 w-4 text-gray-500 mx-auto" />
     : <Minus className="h-4 w-4 text-gray-400 mx-auto" />;
 
+  // Map insights by phone for quick lookup
+  const insightsByPhone = new Map<string, WorkerInsight>(
+    insights.map(i => [i.workerPhone, i])
+  );
+
   return (
     <div className="min-h-screen">
       <AddCertificationModal
@@ -318,6 +406,16 @@ export default function TeamPage() {
               </Button>
             </div>
 
+            {/* Training Needs Summary Banner */}
+            {workersNeedingTraining > 0 && (
+              <div className="mb-4 flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+                <TrendingUp className="h-4 w-4 text-amber-600 flex-shrink-0" />
+                <p className="text-sm text-amber-800">
+                  <span className="font-semibold">{workersNeedingTraining} worker{workersNeedingTraining !== 1 ? "s" : ""}</span> have training recommendations based on question patterns.
+                </p>
+              </div>
+            )}
+
             {loading ? (
               <div className="text-gray-400 py-20 text-center">Loading…</div>
             ) : workers.length === 0 ? (
@@ -335,6 +433,7 @@ export default function TeamPage() {
                       <th className="text-left px-4 py-3 font-medium text-gray-600">Phone</th>
                       <th className="text-left px-4 py-3 font-medium text-gray-600">Role</th>
                       <th className="text-left px-4 py-3 font-medium text-gray-600 hidden md:table-cell">Skills</th>
+                      <th className="text-left px-4 py-3 font-medium text-gray-600">Knowledge</th>
                       <th className="text-left px-4 py-3 font-medium text-gray-600">WOs Completed</th>
                       <th className="text-left px-4 py-3 font-medium text-gray-600">Status</th>
                       <th className="text-left px-4 py-3 font-medium text-gray-600">Joined</th>
@@ -349,13 +448,21 @@ export default function TeamPage() {
                       const isExpanded = expandedWorker === w.id;
                       const workerCerts = certifications.filter(c => c.worker_phone === w.phone);
                       const workerChecklists = checklists.filter(c => c.worker_phone === w.phone);
+                      const insight = insightsByPhone.get(w.phone);
                       return (
                         <>
                         <tr key={w.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => setExpandedWorker(isExpanded ? null : w.id)}>
                           <td className="px-4 py-3 text-gray-400">
                             {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                           </td>
-                          <td className="px-4 py-3 font-medium text-gray-900">{w.name || <span className="text-gray-400 italic">Unnamed</span>}</td>
+                          <td className="px-4 py-3 font-medium text-gray-900">
+                            <div className="flex items-center gap-1.5">
+                              {w.name || <span className="text-gray-400 italic">Unnamed</span>}
+                              {insight && insight.recommendedTraining.length > 0 && (
+                                <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400" title="Has training recommendations" />
+                              )}
+                            </div>
+                          </td>
                           <td className="px-4 py-3 text-gray-600 font-mono text-xs">{w.phone}</td>
                           <td className="px-4 py-3">{roleBadge(w.role)}</td>
                           <td className="px-4 py-3 hidden md:table-cell">
@@ -365,6 +472,13 @@ export default function TeamPage() {
                               </div>
                             ) : (
                               <span className="text-xs text-gray-400">—</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3">
+                            {insight ? (
+                              <KnowledgeScoreBadge level={insight.knowledgeLevel} score={insight.knowledgeScore} />
+                            ) : (
+                              <span className="text-xs text-gray-400">No data</span>
                             )}
                           </td>
                           <td className="px-4 py-3 text-sm text-gray-700 font-medium">{wosCompleted || <span className="text-gray-400">—</span>}</td>
@@ -383,8 +497,8 @@ export default function TeamPage() {
                         </tr>
                         {isExpanded && (
                           <tr key={`${w.id}-expanded`} className="bg-gray-50">
-                            <td colSpan={9} className="px-6 py-4">
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <td colSpan={10} className="px-6 py-4">
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
                                   <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Certifications</p>
                                   {workerCerts.length === 0 ? (
@@ -420,6 +534,67 @@ export default function TeamPage() {
                                         );
                                       })}
                                     </ul>
+                                  )}
+                                </div>
+
+                                {/* Knowledge & Skills Panel */}
+                                <div>
+                                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2 flex items-center gap-1">
+                                    <Brain className="h-3 w-3" /> Knowledge & Skills
+                                  </p>
+                                  {!insight ? (
+                                    <p className="text-xs text-gray-400">No question data yet</p>
+                                  ) : (
+                                    <div className="space-y-2">
+                                      <div className="flex flex-wrap gap-2 text-xs">
+                                        <span className="text-gray-500">{insight.totalQuestions} question{insight.totalQuestions !== 1 ? "s" : ""} asked</span>
+                                        {insight.gapsTriggered > 0 && (
+                                          <span className="flex items-center gap-0.5 text-red-600">
+                                            <AlertTriangle className="h-3 w-3" />
+                                            {insight.gapsTriggered} gap{insight.gapsTriggered !== 1 ? "s" : ""}
+                                          </span>
+                                        )}
+                                      </div>
+                                      {insight.topTopics.length > 0 && (
+                                        <div className="flex flex-wrap gap-1">
+                                          {insight.topTopics.slice(0, 3).map(t => (
+                                            <span key={t.topic} className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded">
+                                              {t.topic} ({t.count})
+                                            </span>
+                                          ))}
+                                        </div>
+                                      )}
+                                      {insight.recommendedTraining.length > 0 && (
+                                        <div>
+                                          <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wide mb-1">Recommended</p>
+                                          <div className="space-y-1">
+                                            {insight.recommendedTraining.map(tr => {
+                                              const key = `${w.phone}:${tr.id}`;
+                                              const msg = assignMsg[key];
+                                              return (
+                                                <div key={tr.id} className="flex items-center justify-between gap-2">
+                                                  <span className="text-xs text-gray-700 flex items-center gap-1">
+                                                    <BookOpen className="h-3 w-3 text-[#C96442]" />
+                                                    {tr.name}
+                                                  </span>
+                                                  {msg ? (
+                                                    <span className="text-[10px] text-green-600 font-medium">{msg}</span>
+                                                  ) : (
+                                                    <button
+                                                      onClick={() => assignTraining(w.phone, tr.id, tr.name)}
+                                                      disabled={assigningTraining === key}
+                                                      className="text-[10px] font-medium px-2 py-0.5 rounded bg-[#C96442]/10 text-[#C96442] hover:bg-[#C96442]/20 disabled:opacity-50"
+                                                    >
+                                                      {assigningTraining === key ? <Loader2 className="h-2.5 w-2.5 animate-spin" /> : "Assign"}
+                                                    </button>
+                                                  )}
+                                                </div>
+                                              );
+                                            })}
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
                                   )}
                                 </div>
                               </div>
