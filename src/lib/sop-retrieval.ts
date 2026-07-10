@@ -54,7 +54,7 @@ export async function getSopAnswerContext(
   }
   const { expandedQuery, matchedTerms } = await expandQuery(companyId, resolvedQuery);
 
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from("sops")
     .select("id, slug, title, content, version_number, approved_at, department_id, language")
     .eq("company_id", companyId)
@@ -65,7 +65,38 @@ export async function getSopAnswerContext(
 
   if (error) {
     console.error("SOP retrieval error:", error);
-    return { sops: [] as SopMatch[], promptBlock: "", matchedTerms };
+  }
+
+  // Fallback: if no results from full-text search, try ilike on title + content
+  if (!data || data.length === 0) {
+    const keywords = resolvedQuery.split(/\s+/).filter(w => w.length > 2).slice(0, 4);
+    let fallbackQuery = supabase
+      .from("sops")
+      .select("id, slug, title, content, version_number, approved_at, department_id, language")
+      .eq("company_id", companyId)
+      .eq("is_current", true)
+      .eq("status", "active");
+    // Try matching any keyword in title or content
+    if (keywords.length > 0) {
+      const orClauses = keywords.map(k => `title.ilike.%${k}%,content.ilike.%${k}%`).join(',');
+      fallbackQuery = fallbackQuery.or(orClauses);
+    }
+    const fallback = await fallbackQuery.limit(resolvedOpts?.limit ?? 3);
+    if (fallback.data && fallback.data.length > 0) {
+      data = fallback.data;
+    }
+  }
+
+  // Last resort: return all SOPs so the AI has context
+  if (!data || data.length === 0) {
+    const allSops = await supabase
+      .from("sops")
+      .select("id, slug, title, content, version_number, approved_at, department_id, language")
+      .eq("company_id", companyId)
+      .eq("is_current", true)
+      .eq("status", "active")
+      .limit(5);
+    data = allSops.data || [];
   }
 
   const sops = (data || []) as SopMatch[];
