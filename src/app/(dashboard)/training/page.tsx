@@ -7,7 +7,7 @@ import {
   GraduationCap, Plus, Clock, Users,
   CheckCircle2, Circle, PlayCircle, X, Loader2, BookOpen, ArrowRight,
   Upload, FileText, Building2, UserPlus, FolderOpen, Link2,
-  ChevronDown, HardDrive, BookMarked, Archive, MessageSquare, Database,
+  ChevronDown, HardDrive, BookMarked, Archive, MessageSquare, Database, Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
@@ -57,8 +57,11 @@ interface Worker {
   id: string;
   phone: string;
   name: string;
+  role?: string | null;
   department_id: string | null;
   department_name: string | null;
+  knowledgeLevel?: string | null;
+  recommendedTraining?: string[];
 }
 
 function timeAgo(dateStr: string) {
@@ -128,6 +131,9 @@ function PathDetailModal({
   const [showImportMenu, setShowImportMenu] = useState(false);
   const [importTooltip, setImportTooltip] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [workers, setWorkers] = useState<Worker[]>([]);
+  const [selectedWorkerId, setSelectedWorkerId] = useState("");
+  const [loadingWorkers, setLoadingWorkers] = useState(false);
 
   const reload = useCallback(() => {
     fetch(`/api/training-paths/${pathId}`)
@@ -137,21 +143,53 @@ function PathDetailModal({
 
   useEffect(() => { reload(); }, [reload]);
 
+  useEffect(() => {
+    if (!companyId) return;
+    setLoadingWorkers(true);
+    const fetchWorkers = async () => {
+      try {
+        const [teamRes, insightsRes] = await Promise.allSettled([
+          fetch(`/api/team?companyId=${companyId}`).then((r) => r.json()),
+          fetch(`/api/team/insights?companyId=${companyId}`).then((r) => r.ok ? r.json() : null),
+        ]);
+        const teamData = teamRes.status === "fulfilled" ? teamRes.value : null;
+        const insightsData = insightsRes.status === "fulfilled" ? insightsRes.value : null;
+        let workerList: Worker[] = teamData?.workers || teamData?.team || [];
+        if (insightsData?.workers) {
+          const insightMap = new Map(insightsData.workers.map((w: Worker) => [w.id, w]));
+          workerList = workerList.map((w) => {
+            const insight = insightMap.get(w.id) as Worker | undefined;
+            return insight ? { ...w, knowledgeLevel: insight.knowledgeLevel, recommendedTraining: insight.recommendedTraining } : w;
+          });
+        }
+        setWorkers(workerList);
+      } catch {
+        setWorkers([]);
+      }
+      setLoadingWorkers(false);
+    };
+    fetchWorkers();
+  }, [companyId]);
+
+  const selectedWorker = workers.find((w) => w.id === selectedWorkerId);
+
   const handleEnroll = async () => {
-    if (!enrollPhone.trim()) return;
+    const phone = selectedWorker?.phone || enrollPhone.trim();
+    if (!phone) return;
     setEnrolling(true);
     setEnrollMsg("");
     const res = await fetch(`/api/training-paths/${pathId}/enroll`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ worker_phone: enrollPhone.trim(), company_id: companyId, assigned_by: "Manager", reminder_frequency: reminderFrequency, reminder_time: reminderTime, due_date: dueDate || undefined }),
+      body: JSON.stringify({ worker_phone: phone, company_id: companyId, assigned_by: "Manager", reminder_frequency: reminderFrequency, reminder_time: reminderTime, due_date: dueDate || undefined }),
     });
     const data = await res.json();
     setEnrolling(false);
     if (data.already_enrolled) {
       setEnrollMsg("Worker already enrolled in this path.");
     } else if (data.enrollment) {
-      setEnrollMsg("Enrolled. Worker will receive Step 1 over SMS.");
+      setEnrollMsg(`Enrolled${selectedWorker ? ` ${selectedWorker.name}` : ""}. Worker will receive Step 1 over SMS.`);
+      setSelectedWorkerId("");
       setEnrollPhone("");
       reload();
     } else {
@@ -330,25 +368,101 @@ function PathDetailModal({
             </div>
           </div>
 
+          {/* Enrollments — moved above assign */}
+          {enrollments.length > 0 && (
+            <div>
+              <h3 className="mb-2 text-sm font-semibold text-gray-700">Enrolled Workers ({enrollments.length})</h3>
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {enrollments.map((e) => (
+                  <div key={e.id} className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-3 py-2">
+                    <div className="flex items-center gap-2">
+                      <WorkerInitials name={e.workers?.name || e.worker_phone} />
+                      <div>
+                        <p className="text-sm font-medium text-gray-800">{e.workers?.name || e.worker_phone}</p>
+                        <p className="text-xs text-gray-400">Last active {timeAgo(e.last_activity_at)}</p>
+                        {e.due_date && (
+                          <p className={cn("text-xs", new Date(e.due_date) < new Date() && e.status !== "completed" ? "text-red-500 font-semibold" : "text-gray-400")}>
+                            {t("Due date")}: {new Date(e.due_date).toLocaleDateString()}
+                            {new Date(e.due_date) < new Date() && e.status !== "completed" && (
+                              <span className="ml-1.5 rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-bold text-red-700">{t("Overdue")}</span>
+                            )}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    {statusPill(e.status, e.current_step, path?.training_steps?.length || 1)}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Assign to individual worker */}
           <div>
             <h3 className="mb-2 text-sm font-semibold text-gray-700">{t("Assign to a Worker")}</h3>
-            <div className="flex gap-2">
-              <input
-                value={enrollPhone}
-                onChange={(e) => setEnrollPhone(e.target.value)}
-                placeholder="+82 10 0000 0000"
-                className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30"
-              />
-              <button
-                onClick={handleEnroll}
-                disabled={enrolling || !enrollPhone.trim()}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white hover:bg-[#B0532F] disabled:opacity-50"
-              >
-                {enrolling ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
-                {t("Assign")}
-              </button>
-            </div>
+            {/* Worker dropdown */}
+            {(() => {
+              const recommendedWorkers = workers.filter((w) =>
+                w.recommendedTraining?.some((rt) =>
+                  path?.name?.toLowerCase().includes(rt.toLowerCase()) ||
+                  path?.description?.toLowerCase().includes(rt.toLowerCase())
+                )
+              );
+              const recommendedIds = new Set(recommendedWorkers.map((w) => w.id));
+              const otherWorkers = workers.filter((w) => !recommendedIds.has(w.id)).sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+              return (
+                <div className="flex gap-2">
+                  <div className="flex-1 relative">
+                    {loadingWorkers ? (
+                      <div className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-400">
+                        <Loader2 className="h-4 w-4 animate-spin" /> Loading workers...
+                      </div>
+                    ) : (
+                      <select
+                        value={selectedWorkerId}
+                        onChange={(e) => setSelectedWorkerId(e.target.value)}
+                        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30 bg-white"
+                      >
+                        <option value="">Select a worker...</option>
+                        {recommendedWorkers.length > 0 && (
+                          <optgroup label="Recommended">
+                            {recommendedWorkers.map((w) => (
+                              <option key={w.id} value={w.id}>
+                                {w.name}{w.role ? ` — ${w.role}` : ""}{w.knowledgeLevel ? ` — Knowledge: ${w.knowledgeLevel}` : ""}
+                              </option>
+                            ))}
+                          </optgroup>
+                        )}
+                        {otherWorkers.length > 0 && (
+                          <optgroup label={recommendedWorkers.length > 0 ? "All Workers" : "Workers"}>
+                            {otherWorkers.map((w) => (
+                              <option key={w.id} value={w.id}>
+                                {w.name}{w.role ? ` — ${w.role}` : ""}{w.knowledgeLevel ? ` — Knowledge: ${w.knowledgeLevel}` : ""}
+                              </option>
+                            ))}
+                          </optgroup>
+                        )}
+                      </select>
+                    )}
+                    {/* Recommended badge under dropdown */}
+                    {selectedWorkerId && recommendedIds.has(selectedWorkerId) && (
+                      <div className="mt-1 flex items-center gap-1 text-xs text-amber-700">
+                        <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                        Recommended for this training
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    onClick={handleEnroll}
+                    disabled={enrolling || !selectedWorkerId}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white hover:bg-[#B0532F] disabled:opacity-50"
+                  >
+                    {enrolling ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
+                    {t("Assign")}
+                  </button>
+                </div>
+              );
+            })()}
 
             {/* Reminder settings */}
             <div className="mt-3 rounded-lg border border-gray-100 bg-gray-50 p-3 space-y-2">
@@ -387,7 +501,7 @@ function PathDetailModal({
             </div>
           </div>
 
-          {/* Assign to entire department */}
+          {/* Assign to entire department — keep below */}
           <div>
             <h3 className="mb-2 text-sm font-semibold text-gray-700">Assign to Entire Department</h3>
             <div className="flex gap-2">
@@ -413,34 +527,7 @@ function PathDetailModal({
             {enrollMsg && <p className="mt-2 text-sm text-gray-600">{enrollMsg}</p>}
           </div>
 
-          {/* Enrollments */}
-          {enrollments.length > 0 && (
-            <div>
-              <h3 className="mb-2 text-sm font-semibold text-gray-700">Enrolled Workers ({enrollments.length})</h3>
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {enrollments.map((e) => (
-                  <div key={e.id} className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-3 py-2">
-                    <div className="flex items-center gap-2">
-                      <WorkerInitials name={e.workers?.name || e.worker_phone} />
-                      <div>
-                        <p className="text-sm font-medium text-gray-800">{e.workers?.name || e.worker_phone}</p>
-                        <p className="text-xs text-gray-400">Last active {timeAgo(e.last_activity_at)}</p>
-                        {e.due_date && (
-                          <p className={cn("text-xs", new Date(e.due_date) < new Date() && e.status !== "completed" ? "text-red-500 font-semibold" : "text-gray-400")}>
-                            {t("Due date")}: {new Date(e.due_date).toLocaleDateString()}
-                            {new Date(e.due_date) < new Date() && e.status !== "completed" && (
-                              <span className="ml-1.5 rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-bold text-red-700">{t("Overdue")}</span>
-                            )}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    {statusPill(e.status, e.current_step, path?.training_steps?.length || 1)}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+
         </div>
       </div>
     </div>
