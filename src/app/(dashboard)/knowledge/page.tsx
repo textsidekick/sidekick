@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   Sparkles,
   AlertTriangle,
+  Trash2,
   Link2,
   Loader2,
   Edit3,
@@ -729,9 +730,9 @@ function GapsTab({ companyId }: { companyId: string }) {
             <div key={i} className="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-5 py-3 shadow-sm">
               <div className="flex items-start gap-3 min-w-0">
                 <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-500" />
-                <p className="text-sm text-gray-800">{gap.question}</p>
+                <p className="text-sm text-gray-800">{gap.topic || gap.question}</p>
               </div>
-              <span className="ml-4 flex-shrink-0 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">{gap.count}x asked</span>
+              <span className="ml-4 flex-shrink-0 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">{gap.frequency || gap.count}x asked</span>
             </div>
           ))}
         </div>
@@ -882,9 +883,22 @@ function TerminologyTab({ companyId }: { companyId: string }) {
                       </div>
                     )}
                   </div>
-                  {term.language && term.language !== "en" && (
-                    <span className="rounded bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-600">{term.language.toUpperCase()}</span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {term.language && term.language !== "en" && (
+                      <span className="rounded bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-600">{term.language.toUpperCase()}</span>
+                    )}
+                    <button
+                      onClick={async () => {
+                        if (!confirm(`Delete "${term.term}"?`)) return;
+                        await fetch(`/api/terminology?id=${term.id}`, { method: "DELETE" });
+                        setTerms((prev) => prev.filter((t) => t.id !== term.id));
+                      }}
+                      className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-500"
+                      title="Delete term"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
