@@ -281,12 +281,20 @@ function NewPathForm({ companyId, onSave, onClose }: { companyId: string; onSave
   );
 }
 
+interface Department {
+  id: string;
+  name: string;
+}
+
 export default function TrainingPage() {
   const [companyId, setCompanyId] = useState("");
   const [paths, setPaths] = useState<TrainingPath[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [selectedPathId, setSelectedPathId] = useState<string | null>(null);
+  const [filterDept, setFilterDept] = useState("");
+  const [filterNewHire, setFilterNewHire] = useState(false);
 
   useEffect(() => {
     try {
@@ -298,18 +306,46 @@ export default function TrainingPage() {
   const loadPaths = useCallback(() => {
     if (!companyId) return;
     setLoading(true);
-    fetch(`/api/training-paths?companyId=${companyId}`)
-      .then((r) => r.json())
-      .then((d) => setPaths(d.paths || []))
+    Promise.all([
+      fetch(`/api/training-paths?companyId=${companyId}`).then((r) => r.json()),
+      fetch(`/api/departments?companyId=${companyId}`).then((r) => r.json()),
+    ])
+      .then(([pathData, deptData]) => {
+        setPaths(pathData.paths || []);
+        setDepartments(deptData.departments || []);
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [companyId]);
 
   useEffect(() => { loadPaths(); }, [loadPaths]);
 
+  const filteredPaths = paths.filter((p) => {
+    if (filterDept && p.department_id !== filterDept) return false;
+    if (filterNewHire) {
+      const nameHint = p.name.toLowerCase();
+      const roleHint = (p.role || "").toLowerCase();
+      return (
+        nameHint.includes("new hire") ||
+        nameHint.includes("onboarding") ||
+        nameHint.includes("신입") ||
+        roleHint.includes("new hire") ||
+        roleHint.includes("onboarding")
+      );
+    }
+    return true;
+  });
+
   const totalEnrolled = paths.reduce((sum, p) => sum + p.enrollment.total, 0);
   const totalCompleted = paths.reduce((sum, p) => sum + p.enrollment.completed, 0);
   const totalInProgress = paths.reduce((sum, p) => sum + p.enrollment.in_progress, 0);
+  const completionPct = totalEnrolled > 0 ? Math.round((totalCompleted / totalEnrolled) * 100) : 0;
+
+  // Estimate average days to completion from estimated_days across paths
+  const activePaths = paths.filter((p) => p.estimated_days > 0);
+  const avgDays = activePaths.length > 0
+    ? Math.round(activePaths.reduce((sum, p) => sum + p.estimated_days, 0) / activePaths.length)
+    : null;
 
   return (
     <div className="mx-auto min-h-screen max-w-7xl px-6 py-8">
@@ -320,25 +356,75 @@ export default function TrainingPage() {
 
       {/* Summary metrics */}
       {paths.length > 0 && (
-        <div className="mt-6 grid grid-cols-3 gap-4">
-          {[
-            { label: "Total enrolled", value: totalEnrolled, icon: Users, color: "text-blue-600" },
-            { label: "In progress", value: totalInProgress, icon: PlayCircle, color: "text-amber-600" },
-            { label: "Completed", value: totalCompleted, icon: CheckCircle2, color: "text-green-600" },
-          ].map((m) => (
-            <div key={m.label} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-              <div className="flex items-center gap-2">
-                <m.icon className={cn("h-5 w-5", m.color)} />
-                <span className="text-xs font-medium text-gray-500">{m.label}</span>
+        <>
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {[
+              { label: "Workers Enrolled", value: totalEnrolled, icon: Users, color: "text-blue-600" },
+              { label: "In Progress", value: totalInProgress, icon: PlayCircle, color: "text-amber-600" },
+              { label: "Completed", value: totalCompleted, icon: CheckCircle2, color: "text-green-600" },
+              { label: "Completion Rate", value: `${completionPct}%`, icon: Circle, color: "text-[#C96442]" },
+            ].map((m) => (
+              <div key={m.label} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                <div className="flex items-center gap-2">
+                  <m.icon className={cn("h-4 w-4", m.color)} />
+                  <span className="text-xs font-medium text-gray-500">{m.label}</span>
+                </div>
+                <p className="mt-2 text-2xl font-bold text-gray-900">{m.value}</p>
               </div>
-              <p className="mt-2 text-3xl font-bold text-gray-900">{m.value}</p>
+            ))}
+          </div>
+
+          {/* Progress bar + time-to-competency */}
+          <div className="mt-4 rounded-xl border border-gray-200 bg-white px-5 py-4 shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
+              <div className="text-sm text-gray-700">
+                <span className="font-semibold">{totalEnrolled}</span> workers enrolled,{" "}
+                <span className="font-semibold">{totalCompleted}</span> completed
+                {" — "}
+                <span className="font-semibold text-[#C96442]">{completionPct}%</span> completion rate
+              </div>
+              {avgDays !== null && (
+                <div className="text-xs text-gray-500">
+                  Average completion: <span className="font-semibold text-gray-700">{avgDays} days</span>
+                </div>
+              )}
             </div>
-          ))}
-        </div>
+            <div className="h-2 w-full rounded-full bg-gray-100">
+              <div
+                className="h-2 rounded-full bg-[#C96442] transition-all"
+                style={{ width: `${completionPct}%` }}
+              />
+            </div>
+          </div>
+        </>
       )}
 
-      <div className="mt-6 flex items-center justify-between">
-        <h2 className="text-base font-semibold text-gray-700">{paths.length} training {paths.length === 1 ? "path" : "paths"}</h2>
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <h2 className="text-base font-semibold text-gray-700 mr-auto">{paths.length} training {paths.length === 1 ? "path" : "paths"}</h2>
+        {/* Department filter */}
+        {departments.length > 0 && (
+          <select
+            value={filterDept}
+            onChange={(e) => setFilterDept(e.target.value)}
+            className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30"
+          >
+            <option value="">All departments</option>
+            {departments.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+          </select>
+        )}
+        {/* New hire filter */}
+        <button
+          onClick={() => setFilterNewHire((v) => !v)}
+          className={cn(
+            "inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors",
+            filterNewHire
+              ? "border-[#C96442]/30 bg-[#F7F3EC] text-[#C96442]"
+              : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+          )}
+        >
+          <GraduationCap className="h-4 w-4" />
+          New Hire Onboarding
+        </button>
         <button onClick={() => setShowForm(true)} className="inline-flex items-center gap-2 rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white hover:bg-[#B0532F]">
           <Plus className="h-4 w-4" /> New Training Path
         </button>
@@ -356,8 +442,14 @@ export default function TrainingPage() {
               <Plus className="h-4 w-4" /> Create first training path
             </button>
           </div>
+        ) : filteredPaths.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-gray-200 bg-white p-12 text-center">
+            <GraduationCap className="mx-auto mb-3 h-10 w-10 text-gray-300" />
+            <p className="font-medium text-gray-600">No matching training paths</p>
+            <p className="mt-1 text-sm text-gray-400">Try adjusting your filters.</p>
+          </div>
         ) : (
-          paths.map((path) => (
+          filteredPaths.map((path) => (
             <div
               key={path.id}
               className="cursor-pointer rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:border-[#C96442]/30 hover:shadow-md transition-all"

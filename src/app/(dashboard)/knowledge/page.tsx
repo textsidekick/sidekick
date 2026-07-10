@@ -318,8 +318,21 @@ function SopsTab({ companyId }: { companyId: string }) {
             </button>
             {expanded === sop.id && (
               <div className="border-t border-gray-100 bg-gray-50/50 px-5 pb-5 pt-4">
+                {/* Approval metadata */}
+                <div className="mb-3 flex flex-wrap items-center gap-4 text-xs text-gray-500">
+                  {sop.approved_by && (
+                    <span className="flex items-center gap-1 font-medium text-gray-700">
+                      <User className="h-3.5 w-3.5" /> Approved by {sop.approved_by}
+                    </span>
+                  )}
+                  <span className="flex items-center gap-1">
+                    <Clock className="h-3.5 w-3.5" /> Last updated {timeAgo(sop.updated_at)}
+                  </span>
+                </div>
                 <div className="mb-2 text-xs font-semibold uppercase text-gray-500">Procedure Content</div>
                 <pre className="whitespace-pre-wrap rounded-lg border border-gray-100 bg-white p-4 text-sm text-gray-700 font-sans">{sop.content}</pre>
+                {/* Version history */}
+                <SOPVersionHistory slug={sop.slug} companyId={companyId} />
                 <div className="mt-4 flex gap-3">
                   <button onClick={() => { setExpanded(null); setShowForm(true); }} className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">
                     <History className="h-3.5 w-3.5" /> New Version
@@ -727,14 +740,235 @@ function GapsTab({ companyId }: { companyId: string }) {
   );
 }
 
+// ─── Terminology tab ─────────────────────────────────────────────────────────
+
+interface TermEntry {
+  id: string;
+  term: string;
+  definition: string;
+  synonyms: string[];
+  language: string;
+  department_id: string | null;
+  created_at: string;
+}
+
+function TerminologyTab({ companyId }: { companyId: string }) {
+  const [terms, setTerms] = useState<TermEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [showForm, setShowForm] = useState(false);
+  const [newTerm, setNewTerm] = useState("");
+  const [newDef, setNewDef] = useState("");
+  const [newSynonyms, setNewSynonyms] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+
+  const loadTerms = useCallback(() => {
+    if (!companyId) return;
+    setLoading(true);
+    fetch(`/api/terminology?companyId=${companyId}`)
+      .then((r) => r.json())
+      .then((d) => setTerms(d.terms || []))
+      .catch(() => setTerms([]))
+      .finally(() => setLoading(false));
+  }, [companyId]);
+
+  useEffect(() => { loadTerms(); }, [loadTerms]);
+
+  const filtered = terms.filter((t) => {
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return (
+      t.term.toLowerCase().includes(q) ||
+      t.definition?.toLowerCase().includes(q) ||
+      t.synonyms?.some((s) => s.toLowerCase().includes(q))
+    );
+  });
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTerm.trim()) { setSaveError("Term is required"); return; }
+    setSaving(true);
+    setSaveError("");
+    try {
+      const res = await fetch("/api/terminology", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          companyId,
+          term: newTerm.trim(),
+          definition: newDef.trim(),
+          synonyms: newSynonyms.split(",").map((s) => s.trim()).filter(Boolean),
+          language: "ko",
+        }),
+      });
+      if (!res.ok) { const d = await res.json(); setSaveError(d.error || "Save failed"); }
+      else { setShowForm(false); setNewTerm(""); setNewDef(""); setNewSynonyms(""); loadTerms(); }
+    } catch { setSaveError("Network error"); }
+    setSaving(false);
+  };
+
+  return (
+    <div>
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search terms / 용어 검색..."
+            className="w-full rounded-lg border border-gray-200 pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30"
+          />
+        </div>
+        <button
+          onClick={() => setShowForm((v) => !v)}
+          className="inline-flex items-center gap-2 rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white hover:bg-[#B0532F]"
+        >
+          <Plus className="h-4 w-4" /> New Term
+        </button>
+      </div>
+
+      {showForm && (
+        <form onSubmit={handleSave} className="mt-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+          <h3 className="mb-4 text-sm font-semibold text-gray-900">Add Term / 용어 추가</h3>
+          {saveError && <p className="mb-3 rounded bg-red-50 px-3 py-2 text-sm text-red-700">{saveError}</p>}
+          <div className="space-y-3">
+            <div>
+              <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Term (용어) *</label>
+              <input value={newTerm} onChange={(e) => setNewTerm(e.target.value)} required className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" placeholder="e.g. 스프링 유닛" />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Definition (정의)</label>
+              <textarea value={newDef} onChange={(e) => setNewDef(e.target.value)} rows={3} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" placeholder="Clear definition for workers" />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Synonyms / 동의어 (comma-separated)</label>
+              <input value={newSynonyms} onChange={(e) => setNewSynonyms(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" placeholder="spring unit, spring assembly" />
+            </div>
+          </div>
+          <div className="mt-4 flex justify-end gap-2">
+            <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
+            <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-[#C96442] px-5 py-2 text-sm font-medium text-white hover:bg-[#B0532F] disabled:opacity-50">
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />} Save Term
+            </button>
+          </div>
+        </form>
+      )}
+
+      <div className="mt-5">
+        {loading ? (
+          <div className="py-16 text-center text-gray-400">Loading terminology...</div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-gray-200 bg-white p-12 text-center">
+            <Tag className="mx-auto mb-3 h-10 w-10 text-gray-300" />
+            <p className="font-medium text-gray-600">{search ? "No matching terms" : "No terminology yet"}</p>
+            <p className="mt-1 text-sm text-gray-400">Add terms and definitions that workers should know.</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {filtered.map((term) => (
+              <div key={term.id} className="rounded-xl border border-gray-200 bg-white px-5 py-4 shadow-sm">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-gray-900">{term.term}</p>
+                    {term.definition && (
+                      <p className="mt-1 text-sm text-gray-600">{term.definition}</p>
+                    )}
+                    {term.synonyms?.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {term.synonyms.map((s) => (
+                          <span key={s} className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">{s}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {term.language && term.language !== "en" && (
+                    <span className="rounded bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-600">{term.language.toUpperCase()}</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── SOP Version History ───────────────────────────────────────────────────────
+
+interface SOPVersion {
+  id: string;
+  version_number: number;
+  is_current: boolean;
+  status: string;
+  created_by: string;
+  approved_by: string;
+  created_at: string;
+  deprecated_at: string | null;
+}
+
+function SOPVersionHistory({ slug, companyId }: { slug: string; companyId: string }) {
+  const [versions, setVersions] = useState<SOPVersion[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`/api/sops/versions?slug=${encodeURIComponent(slug)}&companyId=${companyId}`)
+      .then((r) => r.json())
+      .then((d) => setVersions(d.versions || []))
+      .catch(() => setVersions([]))
+      .finally(() => setLoading(false));
+  }, [slug, companyId]);
+
+  if (loading) return <div className="py-3 text-xs text-gray-400">Loading version history...</div>;
+  if (versions.length <= 1) return null;
+
+  return (
+    <div className="mt-5">
+      <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase text-gray-500">
+        <History className="h-3.5 w-3.5" /> Version History
+      </div>
+      <div className="relative pl-4">
+        <div className="absolute left-1.5 top-1 bottom-1 w-px bg-gray-200" />
+        <div className="space-y-3">
+          {versions.map((v) => (
+            <div key={v.id} className="relative flex items-start gap-3">
+              <div className={cn(
+                "absolute -left-3 mt-1 h-3 w-3 rounded-full border-2 bg-white",
+                v.is_current ? "border-[#C96442]" : "border-gray-300"
+              )} />
+              <div className="min-w-0 flex-1 pl-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className={cn("text-xs font-semibold", v.is_current ? "text-[#C96442]" : "text-gray-600")}>
+                    v{v.version_number}
+                  </span>
+                  {v.is_current && (
+                    <span className="rounded bg-[#C96442]/10 px-1.5 py-0.5 text-[10px] font-medium text-[#C96442]">Current</span>
+                  )}
+                  {statusBadge(v.status)}
+                  <span className="text-[11px] text-gray-400">{timeAgo(v.created_at)}</span>
+                </div>
+                {v.approved_by && (
+                  <p className="mt-0.5 text-[11px] text-gray-400">Approved by {v.approved_by}</p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main page ─────────────────────────────────────────────────────────────────
 
-type Tab = "sops" | "articles" | "gaps";
+type Tab = "sops" | "articles" | "gaps" | "terminology";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "sops", label: "SOPs" },
   { id: "articles", label: "Articles" },
   { id: "gaps", label: "Gaps" },
+  { id: "terminology", label: "Terminology / 용어집" },
 ];
 
 export default function KnowledgePage() {
@@ -785,6 +1019,7 @@ export default function KnowledgePage() {
         {activeTab === "sops" && <SopsTab companyId={companyId} />}
         {activeTab === "articles" && <ArticlesTab companyId={companyId} />}
         {activeTab === "gaps" && <GapsTab companyId={companyId} />}
+        {activeTab === "terminology" && <TerminologyTab companyId={companyId} />}
       </div>
     </div>
   );
