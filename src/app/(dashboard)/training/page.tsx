@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { SectionHeader } from "@/components/dashboard/shared/SectionHeader";
 import { readDashboardScope } from "@/lib/dashboard-scope";
 import {
-  GraduationCap, Plus, ChevronDown, ChevronUp, Clock, Users,
+  GraduationCap, Plus, Clock, Users,
   CheckCircle2, Circle, PlayCircle, X, Loader2, BookOpen, ArrowRight,
-  TrendingUp, AlertCircle,
+  Upload, FileText, Building2, UserPlus, FolderOpen, Link2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -44,6 +44,19 @@ interface Enrollment {
   workers: { name: string } | null;
 }
 
+interface Department {
+  id: string;
+  name: string;
+}
+
+interface Worker {
+  id: string;
+  phone: string;
+  name: string;
+  department_id: string | null;
+  department_name: string | null;
+}
+
 function timeAgo(dateStr: string) {
   if (!dateStr) return "—";
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -70,18 +83,50 @@ function statusPill(status: string, currentStep: number, total: number) {
   );
 }
 
-function PathDetailModal({ pathId, companyId, onClose }: { pathId: string; companyId: string; onClose: () => void }) {
-  const [path, setPath] = useState<{ name: string; description: string; role: string; training_path_steps: TrainingStep[] } | null>(null);
+function WorkerInitials({ name }: { name: string }) {
+  const initials = name
+    .split("")
+    .slice(0, 2)
+    .join("");
+  const colors = ["bg-blue-500", "bg-purple-500", "bg-green-500", "bg-orange-500", "bg-pink-500"];
+  const color = colors[name.charCodeAt(0) % colors.length];
+  return (
+    <div className={cn("h-7 w-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0", color)}>
+      {initials}
+    </div>
+  );
+}
+
+function PathDetailModal({
+  pathId,
+  companyId,
+  departments,
+  onClose,
+}: {
+  pathId: string;
+  companyId: string;
+  departments: Department[];
+  onClose: () => void;
+}) {
+  const [path, setPath] = useState<{ name: string; description: string; role: string; department_id: string | null; training_path_steps: TrainingStep[] } | null>(null);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [enrollPhone, setEnrollPhone] = useState("");
+  const [enrollDept, setEnrollDept] = useState("");
   const [enrolling, setEnrolling] = useState(false);
+  const [enrollingDept, setEnrollingDept] = useState(false);
   const [enrollMsg, setEnrollMsg] = useState("");
+  const [uploadMsg, setUploadMsg] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
+  const reload = useCallback(() => {
     fetch(`/api/training-paths/${pathId}`)
       .then((r) => r.json())
       .then((d) => { setPath(d.path); setEnrollments(d.enrollments || []); });
   }, [pathId]);
+
+  useEffect(() => { reload(); }, [reload]);
 
   const handleEnroll = async () => {
     if (!enrollPhone.trim()) return;
@@ -97,27 +142,93 @@ function PathDetailModal({ pathId, companyId, onClose }: { pathId: string; compa
     if (data.already_enrolled) {
       setEnrollMsg("Worker already enrolled in this path.");
     } else if (data.enrollment) {
-      setEnrollMsg("Enrolled! Worker will receive Step 1 over SMS.");
+      setEnrollMsg("Enrolled. Worker will receive Step 1 over SMS.");
       setEnrollPhone("");
-      // Refresh enrollments
-      fetch(`/api/training-paths/${pathId}`).then((r) => r.json()).then((d) => setEnrollments(d.enrollments || []));
+      reload();
     } else {
       setEnrollMsg(`Error: ${data.error || "unknown"}`);
     }
   };
+
+  const handleEnrollDept = async () => {
+    if (!enrollDept) return;
+    setEnrollingDept(true);
+    setEnrollMsg("");
+    try {
+      const workersRes = await fetch(`/api/workers?companyId=${companyId}&departmentId=${enrollDept}`);
+      const workersData = await workersRes.json();
+      const workers: Worker[] = workersData.workers || [];
+      let enrolled = 0;
+      for (const w of workers) {
+        const res = await fetch(`/api/training-paths/${pathId}/enroll`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ worker_phone: w.phone, company_id: companyId, assigned_by: "Manager" }),
+        });
+        const d = await res.json();
+        if (d.enrollment) enrolled++;
+      }
+      setEnrollMsg(`Enrolled ${enrolled} worker(s) from the selected department.`);
+      setEnrollDept("");
+      reload();
+    } catch {
+      setEnrollMsg("Error enrolling department.");
+    }
+    setEnrollingDept(false);
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setUploadMsg("");
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("companyId", companyId);
+    formData.append("trainingPathId", pathId);
+    try {
+      const res = await fetch("/api/onboarding/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (data.url || data.path || res.ok) {
+        setUploadedFiles((prev) => [...prev, data.url || data.path || file.name]);
+        setUploadMsg(`"${file.name}" uploaded successfully.`);
+      } else {
+        setUploadMsg(`Upload failed: ${data.error || "unknown error"}`);
+      }
+    } catch {
+      setUploadMsg("Upload failed. Please try again.");
+    }
+    setUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const deptName = path?.department_id
+    ? departments.find((d) => d.id === path.department_id)?.name
+    : null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 py-8" onClick={onClose}>
       <div className="w-full max-w-2xl rounded-2xl bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">{path?.name || "Loading…"}</h2>
-            {path?.role && <p className="text-sm text-gray-500">Role: {path.role}</p>}
+            <h2 className="text-lg font-bold text-gray-900">{path?.name || "Loading..."}</h2>
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              {deptName && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#F7F3EC] px-2.5 py-0.5 text-xs font-medium text-[#C96442]">
+                  <Building2 className="h-3 w-3" /> {deptName}
+                </span>
+              )}
+              {path?.role && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">
+                  <Users className="h-3 w-3" /> {path.role}
+                </span>
+              )}
+            </div>
           </div>
           <button onClick={onClose}><X className="h-5 w-5 text-gray-400 hover:text-gray-700" /></button>
         </div>
 
-        <div className="px-6 py-5 space-y-6">
+        <div className="px-6 py-5 space-y-6 max-h-[80vh] overflow-y-auto">
           {/* Steps */}
           {path && (
             <div>
@@ -137,14 +248,48 @@ function PathDetailModal({ pathId, companyId, onClose }: { pathId: string; compa
             </div>
           )}
 
-          {/* Enroll worker */}
+          {/* Training materials upload */}
           <div>
-            <h3 className="mb-2 text-sm font-semibold text-gray-700">Enroll a worker</h3>
+            <h3 className="mb-2 text-sm font-semibold text-gray-700">Training Materials</h3>
+            <div className="rounded-lg border border-dashed border-gray-200 p-4">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                className="hidden"
+                onChange={handleFileUpload}
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              >
+                {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                {uploading ? "Uploading..." : "Upload PDF or Image"}
+              </button>
+              <p className="mt-1.5 text-xs text-gray-400">PDF, DOC, PNG, JPG supported</p>
+              {uploadMsg && <p className="mt-2 text-sm text-gray-600">{uploadMsg}</p>}
+              {uploadedFiles.length > 0 && (
+                <div className="mt-3 space-y-1">
+                  {uploadedFiles.map((f, i) => (
+                    <div key={i} className="flex items-center gap-2 text-xs text-gray-600">
+                      <FileText className="h-3.5 w-3.5 text-gray-400" />
+                      <span className="truncate">{f}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Assign to individual worker */}
+          <div>
+            <h3 className="mb-2 text-sm font-semibold text-gray-700">Assign to a Worker</h3>
             <div className="flex gap-2">
               <input
                 value={enrollPhone}
                 onChange={(e) => setEnrollPhone(e.target.value)}
-                placeholder="+1 555 000 0000"
+                placeholder="+82 10 0000 0000"
                 className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30"
               />
               <button
@@ -152,8 +297,33 @@ function PathDetailModal({ pathId, companyId, onClose }: { pathId: string; compa
                 disabled={enrolling || !enrollPhone.trim()}
                 className="inline-flex items-center gap-1.5 rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white hover:bg-[#B0532F] disabled:opacity-50"
               >
-                {enrolling ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
-                Enroll
+                {enrolling ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
+                Assign
+              </button>
+            </div>
+          </div>
+
+          {/* Assign to entire department */}
+          <div>
+            <h3 className="mb-2 text-sm font-semibold text-gray-700">Assign to Entire Department</h3>
+            <div className="flex gap-2">
+              <select
+                value={enrollDept}
+                onChange={(e) => setEnrollDept(e.target.value)}
+                className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30"
+              >
+                <option value="">Select department...</option>
+                {departments.map((d) => (
+                  <option key={d.id} value={d.id}>{d.name}</option>
+                ))}
+              </select>
+              <button
+                onClick={handleEnrollDept}
+                disabled={enrollingDept || !enrollDept}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white hover:bg-[#B0532F] disabled:opacity-50"
+              >
+                {enrollingDept ? <Loader2 className="h-4 w-4 animate-spin" /> : <Building2 className="h-4 w-4" />}
+                Assign All
               </button>
             </div>
             {enrollMsg && <p className="mt-2 text-sm text-gray-600">{enrollMsg}</p>}
@@ -162,13 +332,16 @@ function PathDetailModal({ pathId, companyId, onClose }: { pathId: string; compa
           {/* Enrollments */}
           {enrollments.length > 0 && (
             <div>
-              <h3 className="mb-2 text-sm font-semibold text-gray-700">Enrolled workers ({enrollments.length})</h3>
+              <h3 className="mb-2 text-sm font-semibold text-gray-700">Enrolled Workers ({enrollments.length})</h3>
               <div className="space-y-2 max-h-48 overflow-y-auto">
                 {enrollments.map((e) => (
                   <div key={e.id} className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-3 py-2">
-                    <div>
-                      <p className="text-sm font-medium text-gray-800">{e.workers?.name || e.worker_phone}</p>
-                      <p className="text-xs text-gray-400">Last active {timeAgo(e.last_activity_at)}</p>
+                    <div className="flex items-center gap-2">
+                      <WorkerInitials name={e.workers?.name || e.worker_phone} />
+                      <div>
+                        <p className="text-sm font-medium text-gray-800">{e.workers?.name || e.worker_phone}</p>
+                        <p className="text-xs text-gray-400">Last active {timeAgo(e.last_activity_at)}</p>
+                      </div>
                     </div>
                     {statusPill(e.status, e.current_step, path?.training_path_steps?.length || 1)}
                   </div>
@@ -282,26 +455,6 @@ function NewPathForm({ companyId, onSave, onClose }: { companyId: string; onSave
   );
 }
 
-interface Department {
-  id: string;
-  name: string;
-}
-
-interface RecommendedWorker {
-  workerId: string;
-  workerPhone: string;
-  workerName: string;
-  knowledgeScore: number;
-  knowledgeLevel: "high" | "medium" | "low";
-}
-
-interface TrainingRecommendation {
-  trainingPathId: string;
-  trainingPathName: string;
-  recommendedWorkers: RecommendedWorker[];
-  recommendedCount: number;
-}
-
 export default function TrainingPage() {
   const [companyId, setCompanyId] = useState("");
   const [paths, setPaths] = useState<TrainingPath[]>([]);
@@ -310,11 +463,6 @@ export default function TrainingPage() {
   const [showForm, setShowForm] = useState(false);
   const [selectedPathId, setSelectedPathId] = useState<string | null>(null);
   const [filterDept, setFilterDept] = useState("");
-  const [filterNewHire, setFilterNewHire] = useState(false);
-  const [trainingRecommendations, setTrainingRecommendations] = useState<TrainingRecommendation[]>([]);
-  const [expandedRec, setExpandedRec] = useState<string | null>(null);
-  const [bulkAssigning, setBulkAssigning] = useState<string | null>(null);
-  const [bulkMsg, setBulkMsg] = useState<Record<string, string>>({});
 
   useEffect(() => {
     try {
@@ -329,51 +477,22 @@ export default function TrainingPage() {
     Promise.all([
       fetch(`/api/training-paths?companyId=${companyId}`).then((r) => r.json()),
       fetch(`/api/departments?companyId=${companyId}`).then((r) => r.json()),
-      fetch(`/api/team/insights?companyId=${companyId}`).then((r) => r.json()),
     ])
-      .then(([pathData, deptData, insightsData]) => {
+      .then(([pathData, deptData]) => {
         setPaths(pathData.paths || []);
         setDepartments(deptData.departments || []);
-        setTrainingRecommendations(insightsData.trainingRecommendations || []);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [companyId]);
 
-  async function bulkAssign(pathId: string, workers: RecommendedWorker[]) {
-    setBulkAssigning(pathId);
-    let count = 0;
-    for (const w of workers) {
-      try {
-        const res = await fetch(`/api/training-paths/${pathId}/enroll`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ worker_phone: w.workerPhone, company_id: companyId, assigned_by: "Manager" }),
-        });
-        const data = await res.json();
-        if (data.enrollment) count++;
-      } catch {}
-    }
-    setBulkAssigning(null);
-    setBulkMsg(m => ({ ...m, [pathId]: `Enrolled ${count} worker${count !== 1 ? "s" : ""}` }));
-    loadPaths();
-  }
-
   useEffect(() => { loadPaths(); }, [loadPaths]);
+
+  const getDeptName = (deptId: string | null) =>
+    deptId ? departments.find((d) => d.id === deptId)?.name || null : null;
 
   const filteredPaths = paths.filter((p) => {
     if (filterDept && p.department_id !== filterDept) return false;
-    if (filterNewHire) {
-      const nameHint = p.name.toLowerCase();
-      const roleHint = (p.role || "").toLowerCase();
-      return (
-        nameHint.includes("new hire") ||
-        nameHint.includes("onboarding") ||
-        nameHint.includes("신입") ||
-        roleHint.includes("new hire") ||
-        roleHint.includes("onboarding")
-      );
-    }
     return true;
   });
 
@@ -382,7 +501,6 @@ export default function TrainingPage() {
   const totalInProgress = paths.reduce((sum, p) => sum + p.enrollment.in_progress, 0);
   const completionPct = totalEnrolled > 0 ? Math.round((totalCompleted / totalEnrolled) * 100) : 0;
 
-  // Estimate average days to completion from estimated_days across paths
   const activePaths = paths.filter((p) => p.estimated_days > 0);
   const avgDays = activePaths.length > 0
     ? Math.round(activePaths.reduce((sum, p) => sum + p.estimated_days, 0) / activePaths.length)
@@ -392,13 +510,26 @@ export default function TrainingPage() {
     <div className="mx-auto min-h-screen max-w-7xl px-6 py-8">
       <SectionHeader
         title="Training Paths"
-        subtitle="Structured onboarding and skill-building programs. New hires are guided step-by-step over text — no app needed."
+        subtitle="Structured onboarding and skill-building programs. Workers are guided step-by-step over text — no app needed."
       />
+
+      {/* Integrations banner */}
+      <div className="mt-5 flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3">
+        <Link2 className="h-4 w-4 flex-shrink-0 text-blue-500" />
+        <p className="text-sm text-blue-700">
+          <span className="font-semibold">Connect Google Drive, SharePoint, or Notion</span> to automatically import training materials into your paths.
+        </p>
+        <div className="ml-auto flex items-center gap-2">
+          <span className="rounded border border-blue-200 bg-white px-2 py-0.5 text-[11px] font-medium text-blue-600"><FolderOpen className="inline h-3 w-3 mr-0.5" />Drive</span>
+          <span className="rounded border border-blue-200 bg-white px-2 py-0.5 text-[11px] font-medium text-blue-600"><FileText className="inline h-3 w-3 mr-0.5" />SharePoint</span>
+          <span className="rounded border border-blue-200 bg-white px-2 py-0.5 text-[11px] font-medium text-blue-600"><BookOpen className="inline h-3 w-3 mr-0.5" />Notion</span>
+        </div>
+      </div>
 
       {/* Summary metrics */}
       {paths.length > 0 && (
         <>
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
               { label: "Workers Enrolled", value: totalEnrolled, icon: Users, color: "text-blue-600" },
               { label: "In Progress", value: totalInProgress, icon: PlayCircle, color: "text-amber-600" },
@@ -415,7 +546,6 @@ export default function TrainingPage() {
             ))}
           </div>
 
-          {/* Progress bar + time-to-competency */}
           <div className="mt-4 rounded-xl border border-gray-200 bg-white px-5 py-4 shadow-sm">
             <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
               <div className="text-sm text-gray-700">
@@ -426,15 +556,12 @@ export default function TrainingPage() {
               </div>
               {avgDays !== null && (
                 <div className="text-xs text-gray-500">
-                  Average completion: <span className="font-semibold text-gray-700">{avgDays} days</span>
+                  Avg. completion: <span className="font-semibold text-gray-700">{avgDays} days</span>
                 </div>
               )}
             </div>
             <div className="h-2 w-full rounded-full bg-gray-100">
-              <div
-                className="h-2 rounded-full bg-[#C96442] transition-all"
-                style={{ width: `${completionPct}%` }}
-              />
+              <div className="h-2 rounded-full bg-[#C96442] transition-all" style={{ width: `${completionPct}%` }} />
             </div>
           </div>
         </>
@@ -442,7 +569,6 @@ export default function TrainingPage() {
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <h2 className="text-base font-semibold text-gray-700 mr-auto">{paths.length} training {paths.length === 1 ? "path" : "paths"}</h2>
-        {/* Department filter */}
         {departments.length > 0 && (
           <select
             value={filterDept}
@@ -453,19 +579,6 @@ export default function TrainingPage() {
             {departments.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
           </select>
         )}
-        {/* New hire filter */}
-        <button
-          onClick={() => setFilterNewHire((v) => !v)}
-          className={cn(
-            "inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors",
-            filterNewHire
-              ? "border-[#C96442]/30 bg-[#F7F3EC] text-[#C96442]"
-              : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
-          )}
-        >
-          <GraduationCap className="h-4 w-4" />
-          New Hire Onboarding
-        </button>
         <button onClick={() => setShowForm(true)} className="inline-flex items-center gap-2 rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white hover:bg-[#B0532F]">
           <Plus className="h-4 w-4" /> New Training Path
         </button>
@@ -473,12 +586,12 @@ export default function TrainingPage() {
 
       <div className="mt-4 space-y-3">
         {loading ? (
-          <div className="py-16 text-center text-gray-400">Loading training paths…</div>
+          <div className="py-16 text-center text-gray-400">Loading training paths...</div>
         ) : paths.length === 0 ? (
           <div className="rounded-xl border border-dashed border-gray-200 bg-white p-12 text-center">
             <GraduationCap className="mx-auto mb-3 h-10 w-10 text-gray-300" />
             <p className="font-medium text-gray-600">No training paths yet</p>
-            <p className="mt-1 text-sm text-gray-400">Create structured learning programs for new hires. They'll receive each step over text, in their language.</p>
+            <p className="mt-1 text-sm text-gray-400">Create structured learning programs. Workers receive each step over text — no app needed.</p>
             <button onClick={() => setShowForm(true)} className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white hover:bg-[#B0532F]">
               <Plus className="h-4 w-4" /> Create first training path
             </button>
@@ -490,17 +603,12 @@ export default function TrainingPage() {
             <p className="mt-1 text-sm text-gray-400">Try adjusting your filters.</p>
           </div>
         ) : (
-              filteredPaths.map((path) => {
-            const rec = trainingRecommendations.find(r => r.trainingPathId === path.id);
-            const recCount = rec?.recommendedCount || 0;
-            const isRecExpanded = expandedRec === path.id;
+          filteredPaths.map((path) => {
+            const deptName = getDeptName(path.department_id);
             return (
-            <div
-              key={path.id}
-              className="rounded-xl border border-gray-200 bg-white shadow-sm hover:border-[#C96442]/30 hover:shadow-md transition-all"
-            >
               <div
-                className="cursor-pointer p-5"
+                key={path.id}
+                className="cursor-pointer rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:border-[#C96442]/30 hover:shadow-md transition-all"
                 onClick={() => setSelectedPathId(path.id)}
               >
                 <div className="flex items-start justify-between gap-4">
@@ -509,89 +617,68 @@ export default function TrainingPage() {
                       <GraduationCap className="h-4 w-4 text-[#C96442]" />
                       <span className="font-semibold text-gray-900">{path.name}</span>
                       {!path.is_active && <span className="rounded bg-gray-100 px-2 py-0.5 text-[10px] text-gray-500">Inactive</span>}
-                      {recCount > 0 && (
-                        <span className="flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-700">
-                          <TrendingUp className="h-3 w-3" /> {recCount} recommended
+                    </div>
+
+                    {/* Department + Role tags */}
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      {deptName && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[#F7F3EC] px-2.5 py-0.5 text-xs font-medium text-[#C96442]">
+                          <Building2 className="h-3 w-3" /> {deptName}
+                        </span>
+                      )}
+                      {path.role && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">
+                          <Users className="h-3 w-3" /> {path.role}
                         </span>
                       )}
                     </div>
-                    {path.role && <p className="mt-0.5 text-sm text-gray-500">For: {path.role}</p>}
-                    {path.description && <p className="mt-1 text-sm text-gray-400 truncate">{path.description}</p>}
+
+                    {path.description && <p className="mt-1.5 text-sm text-gray-400 truncate">{path.description}</p>}
+
                     <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-gray-400">
                       <span className="flex items-center gap-1"><BookOpen className="h-3.5 w-3.5" /> {path.step_count} steps</span>
                       <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> ~{path.estimated_days} days</span>
-                      <span className="flex items-center gap-1"><Users className="h-3.5 w-3.5" /> {path.enrollment.total} enrolled</span>
-                      {path.enrollment.in_progress > 0 && <span className="text-amber-600">{path.enrollment.in_progress} in progress</span>}
-                      {path.enrollment.completed > 0 && <span className="text-green-600">{path.enrollment.completed} completed</span>}
+
+                      {/* Enrolled workers with avatars */}
+                      {path.enrollment.total > 0 ? (
+                        <span className="flex items-center gap-1.5 text-gray-600 font-medium">
+                          <Users className="h-3.5 w-3.5" />
+                          {path.enrollment.total} worker{path.enrollment.total !== 1 ? "s" : ""} enrolled
+                          {path.enrollment.in_progress > 0 && (
+                            <span className="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700">
+                              {path.enrollment.in_progress} in progress
+                            </span>
+                          )}
+                          {path.enrollment.completed > 0 && (
+                            <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-700">
+                              {path.enrollment.completed} completed
+                            </span>
+                          )}
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1 text-gray-400">
+                          <Users className="h-3.5 w-3.5" /> No workers assigned
+                        </span>
+                      )}
                     </div>
                   </div>
                   <ArrowRight className="h-5 w-5 text-gray-300 flex-shrink-0 mt-1" />
                 </div>
               </div>
-
-              {/* Recommended workers section */}
-              {recCount > 0 && (
-                <div className="border-t border-gray-100 px-5 py-3">
-                  <button
-                    className="flex w-full items-center justify-between text-sm"
-                    onClick={() => setExpandedRec(isRecExpanded ? null : path.id)}
-                  >
-                    <span className="flex items-center gap-1.5 text-amber-700 font-medium">
-                      <TrendingUp className="h-3.5 w-3.5" />
-                      {recCount} worker{recCount !== 1 ? "s" : ""} recommended based on question patterns
-                    </span>
-                    {isRecExpanded ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
-                  </button>
-
-                  {isRecExpanded && rec && (
-                    <div className="mt-3 space-y-2">
-                      <div className="space-y-1.5">
-                        {rec.recommendedWorkers.map(w => (
-                          <div key={w.workerId} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2">
-                            <div>
-                              <p className="text-sm font-medium text-gray-800">{w.workerName}</p>
-                              <p className="text-xs text-gray-400">
-                                Knowledge: {w.knowledgeLevel === "high" ? "High" : w.knowledgeLevel === "medium" ? "Medium" : "Low"} · Score {w.knowledgeScore}%
-                              </p>
-                            </div>
-                            <div className={cn(
-                              "h-2 w-16 rounded-full",
-                              w.knowledgeLevel === "high" ? "bg-green-100" : w.knowledgeLevel === "medium" ? "bg-amber-100" : "bg-red-100"
-                            )}>
-                              <div
-                                className={cn("h-2 rounded-full", w.knowledgeLevel === "high" ? "bg-green-500" : w.knowledgeLevel === "medium" ? "bg-amber-500" : "bg-red-500")}
-                                style={{ width: `${w.knowledgeScore}%` }}
-                              />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="pt-1">
-                        {bulkMsg[path.id] ? (
-                          <p className="text-sm text-green-600 font-medium">{bulkMsg[path.id]}</p>
-                        ) : (
-                          <button
-                            onClick={() => bulkAssign(path.id, rec.recommendedWorkers)}
-                            disabled={bulkAssigning === path.id}
-                            className="inline-flex items-center gap-2 rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white hover:bg-[#B0532F] disabled:opacity-50"
-                          >
-                            {bulkAssigning === path.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Users className="h-4 w-4" />}
-                            Assign all {recCount} to this path
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          );
+            );
           })
         )}
       </div>
 
       {showForm && <NewPathForm companyId={companyId} onSave={() => { setShowForm(false); loadPaths(); }} onClose={() => setShowForm(false)} />}
-      {selectedPathId && <PathDetailModal pathId={selectedPathId} companyId={companyId} onClose={() => setSelectedPathId(null)} />}
+      {selectedPathId && (
+        <PathDetailModal
+          pathId={selectedPathId}
+          companyId={companyId}
+          departments={departments}
+          onClose={() => setSelectedPathId(null)}
+        />
+      )}
     </div>
   );
 }
