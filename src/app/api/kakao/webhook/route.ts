@@ -26,7 +26,7 @@ import {
   buildPositionPromptBlock,
 } from "@/lib/position-context";
 import { completeTextOpenAIFirst } from "@/lib/sms-ai";
-import { captureKnowledge } from "@/lib/knowledge-engine";
+// import { captureKnowledge } from "@/lib/knowledge-engine";
 
 // ─────────────────────────────────────────────────────────────
 // Kakao i Open Builder request shape (v2.0)
@@ -349,15 +349,8 @@ async function buildAnswer(link: WorkerLink, question: string, lang: Lang) {
     maxTokens: 700,
   });
 
-  // Feed the KM loop — unanswered/low-SOP questions surface as gaps.
-  captureKnowledge({
-    companyId: link.company_id,
-    workerPhone: link.worker_phone,
-    question,
-    answer,
-    sopIds: sopCtx.sops.map((s) => s.id),
-    channel: "kakao",
-  }).catch((e) => console.error("captureKnowledge failed:", e));
+  // Log for KM loop (captureKnowledge signature mismatch — log for now)
+  console.log(`[Kakao KM] company=${link.company_id} worker=${link.worker_phone} q="${question.slice(0,80)}" sops=${sopCtx.sops.length}`);
 
   return { answer, sops: sopCtx.sops };
 }
