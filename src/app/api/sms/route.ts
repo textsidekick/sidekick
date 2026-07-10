@@ -768,12 +768,17 @@ export async function POST(request: NextRequest) {
     // -----------------------------------------------------------------------
     // 9. Triage: is this an issue report that needs a work order?
     // -----------------------------------------------------------------------
-    const triage = await triageIncomingMessage({
-      companyId,
-      workerId: worker.id as UUID,
-      message: body,
-      mediaUrl,
-    });
+    let triage: any = null;
+    try {
+      triage = await triageIncomingMessage({
+        companyId,
+        workerId: worker.id as UUID,
+        message: body,
+        mediaUrl,
+      });
+    } catch (triageErr) {
+      console.error("[sms] triage failed, skipping to QA:", triageErr);
+    }
 
     if (triage?.isIssueReport) {
       const locationId = await resolveMessageLocationId(
@@ -992,6 +997,6 @@ ${knowledgeBlock || "(no relevant knowledge found)"}`,
     const errMsg = error instanceof Error ? error.message : String(error);
     const errStack = error instanceof Error ? error.stack?.split('\n').slice(0,3).join(' | ') : '';
     console.error("[sms:POST] error:", errMsg, errStack);
-    return twimlResponse(`Error: ${errMsg.slice(0, 150)}`);
+    return twimlResponse("Sorry, something went wrong. Please try again in a moment.");
   }
 }
