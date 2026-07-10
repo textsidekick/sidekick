@@ -33,11 +33,29 @@ export async function completeTextOpenAIFirst(params: {
     user,
     maxTokens = 300,
     openaiModel = process.env.OPENAI_SMS_MODEL || "gpt-4.1",
-    anthropicModel = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-5",
+    anthropicModel = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6",
   } = params;
 
-  let openAiError: unknown = null;
+  let anthropicError: unknown = null;
 
+  // Primary: Anthropic (Claude)
+  try {
+    const response = await anthropic.messages.create({
+      model: anthropicModel,
+      max_tokens: maxTokens,
+      system,
+      messages: [{ role: "user", content: user }],
+    });
+
+    const text = extractAnthropicText(response.content as Array<{ type: string; text?: string }>);
+    if (text) return text;
+    throw new Error("Anthropic returned empty text");
+  } catch (error) {
+    anthropicError = error;
+    console.error("[SMS-AI] Anthropic text request failed, falling back to OpenAI:", error);
+  }
+
+  // Fallback: OpenAI
   try {
     const response = await openai.chat.completions.create({
       model: openaiModel,
@@ -50,24 +68,13 @@ export async function completeTextOpenAIFirst(params: {
 
     const text = response.choices[0]?.message?.content?.trim() || "";
     if (text) return text;
-    throw new Error("OpenAI returned empty text");
+    throw new Error("OpenAI fallback returned empty text");
   } catch (error) {
-    openAiError = error;
-    console.error("[SMS-AI] OpenAI text request failed:", error);
+    console.error("[SMS-AI] OpenAI fallback also failed:", error);
   }
 
-  const response = await anthropic.messages.create({
-    model: anthropicModel,
-    max_tokens: maxTokens,
-    system,
-    messages: [{ role: "user", content: user }],
-  });
-
-  const text = extractAnthropicText(response.content as Array<{ type: string; text?: string }>);
-  if (text) return text;
-
-  if (openAiError) throw openAiError;
-  throw new Error("Anthropic fallback returned empty text");
+  if (anthropicError) throw anthropicError;
+  throw new Error("Both Anthropic and OpenAI failed");
 }
 
 export async function completeJsonOpenAIFirst(params: {
@@ -82,11 +89,34 @@ export async function completeJsonOpenAIFirst(params: {
     user,
     maxTokens = 900,
     openaiModel = process.env.OPENAI_SMS_TRIAGE_MODEL || process.env.OPENAI_SMS_MODEL || "gpt-4.1",
-    anthropicModel = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-5",
+    anthropicModel = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6",
   } = params;
 
-  let openAiError: unknown = null;
+  let anthropicError: unknown = null;
 
+  // Primary: Anthropic (Claude) — ask for JSON in the system prompt
+  try {
+    const jsonSystem = (system ? system + "\n\n" : "") + "Respond with valid JSON only. No markdown, no explanation.";
+    const response = await anthropic.messages.create({
+      model: anthropicModel,
+      max_tokens: maxTokens,
+      system: jsonSystem,
+      messages: [{ role: "user", content: user }],
+    });
+
+    const text = extractAnthropicText(response.content as Array<{ type: string; text?: string }>);
+    if (text) {
+      // Validate it's parseable JSON
+      JSON.parse(text);
+      return text;
+    }
+    throw new Error("Anthropic returned empty JSON text");
+  } catch (error) {
+    anthropicError = error;
+    console.error("[SMS-AI] Anthropic JSON request failed, falling back to OpenAI:", error);
+  }
+
+  // Fallback: OpenAI (has native JSON mode)
   try {
     const response = await openai.chat.completions.create({
       model: openaiModel,
@@ -100,24 +130,13 @@ export async function completeJsonOpenAIFirst(params: {
 
     const text = response.choices[0]?.message?.content?.trim() || "";
     if (text) return text;
-    throw new Error("OpenAI returned empty JSON text");
+    throw new Error("OpenAI fallback returned empty JSON text");
   } catch (error) {
-    openAiError = error;
-    console.error("[SMS-AI] OpenAI JSON request failed:", error);
+    console.error("[SMS-AI] OpenAI JSON fallback also failed:", error);
   }
 
-  const response = await anthropic.messages.create({
-    model: anthropicModel,
-    max_tokens: maxTokens,
-    system,
-    messages: [{ role: "user", content: user }],
-  });
-
-  const text = extractAnthropicText(response.content as Array<{ type: string; text?: string }>);
-  if (text) return text;
-
-  if (openAiError) throw openAiError;
-  throw new Error("Anthropic fallback returned empty JSON text");
+  if (anthropicError) throw anthropicError;
+  throw new Error("Both Anthropic and OpenAI failed for JSON");
 }
 
 export async function completeVisionTextOpenAIFirst(params: {
@@ -134,11 +153,46 @@ export async function completeVisionTextOpenAIFirst(params: {
     mediaType,
     maxTokens = 500,
     openaiModel = process.env.OPENAI_SMS_VISION_MODEL || process.env.OPENAI_SMS_MODEL || "gpt-4.1",
-    anthropicModel = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-5",
+    anthropicModel = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6",
   } = params;
 
-  let openAiError: unknown = null;
+  let anthropicError: unknown = null;
 
+  // Primary: Anthropic (Claude)
+  try {
+    const response = await anthropic.messages.create({
+      model: anthropicModel,
+      max_tokens: maxTokens,
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "image",
+              source: {
+                type: "base64",
+                media_type: toAnthropicImageMediaType(mediaType),
+                data: base64,
+              },
+            },
+            {
+              type: "text",
+              text: prompt,
+            },
+          ],
+        },
+      ],
+    });
+
+    const text = extractAnthropicText(response.content as Array<{ type: string; text?: string }>);
+    if (text) return text;
+    throw new Error("Anthropic returned empty vision text");
+  } catch (error) {
+    anthropicError = error;
+    console.error("[SMS-AI] Anthropic vision request failed, falling back to OpenAI:", error);
+  }
+
+  // Fallback: OpenAI
   try {
     const response = await openai.chat.completions.create({
       model: openaiModel,
@@ -162,39 +216,11 @@ export async function completeVisionTextOpenAIFirst(params: {
 
     const text = response.choices[0]?.message?.content?.trim() || "";
     if (text) return text;
-    throw new Error("OpenAI returned empty vision text");
+    throw new Error("OpenAI fallback returned empty vision text");
   } catch (error) {
-    openAiError = error;
-    console.error("[SMS-AI] OpenAI vision request failed:", error);
+    console.error("[SMS-AI] OpenAI vision fallback also failed:", error);
   }
 
-  const response = await anthropic.messages.create({
-    model: anthropicModel,
-    max_tokens: maxTokens,
-    messages: [
-      {
-        role: "user",
-        content: [
-          {
-            type: "image",
-            source: {
-              type: "base64",
-              media_type: toAnthropicImageMediaType(mediaType),
-              data: base64,
-            },
-          },
-          {
-            type: "text",
-            text: prompt,
-          },
-        ],
-      },
-    ],
-  });
-
-  const text = extractAnthropicText(response.content as Array<{ type: string; text?: string }>);
-  if (text) return text;
-
-  if (openAiError) throw openAiError;
-  throw new Error("Anthropic fallback returned empty vision text");
+  if (anthropicError) throw anthropicError;
+  throw new Error("Both Anthropic and OpenAI failed for vision");
 }
