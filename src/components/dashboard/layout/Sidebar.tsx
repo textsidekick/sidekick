@@ -10,7 +10,6 @@ import { useState, useEffect } from "react";
 const NAV_ITEMS = [
   { id: "today", label: "Overview", icon: LayoutDashboard, href: "/today" },
   { id: "inbox", label: "Inbox", icon: MessageSquare, href: "/inbox" },
-  { id: "sops", label: "SOPs", icon: FileText, href: "/sops" },
   { id: "training", label: "Training", icon: GraduationCap, href: "/training" },
   { id: "knowledge", label: "Knowledge", icon: LibraryBig, href: "/knowledge" },
   { id: "work-orders", label: "Work Orders", icon: ClipboardList, href: "/work-orders" },

@@ -4,7 +4,19 @@ import { completeJsonOpenAIFirst } from "@/lib/sms-ai";
 // ============================================
 // Auto-capture knowledge from completed work orders
 // ============================================
-export async function captureKnowledge(workOrderId: string): Promise<string | null> {
+export async function captureKnowledge(
+  argsOrWorkOrderId:
+    | string
+    | { companyId: string; workerId: string; message: string; context?: string; workOrderId?: string }
+): Promise<string | null> {
+  // Accept either a plain workOrderId string or an object from the SMS pipeline
+  const workOrderId =
+    typeof argsOrWorkOrderId === "string"
+      ? argsOrWorkOrderId
+      : argsOrWorkOrderId.workOrderId || null;
+
+  if (!workOrderId) return null;
+
   const { data: wo } = await supabase
     .from("work_orders")
     .select("*")

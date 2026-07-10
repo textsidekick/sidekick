@@ -26,11 +26,33 @@ export type SopMatch = {
  *   const ctx = await getSopAnswerContext(companyId, incomingMessage);
  *   if (ctx.promptBlock) systemPrompt += "\n\n" + ctx.promptBlock;
  */
-export async function getSopAnswerContext(companyId: string, query: string, opts?: {
+export async function getSopAnswerContext(args: {
+  companyId: string;
+  query: string;
+  positionId?: string | null;
+  lang?: string;
   workerPhone?: string;
   limit?: number;
-}) {
-  const { expandedQuery, matchedTerms } = await expandQuery(companyId, query);
+})
+export async function getSopAnswerContext(companyId: string, query: string, opts?: { workerPhone?: string; limit?: number; })
+export async function getSopAnswerContext(
+  argsOrCompanyId: string | { companyId: string; query: string; positionId?: string | null; lang?: string; workerPhone?: string; limit?: number },
+  query?: string,
+  opts?: { workerPhone?: string; limit?: number }
+) {
+  let companyId: string;
+  let resolvedQuery: string;
+  let resolvedOpts: { workerPhone?: string; limit?: number } | undefined;
+  if (typeof argsOrCompanyId === "object") {
+    companyId = argsOrCompanyId.companyId;
+    resolvedQuery = argsOrCompanyId.query;
+    resolvedOpts = { workerPhone: argsOrCompanyId.workerPhone, limit: argsOrCompanyId.limit };
+  } else {
+    companyId = argsOrCompanyId;
+    resolvedQuery = query!;
+    resolvedOpts = opts;
+  }
+  const { expandedQuery, matchedTerms } = await expandQuery(companyId, resolvedQuery);
 
   const { data, error } = await supabase
     .from("sops")
@@ -39,7 +61,7 @@ export async function getSopAnswerContext(companyId: string, query: string, opts
     .eq("is_current", true)
     .eq("status", "active")
     .textSearch("search_tsv", expandedQuery, { type: "websearch", config: "simple" })
-    .limit(opts?.limit ?? 3);
+    .limit(resolvedOpts?.limit ?? 3);
 
   if (error) {
     console.error("SOP retrieval error:", error);
@@ -56,7 +78,7 @@ export async function getSopAnswerContext(companyId: string, query: string, opts
         source_type: "sop",
         source_id: s.id,
         event: "sms_answer",
-        worker_phone: opts?.workerPhone || null,
+        worker_phone: resolvedOpts?.workerPhone || null,
         department_id: s.department_id,
       }))
     );
