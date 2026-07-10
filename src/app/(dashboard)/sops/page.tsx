@@ -262,7 +262,7 @@ export default function SopsPage() {
 
       {/* SMS usage hint */}
       <div className="mt-4 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-800">
-        <strong>📱 Text access:</strong> Workers can text <code className="rounded bg-blue-100 px-1">"SOP for [topic]"</code> to get the latest version over SMS or WhatsApp instantly.
+        <strong>Text access:</strong> Workers can text <code className="rounded bg-blue-100 px-1">"SOP for [topic]"</code> to get the latest version over SMS or WhatsApp instantly.
       </div>
 
       {/* SOP List */}

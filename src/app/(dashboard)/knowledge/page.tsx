@@ -273,7 +273,7 @@ function SopsTab({ companyId }: { companyId: string }) {
       </div>
 
       <div className="mt-4 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-800">
-        <strong>📱 Text access:</strong> Workers can text <code className="rounded bg-blue-100 px-1">"SOP for [topic]"</code> to get the latest version over SMS instantly.
+        <strong>Text access:</strong> Workers can text <code className="rounded bg-blue-100 px-1">"SOP for [topic]"</code> to get the latest version over SMS instantly.
       </div>
 
       <div className="mt-5 space-y-3">
@@ -707,7 +707,7 @@ function GapsTab({ companyId }: { companyId: string }) {
       ) : gaps.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-200 bg-white p-12 text-center">
           <CheckCircle2 className="mx-auto mb-3 h-10 w-10 text-green-400" />
-          <p className="font-medium text-gray-600">No gaps detected 🎉</p>
+          <p className="font-medium text-gray-600">No gaps detected</p>
           <p className="mt-1 text-sm text-gray-400">Your knowledge base is covering all worker questions.</p>
         </div>
       ) : (

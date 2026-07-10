@@ -96,7 +96,7 @@ function PathDetailModal({ pathId, companyId, onClose }: { pathId: string; compa
     if (data.already_enrolled) {
       setEnrollMsg("Worker already enrolled in this path.");
     } else if (data.enrollment) {
-      setEnrollMsg("✅ Enrolled! Worker will receive Step 1 over SMS.");
+      setEnrollMsg("Enrolled! Worker will receive Step 1 over SMS.");
       setEnrollPhone("");
       // Refresh enrollments
       fetch(`/api/training-paths/${pathId}`).then((r) => r.json()).then((d) => setEnrollments(d.enrollments || []));
