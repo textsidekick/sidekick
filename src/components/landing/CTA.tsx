@@ -2,36 +2,77 @@ import { ArrowIcon } from "@/components/landing/icons";
 
 export default function CTA() {
   return (
-    <section className="bg-[#171C22] px-5 py-20 text-white md:px-8 lg:px-12 lg:py-24">
-      <div className="mx-auto max-w-[1280px] rounded-[20px] border border-white/10 bg-white/[0.03] p-8 md:p-10 lg:p-12">
-        <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
-          <div className="max-w-[720px]">
-            <div className="text-[12px] font-semibold uppercase tracking-[0.14em] text-white/45">See Sidekick on your floor</div>
-            <h2
-              className="mt-4"
-              style={{ fontSize: "clamp(2.4rem, 4.6vw, 4rem)", lineHeight: 0.98, letterSpacing: "-0.03em", fontWeight: 650 }}
-            >
-              We’ll show you how a real frontline workflow would run through Sidekick.
-            </h2>
-            <p className="mt-5 max-w-[620px] text-[17px] leading-[1.65] text-white/70">
-              We can walk through issue intake, routing, question answering, and how the resolution history stays attached to the operation.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-3 lg:justify-end">
+    <section style={{ padding: "96px 24px 72px" }}>
+      <div
+        style={{
+          maxWidth: 1180,
+          margin: "0 auto",
+          color: "#F7F3EC",
+          borderRadius: 32,
+          padding: "80px 64px",
+          background: "linear-gradient(135deg, #0060F0 0%, #004BB8 100%)",
+          display: "grid",
+          gridTemplateColumns: "1fr",
+          gap: 48,
+          position: "relative",
+          overflow: "hidden",
+          textAlign: "center",
+        }}
+      >
+        <div>
+          <h2
+            style={{
+              fontFamily: "var(--font-instrument), Georgia, serif",
+              fontWeight: 400,
+              fontSize: 56,
+              lineHeight: 0.98,
+              letterSpacing: "-0.025em",
+              margin: "0 0 20px",
+              color: "#F7F3EC",
+            }}
+          >
+            Give your team a <em style={{ fontStyle: "italic" }}>Sidekick.</em>
+          </h2>
+          <p style={{ fontSize: 17, lineHeight: 1.5, margin: "0 auto 36px", maxWidth: 520, color: "rgba(247,243,236,0.9)" }}>
+            See how Sidekick would work on your floor. No app rollout, no per-seat trap, no vague AI demo.
+          </p>
+          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
             <a
               href="https://calendly.com/justin-textsidekick"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-[8px] bg-[#F05A28] px-5 py-3.5 text-[15px] font-semibold text-white transition hover:bg-[#d94e20]"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 10,
+                background: "#F7F3EC",
+                color: "#1C1A16",
+                padding: "16px 28px",
+                borderRadius: 9999,
+                fontSize: 15,
+                fontWeight: 600,
+                textDecoration: "none",
+              }}
             >
               Book a demo <ArrowIcon size={14} />
             </a>
             <a
-              href="mailto:hello@textsidekick.com"
-              className="inline-flex items-center gap-2 rounded-[8px] border border-white/16 px-5 py-3.5 text-[15px] font-semibold text-white/85 transition hover:bg-white/5"
+              href="#contact"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 10,
+                background: "transparent",
+                color: "#F7F3EC",
+                padding: "16px 28px",
+                borderRadius: 9999,
+                fontSize: 15,
+                fontWeight: 600,
+                textDecoration: "none",
+                border: "1px solid rgba(247,243,236,0.35)",
+              }}
             >
-              Email us
+              Contact us
             </a>
           </div>
         </div>

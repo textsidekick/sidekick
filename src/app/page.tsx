@@ -6,11 +6,12 @@ import Comparison from "@/components/landing/Comparison";
 import KnowledgeLayer from "@/components/landing/KnowledgeLayer";
 import FAQ from "@/components/landing/FAQ";
 import CTA from "@/components/landing/CTA";
+import Contact from "@/components/landing/Contact";
 import Footer from "@/components/landing/Footer";
 
 export default function Page() {
   return (
-    <main className="overflow-hidden bg-[#F3F4F1] text-[#171A1D]">
+    <main className="overflow-hidden" style={{ background: "#F7F3EC", color: "#1C1A16" }}>
       <Nav />
       <Hero />
       <Logos />
@@ -19,6 +20,7 @@ export default function Page() {
       <KnowledgeLayer />
       <FAQ />
       <CTA />
+      <Contact />
       <Footer />
     </main>
   );

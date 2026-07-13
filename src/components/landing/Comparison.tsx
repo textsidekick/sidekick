@@ -1,67 +1,96 @@
 import { Eyebrow } from "@/components/landing/Brand";
 
-const FLOOR = [
-  "No app install or per-worker login ritual",
-  "Workers use familiar texting behavior",
-  "Useful for issues, questions, and exceptions",
-  "Fast enough that people actually use it under pressure",
-];
-
-const OPS = [
-  "Structured asset, priority, and ownership fields",
-  "Timestamps and resolution history stay attached to the record",
-  "Managers can review, correct, and follow the thread",
-  "Can sit alongside existing systems instead of forcing a rip-and-replace",
+const OLD_STEPS = [
+  "See a problem on the floor",
+  "Find your supervisor",
+  "Radio the maintenance office",
+  "Fill out a form",
+  "Hope someone gets to it",
 ];
 
 export default function Comparison() {
   return (
-    <section className="bg-white px-5 py-20 md:px-8 lg:px-12 lg:py-28">
-      <div className="mx-auto max-w-[1280px]">
-        <div className="max-w-[760px]">
-          <Eyebrow>Built for actual plant conditions</Eyebrow>
-          <h2
-            className="mt-5 text-[#171A1D]"
-            style={{ fontSize: "clamp(2.3rem, 4.5vw, 4rem)", lineHeight: 1, letterSpacing: "-0.03em", fontWeight: 650 }}
+    <section className="px-6 md:px-10 lg:px-14 py-24 border-t border-ink/10">
+      <div className="max-w-[1180px] mx-auto">
+        <Eyebrow>The difference</Eyebrow>
+        <h2
+          className="font-serif font-normal mt-5 mb-14 max-w-[720px]"
+          style={{ fontSize: 56, lineHeight: 1, letterSpacing: "-0.02em" }}
+        >
+          Reported immediately vs. discovered too late.
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Old way */}
+          <div
+            className="rounded-[24px] p-8 border border-ink/10"
+            style={{ background: "rgba(28,26,22,0.04)" }}
           >
-            Easy for the floor. Structured for operations.
-          </h2>
-        </div>
+            <div className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-6">
+              The old way
+            </div>
+            <div className="flex flex-col gap-3 mb-8">
+              {OLD_STEPS.map((step, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div
+                    className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-[11px] font-semibold"
+                    style={{ background: "rgba(28,26,22,0.08)", color: "rgba(28,26,22,0.4)" }}
+                  >
+                    {i + 1}
+                  </div>
+                  <span className="text-[15px] text-ink/60">{step}</span>
+                </div>
+              ))}
+            </div>
+            <div
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold"
+              style={{ background: "rgba(28,26,22,0.08)", color: "rgba(28,26,22,0.5)" }}
+            >
+              Delayed, inconsistent, easy to lose
+            </div>
+          </div>
 
-        <div className="mt-12 grid gap-6 lg:grid-cols-2">
-          <Card title="Easy for the floor" subtitle="Adoption matters more than feature count." items={FLOOR} dark={false} />
-          <Card title="Structured for operations" subtitle="Managers should get a usable operational record, not another chat thread." items={OPS} dark={true} />
+          {/* Sidekick way */}
+          <div
+            className="rounded-[24px] p-8 border border-accent/30 relative overflow-hidden"
+            style={{ background: "rgba(0,96,240,0.06)" }}
+          >
+            <div
+              className="absolute inset-0 rounded-[24px] pointer-events-none"
+              style={{
+                background:
+                  "radial-gradient(60% 60% at 30% 30%, rgba(0,96,240,0.12), transparent 70%)",
+              }}
+            />
+            <div className="relative">
+              <div className="text-xs uppercase tracking-widest text-accent/70 font-mono mb-6">
+                With Sidekick
+              </div>
+              <div className="flex items-center gap-3 mb-8">
+                <div
+                  className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-[11px] font-semibold bg-accent text-cream"
+                >
+                  1
+                </div>
+                <span
+                  className="text-[22px] font-serif font-normal"
+                  style={{ color: "#1C1A16" }}
+                >
+                  Text what you see. Sidekick takes it from there.
+                </span>
+              </div>
+              <p className="text-[15px] text-ink/65 leading-relaxed mb-8 max-w-[340px]">
+                The issue gets captured, routed, and logged before it disappears into a hallway conversation, clipboard, or memory.
+              </p>
+              <div
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold text-white"
+                style={{ background: "#0060F0" }}
+              >
+                Fast enough that people actually use it
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
-  );
-}
-
-function Card({
-  title,
-  subtitle,
-  items,
-  dark,
-}: {
-  title: string;
-  subtitle: string;
-  items: string[];
-  dark?: boolean;
-}) {
-  return (
-    <div className={`rounded-[16px] border p-6 md:p-7 ${dark ? "border-[#171A1D] bg-[#171A1D] text-white" : "border-black/8 bg-[#F3F4F1] text-[#171A1D]"}`}>
-      <div className={`text-[12px] font-semibold uppercase tracking-[0.14em] ${dark ? "text-white/45" : "text-[#6B747C]"}`}>
-        {title}
-      </div>
-      <p className={`mt-3 text-[24px] font-semibold tracking-[-0.02em] ${dark ? "text-white" : "text-[#171A1D]"}`}>{subtitle}</p>
-      <div className="mt-6 grid gap-3">
-        {items.map((item) => (
-          <div key={item} className={`flex items-start gap-3 rounded-[10px] border px-4 py-3 text-[14px] leading-[1.6] ${dark ? "border-white/10 bg-white/4 text-white/85" : "border-black/8 bg-white text-[#49545F]"}`}>
-            <span className={`mt-[7px] block h-1.5 w-1.5 rounded-full ${dark ? "bg-[#F05A28]" : "bg-[#245BDB]"}`} />
-            <span>{item}</span>
-          </div>
-        ))}
-      </div>
-    </div>
   );
 }

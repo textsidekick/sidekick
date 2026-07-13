@@ -3,41 +3,70 @@
 import { SidekickLogo } from "@/components/landing/Brand";
 
 export default function Nav() {
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-black/10 bg-[#F3F4F1]/92 backdrop-blur">
-      <div className="mx-auto flex max-w-[1280px] items-center justify-between px-5 py-3 md:px-8 lg:px-12">
-        <button
-          onClick={scrollToTop}
-          className="flex items-center gap-3 bg-transparent p-0 text-left"
-          style={{ border: "none", cursor: "pointer" }}
-        >
-          <SidekickLogo size={30} />
-          <span className="text-[18px] font-semibold tracking-tight text-[#171A1D]">Sidekick</span>
+    <div style={{ position: "fixed", top: 16, left: 0, right: 0, zIndex: 50, display: "flex", justifyContent: "center", padding: "0 16px", pointerEvents: "none" }}>
+      <nav
+        style={{
+          pointerEvents: "auto",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 8,
+          paddingLeft: 16,
+          paddingRight: 8,
+          paddingTop: 8,
+          paddingBottom: 8,
+          borderRadius: 9999,
+          border: "1px solid rgba(28,26,22,0.1)",
+          background: "rgba(247,243,236,0.85)",
+          backdropFilter: "blur(16px) saturate(1.5)",
+          boxShadow: "0 6px 24px -8px rgba(28,26,22,0.12), 0 2px 6px -2px rgba(28,26,22,0.06)",
+          maxWidth: "100%",
+        }}
+      >
+        <button onClick={scrollToTop} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", background: "none", border: "none", padding: 0 }}>
+          <SidekickLogo size={28} />
+          <span style={{ fontSize: 16, fontWeight: 600, letterSpacing: "-0.02em", color: "#1C1A16", whiteSpace: "nowrap" }}>
+            Sidekick
+          </span>
         </button>
 
-        <nav className="hidden items-center gap-7 text-[14px] text-[#4E5760] md:flex">
-          <a href="#product" className="hover:text-[#171A1D]">Product</a>
-          <a href="#workflow" className="hover:text-[#171A1D]">Workflow</a>
-          <a href="#knowledge" className="hover:text-[#171A1D]">Knowledge</a>
-          <a href="#faq" className="hover:text-[#171A1D]">FAQ</a>
-        </nav>
+        {/* Desktop links - hidden on mobile via media query */}
+        <div className="nav-desktop-links" style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 14, color: "rgba(28,26,22,0.7)", marginLeft: 16 }}>
+          <a style={{ color: "inherit", textDecoration: "none" }} href="#product">Product</a>
+          <a style={{ color: "inherit", textDecoration: "none" }} href="#proof">Proof</a>
+          <a style={{ color: "inherit", textDecoration: "none" }} href="#contact">Contact Us</a>
+          <a style={{ color: "inherit", textDecoration: "none" }} href="https://textsidekick.substack.com/" target="_blank" rel="noopener noreferrer">Blog</a>
+          <a style={{ color: "inherit", textDecoration: "none" }} href="https://calendly.com/justin-textsidekick" target="_blank" rel="noopener noreferrer">Book a Demo</a>
+        </div>
 
-        <div className="flex items-center gap-3">
-          <a href="/login" className="hidden text-[14px] font-medium text-[#171A1D] md:inline-flex">
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: 8 }}>
+          <a
+            href="/login"
+            style={{ color: "#1C1A16", padding: "8px 14px", borderRadius: 9999, fontSize: 13, fontWeight: 500, textDecoration: "none", whiteSpace: "nowrap" }}
+          >
             Login
           </a>
           <a
             href="https://calendly.com/justin-textsidekick"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center rounded-[8px] bg-[#171A1D] px-4 py-2.5 text-[14px] font-semibold text-white transition hover:bg-black"
+            style={{ background: "#1C1A16", color: "#F7F3EC", padding: "8px 14px", borderRadius: 9999, fontSize: 13, fontWeight: 500, textDecoration: "none", whiteSpace: "nowrap" }}
           >
-            Book a demo
+            Book Demo
           </a>
         </div>
-      </div>
-    </header>
+      </nav>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .nav-desktop-links { display: none !important; }
+        }
+      `}</style>
+    </div>
   );
 }
