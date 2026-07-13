@@ -18,7 +18,7 @@ const ENTRIES = [
 
 export default function KnowledgeLayer() {
   return (
-    <section className="px-14 py-24 border-t border-ink/10">
+    <section className="px-6 md:px-10 lg:px-14 py-24 border-t border-ink/10">
       <div className="max-w-[1180px] mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-20 items-center">
         <div>
           <Eyebrow>The knowledge layer</Eyebrow>
@@ -31,10 +31,10 @@ export default function KnowledgeLayer() {
               textWrap: "balance" as React.CSSProperties["textWrap"],
             }}
           >
-            Every repair makes your plant <em className="italic text-accent">smarter.</em>
+            Every fix leaves your operation <em className="italic text-accent">less fragile.</em>
           </h2>
           <p className="text-[17px] leading-[1.55] text-ink/70 m-0 mb-7 max-w-[540px]">
-            When a tech fixes a machine, Sidekick turns the resolution into a searchable knowledge article — automatically. Next time it breaks, anyone can ask &ldquo;what worked last time?&rdquo; and get a cited, verified answer. The more your team works, the smarter Sidekick gets.
+            When a tech fixes a machine, Sidekick captures the resolution in plain English with the asset, the steps, and who handled it. Next time it breaks, your team can ask what worked last time and get a grounded answer.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-[540px]">
             {PAYOFFS.map((p) => (
@@ -51,7 +51,7 @@ export default function KnowledgeLayer() {
         <div className="bg-cream2 border border-ink/10 rounded-[20px] p-8 relative overflow-hidden">
           <div className="flex items-center justify-between mb-5">
             <div className="text-[13px] font-semibold text-ink">
-              Knowledge base · Halverson Mfg
+              Knowledge base · Example plant history
             </div>
             <div className="text-[11px] text-ink/50 uppercase tracking-widest">
               Auto-captured

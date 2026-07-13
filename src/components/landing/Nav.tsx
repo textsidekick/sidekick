@@ -37,6 +37,8 @@ export default function Nav() {
 
         {/* Desktop links - hidden on mobile via media query */}
         <div className="nav-desktop-links" style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 14, color: "rgba(28,26,22,0.7)", marginLeft: 16 }}>
+          <a style={{ color: "inherit", textDecoration: "none" }} href="#product">Product</a>
+          <a style={{ color: "inherit", textDecoration: "none" }} href="#proof">Proof</a>
           <a style={{ color: "inherit", textDecoration: "none" }} href="#contact">Contact Us</a>
           <a style={{ color: "inherit", textDecoration: "none" }} href="https://textsidekick.substack.com/" target="_blank" rel="noopener noreferrer">Blog</a>
           <a style={{ color: "inherit", textDecoration: "none" }} href="https://calendly.com/justin-textsidekick" target="_blank" rel="noopener noreferrer">Book a Demo</a>
@@ -50,10 +52,12 @@ export default function Nav() {
             Login
           </a>
           <a
-            href="/login"
+            href="https://calendly.com/justin-textsidekick"
+            target="_blank"
+            rel="noopener noreferrer"
             style={{ background: "#1C1A16", color: "#F7F3EC", padding: "8px 14px", borderRadius: 9999, fontSize: 13, fontWeight: 500, textDecoration: "none", whiteSpace: "nowrap" }}
           >
-            Try Sidekick
+            Book Demo
           </a>
         </div>
       </nav>

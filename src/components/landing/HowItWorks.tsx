@@ -3,31 +3,31 @@ import { Eyebrow } from "@/components/landing/Brand";
 const STEPS = [
   {
     n: "01",
-    title: "Text it",
-    body: "Equipment issues, safety hazards, quality problems, supply needs — any worker texts what they see. Any language, any phone. No app needed.",
+    title: "A worker texts the issue",
+    body: "Equipment issues, safety hazards, quality problems, supply needs — workers describe what they see in plain language from any phone.",
   },
   {
     n: "02",
-    title: "AI triages & assigns",
-    body: "Sidekick identifies the asset, sets priority, creates a work order, and texts the right technician with troubleshooting steps.",
+    title: "Sidekick structures the work",
+    body: "Sidekick identifies the asset, sets priority, creates the work order, and routes the right technician with the right context.",
   },
   {
     n: "03",
-    title: "It gets fixed and logged",
-    body: "Tech texts START and DONE. The fix becomes searchable knowledge. Patterns get flagged automatically.",
+    title: "The fix becomes knowledge",
+    body: "The technician closes the loop by text. The resolution is saved as searchable history so the next problem gets solved faster.",
   },
 ];
 
 export default function HowItWorks() {
   return (
-    <section id="product" className="px-14 py-24 border-t border-ink/10">
+    <section id="product" className="px-6 md:px-10 lg:px-14 py-24 border-t border-ink/10 scroll-mt-24">
       <div className="max-w-[1180px] mx-auto">
         <Eyebrow>How it works</Eyebrow>
         <h2
           className="font-serif font-normal mt-5 mb-14 max-w-[720px]"
           style={{ fontSize: 56, lineHeight: 1, letterSpacing: "-0.02em" }}
         >
-          An issue reported is an issue handled.
+          Turn frontline texts into tracked work and reusable know-how.
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {STEPS.map((s) => (

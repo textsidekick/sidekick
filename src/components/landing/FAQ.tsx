@@ -5,20 +5,28 @@ import { Eyebrow } from "@/components/landing/Brand";
 
 const FAQS = [
   {
-    q: "Do workers need to download an app?",
-    a: "No. They text a phone number. Any phone that can send SMS works.",
+    q: "Do workers need to download an app or learn a new system?",
+    a: "No. Workers use text. Managers get structured records, routing, and history without forcing the floor into another login.",
   },
   {
-    q: "What languages does it support?",
-    a: "All of them. Workers can text or send voice notes in any language.",
+    q: "What does pricing look like?",
+    a: "We price by site, not by seat, so you can roll it out across the floor without getting punished for adoption.",
   },
   {
-    q: "What if the AI gets something wrong?",
-    a: "Managers can correct any triage with one tap. Sidekick learns from every correction.",
+    q: "What if workers are not allowed to install apps or use complex tools?",
+    a: "That is exactly the point. Sidekick works over familiar channels like SMS, so adoption is much easier than a traditional CMMS workflow.",
   },
   {
-    q: "Can I use it alongside my current CMMS?",
-    a: "Yes. Sidekick works as a standalone system or as an intake layer feeding your existing tools.",
+    q: "Can I use it alongside my current systems?",
+    a: "Yes. Sidekick can stand alone or act as the intake and knowledge layer on top of your existing processes and systems.",
+  },
+  {
+    q: "What happens when the AI gets something wrong?",
+    a: "Managers stay in control. Sidekick can be corrected, and every correction improves the quality of future routing and answers.",
+  },
+  {
+    q: "Where does the knowledge go?",
+    a: "Into a searchable company memory tied to the issue, asset, and resolution — so critical know-how does not disappear when a shift ends or someone leaves.",
   },
 ];
 
@@ -26,7 +34,7 @@ export default function FAQ() {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section className="px-14 py-24 border-t border-ink/10">
+    <section className="px-6 md:px-10 lg:px-14 py-24 border-t border-ink/10">
       <div className="max-w-[720px] mx-auto">
         <Eyebrow>FAQ</Eyebrow>
         <h2

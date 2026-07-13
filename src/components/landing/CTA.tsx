@@ -34,11 +34,13 @@ export default function CTA() {
             Give your team a <em style={{ fontStyle: "italic" }}>Sidekick.</em>
           </h2>
           <p style={{ fontSize: 17, lineHeight: 1.5, margin: "0 auto 36px", maxWidth: 520, color: "rgba(247,243,236,0.9)" }}>
-            Set up in 90 seconds. No app, no training, no per-seat pricing.
+            See how Sidekick would work on your floor. No app rollout, no per-seat trap, no vague AI demo.
           </p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
             <a
-              href="/login"
+              href="https://calendly.com/justin-textsidekick"
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -52,7 +54,25 @@ export default function CTA() {
                 textDecoration: "none",
               }}
             >
-              Get Started <ArrowIcon size={14} />
+              Book a demo <ArrowIcon size={14} />
+            </a>
+            <a
+              href="#contact"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 10,
+                background: "transparent",
+                color: "#F7F3EC",
+                padding: "16px 28px",
+                borderRadius: 9999,
+                fontSize: 15,
+                fontWeight: 600,
+                textDecoration: "none",
+                border: "1px solid rgba(247,243,236,0.35)",
+              }}
+            >
+              Contact us
             </a>
           </div>
         </div>

@@ -10,14 +10,14 @@ const OLD_STEPS = [
 
 export default function Comparison() {
   return (
-    <section className="px-14 py-24 border-t border-ink/10">
+    <section className="px-6 md:px-10 lg:px-14 py-24 border-t border-ink/10">
       <div className="max-w-[1180px] mx-auto">
         <Eyebrow>The difference</Eyebrow>
         <h2
           className="font-serif font-normal mt-5 mb-14 max-w-[720px]"
           style={{ fontSize: 56, lineHeight: 1, letterSpacing: "-0.02em" }}
         >
-          20 seconds vs. 5 minutes.
+          Reported immediately vs. discovered too late.
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Old way */}
@@ -45,7 +45,7 @@ export default function Comparison() {
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold"
               style={{ background: "rgba(28,26,22,0.08)", color: "rgba(28,26,22,0.5)" }}
             >
-              3–5 minutes
+              Delayed, inconsistent, easy to lose
             </div>
           </div>
 
@@ -75,17 +75,17 @@ export default function Comparison() {
                   className="text-[22px] font-serif font-normal"
                   style={{ color: "#1C1A16" }}
                 >
-                  Text what you see.
+                  Text what you see. Sidekick takes it from there.
                 </span>
               </div>
               <p className="text-[15px] text-ink/65 leading-relaxed mb-8 max-w-[340px]">
-                Any issue, any language. Work order created, right person assigned, issue tracked — before the worker puts their phone away.
+                The issue gets captured, routed, and logged before it disappears into a hallway conversation, clipboard, or memory.
               </p>
               <div
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold text-white"
                 style={{ background: "#0060F0" }}
               >
-                20 seconds
+                Fast enough that people actually use it
               </div>
             </div>
           </div>

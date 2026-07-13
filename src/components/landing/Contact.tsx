@@ -41,7 +41,7 @@ export default function Contact() {
   return (
     <section
       id="contact"
-      className="px-14 py-24 border-t border-ink/10 scroll-mt-24"
+      className="px-6 md:px-10 lg:px-14 py-24 border-t border-ink/10 scroll-mt-24"
     >
       <div className="max-w-[1180px] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-20 items-start">
         <div>
@@ -55,10 +55,10 @@ export default function Contact() {
               textWrap: "balance" as React.CSSProperties["textWrap"],
             }}
           >
-            Talk to a real human about <em className="italic text-accent">your</em> floor.
+            Talk to a real human about <em className="italic text-accent">your</em> operation.
           </h2>
           <p className="text-base leading-[1.55] text-ink/70 m-0 mb-9 max-w-[460px]">
-            Tell us a little about your operation and we&apos;ll set up a short call — no pitch deck, just a conversation about whether Sidekick makes sense for you.
+            Tell us a little about your operation and we&apos;ll set up a short call to see whether Sidekick can help with issue reporting, workflow routing, and knowledge capture.
           </p>
           <div className="flex flex-col gap-[18px]">
             {[
