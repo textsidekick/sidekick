@@ -1,48 +1,48 @@
-import { SidekickLogo, YCBadge } from "@/components/landing/Brand";
+import { SidekickLogo } from "@/components/landing/Brand";
 
 export default function Footer() {
   return (
-    <footer className="px-14 pt-12 pb-10 border-t border-ink/10">
-      <div className="max-w-[1180px] mx-auto flex flex-col md:flex-row justify-between items-start gap-12">
-        <div className="max-w-[320px]">
-          <div className="flex items-center gap-3 mb-3">
-            <SidekickLogo size={40} />
-            <span className="text-[22px] font-semibold tracking-tight">Sidekick</span>
+    <footer className="border-t border-black/8 bg-[#F3F4F1] px-5 py-10 md:px-8 lg:px-12">
+      <div className="mx-auto flex max-w-[1280px] flex-col gap-8 md:flex-row md:items-end md:justify-between">
+        <div className="max-w-[340px]">
+          <div className="flex items-center gap-3">
+            <SidekickLogo size={34} />
+            <span className="text-[20px] font-semibold tracking-tight text-[#171A1D]">Sidekick</span>
           </div>
-          <p className="text-[13px] text-ink/55 leading-[1.5] m-0 mb-4">
-            Built in San Francisco for the 80% of American workers without a desk.
+          <p className="mt-3 text-[14px] leading-[1.6] text-[#55606A]">
+            SMS-first operations software for frontline teams that need cleaner intake, clearer routing, and retained knowledge.
           </p>
-          <YCBadge height={22} />
         </div>
-        <div className="flex gap-16 text-[13px]">
+
+        <div className="grid gap-8 text-[14px] text-[#55606A] md:grid-cols-3 md:gap-14">
           <div>
-            <div className="font-semibold mb-3 text-ink">Company</div>
-            <div className="flex flex-col gap-2 text-ink/60">
-              <a
-                href="https://textsidekick.substack.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-ink"
-              >
-                Blog
-              </a>
-              <a href="mailto:hello@textsidekick.com" className="hover:text-ink">
-                Contact
-              </a>
+            <div className="mb-3 font-semibold text-[#171A1D]">Product</div>
+            <div className="flex flex-col gap-2">
+              <a href="#product" className="hover:text-[#171A1D]">Overview</a>
+              <a href="#workflow" className="hover:text-[#171A1D]">Workflow</a>
+              <a href="#knowledge" className="hover:text-[#171A1D]">Knowledge</a>
             </div>
           </div>
           <div>
-            <div className="font-semibold mb-3 text-ink">Legal</div>
-            <div className="flex flex-col gap-2 text-ink/60">
-              <a href="/privacy" className="hover:text-ink">Privacy Policy</a>
-              <a href="/terms" className="hover:text-ink">Terms of Service</a>
+            <div className="mb-3 font-semibold text-[#171A1D]">Company</div>
+            <div className="flex flex-col gap-2">
+              <a href="https://textsidekick.substack.com/" target="_blank" rel="noopener noreferrer" className="hover:text-[#171A1D]">Blog</a>
+              <a href="mailto:hello@textsidekick.com" className="hover:text-[#171A1D]">hello@textsidekick.com</a>
+            </div>
+          </div>
+          <div>
+            <div className="mb-3 font-semibold text-[#171A1D]">Legal</div>
+            <div className="flex flex-col gap-2">
+              <a href="/privacy" className="hover:text-[#171A1D]">Privacy Policy</a>
+              <a href="/terms" className="hover:text-[#171A1D]">Terms of Service</a>
             </div>
           </div>
         </div>
       </div>
-      <div className="max-w-[1180px] mx-auto mt-8 pt-5 border-t border-ink/[0.06] flex justify-between text-xs text-ink/45">
+
+      <div className="mx-auto mt-8 flex max-w-[1280px] flex-col gap-2 border-t border-black/8 pt-5 text-[12px] text-[#6D7680] md:flex-row md:items-center md:justify-between">
         <div>© {new Date().getFullYear()} Sidekick HQ, Inc.</div>
-        <div>hello@textsidekick.com</div>
+        <div>Built in San Francisco</div>
       </div>
     </footer>
   );
