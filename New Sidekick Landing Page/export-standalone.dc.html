@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=2000&q=80" data-resource-id="heroBg" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=2000&q=80" data-resource-id="showcaseBg" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?auto=format&fit=crop&w=1400&q=80" data-resource-id="opsModel" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80" data-resource-id="footerArch" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80" data-resource-id="ucWorkorders" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80" data-resource-id="ucSops" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80" data-resource-id="ucTraining" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80" data-resource-id="ucEscalations" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" data-resource-id="ucHandoffs" />
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+  <style>
+    html, body { margin: 0; padding: 0; background: #FAF8F1; color: #26251E; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #26251E; text-decoration: none; }
+    a:hover { color: #C05B2B; }
+    ::selection { background: #E8DFC9; }
+  </style>
+</helmet>
+
+<div style="min-height: 100vh; background: #FAF8F1">
+
+  <!-- ============ NAV + HERO ============ -->
+  <header data-screen-label="Hero" style="position: relative; height: 720px; overflow: hidden">
+    <div style="position: absolute; inset: 0">
+      <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="hero-bg" shape="rect" placeholder="Hero photo — frontline worker mid-shift (kitchen, warehouse, or shop floor)" src="{{ heroSrc }}" credit="Photo by Crystal Kwok on Unsplash" credit-href="https://unsplash.com/@spacexuan" hint-size="100%,720px"></x-import>
+    </div>
+    <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,18,12,0.45) 0%, rgba(20,18,12,0.28) 40%, rgba(20,18,12,0.05) 100%); pointer-events: none"></div>
+
+    <nav style="position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; padding: 22px 36px; pointer-events: none">
+      <a href="#" style="pointer-events: auto; display: flex; align-items: center; gap: 9px; color: #FFFFFF; font-size: 17px; font-weight: 500; letter-spacing: 0.01em">
+        <span style="display: inline-block; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #FFFFFF"></span>
+        sidekick
+      </a>
+      <div style="pointer-events: auto; display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.22); backdrop-filter: blur(10px); border-radius: 999px; padding: 6px 8px">
+        <a href="#how" style="color: #FFFFFF; font-size: 13px; padding: 7px 14px; border-radius: 999px" style-hover="background: rgba(255,255,255,0.15); color: #FFFFFF">How it works</a>
+        <a href="#usecases" style="color: #FFFFFF; font-size: 13px; padding: 7px 14px; border-radius: 999px" style-hover="background: rgba(255,255,255,0.15); color: #FFFFFF">Use cases</a>
+        <a href="#faq" style="color: #FFFFFF; font-size: 13px; padding: 7px 14px; border-radius: 999px" style-hover="background: rgba(255,255,255,0.15); color: #FFFFFF">FAQ</a>
+      </div>
+      <div style="pointer-events: auto; display: flex; align-items: center; gap: 10px">
+        <a href="#" style="color: #FFFFFF; font-size: 13px; padding: 9px 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.4)" style-hover="background: rgba(255,255,255,0.15); color: #FFFFFF">Log in</a>
+        <a href="#" style="color: #26251E; background: #FFFFFF; font-size: 13px; font-weight: 500; padding: 9px 18px; border-radius: 999px" style-hover="background: #F0EBDD; color: #26251E">Get a demo</a>
+      </div>
+    </nav>
+
+    <div style="position: relative; z-index: 2; max-width: 640px; margin: 96px auto 0; text-align: center; padding: 0 24px; pointer-events: none">
+      <h1 style="font-family: Newsreader, Georgia, serif; font-weight: 400; font-size: 58px; line-height: 1.08; color: #FFFFFF; margin: 0 0 22px; text-wrap: balance">Frontline work, handled by text.</h1>
+      <p style="font-size: 16px; line-height: 1.6; color: rgba(255,255,255,0.88); margin: 0 auto 30px; max-width: 460px; text-wrap: pretty">Sidekick is the text layer for frontline operations. Work orders, SOP answers, training, and urgent issues — handled over SMS, with a dashboard for managers. No apps. No logins.</p>
+      <a href="#" style="pointer-events: auto; display: inline-block; background: #FFFFFF; color: #26251E; font-size: 14px; font-weight: 500; padding: 13px 26px; border-radius: 999px" style-hover="background: #F0EBDD; color: #26251E">Get a demo</a>
+    </div>
+  </header>
+
+  <!-- ============ HOW IT WORKS ============ -->
+  <section id="how" data-screen-label="How it works" style="padding: 84px 36px">
+    <div style="max-width: 1080px; margin: 0 auto; background: #F1ECDF; border-radius: 20px; padding: 56px 56px 60px">
+      <div style="text-align: center; margin-bottom: 52px">
+        <h2 style="font-family: Newsreader, Georgia, serif; font-weight: 400; font-size: 30px; margin: 0 0 16px">How Sidekick works</h2>
+        <a href="#" style="display: inline-block; font-size: 12.5px; font-weight: 500; padding: 8px 16px; border-radius: 999px; border: 1px solid #26251E" style-hover="background: #26251E; color: #FFFFFF">See it in action</a>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 48px">
+        <div style="text-align: center">
+          <div style="width: 40px; height: 40px; margin: 0 auto 16px; border-radius: 12px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: Newsreader, Georgia, serif; font-size: 17px; color: {{ accent }}">1</div>
+          <h3 style="font-size: 14.5px; font-weight: 600; margin: 0 0 10px">Text like you already do</h3>
+          <p style="font-size: 13px; line-height: 1.6; color: #6E6A5D; margin: 0; text-wrap: pretty">Workers text Sidekick the way they'd text a coworker. Nothing to install, no password to forget.</p>
+        </div>
+        <div style="text-align: center">
+          <div style="width: 40px; height: 40px; margin: 0 auto 16px; border-radius: 12px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: Newsreader, Georgia, serif; font-size: 17px; color: {{ accent }}">2</div>
+          <h3 style="font-size: 14.5px; font-weight: 600; margin: 0 0 10px">Sidekick knows your operation</h3>
+          <p style="font-size: 13px; line-height: 1.6; color: #6E6A5D; margin: 0; text-wrap: pretty">It's trained on your SOPs, equipment, schedules, and vendors — so every answer is specific to your site.</p>
+        </div>
+        <div style="text-align: center">
+          <div style="width: 40px; height: 40px; margin: 0 auto 16px; border-radius: 12px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: Newsreader, Georgia, serif; font-size: 17px; color: {{ accent }}">3</div>
+          <h3 style="font-size: 14.5px; font-weight: 600; margin: 0 0 10px">Managers see everything</h3>
+          <p style="font-size: 13px; line-height: 1.6; color: #6E6A5D; margin: 0; text-wrap: pretty">Every request becomes a tracked work order in the dashboard — status, history, and escalations included.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WORK ORDERS INTRO ============ -->
+  <section data-screen-label="Work orders intro" style="padding: 40px 36px 72px; text-align: center">
+    <div style="max-width: 620px; margin: 0 auto">
+      <span style="display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: {{ accent }}; margin-bottom: 18px">Work orders</span>
+      <h2 style="font-family: Newsreader, Georgia, serif; font-weight: 400; font-size: 44px; line-height: 1.12; margin: 0 0 18px; text-wrap: balance">Your backlog, handled.</h2>
+      <p style="font-size: 15px; line-height: 1.65; color: #6E6A5D; margin: 0 auto; max-width: 480px; text-wrap: pretty">Text Sidekick a problem and it becomes a routed, tracked work order — assigned, escalated, and closed out without anyone opening a laptop.</p>
+    </div>
+  </section>
+
+  <!-- ============ TEXT SIDEKICK SHOWCASE ============ -->
+  <section data-screen-label="Text Sidekick showcase" style="position: relative; height: 480px; overflow: hidden">
+    <div style="position: absolute; inset: 0">
+      <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="showcase-bg" shape="rect" placeholder="Wide photo — back of house / warehouse floor" src="{{ showcaseSrc }}" credit="Photo by Adrian Sulyok on Unsplash" credit-href="https://unsplash.com/@sulyokimag" hint-size="100%,480px"></x-import>
+    </div>
+    <div style="position: absolute; inset: 0; background: rgba(20,18,12,0.55); pointer-events: none"></div>
+    <div style="position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; pointer-events: none">
+      <div style="font-family: Newsreader, Georgia, serif; font-size: 30px; color: rgba(255,255,255,0.22)">restock gloves for line 2</div>
+      <div style="font-family: Newsreader, Georgia, serif; font-size: 34px; color: rgba(255,255,255,0.45)">what's the SOP for a chemical spill</div>
+      <div style="display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; justify-content: center">
+        <span style="font-family: Newsreader, Georgia, serif; font-size: 40px; color: rgba(255,255,255,0.75)">Text Sidekick —</span>
+        <span style="font-family: Newsreader, Georgia, serif; font-size: 40px; color: #FFFFFF; border-bottom: 2px solid rgba(255,255,255,0.7); padding-bottom: 4px">dock door 3 is stuck</span>
+      </div>
+      <div style="font-family: Newsreader, Georgia, serif; font-size: 34px; color: rgba(255,255,255,0.45)">who's covering the closing shift</div>
+      <div style="font-family: Newsreader, Georgia, serif; font-size: 30px; color: rgba(255,255,255,0.22)">the fryer won't ignite</div>
+    </div>
+  </section>
+
+  <!-- ============ SPOTLIGHT A: ONE THREAD ============ -->
+  <section data-screen-label="Spotlight: one thread" style="padding: 110px 36px">
+    <div style="max-width: 1020px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1.1fr; gap: 72px; align-items: center">
+      <div>
+        <h2 style="font-family: Newsreader, Georgia, serif; font-weight: 400; font-size: 34px; line-height: 1.15; margin: 0 0 18px; text-wrap: balance">Every issue,<br>one thread.</h2>
+        <p style="font-size: 14px; line-height: 1.7; color: #6E6A5D; margin: 0 0 24px; text-wrap: pretty">Workers report problems in plain language — a broken freezer, a stuck door, a missing SOP. Sidekick triages, opens the work order, and keeps everyone posted in the same thread. No forms, no tickets, no chasing.</p>
+        <a href="#" style="font-size: 13.5px; font-weight: 500; color: {{ accent }}" style-hover="color: #26251E">Explore work orders →</a>
+      </div>
+      <div style="background: #F1ECDF; border-radius: 20px; padding: 44px 40px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start">
+        <span style="align-self: flex-end; background: {{ accent }}; color: #FFFFFF; font-size: 12px; font-weight: 500; padding: 7px 14px; border-radius: 999px; box-shadow: 0 4px 14px rgba(0,0,0,0.12)">✓ New work order created</span>
+        <div style="background: #FFFFFF; border-radius: 14px; padding: 13px 18px; font-size: 13.5px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); transform: rotate(-1deg)">Walk-in freezer is reading 48°F</div>
+        <div style="background: #FFFFFF; border-radius: 14px; padding: 13px 18px; font-size: 13.5px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); transform: rotate(0.5deg); margin-left: 22px">Forklift 2 is making a grinding noise</div>
+        <div style="background: #FFFFFF; border-radius: 14px; padding: 13px 18px; font-size: 13.5px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); transform: rotate(-0.5deg); margin-left: 8px">Need the lockout/tagout steps for the mixer</div>
+        <div style="background: #FFFFFF; border-radius: 14px; padding: 13px 18px; font-size: 13.5px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); transform: rotate(1deg); margin-left: 30px">Light out in aisle 7, ladder needed</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SPOTLIGHT B: DASHBOARD ============ -->
+  <section data-screen-label="Spotlight: dashboard" style="padding: 0 36px 110px">
+    <div style="max-width: 1020px; margin: 0 auto; display: grid; grid-template-columns: 1.1fr 1fr; gap: 72px; align-items: center">
+      <div style="background: #F1ECDF; border-radius: 20px; padding: 40px">
+        <div style="background: #FFFFFF; border-radius: 16px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06)">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px">
+            <span style="font-size: 12px; font-weight: 600">Open work orders</span>
+            <span style="font-size: 11px; color: #9B9788">This week</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <div style="display: flex; align-items: center; justify-content: space-between; background: #FAF8F1; border-radius: 10px; padding: 11px 14px">
+              <span style="font-size: 12.5px">Walk-in freezer — temp alarm</span>
+              <span style="font-size: 10.5px; font-weight: 600; color: {{ accent }}; border: 1px solid {{ accent }}; border-radius: 999px; padding: 3px 9px">Urgent</span>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; background: #FAF8F1; border-radius: 10px; padding: 11px 14px">
+              <span style="font-size: 12.5px">Dock door 3 — stuck roller</span>
+              <span style="font-size: 10.5px; font-weight: 600; color: #6E6A5D; border: 1px solid #D8D2C0; border-radius: 999px; padding: 3px 9px">Assigned</span>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; background: #FAF8F1; border-radius: 10px; padding: 11px 14px">
+              <span style="font-size: 12.5px">Aisle 7 lighting</span>
+              <span style="font-size: 10.5px; font-weight: 600; color: #5A6B3B; border: 1px solid #C5CBAE; border-radius: 999px; padding: 3px 9px">Done</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h2 style="font-family: Newsreader, Georgia, serif; font-weight: 400; font-size: 34px; line-height: 1.15; margin: 0 0 18px; text-wrap: balance">A dashboard around the thread.</h2>
+        <p style="font-size: 14px; line-height: 1.7; color: #6E6A5D; margin: 0 0 24px; text-wrap: pretty">Managers get a live view of everything moving through Sidekick: open work orders, response times, recurring issues, and who needs help — without asking anyone for a status update.</p>
+        <a href="#" style="font-size: 13.5px; font-weight: 500; color: {{ accent }}" style-hover="color: #26251E">Explore the dashboard →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ USE CASES CAROUSEL ============ -->
+  <section id="usecases" data-screen-label="Use cases" style="padding: 96px 0; background: #F5F1E6">
+    <div style="text-align: center; padding: 0 36px; margin-bottom: 56px">
+      <span style="display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: {{ accent }}; margin-bottom: 18px">Use cases</span>
+      <h2 style="font-family: Newsreader, Georgia, serif; font-weight: 400; font-size: 44px; line-height: 1.12; margin: 0 0 18px; text-wrap: balance">Never chase a status update again.</h2>
+      <p style="font-size: 15px; line-height: 1.65; color: #6E6A5D; margin: 0 auto; max-width: 480px; text-wrap: pretty">One number to text for everything that keeps a shift moving — from broken equipment to "how do I…" questions.</p>
+    </div>
+    <div style="display: flex; gap: 20px; overflow-x: auto; padding: 12px 36px 24px; scroll-snap-type: x mandatory">
+      <sc-for list="{{ useCases }}" as="uc" hint-placeholder-count="5">
+        <div style="flex: none; width: 280px; scroll-snap-align: center; position: relative; border-radius: 18px; overflow: hidden; height: 360px">
+          <div style="position: absolute; inset: 0">
+            <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="{{ uc.slotId }}" shape="rect" placeholder="{{ uc.placeholder }}" src="{{ uc.src }}" credit="{{ uc.credit }}" credit-href="{{ uc.creditHref }}" hint-size="280px,360px"></x-import>
+          </div>
+          <div style="position: absolute; top: 16px; left: 16px; right: 16px; background: #FFFFFF; border-radius: 12px; padding: 12px 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.14); pointer-events: none">
+            <div style="font-size: 13px; font-weight: 600; margin-bottom: 3px">{{ uc.title }}</div>
+            <div style="font-size: 11.5px; color: #6E6A5D; line-height: 1.45">{{ uc.blurb }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ EVERYDAY QUESTIONS GRID ============ -->
+  <section data-screen-label="Everyday questions" style="padding: 110px 36px">
+    <div style="max-width: 880px; margin: 0 auto">
+      <h2 style="font-family: Newsreader, Georgia, serif; font-weight: 400; font-size: 40px; text-align: center; margin: 0 0 54px; text-wrap: balance">And for the everyday questions.</h2>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+        <div style="background: #F1ECDF; border-radius: 18px; padding: 28px 30px">
+          <h3 style="font-size: 14.5px; font-weight: 600; margin: 0 0 8px">SOP answers</h3>
+          <p style="font-size: 13px; line-height: 1.6; color: #6E6A5D; margin: 0; text-wrap: pretty">"How do I reset the POS?" Answered in seconds, sourced from your own procedures — not the internet.</p>
+        </div>
+        <div style="background: #F1ECDF; border-radius: 18px; padding: 28px 30px">
+          <h3 style="font-size: 14.5px; font-weight: 600; margin: 0 0 8px">Training in the flow of work</h3>
+          <p style="font-size: 13px; line-height: 1.6; color: #6E6A5D; margin: 0; text-wrap: pretty">Bite-size refreshers and onboarding nudges arrive by text — right when a task needs them.</p>
+        </div>
+        <div style="background: #F1ECDF; border-radius: 18px; padding: 28px 30px">
+          <h3 style="font-size: 14.5px; font-weight: 600; margin: 0 0 8px">Any language</h3>
+          <p style="font-size: 13px; line-height: 1.6; color: #6E6A5D; margin: 0; text-wrap: pretty">Workers text in their language; managers read in theirs. Sidekick translates both ways, automatically.</p>
+        </div>
+        <div style="background: #F1ECDF; border-radius: 18px; padding: 28px 30px">
+          <h3 style="font-size: 14.5px; font-weight: 600; margin: 0 0 8px">Checklists &amp; handoffs</h3>
+          <p style="font-size: 13px; line-height: 1.6; color: #6E6A5D; margin: 0; text-wrap: pretty">Opening lists, closing lists, shift notes — confirmed by text and logged for the next shift.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DEEP UNDERSTANDING ============ -->
+  <section data-screen-label="Deep understanding" style="padding: 40px 36px 120px; text-align: center">
+    <div style="max-width: 640px; margin: 0 auto 56px">
+      <span style="display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: {{ accent }}; margin-bottom: 18px">The system</span>
+      <h2 style="font-family: Newsreader, Georgia, serif; font-weight: 400; font-size: 44px; line-height: 1.12; margin: 0 0 18px; text-wrap: balance">Built on a deep understanding of your operation.</h2>
+      <p style="font-size: 15px; line-height: 1.65; color: #6E6A5D; margin: 0 auto; max-width: 500px; text-wrap: pretty">During onboarding, Sidekick ingests your SOPs, equipment lists, schedules, and vendor contacts into a living model of your operation — so every text lands with full context.</p>
+    </div>
+    <div style="max-width: 560px; height: 340px; margin: 0 auto 40px">
+      <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="ops-model" shape="rounded" radius="20" placeholder="Overhead photo or 3D render of your facility" src="{{ opsSrc }}" credit="Photo by CHUTTERSNAP on Unsplash" credit-href="https://unsplash.com/@chuttersnap" hint-size="560px,340px"></x-import>
+    </div>
+    <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; max-width: 760px; margin: 0 auto 22px">
+      <span style="font-size: 12px; padding: 8px 16px; border-radius: 999px; background: #26251E; color: #FFFFFF">Equipment</span>
+      <span style="font-size: 12px; padding: 8px 16px; border-radius: 999px; border: 1px solid #D8D2C0; color: #6E6A5D">SOPs</span>
+      <span style="font-size: 12px; padding: 8px 16px; border-radius: 999px; border: 1px solid #D8D2C0; color: #6E6A5D">Schedules</span>
+      <span style="font-size: 12px; padding: 8px 16px; border-radius: 999px; border: 1px solid #D8D2C0; color: #6E6A5D">Vendors</span>
+      <span style="font-size: 12px; padding: 8px 16px; border-radius: 999px; border: 1px solid #D8D2C0; color: #6E6A5D">Training</span>
+      <span style="font-size: 12px; padding: 8px 16px; border-radius: 999px; border: 1px solid #D8D2C0; color: #6E6A5D">People</span>
+      <span style="font-size: 12px; padding: 8px 16px; border-radius: 999px; border: 1px solid #D8D2C0; color: #6E6A5D">Locations</span>
+    </div>
+    <p style="font-size: 12.5px; line-height: 1.6; color: #9B9788; max-width: 420px; margin: 0 auto">A living model of your site — equipment, procedures, people, and history — kept current by every conversation.</p>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section id="faq" data-screen-label="FAQ" style="padding: 0 36px 120px">
+    <div style="max-width: 760px; margin: 0 auto">
+      <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="4">
+        <div style="border-top: 1px solid #E3DDCB">
+          <button onClick="{{ f.toggle }}" style="width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px; background: none; border: none; padding: 22px 4px; cursor: pointer; text-align: left; font-family: inherit; font-size: 15px; color: #26251E" style-hover="color: #6E6A5D">
+            {{ f.q }}
+            <span style="font-family: Newsreader, Georgia, serif; font-size: 22px; color: #9B9788; flex: none">{{ f.symbol }}</span>
+          </button>
+          <div style="display: {{ f.answerDisplay }}; padding: 0 4px 24px; font-size: 13.5px; line-height: 1.7; color: #6E6A5D; max-width: 620px">{{ f.a }}</div>
+        </div>
+      </sc-for>
+      <div style="border-top: 1px solid #E3DDCB"></div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer data-screen-label="Footer" style="background: {{ footerBg }}; color: #EFEDE2; padding: 90px 36px 0; overflow: hidden">
+    <div style="max-width: 1020px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 64px">
+      <div>
+        <p style="font-family: Newsreader, Georgia, serif; font-weight: 400; font-size: 26px; line-height: 1.3; margin: 0 0 28px; text-wrap: balance">One text thread to run everyday operations. Welcome to Sidekick.</p>
+        <div style="display: flex; gap: 8px; max-width: 340px">
+          <input type="email" placeholder="Work email" style="flex: 1; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.25); border-radius: 999px; padding: 11px 18px; font-size: 13px; color: #FFFFFF; font-family: inherit; outline: none">
+          <button style="flex: none; background: #EFEDE2; color: #3A3F26; border: none; border-radius: 999px; padding: 11px 20px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit" style-hover="background: #FFFFFF">Get a demo</button>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px; font-size: 13px">
+        <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(239,237,226,0.5); margin-bottom: 4px">Product</span>
+        <a href="#" style="color: #EFEDE2" style-hover="color: #FFFFFF">Work orders</a>
+        <a href="#" style="color: #EFEDE2" style-hover="color: #FFFFFF">SOP answers</a>
+        <a href="#" style="color: #EFEDE2" style-hover="color: #FFFFFF">Training</a>
+        <a href="#" style="color: #EFEDE2" style-hover="color: #FFFFFF">Manager dashboard</a>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px; font-size: 13px">
+        <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(239,237,226,0.5); margin-bottom: 4px">Company</span>
+        <a href="#" style="color: #EFEDE2" style-hover="color: #FFFFFF">About</a>
+        <a href="#" style="color: #EFEDE2" style-hover="color: #FFFFFF">Careers</a>
+        <a href="#" style="color: #EFEDE2" style-hover="color: #FFFFFF">Contact</a>
+        <a href="#" style="color: #EFEDE2" style-hover="color: #FFFFFF">Privacy</a>
+      </div>
+    </div>
+    <div style="max-width: 1020px; margin: 64px auto 0; display: flex; justify-content: space-between; align-items: flex-end; font-size: 11.5px; color: rgba(239,237,226,0.5); padding-bottom: 24px">
+      <span>© 2026 Sidekick</span>
+      <span>Text-first operations</span>
+    </div>
+    <div style="width: 480px; height: 260px; margin: 0 auto; border-radius: 240px 240px 0 0; overflow: hidden">
+      <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="footer-arch" shape="rect" placeholder="Landscape or team photo (arch crop)" src="{{ footerSrc }}" credit="Photo by Bailey Zindel on Unsplash" credit-href="https://unsplash.com/@baileyzindel" hint-size="480px,260px"></x-import>
+    </div>
+  </footer>
+
+</div>
+</x-dc>
+<template id="__bundler_thumbnail" data-bg-color="#FAF8F1">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#FAF8F1"/>
+    <circle cx="600" cy="360" r="120" fill="none" stroke="#3F4A2C" stroke-width="26"/>
+    <text x="600" y="580" text-anchor="middle" font-family="Georgia, serif" font-size="86" fill="#26251E">sidekick</text>
+  </svg>
+</template>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;accentColor&quot;: { &quot;editor&quot;: &quot;color&quot;, &quot;default&quot;: &quot;#C05B2B&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;options&quot;: [&quot;#C05B2B&quot;, &quot;#5A6B3B&quot;, &quot;#3F5E78&quot;, &quot;#A87A2E&quot;], &quot;section&quot;: &quot;Theme&quot; },
+  &quot;footerTone&quot;: { &quot;editor&quot;: &quot;enum&quot;, &quot;default&quot;: &quot;olive&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;options&quot;: [&quot;olive&quot;, &quot;charcoal&quot;], &quot;section&quot;: &quot;Theme&quot; }
+}">
+class Component extends DCLogic {
+  state = { openFaq: 0 };
+
+  renderVals() {
+    const res = window.__resources || {};
+    const heroSrc = res.heroBg ?? "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=2000&q=80";
+    const showcaseSrc = res.showcaseBg ?? "https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=2000&q=80";
+    const opsSrc = res.opsModel ?? "https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?auto=format&fit=crop&w=1400&q=80";
+    const footerSrc = res.footerArch ?? "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80";
+    const accent = this.props.accentColor ?? "#C05B2B";
+    const footerBg = (this.props.footerTone ?? "olive") === "charcoal" ? "#2B2A24" : "#3F4A2C";
+
+    const faqsData = [
+      { q: "Do workers need to install anything?", a: "No. Sidekick works over plain SMS — workers text a number the same way they'd text a coworker. There's no app to download, no account to create, and no password to forget. Managers use a web dashboard." },
+      { q: "How does Sidekick learn our operation?", a: "During onboarding we ingest your SOPs, equipment lists, schedules, vendor contacts, and site details. From then on, every conversation keeps the model current — so answers stay specific to your locations, your machines, and your procedures." },
+      { q: "What happens with urgent issues?", a: "You set the escalation rules. When something is flagged urgent — a down freezer, a safety issue — Sidekick alerts the right manager immediately by text and call, and keeps escalating until someone acknowledges it." },
+      { q: "Does it replace our CMMS or ticketing system?", a: "It can work either way. Sidekick can be your system of record for work orders, or sit in front of the tools you already use — turning texts into tickets and syncing status back to the thread." }
+    ];
+
+    const faqs = faqsData.map((f, i) => ({
+      q: f.q,
+      a: f.a,
+      symbol: this.state.openFaq === i ? "−" : "+",
+      answerDisplay: this.state.openFaq === i ? "block" : "none",
+      toggle: () => this.setState(s => ({ openFaq: s.openFaq === i ? -1 : i }))
+    }));
+
+    const useCases = [
+      { slotId: "uc-workorders", title: "Work orders", blurb: "Report it by text; it's routed, tracked, and closed out.", placeholder: "Photo — maintenance tech at work", src: res.ucWorkorders ?? "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80", credit: "Photo by Petrebels on Unsplash", creditHref: "https://unsplash.com/@petrebels" },
+      { slotId: "uc-sops", title: "SOP answers", blurb: "Procedures answered from your own docs, in seconds.", placeholder: "Photo — kitchen or line station", src: res.ucSops ?? "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80", credit: "Photo by Jason Briscoe on Unsplash", creditHref: "https://unsplash.com/@jsnbrsc" },
+      { slotId: "uc-training", title: "Training", blurb: "Onboarding and refreshers, delivered in the flow of work.", placeholder: "Photo — new hire learning a station", src: res.ucTraining ?? "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80", credit: "Photo by Austin Distel on Unsplash", creditHref: "https://unsplash.com/@austindistel" },
+      { slotId: "uc-escalations", title: "Urgent escalations", blurb: "Critical issues reach the right person, immediately.", placeholder: "Photo — walk-in freezer or equipment room", src: res.ucEscalations ?? "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80", credit: "Photo by ThisisEngineering on Unsplash", creditHref: "https://unsplash.com/@thisisengineering" },
+      { slotId: "uc-handoffs", title: "Shift handoffs", blurb: "Notes and checklists that carry between shifts.", placeholder: "Photo — shift change / team huddle", src: res.ucHandoffs ?? "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80", credit: "Photo by Marvin Meyer on Unsplash", creditHref: "https://unsplash.com/@marvelous" }
+    ];
+
+    return { accent, footerBg, faqs, useCases, heroSrc, showcaseSrc, opsSrc, footerSrc };
+  }
+}
+</script>
+</body>
+</html>
