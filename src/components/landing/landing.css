@@ -286,9 +286,10 @@
   .lp-nav-left {
     flex-direction: row;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
     gap: 12px !important;
     flex-wrap: nowrap;
+    width: 100%;
   }
 
   .lp-nav-brand {
@@ -298,7 +299,8 @@
   }
 
   .lp-nav-brand span {
-    display: none !important;
+    display: inline !important;
+    max-width: none !important;
   }
 
   .lp-nav-brand img {
@@ -308,11 +310,12 @@
 
   .lp-nav-links {
     width: auto;
-    justify-content: flex-start;
+    justify-content: flex-end;
     gap: 12px !important;
     font-size: 12px !important;
     flex: 0 1 auto;
     white-space: nowrap;
+    margin-left: auto;
   }
 
   .lp-nav-actions {
