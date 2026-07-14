@@ -5,6 +5,7 @@
   font-family: var(--font-jakarta), "Helvetica Neue", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 .lp ::selection {
   background: #e8dfc9;
@@ -81,4 +82,139 @@
 }
 .sk-chat-scroll::-webkit-scrollbar {
   display: none;
+}
+
+@media (max-width: 900px) {
+  .lp-nav-shell {
+    top: 12px !important;
+    padding: 0 12px !important;
+  }
+
+  .lp-nav-inner {
+    width: 100%;
+    max-width: 100%;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px !important;
+    padding: 10px 12px !important;
+    border-radius: 24px !important;
+  }
+
+  .lp-nav-left {
+    min-width: 0;
+    gap: 12px !important;
+    align-items: center;
+  }
+
+  .lp-nav-brand {
+    min-width: 0;
+    gap: 8px !important;
+    font-size: 15px !important;
+  }
+
+  .lp-nav-brand span {
+    display: inline-block;
+    max-width: 92px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lp-nav-links {
+    gap: 12px !important;
+    font-size: 13px !important;
+    flex-wrap: wrap;
+  }
+
+  .lp-nav-actions {
+    justify-self: end;
+  }
+
+  .lp-login {
+    display: none !important;
+  }
+
+  .lp-nav-cta {
+    font-size: 12px !important;
+    padding: 10px 14px !important;
+    white-space: nowrap;
+  }
+
+  .lp-hero {
+    min-height: auto !important;
+  }
+
+  .lp-hero-grid {
+    margin-top: 104px !important;
+    padding: 0 18px 40px !important;
+    grid-template-columns: 1fr !important;
+    gap: 28px !important;
+  }
+
+  .lp-hero-copy {
+    max-width: 100%;
+  }
+
+  .lp-hero-badge {
+    margin-bottom: 14px !important;
+  }
+
+  .lp-hero-title {
+    font-size: clamp(46px, 16vw, 72px) !important;
+    line-height: 0.94 !important;
+    max-width: 6.5ch;
+    margin-bottom: 16px !important;
+  }
+
+  .lp-hero-body {
+    font-size: 15px !important;
+    max-width: 320px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .lp-hero-cta {
+    font-size: 14px !important;
+    padding: 12px 20px !important;
+  }
+
+  .lp-hero-phone {
+    width: min(100%, 320px) !important;
+    justify-self: center !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .lp-nav-inner {
+    grid-template-columns: 1fr;
+    justify-items: stretch;
+  }
+
+  .lp-nav-left {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .lp-nav-links {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .lp-nav-actions {
+    justify-self: stretch;
+  }
+
+  .lp-nav-cta {
+    display: block;
+    text-align: center;
+    width: 100%;
+  }
+
+  .lp-hero-grid {
+    margin-top: 138px !important;
+  }
+
+  .lp-hero-title {
+    max-width: 5.6ch;
+  }
 }
