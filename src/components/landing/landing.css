@@ -277,10 +277,10 @@
 
 @media (max-width: 560px) {
   .lp-nav-inner {
-    grid-template-columns: 1fr;
-    justify-items: stretch;
-    gap: 8px !important;
-    padding: 10px 10px 12px !important;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px !important;
+    padding: 10px 10px !important;
   }
 
   .lp-nav-left {
@@ -322,15 +322,17 @@
   }
 
   .lp-nav-actions {
-    justify-self: stretch;
+    justify-self: end;
+    flex: 0 0 auto;
   }
 
   .lp-nav-cta {
-    display: block;
+    display: inline-block;
     text-align: center;
-    width: 100%;
-    padding: 9px 12px !important;
-    font-size: 11.5px !important;
+    width: auto;
+    padding: 8px 10px !important;
+    font-size: 11px !important;
+    white-space: nowrap;
   }
 
   .lp-hero-grid {
