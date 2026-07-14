@@ -211,8 +211,8 @@ function ProcessOrbit(rawProps) {
 
   const N = steps.length;
   const stepsKey = steps.map((s) => `${s.title}\u0001${s.description}`).join("\u0002");
-  const runwayVh = compact ? Math.max(96, Math.max(1, N - 1) * 12 + 72) : Math.max(1, N - 1) * stepLength + 100;
-  const panelHeight = compact ? "68svh" : "100svh";
+  const runwayVh = compact ? Math.max(84, Math.max(1, N - 1) * 10 + 58) : Math.max(1, N - 1) * stepLength + 100;
+  const panelHeight = compact ? "52svh" : "100svh";
 
   const numSizeRaw = typeof numberFont.fontSize === "number" ? numberFont.fontSize : parseFloat(String(numberFont.fontSize)) || 60;
   const titleSizeRaw = typeof titleFont.fontSize === "number" ? titleFont.fontSize : parseFloat(String(titleFont.fontSize)) || 46;
@@ -538,6 +538,59 @@ function ProcessOrbit(rawProps) {
       window.removeEventListener("load", remeasure);
     };
   }, [N, snap, compact, numSize, ghostSize, titleSize, stepsKey, imageZoom]);
+
+  if (compact) {
+    return (
+      <div
+        ref={outerRef}
+        className={uid}
+        style={Object.assign({ width: "100%" }, style, {
+          position: "relative",
+          overflow: "hidden",
+          background,
+          padding: "24px 16px 20px",
+          borderRadius: 24
+        })}
+        role="region"
+        aria-label="Process steps"
+      >
+        {showMarks && <CornerMarks color={colors.guide} />}
+        <div style={{ display: "grid", gap: 18 }}>
+          {steps.map((s, i) => (
+            <div key={i} style={{ display: "grid", gridTemplateColumns: "40px minmax(0, 1fr)", gap: 12, alignItems: "start" }}>
+              <div>
+                <div style={Object.assign({}, monoFont, {
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minWidth: 32,
+                  height: 22,
+                  padding: "0 7px",
+                  borderRadius: 999,
+                  background: tint(colors.ink, 0.06),
+                  color: colors.ink,
+                  fontVariantNumeric: "tabular-nums"
+                })}>
+                  {i + 1} / {N}
+                </div>
+                <div style={Object.assign({ marginTop: 8, color: colors.ink }, numberFontRest, { fontSize: numSizeMobile * 0.92, lineHeight: 1 })}>
+                  {s.number}
+                </div>
+              </div>
+              <div>
+                <div className={`${uid}-title`} style={Object.assign({}, titleFontRest, { color: colors.ink, fontSize: titleSizeMobile * 0.92, lineHeight: 1.08 })}>
+                  {s.title}
+                </div>
+                <div style={Object.assign({}, descFont, { color: colors.muted, marginTop: 8, fontSize: 13.5, lineHeight: 1.5 })}>
+                  {s.description}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
