@@ -269,6 +269,11 @@
     min-height: 320px;
   }
 
+  .lp-contact-section {
+    padding-top: 8px !important;
+    padding-bottom: 88px !important;
+  }
+
   .lp-contact-form,
   .lp-contact-success {
     padding: 20px !important;
@@ -422,6 +427,11 @@
   .lp-spotlight-demo,
   .lp-knowledge-demo {
     min-height: 280px;
+  }
+
+  .lp-contact-section {
+    padding-top: 0 !important;
+    padding-bottom: 72px !important;
   }
 
   .lp-faq-section {
