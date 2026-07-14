@@ -103,7 +103,7 @@
 
   .lp-nav-left {
     min-width: 0;
-    gap: 12px !important;
+    gap: 10px !important;
     align-items: center;
   }
 
@@ -122,9 +122,13 @@
   }
 
   .lp-nav-links {
-    gap: 12px !important;
+    gap: 10px !important;
     font-size: 13px !important;
     flex-wrap: wrap;
+  }
+
+  .lp-navlink {
+    letter-spacing: -0.01em;
   }
 
   .lp-nav-actions {
@@ -153,11 +157,15 @@
     min-height: auto !important;
   }
 
+  .lp-hero-overlay {
+    background: linear-gradient(180deg, rgba(20,18,12,0.52) 0%, rgba(20,18,12,0.36) 42%, rgba(20,18,12,0.12) 100%) !important;
+  }
+
   .lp-hero-grid {
     margin-top: 104px !important;
     padding: 0 18px 40px !important;
     grid-template-columns: 1fr !important;
-    gap: 28px !important;
+    gap: 24px !important;
   }
 
   .lp-hero-copy {
@@ -165,20 +173,22 @@
   }
 
   .lp-hero-badge {
-    margin-bottom: 14px !important;
+    margin-bottom: 12px !important;
   }
 
   .lp-hero-title {
-    font-size: clamp(46px, 16vw, 72px) !important;
-    line-height: 0.94 !important;
-    max-width: 6.5ch;
-    margin-bottom: 16px !important;
+    font-size: clamp(40px, 11vw, 56px) !important;
+    line-height: 0.98 !important;
+    max-width: 8.2ch;
+    margin-bottom: 14px !important;
+    text-wrap: balance;
   }
 
   .lp-hero-body {
     font-size: 15px !important;
-    max-width: 320px !important;
-    margin-bottom: 20px !important;
+    line-height: 1.55 !important;
+    max-width: 31ch !important;
+    margin-bottom: 18px !important;
   }
 
   .lp-hero-cta {
@@ -187,7 +197,7 @@
   }
 
   .lp-hero-phone {
-    width: min(100%, 320px) !important;
+    width: min(100%, 300px) !important;
     justify-self: center !important;
   }
 
@@ -269,16 +279,31 @@
   .lp-nav-inner {
     grid-template-columns: 1fr;
     justify-items: stretch;
+    gap: 8px !important;
+    padding: 10px 10px 12px !important;
   }
 
   .lp-nav-left {
-    flex-wrap: wrap;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 8px !important;
+  }
+
+  .lp-nav-brand {
+    font-size: 14px !important;
+  }
+
+  .lp-nav-brand img {
+    width: 26px !important;
+    height: 26px !important;
   }
 
   .lp-nav-links {
-    width: 100%;
-    justify-content: space-between;
+    width: auto;
+    justify-content: flex-start;
+    gap: 16px !important;
+    font-size: 12.5px !important;
   }
 
   .lp-nav-actions {
@@ -292,11 +317,30 @@
   }
 
   .lp-hero-grid {
-    margin-top: 138px !important;
+    margin-top: 132px !important;
+    gap: 20px !important;
+  }
+
+  .lp-hero-badge {
+    gap: 6px !important;
   }
 
   .lp-hero-title {
-    max-width: 5.6ch;
+    font-size: clamp(36px, 10.8vw, 48px) !important;
+    max-width: 9ch;
+  }
+
+  .lp-hero-body {
+    max-width: none !important;
+  }
+
+  .lp-hero-cta {
+    width: 100%;
+    text-align: center;
+  }
+
+  .lp-hero-phone {
+    width: min(100%, 270px) !important;
   }
 
   .lp-how-card {
