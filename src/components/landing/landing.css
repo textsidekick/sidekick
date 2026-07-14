@@ -177,9 +177,9 @@
   }
 
   .lp-hero-title {
-    font-size: clamp(40px, 11vw, 56px) !important;
-    line-height: 0.98 !important;
-    max-width: 8.2ch;
+    font-size: clamp(34px, 8.5vw, 48px) !important;
+    line-height: 1.02 !important;
+    max-width: 12ch;
     margin-bottom: 14px !important;
     text-wrap: balance;
   }
@@ -187,7 +187,7 @@
   .lp-hero-body {
     font-size: 15px !important;
     line-height: 1.55 !important;
-    max-width: 31ch !important;
+    max-width: 34ch !important;
     margin-bottom: 18px !important;
   }
 
@@ -336,12 +336,13 @@
   }
 
   .lp-hero-title {
-    font-size: clamp(36px, 10.8vw, 48px) !important;
-    max-width: 9ch;
+    font-size: clamp(32px, 8.8vw, 42px) !important;
+    line-height: 1.04 !important;
+    max-width: 13ch;
   }
 
   .lp-hero-body {
-    max-width: none !important;
+    max-width: 36ch !important;
   }
 
   .lp-hero-cta {
