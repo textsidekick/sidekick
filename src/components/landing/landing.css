@@ -194,7 +194,13 @@
     margin-bottom: 18px !important;
   }
 
-  .lp-hero-cta {
+  .lp-hero-actions {
+    width: 100%;
+    gap: 10px !important;
+  }
+
+  .lp-hero-cta,
+  .lp-hero-login {
     font-size: 14px !important;
     padding: 12px 20px !important;
   }
@@ -377,9 +383,16 @@
     max-width: 36ch !important;
   }
 
-  .lp-hero-cta {
+  .lp-hero-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .lp-hero-cta,
+  .lp-hero-login {
     width: 100%;
     text-align: center;
+    justify-content: center;
   }
 
   .lp-hero-phone {

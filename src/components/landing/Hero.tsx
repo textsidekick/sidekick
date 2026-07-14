@@ -21,9 +21,14 @@ export default function Hero() {
           <p className="lp-hero-body" style={{ fontSize: 16, lineHeight: 1.6, color: "rgba(255,255,255,0.88)", margin: "0 0 30px", maxWidth: 460, textWrap: "pretty" }}>
             Workers report issues by text. Sidekick creates the work order, routes the right person, and turns every fix into searchable knowledge. No app, no login, any phone.
           </p>
-          <a className="lp-btn-blue lp-hero-cta" href={LINKS.bookDemo} target="_blank" rel="noopener noreferrer" style={{ pointerEvents: "auto", display: "inline-block", fontSize: 14, fontWeight: 500, padding: "13px 26px", borderRadius: 999 }}>
-            Get a demo
-          </a>
+          <div className="lp-hero-actions" style={{ pointerEvents: "auto", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+            <a className="lp-btn-blue lp-hero-cta" href={LINKS.bookDemo} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", fontSize: 14, fontWeight: 500, padding: "13px 26px", borderRadius: 999 }}>
+              Get a demo
+            </a>
+            <a className="lp-pill-outline lp-hero-login" href={LINKS.login} style={{ display: "inline-block", fontSize: 14, fontWeight: 500, padding: "13px 26px", borderRadius: 999, border: "1px solid rgba(255,255,255,0.28)", color: "#FFFFFF", background: "rgba(255,255,255,0.06)", backdropFilter: "blur(10px)" }}>
+              Login
+            </a>
+          </div>
         </div>
         <div className="lp-hero-phone" style={{ justifySelf: "end", width: 272, position: "relative" }}>
           <PhoneDemo />
