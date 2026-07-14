@@ -1,5 +1,3 @@
-import SidekickChat from "@/components/landing/SidekickChat";
-
 type Props = {
   scale?: number;
   time?: string;
