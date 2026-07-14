@@ -194,7 +194,8 @@
   .lp-how-section,
   .lp-knowledge-section,
   .lp-spotlight-section,
-  .lp-contact-section {
+  .lp-contact-section,
+  .lp-faq-section {
     padding-left: 18px !important;
     padding-right: 18px !important;
   }
@@ -311,5 +312,9 @@
   .lp-spotlight-demo,
   .lp-knowledge-demo {
     min-height: 280px;
+  }
+
+  .lp-faq-section {
+    padding-top: 44px !important;
   }
 }

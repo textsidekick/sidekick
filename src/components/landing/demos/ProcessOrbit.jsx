@@ -211,7 +211,8 @@ function ProcessOrbit(rawProps) {
 
   const N = steps.length;
   const stepsKey = steps.map((s) => `${s.title}\u0001${s.description}`).join("\u0002");
-  const runwayVh = Math.max(1, N - 1) * stepLength + 100;
+  const runwayVh = compact ? Math.max(165, Math.max(1, N - 1) * 34 + 96) : Math.max(1, N - 1) * stepLength + 100;
+  const panelHeight = compact ? "78svh" : "100svh";
 
   const numSizeRaw = typeof numberFont.fontSize === "number" ? numberFont.fontSize : parseFloat(String(numberFont.fontSize)) || 60;
   const titleSizeRaw = typeof titleFont.fontSize === "number" ? titleFont.fontSize : parseFloat(String(titleFont.fontSize)) || 46;
@@ -564,7 +565,7 @@ function ProcessOrbit(rawProps) {
       />
       <div
         ref={panelRef}
-        style={{ position: "sticky", top: 0, width: "100%", height: "100svh", overflow: "hidden" }}
+        style={{ position: "sticky", top: 0, width: "100%", height: panelHeight, overflow: "hidden" }}
       >
         {backgroundImage && backgroundImage.src && (
           <div aria-hidden="true" style={{ position: "absolute", inset: 0, overflow: "hidden" }}>

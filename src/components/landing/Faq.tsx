@@ -18,7 +18,7 @@ export default function Faq() {
   const [open, setOpen] = useState<number>(0);
 
   return (
-    <section id="faq" style={{ padding: "0 36px 120px" }}>
+    <section id="faq" className="lp-faq-section" style={{ padding: "0 36px 120px" }}>
       <div style={{ maxWidth: 960, margin: "0 auto" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
           <span style={{ width: 7, height: 7, borderRadius: "50%", background: ACCENT }} />
