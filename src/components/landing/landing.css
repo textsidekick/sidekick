@@ -136,7 +136,10 @@
   }
 
   .lp-login {
-    display: none !important;
+    display: inline-block !important;
+    font-size: 12px !important;
+    padding: 8px 10px !important;
+    white-space: nowrap;
   }
 
   .lp-nav-cta {
@@ -324,6 +327,16 @@
   .lp-nav-actions {
     justify-self: end;
     flex: 0 0 auto;
+    display: flex !important;
+    align-items: center;
+    gap: 6px !important;
+  }
+
+  .lp-login {
+    display: inline-block !important;
+    padding: 7px 8px !important;
+    font-size: 11px !important;
+    white-space: nowrap;
   }
 
   .lp-nav-cta {
