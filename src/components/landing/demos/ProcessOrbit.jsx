@@ -211,8 +211,8 @@ function ProcessOrbit(rawProps) {
 
   const N = steps.length;
   const stepsKey = steps.map((s) => `${s.title}\u0001${s.description}`).join("\u0002");
-  const runwayVh = compact ? Math.max(165, Math.max(1, N - 1) * 34 + 96) : Math.max(1, N - 1) * stepLength + 100;
-  const panelHeight = compact ? "78svh" : "100svh";
+  const runwayVh = compact ? Math.max(118, Math.max(1, N - 1) * 18 + 78) : Math.max(1, N - 1) * stepLength + 100;
+  const panelHeight = compact ? "62svh" : "100svh";
 
   const numSizeRaw = typeof numberFont.fontSize === "number" ? numberFont.fontSize : parseFloat(String(numberFont.fontSize)) || 60;
   const titleSizeRaw = typeof titleFont.fontSize === "number" ? titleFont.fontSize : parseFloat(String(titleFont.fontSize)) || 46;
@@ -229,8 +229,8 @@ function ProcessOrbit(rawProps) {
   const numSize = numSizeRaw * FS;
   const titleSize = titleSizeRaw * FS;
   const ghostSize = wheelNumberSize * (compact ? 0.55 : 1);
-  const DOTX = compact ? 0.1 : DOT_X;
-  const GAP = compact ? 34 : CONTENT_GAP;
+  const DOTX = compact ? 0.12 : DOT_X;
+  const GAP = compact ? 24 : CONTENT_GAP;
 
   const SLOT = numSize * 2.2;
   const REEL_W = numSize * 2.0;
