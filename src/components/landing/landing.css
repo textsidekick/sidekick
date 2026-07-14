@@ -213,6 +213,16 @@
     padding-right: 18px !important;
   }
 
+  .lp-how-section {
+    padding-top: 56px !important;
+    padding-bottom: 22px !important;
+  }
+
+  .lp-knowledge-section {
+    padding-top: 40px !important;
+    padding-bottom: 72px !important;
+  }
+
   .lp-how-card {
     padding: 36px 22px 40px !important;
   }
@@ -374,6 +384,16 @@
 
   .lp-hero-phone {
     width: min(100%, 270px) !important;
+  }
+
+  .lp-how-section {
+    padding-top: 48px !important;
+    padding-bottom: 12px !important;
+  }
+
+  .lp-knowledge-section {
+    padding-top: 28px !important;
+    padding-bottom: 56px !important;
   }
 
   .lp-how-card {
