@@ -1,27 +1,37 @@
+import type { Metadata } from "next";
+import { instrumentSerif, jakarta, quicksand } from "@/components/landing/fonts";
+import "@/components/landing/landing.css";
 import Nav from "@/components/landing/Nav";
 import Hero from "@/components/landing/Hero";
-import Logos from "@/components/landing/Logos";
 import HowItWorks from "@/components/landing/HowItWorks";
-import Comparison from "@/components/landing/Comparison";
-import KnowledgeLayer from "@/components/landing/KnowledgeLayer";
-import FAQ from "@/components/landing/FAQ";
-import CTA from "@/components/landing/CTA";
-import Contact from "@/components/landing/Contact";
+import OrbitSection from "@/components/landing/OrbitSection";
+import KnowledgeSection from "@/components/landing/KnowledgeSection";
+import VideoSliver from "@/components/landing/VideoSliver";
+import Spotlights from "@/components/landing/Spotlights";
+import Faq from "@/components/landing/Faq";
+import ContactSection from "@/components/landing/ContactSection";
 import Footer from "@/components/landing/Footer";
+
+export const metadata: Metadata = {
+  title: "Sidekick — Your workers text. Sidekick handles the rest.",
+  description:
+    "Workers report issues by text. Sidekick creates the work order, routes the right person, and turns every fix into searchable knowledge. No app, no login, any phone.",
+};
 
 export default function Page() {
   return (
-    <main className="overflow-hidden" style={{ background: "#F7F3EC", color: "#1C1A16" }}>
+    <div className={`lp ${jakarta.variable} ${instrumentSerif.variable} ${quicksand.variable}`}>
       <Nav />
       <Hero />
-      <Logos />
       <HowItWorks />
-      <Comparison />
-      <KnowledgeLayer />
-      <FAQ />
-      <CTA />
-      <Contact />
+      <OrbitSection />
+      <KnowledgeSection />
+      <VideoSliver src="/landing/sliver-text.mp4" plain="Text Sidekick:" italic="photos, videos, voice memos in any language" />
+      <Spotlights />
+      <VideoSliver src="/landing/sliver-knowledge.mp4" plain="Every fix," italic="remembered." objectPosition="50% 100%" />
+      <Faq />
+      <ContactSection />
       <Footer />
-    </main>
+    </div>
   );
 }

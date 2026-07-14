@@ -1,54 +1,47 @@
-import { Eyebrow } from "@/components/landing/Brand";
+import VideoLoop from "./VideoLoop";
+
+const serif = "var(--font-instrument-serif), Georgia, serif";
+const mask = "radial-gradient(closest-side, #000 55%, transparent 96%)";
 
 const STEPS = [
   {
-    n: "01",
-    title: "A worker texts the issue",
-    body: "Equipment issues, safety hazards, quality problems, supply needs — workers describe what they see in plain language from any phone.",
+    video: "/landing/how-text.mp4",
+    tile: "#FCF6EE",
+    title: "Text like you already do",
+    body: "Plain SMS on any phone: texts, photos, voice memos. Nothing to install, no password to forget.",
   },
   {
-    n: "02",
-    title: "Sidekick structures the work",
-    body: "Sidekick identifies the asset, sets priority, creates the work order, and routes the right technician with the right context.",
+    video: "/landing/how-reach.mp4",
+    tile: "#F7F3ED",
+    title: "Reach the whole floor",
+    body: "Sidekick handles questions and alerts on its own, and escalates to the right manager the moment it should.",
   },
   {
-    n: "03",
-    title: "The fix becomes knowledge",
-    body: "The technician closes the loop by text. The resolution is saved as searchable history so the next problem gets solved faster.",
+    video: "/landing/how-knowledge.mp4",
+    tile: "#F5F1EB",
+    title: "Save tribal knowledge",
+    body: "Sidekick records the know-how in your veterans' heads and learns from every fix, so nothing retires when they do.",
   },
 ];
 
 export default function HowItWorks() {
   return (
-    <section id="product" className="px-6 md:px-10 lg:px-14 py-24 border-t border-ink/10 scroll-mt-24">
-      <div className="max-w-[1180px] mx-auto">
-        <Eyebrow>How it works</Eyebrow>
-        <h2
-          className="font-serif font-normal mt-5 mb-14 max-w-[720px]"
-          style={{ fontSize: 56, lineHeight: 1, letterSpacing: "-0.02em" }}
-        >
-          Turn frontline texts into tracked work and reusable know-how.
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <section id="how" style={{ padding: "84px 36px" }}>
+      <div style={{ maxWidth: 1080, margin: "0 auto", background: "#F1ECDF", borderRadius: 20, padding: "56px 56px 60px" }}>
+        <div style={{ textAlign: "center", marginBottom: 52 }}>
+          <h2 style={{ fontFamily: serif, fontWeight: 400, fontSize: 30, margin: "0 0 16px" }}>How Sidekick works</h2>
+          <a className="lp-pill-outline" href="#contact" style={{ display: "inline-block", fontSize: 12.5, fontWeight: 500, padding: "8px 16px", borderRadius: 999, border: "1px solid #26251E", color: "#26251E" }}>
+            See it in action
+          </a>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 48 }}>
           {STEPS.map((s) => (
-            <div
-              key={s.n}
-              className="bg-white rounded-[20px] p-7 border border-ink/[0.06]"
-              style={{
-                boxShadow:
-                  "0 1px 0 rgba(28,26,22,0.04), 0 8px 24px -12px rgba(28,26,22,0.08)",
-              }}
-            >
-              <div className="font-mono text-xs text-accent mb-6 tracking-widest">
-                STEP {s.n}
+            <div key={s.title} style={{ textAlign: "center" }}>
+              <div style={{ width: 124, height: 124, margin: "0 auto 18px", background: s.tile, borderRadius: 26, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <VideoLoop src={s.video} style={{ width: 116, height: 116, objectFit: "cover", WebkitMaskImage: mask, maskImage: mask }} />
               </div>
-              <h3
-                className="font-serif font-normal m-0 mb-3"
-                style={{ fontSize: 28, lineHeight: 1.1, letterSpacing: "-0.015em" }}
-              >
-                {s.title}
-              </h3>
-              <p className="text-[15px] leading-[1.55] text-ink/70 m-0">{s.body}</p>
+              <h3 style={{ fontSize: 14.5, fontWeight: 600, margin: "0 0 10px" }}>{s.title}</h3>
+              <p style={{ fontSize: 13, lineHeight: 1.6, color: "#6E6A5D", margin: 0, textWrap: "pretty" }}>{s.body}</p>
             </div>
           ))}
         </div>

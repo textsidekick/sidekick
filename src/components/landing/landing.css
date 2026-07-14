@@ -1,0 +1,84 @@
+/* Landing page scoped styles: base type, link hovers, and demo keyframes. */
+.lp {
+  background: #faf8f1;
+  color: #26251e;
+  font-family: var(--font-jakarta), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+.lp ::selection {
+  background: #e8dfc9;
+}
+.lp a {
+  color: #26251e;
+  text-decoration: none;
+}
+.lp a:hover {
+  color: #1d6bf3;
+}
+
+/* nav */
+.lp-navlink {
+  color: rgba(38, 37, 30, 0.7) !important;
+  transition: color 0.15s ease;
+}
+.lp-navlink:hover {
+  color: #26251e !important;
+}
+.lp-login:hover {
+  background: rgba(38, 37, 30, 0.05);
+}
+.lp-btn-dark {
+  background: #26251e;
+  color: #efede2 !important;
+  transition: background 0.15s ease;
+}
+.lp-btn-dark:hover {
+  background: #000000;
+  color: #ffffff !important;
+}
+.lp-btn-blue {
+  background: #1d6bf3;
+  color: #ffffff !important;
+  transition: background 0.15s ease;
+}
+.lp-btn-blue:hover {
+  background: #1656cc;
+}
+.lp-pill-outline {
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.lp-pill-outline:hover {
+  background: #26251e;
+  color: #ffffff !important;
+}
+.lp-footer-link {
+  color: #26251e !important;
+}
+.lp-footer-link:hover {
+  color: #1d6bf3 !important;
+}
+
+/* phone demo (iMessage sim) */
+@keyframes sk-typing-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+@keyframes sk-blink {
+  0%, 100% { opacity: 1; }
+  70% { opacity: 1; }
+  71% { opacity: 0; }
+  90% { opacity: 0; }
+  91% { opacity: 1; }
+}
+@keyframes sk-msg-in {
+  0% { opacity: 0; transform: scale(0.8) translateY(8px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.sk-chat-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.sk-chat-scroll::-webkit-scrollbar {
+  display: none;
+}

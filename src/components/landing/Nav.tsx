@@ -1,72 +1,25 @@
-"use client";
-
-import { SidekickLogo } from "@/components/landing/Brand";
+import { LINKS } from "./links";
 
 export default function Nav() {
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   return (
-    <div style={{ position: "fixed", top: 16, left: 0, right: 0, zIndex: 50, display: "flex", justifyContent: "center", padding: "0 16px", pointerEvents: "none" }}>
-      <nav
-        style={{
-          pointerEvents: "auto",
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 8,
-          paddingLeft: 16,
-          paddingRight: 8,
-          paddingTop: 8,
-          paddingBottom: 8,
-          borderRadius: 9999,
-          border: "1px solid rgba(28,26,22,0.1)",
-          background: "rgba(247,243,236,0.85)",
-          backdropFilter: "blur(16px) saturate(1.5)",
-          boxShadow: "0 6px 24px -8px rgba(28,26,22,0.12), 0 2px 6px -2px rgba(28,26,22,0.06)",
-          maxWidth: "100%",
-        }}
-      >
-        <button onClick={scrollToTop} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", background: "none", border: "none", padding: 0 }}>
-          <SidekickLogo size={28} />
-          <span style={{ fontSize: 16, fontWeight: 600, letterSpacing: "-0.02em", color: "#1C1A16", whiteSpace: "nowrap" }}>
+    <nav style={{ position: "fixed", top: 16, left: 0, right: 0, zIndex: 50, display: "flex", justifyContent: "center", padding: "0 24px", pointerEvents: "none" }}>
+      <div style={{ pointerEvents: "auto", display: "inline-flex", alignItems: "center", gap: 32, padding: "8px 8px 8px 20px", borderRadius: 999, border: "1px solid rgba(38,37,30,0.1)", background: "rgba(250,248,241,0.85)", backdropFilter: "blur(20px) saturate(1.5)", boxShadow: "0 6px 24px -8px rgba(28,26,22,0.12), 0 2px 6px -2px rgba(28,26,22,0.06)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 26 }}>
+          <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, color: "#1D6BF3", fontFamily: "var(--font-quicksand), sans-serif", fontSize: 17, fontWeight: 700, letterSpacing: "-0.01em" }}>
+            <img src="/landing/sidekick-logo.png" alt="Sidekick" style={{ display: "block", width: 30, height: 30, objectFit: "contain" }} />
             Sidekick
-          </span>
-        </button>
-
-        {/* Desktop links - hidden on mobile via media query */}
-        <div className="nav-desktop-links" style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 14, color: "rgba(28,26,22,0.7)", marginLeft: 16 }}>
-          <a style={{ color: "inherit", textDecoration: "none" }} href="#product">Product</a>
-          <a style={{ color: "inherit", textDecoration: "none" }} href="#proof">Proof</a>
-          <a style={{ color: "inherit", textDecoration: "none" }} href="#contact">Contact Us</a>
-          <a style={{ color: "inherit", textDecoration: "none" }} href="https://textsidekick.substack.com/" target="_blank" rel="noopener noreferrer">Blog</a>
-          <a style={{ color: "inherit", textDecoration: "none" }} href="https://calendly.com/justin-textsidekick" target="_blank" rel="noopener noreferrer">Book a Demo</a>
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: 8 }}>
-          <a
-            href="/login"
-            style={{ color: "#1C1A16", padding: "8px 14px", borderRadius: 9999, fontSize: 13, fontWeight: 500, textDecoration: "none", whiteSpace: "nowrap" }}
-          >
-            Login
           </a>
-          <a
-            href="https://calendly.com/justin-textsidekick"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ background: "#1C1A16", color: "#F7F3EC", padding: "8px 14px", borderRadius: 9999, fontSize: 13, fontWeight: 500, textDecoration: "none", whiteSpace: "nowrap" }}
-          >
-            Book Demo
-          </a>
+          <div style={{ display: "flex", alignItems: "center", gap: 20, fontSize: 14 }}>
+            <a className="lp-navlink" href="#how">Product</a>
+            <a className="lp-navlink" href={LINKS.blog} target="_blank" rel="noopener noreferrer">Blog</a>
+            <a className="lp-navlink" href="#faq">FAQ</a>
+          </div>
         </div>
-      </nav>
-
-      <style>{`
-        @media (max-width: 640px) {
-          .nav-desktop-links { display: none !important; }
-        }
-      `}</style>
-    </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <a className="lp-login" href={LINKS.login} style={{ color: "#26251E", fontSize: 13, fontWeight: 500, padding: "9px 16px", borderRadius: 999 }}>Login</a>
+          <a className="lp-btn-dark" href={LINKS.bookDemo} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, fontWeight: 500, padding: "9px 16px", borderRadius: 999 }}>Book a demo →</a>
+        </div>
+      </div>
+    </nav>
   );
 }
