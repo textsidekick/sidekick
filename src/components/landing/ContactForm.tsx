@@ -68,7 +68,7 @@ export default function ContactForm() {
 
   if (status === "success") {
     return (
-      <div style={{ background: "#FBF7EF", border: "1px solid #EDE7D8", borderRadius: 20, padding: 28, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 12 }}>
+      <div className="lp-contact-success" style={{ background: "#FBF7EF", border: "1px solid #EDE7D8", borderRadius: 20, padding: 28, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 12 }}>
         <span style={{ width: 36, height: 36, borderRadius: "50%", background: ACCENT, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
         </span>
@@ -81,8 +81,8 @@ export default function ContactForm() {
   }
 
   return (
-    <form onSubmit={submit} style={{ background: "#FBF7EF", border: "1px solid #EDE7D8", borderRadius: 20, padding: 28 }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+    <form className="lp-contact-form" onSubmit={submit} style={{ background: "#FBF7EF", border: "1px solid #EDE7D8", borderRadius: 20, padding: 28 }}>
+      <div className="lp-contact-fields" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
         <div>
           <label style={labelStyle}>Your name <span style={{ color: ACCENT }}>*</span></label>
           <input type="text" required value={fields.name} onChange={set("name")} placeholder="Jordan Halverson" style={inputStyle} />
@@ -114,14 +114,14 @@ export default function ContactForm() {
           {error}
         </div>
       )}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 20 }}>
-        <span style={{ fontSize: 11.5, lineHeight: 1.5, color: "#9B9788", maxWidth: 240 }}>
+      <div className="lp-contact-actions" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 20 }}>
+        <span className="lp-contact-note" style={{ fontSize: 11.5, lineHeight: 1.5, color: "#9B9788", maxWidth: 240 }}>
           We&rsquo;ll never share your info. Reply within one business day.
         </span>
         <button
           type="submit"
           disabled={status === "submitting"}
-          className="lp-btn-dark"
+          className="lp-btn-dark lp-contact-submit"
           style={{ flex: "none", display: "inline-flex", alignItems: "center", gap: 8, border: "none", borderRadius: 999, padding: "13px 24px", fontSize: 13.5, fontWeight: 500, cursor: status === "submitting" ? "default" : "pointer", fontFamily: "inherit", opacity: status === "submitting" ? 0.7 : 1 }}
         >
           {status === "submitting" ? "Sending…" : "Send message →"}

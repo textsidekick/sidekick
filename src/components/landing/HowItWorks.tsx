@@ -26,17 +26,17 @@ const STEPS = [
 
 export default function HowItWorks() {
   return (
-    <section id="how" style={{ padding: "84px 36px" }}>
-      <div style={{ maxWidth: 1080, margin: "0 auto", background: "#F1ECDF", borderRadius: 20, padding: "56px 56px 60px" }}>
-        <div style={{ textAlign: "center", marginBottom: 52 }}>
+    <section id="how" className="lp-how-section" style={{ padding: "84px 36px" }}>
+      <div className="lp-how-card" style={{ maxWidth: 1080, margin: "0 auto", background: "#F1ECDF", borderRadius: 20, padding: "56px 56px 60px" }}>
+        <div className="lp-how-header" style={{ textAlign: "center", marginBottom: 52 }}>
           <h2 style={{ fontFamily: serif, fontWeight: 400, fontSize: 30, margin: "0 0 16px" }}>How Sidekick works</h2>
           <a className="lp-pill-outline" href="#contact" style={{ display: "inline-block", fontSize: 12.5, fontWeight: 500, padding: "8px 16px", borderRadius: 999, border: "1px solid #26251E", color: "#26251E" }}>
             See it in action
           </a>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 48 }}>
+        <div className="lp-how-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 48 }}>
           {STEPS.map((s) => (
-            <div key={s.title} style={{ textAlign: "center" }}>
+            <div key={s.title} className="lp-how-step" style={{ textAlign: "center" }}>
               <div style={{ width: 124, height: 124, margin: "0 auto 18px", background: s.tile, borderRadius: 26, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <VideoLoop src={s.video} style={{ width: 116, height: 116, objectFit: "cover", WebkitMaskImage: mask, maskImage: mask }} />
               </div>

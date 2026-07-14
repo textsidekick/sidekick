@@ -141,6 +141,14 @@
     white-space: nowrap;
   }
 
+  .lp-hero,
+  .lp-how-section,
+  .lp-knowledge-section,
+  .lp-spotlight-section,
+  .lp-contact-section {
+    overflow-x: hidden;
+  }
+
   .lp-hero {
     min-height: auto !important;
   }
@@ -182,6 +190,78 @@
     width: min(100%, 320px) !important;
     justify-self: center !important;
   }
+
+  .lp-how-section,
+  .lp-knowledge-section,
+  .lp-spotlight-section,
+  .lp-contact-section {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  .lp-how-card {
+    padding: 36px 22px 40px !important;
+  }
+
+  .lp-how-header {
+    margin-bottom: 28px !important;
+  }
+
+  .lp-how-grid,
+  .lp-knowledge-grid,
+  .lp-spotlight-grid,
+  .lp-contact-grid,
+  .lp-contact-fields {
+    grid-template-columns: 1fr !important;
+  }
+
+  .lp-how-grid,
+  .lp-knowledge-grid {
+    gap: 22px !important;
+  }
+
+  .lp-spotlight-grid,
+  .lp-contact-grid {
+    gap: 28px !important;
+  }
+
+  .lp-spotlight-grid-reverse > :first-child {
+    order: 2;
+  }
+
+  .lp-spotlight-grid-reverse > :last-child {
+    order: 1;
+  }
+
+  .lp-spotlight-demo,
+  .lp-knowledge-demo {
+    height: auto !important;
+    min-height: 320px;
+  }
+
+  .lp-contact-form,
+  .lp-contact-success {
+    padding: 20px !important;
+  }
+
+  .lp-contact-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .lp-contact-note {
+    max-width: none !important;
+  }
+
+  .lp-contact-submit {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .lp-contact-row {
+    flex-direction: column;
+    gap: 6px !important;
+  }
 }
 
 @media (max-width: 560px) {
@@ -216,5 +296,20 @@
 
   .lp-hero-title {
     max-width: 5.6ch;
+  }
+
+  .lp-how-card {
+    padding: 28px 16px 32px !important;
+  }
+
+  .lp-how-step,
+  .lp-knowledge-header,
+  .lp-contact-grid {
+    text-align: left !important;
+  }
+
+  .lp-spotlight-demo,
+  .lp-knowledge-demo {
+    min-height: 280px;
   }
 }

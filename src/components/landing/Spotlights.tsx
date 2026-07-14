@@ -26,8 +26,8 @@ export default function Spotlights() {
   return (
     <>
       {/* Work orders */}
-      <section style={{ padding: "110px 36px" }}>
-        <div style={{ maxWidth: 1020, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1.1fr", gap: 72, alignItems: "center" }}>
+      <section className="lp-spotlight-section" style={{ padding: "110px 36px" }}>
+        <div className="lp-spotlight-grid" style={{ maxWidth: 1020, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1.1fr", gap: 72, alignItems: "center" }}>
           <div>
             <h2 style={h2Style}>
               Every issue,
@@ -38,16 +38,16 @@ export default function Spotlights() {
               Workers report problems in plain language: a broken freezer, a stuck door, a missing SOP. Sidekick triages, opens the work order, and keeps everyone posted in the same thread. No forms, no tickets, no chasing.
             </p>
           </div>
-          <div style={{ height: 400 }}>
+          <div className="lp-spotlight-demo" style={{ height: 400 }}>
             <ThreadDemo accent={ACCENT} />
           </div>
         </div>
       </section>
 
       {/* Assets */}
-      <section style={{ padding: "0 36px 110px" }}>
-        <div style={{ maxWidth: 1020, margin: "0 auto", display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: 72, alignItems: "center" }}>
-          <div style={{ height: 460 }}>
+      <section className="lp-spotlight-section" style={{ padding: "0 36px 110px" }}>
+        <div className="lp-spotlight-grid lp-spotlight-grid-reverse" style={{ maxWidth: 1020, margin: "0 auto", display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: 72, alignItems: "center" }}>
+          <div className="lp-spotlight-demo" style={{ height: 460 }}>
             <AssetDemo accent={ACCENT} />
           </div>
           <div>
@@ -60,15 +60,15 @@ export default function Spotlights() {
       </section>
 
       {/* Training */}
-      <section style={{ padding: "0 36px 110px" }}>
-        <div style={{ maxWidth: 1020, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1.1fr", gap: 72, alignItems: "center" }}>
+      <section className="lp-spotlight-section" style={{ padding: "0 36px 110px" }}>
+        <div className="lp-spotlight-grid" style={{ maxWidth: 1020, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1.1fr", gap: 72, alignItems: "center" }}>
           <div>
             <h2 style={h2Style}>Training that meets the floor.</h2>
             <p style={pStyle}>
               New hires onboard over text: bite-size modules, walkthrough videos, and quizzes delivered in the flow of work. Managers see who&rsquo;s trained and certified at a glance.
             </p>
           </div>
-          <div style={{ height: 460 }}>
+          <div className="lp-spotlight-demo" style={{ height: 460 }}>
             <TrainingDemo accent={ACCENT} />
           </div>
         </div>

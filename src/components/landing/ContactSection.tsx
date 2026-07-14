@@ -15,8 +15,8 @@ const rowLabel: React.CSSProperties = {
 
 export default function ContactSection() {
   return (
-    <section id="contact" style={{ padding: "0 36px 120px" }}>
-      <div style={{ maxWidth: 1080, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1.15fr", gap: 64, alignItems: "start" }}>
+    <section id="contact" className="lp-contact-section" style={{ padding: "0 36px 120px" }}>
+      <div className="lp-contact-grid" style={{ maxWidth: 1080, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1.15fr", gap: 64, alignItems: "start" }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
             <span style={{ width: 7, height: 7, borderRadius: "50%", background: ACCENT }} />
@@ -29,15 +29,15 @@ export default function ContactSection() {
             Tell us a little about your operation and we&rsquo;ll set up a short call to see whether Sidekick can help with issue reporting, workflow routing, and knowledge capture.
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 24 }}>
+            <div className="lp-contact-row" style={{ display: "flex", alignItems: "baseline", gap: 24 }}>
               <span style={rowLabel}>EMAIL</span>
               <a href={LINKS.contactEmail} style={{ fontSize: 14.5, color: "#26251E" }}>hello@textsidekick.com</a>
             </div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 24 }}>
+            <div className="lp-contact-row" style={{ display: "flex", alignItems: "baseline", gap: 24 }}>
               <span style={rowLabel}>PHONE</span>
               <span style={{ fontSize: 14.5, color: "#26251E" }}>+1 (408) 828-5979</span>
             </div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 24 }}>
+            <div className="lp-contact-row" style={{ display: "flex", alignItems: "baseline", gap: 24 }}>
               <span style={rowLabel}>OFFICE</span>
               <span style={{ fontSize: 14.5, color: "#26251E" }}>San Francisco, CA</span>
             </div>
