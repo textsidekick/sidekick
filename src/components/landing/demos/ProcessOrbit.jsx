@@ -548,24 +548,24 @@ function ProcessOrbit(rawProps) {
           position: "relative",
           overflow: "hidden",
           background,
-          padding: "28px 20px 24px",
+          padding: "24px 16px 20px",
           borderRadius: 24
         })}
         role="region"
         aria-label="Process steps"
       >
         {showMarks && <CornerMarks color={colors.guide} />}
-        <div style={{ display: "grid", gap: 22 }}>
+        <div style={{ display: "grid", gap: 18 }}>
           {steps.map((s, i) => (
-            <div key={i} style={{ display: "grid", gridTemplateColumns: "44px minmax(0, 1fr)", gap: 14, alignItems: "start" }}>
+            <div key={i} style={{ display: "grid", gridTemplateColumns: "40px minmax(0, 1fr)", gap: 12, alignItems: "start" }}>
               <div>
                 <div style={Object.assign({}, monoFont, {
                   display: "inline-flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  minWidth: 36,
-                  height: 24,
-                  padding: "0 8px",
+                  minWidth: 32,
+                  height: 22,
+                  padding: "0 7px",
                   borderRadius: 999,
                   background: tint(colors.ink, 0.06),
                   color: colors.ink,
@@ -573,15 +573,15 @@ function ProcessOrbit(rawProps) {
                 })}>
                   {i + 1} / {N}
                 </div>
-                <div style={Object.assign({ marginTop: 10, color: colors.ink }, numberFontRest, { fontSize: numSizeMobile, lineHeight: 1 })}>
+                <div style={Object.assign({ marginTop: 8, color: colors.ink }, numberFontRest, { fontSize: numSizeMobile * 0.92, lineHeight: 1 })}>
                   {s.number}
                 </div>
               </div>
               <div>
-                <div className={`${uid}-title`} style={Object.assign({}, titleFontRest, { color: colors.ink, fontSize: titleSizeMobile, lineHeight: 1.06 })}>
+                <div className={`${uid}-title`} style={Object.assign({}, titleFontRest, { color: colors.ink, fontSize: titleSizeMobile * 0.92, lineHeight: 1.08 })}>
                   {s.title}
                 </div>
-                <div style={Object.assign({}, descFont, { color: colors.muted, marginTop: 10 })}>
+                <div style={Object.assign({}, descFont, { color: colors.muted, marginTop: 8, fontSize: 13.5, lineHeight: 1.5 })}>
                   {s.description}
                 </div>
               </div>

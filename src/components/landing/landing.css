@@ -287,15 +287,17 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: 12px !important;
+    gap: 10px !important;
     flex-wrap: nowrap;
     width: 100%;
+    min-width: 0;
   }
 
   .lp-nav-brand {
-    font-size: 14px !important;
+    font-size: 13px !important;
     flex: 0 0 auto;
     gap: 6px !important;
+    min-width: 0;
   }
 
   .lp-nav-brand span {
@@ -304,18 +306,19 @@
   }
 
   .lp-nav-brand img {
-    width: 26px !important;
-    height: 26px !important;
+    width: 24px !important;
+    height: 24px !important;
   }
 
   .lp-nav-links {
     width: auto;
     justify-content: flex-end;
-    gap: 12px !important;
-    font-size: 12px !important;
+    gap: 10px !important;
+    font-size: 11.5px !important;
     flex: 0 1 auto;
     white-space: nowrap;
     margin-left: auto;
+    min-width: 0;
   }
 
   .lp-nav-actions {
@@ -326,7 +329,8 @@
     display: block;
     text-align: center;
     width: 100%;
-    padding: 10px 12px !important;
+    padding: 9px 12px !important;
+    font-size: 11.5px !important;
   }
 
   .lp-hero-grid {
