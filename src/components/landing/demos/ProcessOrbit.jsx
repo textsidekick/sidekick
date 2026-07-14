@@ -211,7 +211,7 @@ function ProcessOrbit(rawProps) {
 
   const N = steps.length;
   const stepsKey = steps.map((s) => `${s.title}\u0001${s.description}`).join("\u0002");
-  const runwayVh = compact ? Math.max(128, Math.max(1, N - 1) * 20 + 88) : Math.max(1, N - 1) * stepLength + 100;
+  const runwayVh = compact ? Math.max(96, Math.max(1, N - 1) * 12 + 72) : Math.max(1, N - 1) * stepLength + 100;
   const panelHeight = compact ? "68svh" : "100svh";
 
   const numSizeRaw = typeof numberFont.fontSize === "number" ? numberFont.fontSize : parseFloat(String(numberFont.fontSize)) || 60;
