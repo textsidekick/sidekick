@@ -193,6 +193,15 @@
     text-wrap: balance;
   }
 
+  .lp-hero-line1,
+  .lp-hero-line2 {
+    display: inline;
+  }
+
+  .lp-hero-line2 {
+    white-space: nowrap;
+  }
+
   .lp-hero-body {
     font-size: 15px !important;
     line-height: 1.55 !important;
@@ -389,6 +398,15 @@
     font-size: clamp(32px, 8.8vw, 42px) !important;
     line-height: 1.04 !important;
     max-width: 13ch;
+  }
+
+  .lp-hero-line1,
+  .lp-hero-line2 {
+    display: block;
+  }
+
+  .lp-hero-line1 {
+    white-space: nowrap;
   }
 
   .lp-hero-body {

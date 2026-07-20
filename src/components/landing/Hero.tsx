@@ -17,7 +17,7 @@ export default function Hero() {
               <img src="/landing/yc-logo.png" alt="Y Combinator" style={{ display: "block", height: 26, objectFit: "contain", marginLeft: -3, transform: "translateY(1.5px)" }} />
             </div>
             <h1 className="lp-hero-title" style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif", fontWeight: 400, fontSize: 64, lineHeight: 1.05, color: "#FFFFFF", margin: "0 0 16px", textWrap: "pretty", maxWidth: 640 }}>
-              Your workers text. <span style={{ color: "#4D8DFF" }}>Sidekick</span> handles the rest.
+              <span className="lp-hero-line1">Your workers text.</span>{" "}<span className="lp-hero-line2"><span style={{ color: "#4D8DFF" }}>Sidekick</span> handles the rest.</span>
             </h1>
             <p className="lp-hero-body" style={{ fontSize: 16, lineHeight: 1.6, color: "rgba(255,255,255,0.88)", margin: 0, maxWidth: 460, textWrap: "pretty" }}>
               Workers report issues by text. Sidekick creates the work order, routes the right person, and turns every fix into searchable knowledge. No app, no login, any phone.
