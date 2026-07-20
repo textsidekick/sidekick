@@ -113,7 +113,7 @@ function KnowledgeBaseDemo(props) {
         ))}
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 7, flex: "none", paddingLeft: 6 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 7, flex: "none", padding: "2px 0 8px 6px" }}>
         <span style={{ width: 6, height: 6, borderRadius: "50%", background: accent, animation: "sk-kb-pulse 1.6s ease-in-out infinite" }} />
         <span style={{ fontSize: 11, color: "#6E6A5D" }}>+12 entries captured this week. Nothing walks out the door</span>
       </div>
