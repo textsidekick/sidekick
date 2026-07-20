@@ -11,12 +11,12 @@ export default function Hero() {
 
       <div className="lp-hero-grid" style={{ position: "relative", zIndex: 2, maxWidth: 1020, margin: "120px auto 0", minHeight: "calc(100svh - 120px)", padding: "0 24px 56px", display: "grid", gridTemplateColumns: "minmax(0, 1fr) 272px", gap: 48, alignItems: "center", pointerEvents: "none" }}>
         <div className="lp-hero-copy" style={{ maxWidth: 560 }}>
-          <div className="lp-hero-copy-panel" style={{ display: "inline-flex", flexDirection: "column", alignItems: "flex-start", maxWidth: 500, padding: "12px 14px", borderRadius: 22, background: "radial-gradient(120% 140% at 0% 0%, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 30%, transparent 54%), linear-gradient(180deg, rgba(38,38,35,0.2) 0%, rgba(28,28,26,0.12) 100%)", border: "1px solid rgba(255,255,255,0.04)", backdropFilter: "blur(10px) saturate(1.02)", boxShadow: "0 10px 34px -24px rgba(0,0,0,0.28)" }}>
+          <div className="lp-hero-copy-panel" style={{ display: "inline-flex", flexDirection: "column", alignItems: "flex-start", maxWidth: 540, padding: "12px 14px", borderRadius: 22, background: "radial-gradient(120% 140% at 0% 0%, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.015) 28%, transparent 52%), linear-gradient(180deg, rgba(38,38,35,0.14) 0%, rgba(28,28,26,0.08) 100%)", border: "1px solid rgba(255,255,255,0.03)", backdropFilter: "blur(8px) saturate(1.01)", boxShadow: "0 8px 28px -24px rgba(0,0,0,0.22)" }}>
             <div className="lp-hero-badge" style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
               <span style={{ fontSize: 14.5, fontWeight: 500, lineHeight: 1, color: "rgba(255,255,255,0.85)" }}>Backed by</span>
               <img src="/landing/yc-logo.png" alt="Y Combinator" style={{ display: "block", height: 26, objectFit: "contain", marginLeft: -3, transform: "translateY(1.5px)" }} />
             </div>
-            <h1 className="lp-hero-title" style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif", fontWeight: 400, fontSize: 64, lineHeight: 1.05, color: "#FFFFFF", margin: "0 0 16px", textWrap: "balance", maxWidth: 500 }}>
+            <h1 className="lp-hero-title" style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif", fontWeight: 400, fontSize: 64, lineHeight: 1.05, color: "#FFFFFF", margin: "0 0 16px", textWrap: "balance", maxWidth: 540 }}>
               Your workers text. <span style={{ color: "#4D8DFF" }}>Sidekick</span> handles the rest.
             </h1>
             <p className="lp-hero-body" style={{ fontSize: 16, lineHeight: 1.6, color: "rgba(255,255,255,0.88)", margin: 0, maxWidth: 460, textWrap: "pretty" }}>
