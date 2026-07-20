@@ -57,7 +57,7 @@ function KnowledgeBaseDemo(props) {
   return (
     <div style={{
       width: "100%", height: "100%", background: "#F1ECDF", borderRadius: 20, padding: "28px 32px",
-      boxSizing: "border-box", overflow: "hidden", display: "flex", flexDirection: "column", justifyContent: "center", gap: 12,
+      boxSizing: "border-box", overflow: "hidden", display: "flex", flexDirection: "column", justifyContent: "flex-start", gap: 12,
       fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif"
     }}>
       <style>{`
