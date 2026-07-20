@@ -36,27 +36,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing file" }, { status: 400 });
     }
 
-    // Check document upload limit for trial accounts
-    const { data: account } = await supabase
-      .from("manager_accounts")
-      .select("plan, documents_limit")
-      .eq("company_id", companyId)
-      .single();
-
-    if (account?.plan === "trial") {
-      const { count } = await supabase
-        .from("documents")
-        .select("*", { count: "exact", head: true })
-        .eq("company_id", companyId);
-
-      if ((count || 0) >= (account.documents_limit || 3)) {
-        return NextResponse.json({
-          error: "Document limit reached. Upgrade your plan to upload more documents.",
-          upgrade: true,
-        }, { status: 403 });
-      }
-    }
-
     // Extract text from file
     let text = "";
     const isPdf = file.name.endsWith(".pdf") || file.type === "application/pdf";

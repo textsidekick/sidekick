@@ -15,7 +15,6 @@ import { EmptyState } from "@/components/dashboard/shared/EmptyState";
 import { PriorityBadge } from "@/components/dashboard/shared/PriorityBadge";
 import { StatusBadge } from "@/components/dashboard/shared/StatusBadge";
 import DemoMode from "@/components/dashboard/DemoMode";
-import UpgradeBanner from "@/components/dashboard/UpgradeBanner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -59,7 +58,6 @@ export default function ManagerDashboard() {
   const [unansweredQuestions, setUnansweredQuestions] = useState<any[]>([]);
   const [loadingStats, setLoadingStats] = useState(false);
   const [loadingIssues, setLoadingIssues] = useState(false);
-  const [trialInfo, setTrialInfo] = useState<{ plan: string; questionsUsed: number; questionsLimit: number; trialEndsAt: string } | null>(null);
   const [showDemoMode, setShowDemoMode] = useState(false);
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [loadingWorkOrders, setLoadingWorkOrders] = useState(false);
@@ -67,21 +65,6 @@ export default function ManagerDashboard() {
   // Demo mode
   useEffect(() => {
     setShowDemoMode(localStorage.getItem("sidekick_demo_mode") === "true");
-  }, []);
-
-  // Trial info
-  useEffect(() => {
-    try {
-      const authData = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
-      if (authData.plan) {
-        setTrialInfo({
-          plan: authData.plan,
-          questionsUsed: authData.questionsUsed || 0,
-          questionsLimit: authData.questionsLimit || 50,
-          trialEndsAt: authData.trialEndsAt || "",
-        });
-      }
-    } catch {}
   }, []);
 
   // Load companies + workers

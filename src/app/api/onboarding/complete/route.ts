@@ -224,12 +224,11 @@ Return ONLY valid JSON, no markdown. Include all fields that have data.`;
       console.warn("[Complete] Location creation failed:", locationError);
     }
 
-    // Create manager account (trial) and manager_users entry for dashboard login
+    // Create manager account and manager_users entry for dashboard login
     try {
       await supabase.from("manager_accounts").upsert({
         company_id: companyId,
-        plan: "trial",
-        trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+        plan: "standard",
         questions_used: 0,
         questions_limit: 100,
       } as any, { onConflict: "company_id" });

@@ -3,6 +3,8 @@ import { supabase } from "@/lib/supabase";
 import crypto from "crypto";
 import { checkRateLimit, rateLimitKey } from "@/lib/rate-limit";
 
+const OPEN_ACCESS_COMPANY_NAME = "Pacific Coast Manufacturing";
+
 export async function POST(request: NextRequest) {
   try {
     const { phone, code } = await request.json();
@@ -90,6 +92,20 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Method 4: Allow any verified phone number into Pacific Coast Manufacturing
+    if (!companyId) {
+      const { data: openAccessCompany } = await supabase
+        .from("companies")
+        .select("id")
+        .ilike("name", OPEN_ACCESS_COMPANY_NAME)
+        .limit(1)
+        .single();
+
+      if (openAccessCompany?.id) {
+        companyId = openAccessCompany.id;
+      }
+    }
+
     if (companyId && !userId) {
       const { data: user } = await supabase
         .from("manager_users")
@@ -140,8 +156,7 @@ export async function POST(request: NextRequest) {
       companyId,
       username: username || phone,
       isNewUser,
-      plan: isPaidUser ? "paid" : "trial",
-      trialExpired: false,
+      plan: isPaidUser ? "pro" : "standard",
       questionsExhausted: false,
     });
 

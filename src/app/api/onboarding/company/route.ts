@@ -41,8 +41,7 @@ export async function POST(req: NextRequest) {
     // Create default manager account
     await supabase.from("manager_accounts").insert({
       company_id: company.id,
-      plan: "trial",
-      trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+      plan: "standard",
       questions_used: 0,
       questions_limit: 100,
     } as any);

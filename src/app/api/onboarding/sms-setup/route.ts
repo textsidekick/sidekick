@@ -331,12 +331,11 @@ async function completeOnboarding(
     }
   }
 
-  // Create manager account for trial
+  // Create manager account
   if (companyId) {
     await supabase.from("manager_accounts").upsert({
       company_id: companyId,
-      plan: "trial",
-      trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+      plan: "standard",
       questions_used: 0,
       questions_limit: 100,
     } as any, { onConflict: "company_id" }).then(r => {

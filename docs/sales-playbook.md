@@ -86,7 +86,7 @@ Meanwhile:
 | **Pro** | $499/mo per location | Everything in Starter + unlimited workers, unlimited docs, work orders, asset tracking, skill gaps, manager chat |
 | **Enterprise** | $799/mo per location | Everything in Pro + multilingual, WhatsApp, weekly ROI reports, dedicated onboarding, API access, custom integrations |
 
-All plans include a **14-day free trial** with full feature access.
+Plans are sold through guided demos and onboarding, with full feature access enabled during rollout.
 
 ### Money-Back Guarantee (use selectively)
 For prospects who seem on the fence, you can offer: **"Try it for a full month. If you're not seeing value, we'll refund the entire first month — no questions asked."**
