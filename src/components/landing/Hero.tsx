@@ -11,15 +11,15 @@ export default function Hero() {
 
       <div className="lp-hero-grid" style={{ position: "relative", zIndex: 2, maxWidth: 1020, margin: "120px auto 0", minHeight: "calc(100svh - 120px)", padding: "0 24px 56px", display: "grid", gridTemplateColumns: "minmax(0, 1fr) 272px", gap: 48, alignItems: "center", pointerEvents: "none" }}>
         <div className="lp-hero-copy" style={{ maxWidth: 560 }}>
-          <div className="lp-hero-copy-panel" style={{ display: "inline-flex", flexDirection: "column", alignItems: "flex-start", padding: "20px 22px", borderRadius: 24, background: "radial-gradient(120% 140% at 0% 0%, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 32%, transparent 56%), linear-gradient(180deg, rgba(54,54,50,0.42) 0%, rgba(35,35,33,0.32) 100%)", border: "1px solid rgba(255,255,255,0.06)", backdropFilter: "blur(18px) saturate(1.05)", boxShadow: "0 16px 54px -28px rgba(0,0,0,0.36), inset 0 1px 0 rgba(255,255,255,0.04)" }}>
-            <div className="lp-hero-badge" style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 18 }}>
+          <div className="lp-hero-copy-panel" style={{ display: "inline-flex", flexDirection: "column", alignItems: "flex-start", width: "fit-content", maxWidth: 460, padding: "18px 20px", borderRadius: 24, background: "radial-gradient(120% 140% at 0% 0%, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 32%, transparent 56%), linear-gradient(180deg, rgba(54,54,50,0.42) 0%, rgba(35,35,33,0.32) 100%)", border: "1px solid rgba(255,255,255,0.06)", backdropFilter: "blur(18px) saturate(1.05)", boxShadow: "0 16px 54px -28px rgba(0,0,0,0.36), inset 0 1px 0 rgba(255,255,255,0.04)" }}>
+            <div className="lp-hero-badge" style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
               <span style={{ fontSize: 14.5, fontWeight: 500, lineHeight: 1, color: "rgba(255,255,255,0.85)" }}>Backed by</span>
               <img src="/landing/yc-logo.png" alt="Y Combinator" style={{ display: "block", height: 26, objectFit: "contain", marginLeft: -3, transform: "translateY(1.5px)" }} />
             </div>
-            <h1 className="lp-hero-title" style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif", fontWeight: 400, fontSize: 64, lineHeight: 1.05, color: "#FFFFFF", margin: "0 0 18px", textWrap: "balance" }}>
+            <h1 className="lp-hero-title" style={{ display: "inline", fontFamily: "var(--font-instrument-serif), Georgia, serif", fontWeight: 400, fontSize: 64, lineHeight: 1.05, color: "#FFFFFF", margin: "0 0 16px", textWrap: "balance", maxWidth: "11ch" }}>
               Your workers text. <span style={{ color: "#4D8DFF" }}>Sidekick</span> handles the rest.
             </h1>
-            <p className="lp-hero-body" style={{ fontSize: 16, lineHeight: 1.6, color: "rgba(255,255,255,0.88)", margin: 0, maxWidth: 460, textWrap: "pretty" }}>
+            <p className="lp-hero-body" style={{ fontSize: 16, lineHeight: 1.6, color: "rgba(255,255,255,0.88)", margin: 0, maxWidth: 430, textWrap: "pretty" }}>
               Workers report issues by text. Sidekick creates the work order, routes the right person, and turns every fix into searchable knowledge. No app, no login, any phone.
             </p>
           </div>
