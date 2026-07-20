@@ -166,6 +166,7 @@
 
   .lp-hero-grid {
     margin-top: 104px !important;
+    min-height: auto !important;
     padding: 0 18px 40px !important;
     grid-template-columns: 1fr !important;
     gap: 24px !important;
@@ -371,6 +372,7 @@
 
   .lp-hero-grid {
     margin-top: 132px !important;
+    min-height: auto !important;
     gap: 20px !important;
   }
 
