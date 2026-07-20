@@ -11,23 +11,25 @@ export default function Hero() {
 
       <div className="lp-hero-grid" style={{ position: "relative", zIndex: 2, maxWidth: 1020, margin: "120px auto 0", minHeight: "calc(100svh - 120px)", padding: "0 24px 56px", display: "grid", gridTemplateColumns: "minmax(0, 1fr) 272px", gap: 48, alignItems: "center", pointerEvents: "none" }}>
         <div className="lp-hero-copy" style={{ maxWidth: 560 }}>
-          <div className="lp-hero-badge" style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 22 }}>
-            <span style={{ fontSize: 14.5, fontWeight: 500, lineHeight: 1, color: "rgba(255,255,255,0.85)" }}>Backed by</span>
-            <img src="/landing/yc-logo.png" alt="Y Combinator" style={{ display: "block", height: 26, objectFit: "contain", marginLeft: -3, transform: "translateY(1.5px)" }} />
-          </div>
-          <h1 className="lp-hero-title" style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif", fontWeight: 400, fontSize: 64, lineHeight: 1.05, color: "#FFFFFF", margin: "0 0 22px", textWrap: "balance" }}>
-            Your workers text. <span style={{ color: "#4D8DFF" }}>Sidekick</span> handles the rest.
-          </h1>
-          <p className="lp-hero-body" style={{ fontSize: 16, lineHeight: 1.6, color: "rgba(255,255,255,0.88)", margin: "0 0 30px", maxWidth: 460, textWrap: "pretty" }}>
-            Workers report issues by text. Sidekick creates the work order, routes the right person, and turns every fix into searchable knowledge. No app, no login, any phone.
-          </p>
-          <div className="lp-hero-actions" style={{ pointerEvents: "auto", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-            <a className="lp-btn-blue lp-hero-cta" href={LINKS.bookDemo} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", fontSize: 14, fontWeight: 500, padding: "13px 26px", borderRadius: 999 }}>
-              Get a demo
-            </a>
-            <a className="lp-pill-outline lp-hero-login" href={LINKS.login} style={{ display: "inline-block", fontSize: 14, fontWeight: 500, padding: "13px 26px", borderRadius: 999, border: "1px solid rgba(255,255,255,0.28)", color: "#FFFFFF", background: "rgba(255,255,255,0.06)", backdropFilter: "blur(10px)" }}>
-              Login
-            </a>
+          <div className="lp-hero-copy-panel" style={{ padding: "30px 32px", borderRadius: 28, background: "linear-gradient(180deg, rgba(58,58,54,0.58) 0%, rgba(42,42,39,0.5) 100%)", border: "1px solid rgba(255,255,255,0.14)", backdropFilter: "blur(16px) saturate(1.15)", boxShadow: "0 18px 60px -24px rgba(0,0,0,0.5)" }}>
+            <div className="lp-hero-badge" style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 22 }}>
+              <span style={{ fontSize: 14.5, fontWeight: 500, lineHeight: 1, color: "rgba(255,255,255,0.85)" }}>Backed by</span>
+              <img src="/landing/yc-logo.png" alt="Y Combinator" style={{ display: "block", height: 26, objectFit: "contain", marginLeft: -3, transform: "translateY(1.5px)" }} />
+            </div>
+            <h1 className="lp-hero-title" style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif", fontWeight: 400, fontSize: 64, lineHeight: 1.05, color: "#FFFFFF", margin: "0 0 22px", textWrap: "balance" }}>
+              Your workers text. <span style={{ color: "#4D8DFF" }}>Sidekick</span> handles the rest.
+            </h1>
+            <p className="lp-hero-body" style={{ fontSize: 16, lineHeight: 1.6, color: "rgba(255,255,255,0.88)", margin: "0 0 30px", maxWidth: 460, textWrap: "pretty" }}>
+              Workers report issues by text. Sidekick creates the work order, routes the right person, and turns every fix into searchable knowledge. No app, no login, any phone.
+            </p>
+            <div className="lp-hero-actions" style={{ pointerEvents: "auto", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+              <a className="lp-btn-blue lp-hero-cta" href={LINKS.bookDemo} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", fontSize: 14, fontWeight: 500, padding: "13px 26px", borderRadius: 999 }}>
+                Get a demo
+              </a>
+              <a className="lp-pill-outline lp-hero-login" href={LINKS.login} style={{ display: "inline-block", fontSize: 14, fontWeight: 500, padding: "13px 26px", borderRadius: 999, border: "1px solid rgba(255,255,255,0.28)", color: "#FFFFFF", background: "rgba(255,255,255,0.06)", backdropFilter: "blur(10px)" }}>
+                Login
+              </a>
+            </div>
           </div>
         </div>
         <div className="lp-hero-phone" style={{ justifySelf: "end", width: 272, position: "relative" }}>

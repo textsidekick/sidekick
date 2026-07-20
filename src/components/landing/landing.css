@@ -176,6 +176,11 @@
     max-width: 100%;
   }
 
+  .lp-hero-copy-panel {
+    padding: 24px 22px !important;
+    border-radius: 24px !important;
+  }
+
   .lp-hero-badge {
     margin-bottom: 12px !important;
   }
@@ -388,6 +393,11 @@
 
   .lp-hero-body {
     max-width: 36ch !important;
+  }
+
+  .lp-hero-copy-panel {
+    padding: 22px 18px !important;
+    border-radius: 22px !important;
   }
 
   .lp-hero-actions {
