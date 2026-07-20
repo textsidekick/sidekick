@@ -56,8 +56,8 @@ function KnowledgeBaseDemo(props) {
 
   return (
     <div style={{
-      width: "100%", height: "100%", background: "#F1ECDF", borderRadius: 20, padding: "28px 32px",
-      boxSizing: "border-box", overflow: "hidden", display: "flex", flexDirection: "column", justifyContent: "flex-start", gap: 12,
+      width: "100%", height: "100%", background: "#F1ECDF", borderRadius: 20, padding: "24px 28px",
+      boxSizing: "border-box", overflow: "hidden", display: "flex", flexDirection: "column", justifyContent: "flex-start", gap: 10,
       fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif"
     }}>
       <style>{`
@@ -66,7 +66,7 @@ function KnowledgeBaseDemo(props) {
         @keyframes sk-kb-pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
       `}</style>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 10, background: "#FDFCF9", borderRadius: 999, padding: "13px 19px", boxShadow: "0 10px 30px rgba(38,37,30,0.1), 0 2px 8px rgba(38,37,30,0.05)", flex: "none" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, background: "#FDFCF9", borderRadius: 999, padding: "12px 18px", boxShadow: "0 10px 30px rgba(38,37,30,0.1), 0 2px 8px rgba(38,37,30,0.05)", flex: "none" }}>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9B9788" strokeWidth="2" style={{ flex: "none" }}><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
         <span style={{ fontSize: 13.5, color: typed ? "#26251E" : "#B0AA99", whiteSpace: "nowrap", overflow: "hidden" }}>
           {typed || (searching ? "" : "Search everything your floor has learned…")}
@@ -74,7 +74,7 @@ function KnowledgeBaseDemo(props) {
         {searching && !answer && <span style={{ width: 1.5, height: 14, background: accent, animation: "sk-kb-blink 1s step-end infinite", flex: "none" }} />}
       </div>
 
-      <div style={{ minHeight: 86, flex: "none" }}>
+      <div style={{ minHeight: 82, flex: "none" }}>
         {(thinking || answer) && (
           <div style={{ animation: "sk-kb-in 0.35s ease-out both", background: "#FBF2DC", border: "1px solid #E8CFA0", borderRadius: 14, padding: "12px 17px", boxShadow: "0 6px 18px rgba(38,37,30,0.07)" }}>
             {thinking ? (
@@ -93,11 +93,11 @@ function KnowledgeBaseDemo(props) {
         )}
       </div>
 
-      <div style={{ background: "#FDFCF9", borderRadius: 18, boxShadow: "0 10px 34px rgba(38,37,30,0.1), 0 2px 8px rgba(38,37,30,0.05)", padding: "6px 18px", flex: "none" }}>
+      <div style={{ background: "#FDFCF9", borderRadius: 18, boxShadow: "0 10px 34px rgba(38,37,30,0.1), 0 2px 8px rgba(38,37,30,0.05)", padding: "4px 16px", flex: "none" }}>
         {ENTRIES.map((e, i) => (
           <div key={i} style={{
             display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
-            borderBottom: i < ENTRIES.length - 1 ? "1px solid #F0EBDD" : "none", padding: "10px 4px",
+            borderBottom: i < ENTRIES.length - 1 ? "1px solid #F0EBDD" : "none", padding: "9px 4px",
             background: filtered && e.match ? "#FBF2DC" : "transparent",
             borderRadius: filtered && e.match ? 9 : 0,
             opacity: shown <= i ? 0 : (filtered && !e.match ? 0.35 : 1),
