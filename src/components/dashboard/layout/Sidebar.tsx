@@ -109,7 +109,7 @@ export function Sidebar() {
   const selectedLocation = selectedCompany?.locations?.find(location => location.id === selectedLocationId);
 
   const sidebarContent = (
-    <div className="fixed left-0 top-0 bottom-0 w-[220px] bg-[#182430] border-r border-white/10 flex flex-col z-50">
+    <div className="fixed left-0 top-0 bottom-0 w-[220px] bg-[#343A40] border-r border-white/10 flex flex-col z-50">
       {/* Logo area */}
       <div style={{ height: 64, display: 'flex', alignItems: 'center', gap: 12, padding: '0 20px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
         <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={30} height={30} style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />

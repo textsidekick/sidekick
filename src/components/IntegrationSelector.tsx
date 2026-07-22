@@ -94,10 +94,10 @@ export default function IntegrationSelector({ companyId, onConnect, compact }: I
         <div style={{ display: "flex", gap: 6, marginTop: 12 }}>
           {(["all", "connected"] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)} style={{
-              padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 500,
+              padding: "8px 12px", borderRadius: 999, fontSize: 12, fontWeight: 600,
               border: "1px solid rgba(28,26,22,0.1)",
-              background: filter === f ? "#C96442" : "transparent",
-              color: filter === f ? "white" : "rgba(28,26,22,0.6)",
+              background: filter === f ? "#F8FBFF" : "transparent",
+              color: filter === f ? "#475569" : "rgba(28,26,22,0.6)",
               cursor: "pointer", textTransform: "capitalize",
             }}>{f}</button>
           ))}
@@ -113,7 +113,7 @@ export default function IntegrationSelector({ companyId, onConnect, compact }: I
               style={{
                 display: "flex", alignItems: "center", gap: 10, padding: "10px 12px",
                 borderRadius: 10, border: "1px solid rgba(28,26,22,0.08)",
-                background: connected.has(integration.id) ? "rgba(201,100,66,0.05)" : "white",
+                background: connected.has(integration.id) ? "#F8FBFF" : "white",
                 cursor: integration.status === "coming_soon" ? "default" : "pointer",
                 opacity: integration.status === "coming_soon" ? 0.5 : 1,
                 textAlign: "left", width: "100%",

@@ -96,10 +96,10 @@ function EmptyState({ sectionId }: { sectionId: SectionId }) {
     }}>
       <div style={{
         width: 48, height: 48, borderRadius: 12,
-        background: "rgba(201,100,66,0.08)", margin: "0 auto 12px",
+        background: "rgba(0,96,240,0.08)", margin: "0 auto 12px",
         display: "flex", alignItems: "center", justifyContent: "center",
       }}>
-        {React.createElement(SECTION_ICONS[sectionId], { size: 22, color: "rgba(201,100,66,0.4)" })}
+        {React.createElement(SECTION_ICONS[sectionId], { size: 22, color: "#94A3B8" })}
       </div>
       <p style={{ fontSize: 13, lineHeight: 1.5, maxWidth: 200, margin: "0 auto" }}>{hints[sectionId]}</p>
     </div>
@@ -148,10 +148,10 @@ function AssetPanel({ data }: { data: Asset[] }) {
         }}>
           <div style={{
             width: 32, height: 32, borderRadius: 8,
-            background: "rgba(201,100,66,0.08)",
+            background: "rgba(0,96,240,0.08)",
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>
-            <Wrench size={16} style={{ color: "#C96442" }} />
+            <Wrench size={16} style={{ color: "#0060F0" }} />
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 14, fontWeight: 600, color: "#1C1A16" }}>{asset.name}</div>
@@ -209,7 +209,7 @@ function TeamPanel({ data }: { data: TeamMember[] }) {
 function KnowledgePanel({ data }: { data: KnowledgeDoc[] }) {
   if (data.length === 0) return <EmptyState sectionId="knowledge" />;
   const typeColors: Record<string, string> = {
-    sop: "#C96442", manual: "#2563eb", safety: "#dc2626", other: "#6b7280",
+    sop: "#0060F0", manual: "#334155", safety: "#334155", other: "#6b7280",
   };
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -311,10 +311,10 @@ export default function DataPanel({ activeSectionId, data, integrationSelector, 
       }}>
         <div style={{
           width: 36, height: 36, borderRadius: 10,
-          background: "rgba(201,100,66,0.08)",
+          background: "rgba(0,96,240,0.08)",
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>
-          <Icon size={18} style={{ color: "#C96442" }} />
+          <Icon size={18} style={{ color: "#0060F0" }} />
         </div>
         <div>
           <div style={{ fontSize: 15, fontWeight: 700, color: "#1C1A16" }}>

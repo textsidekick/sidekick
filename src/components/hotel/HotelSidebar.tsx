@@ -125,7 +125,7 @@ export function HotelSidebar() {
         </div>
       </div>
 
-      <aside className="fixed left-0 top-0 bottom-0 z-40 hidden w-[250px] border-r border-slate-200 bg-[#182430] lg:block">
+      <aside className="fixed left-0 top-0 bottom-0 z-40 hidden w-[250px] border-r border-slate-200 bg-[#343A40] lg:block">
         <div className="flex h-full min-h-0 flex-col overflow-hidden">
         <div className="flex h-16 shrink-0 items-center gap-3 border-b border-white/10 px-5">
           <Image

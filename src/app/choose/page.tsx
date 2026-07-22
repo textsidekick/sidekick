@@ -34,7 +34,7 @@ export default function ChoosePage() {
             }}
           >
             <div style={{
-              width: 44, height: 44, borderRadius: 12, background: "rgba(201,100,66,0.1)",
+              width: 44, height: 44, borderRadius: 12, background: "#F1F5F9",
               display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
             }}>
               <LayoutDashboard size={22} style={{ color: "#0060F0" }} />
@@ -55,7 +55,7 @@ export default function ChoosePage() {
             }}
           >
             <div style={{
-              width: 44, height: 44, borderRadius: 12, background: "rgba(201,100,66,0.1)",
+              width: 44, height: 44, borderRadius: 12, background: "#F1F5F9",
               display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
             }}>
               <MessageCircle size={22} style={{ color: "#0060F0" }} />
