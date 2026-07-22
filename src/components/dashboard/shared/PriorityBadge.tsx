@@ -10,7 +10,7 @@ type SettingsResponse = {
 };
 
 const PRIORITY_CLASSES: Record<string, string> = {
-  critical: "bg-slate-900 text-white border border-slate-900",
+  critical: "bg-red-600 text-white border border-red-600",
   high: "bg-white text-slate-700 border border-slate-200",
   medium: "bg-white text-slate-700 border border-slate-200",
   low: "bg-slate-100 text-slate-700 border border-slate-200",

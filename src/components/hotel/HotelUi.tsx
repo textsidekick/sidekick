@@ -36,9 +36,7 @@ export function HotelQueueCard({ href, icon: Icon, title, count, detail }: { hre
   return (
     <Link href={href} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/50 transition-transform hover:-translate-y-0.5">
       <div className="flex items-start justify-between gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100">
-          <Icon className="h-5 w-5 text-[#0060F0]" />
-        </div>
+        <Icon className="h-5 w-5 flex-shrink-0 text-slate-600" />
         <div className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
           Open <ArrowUpRight className="h-3.5 w-3.5" />
         </div>
