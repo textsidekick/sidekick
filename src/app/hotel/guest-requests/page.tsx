@@ -7,6 +7,8 @@ import { useHotelDemoState } from "@/lib/hotel-demo-store";
 export default function HotelGuestRequestsPage() {
   const { state, actions, loaded } = useHotelDemoState();
 
+  const actionChip = "inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700";
+
   if (!loaded) return null;
 
   const requests = state.requests.filter((item) => item.kind === "guest" || item.source === "guest sms" || item.kind === "front_desk");
@@ -89,28 +91,28 @@ export default function HotelGuestRequestsPage() {
                           <div><span className="font-semibold text-[#17202B]">Stay:</span> {stay ? `${stay.status.replace(/_/g, " ")} · ${stay.nights} night${stay.nights === 1 ? "" : "s"}` : "No stay context"}</div>
                         </div>
                         {request.triageStatus === "needs_review" ? (
-                          <div className="mt-3 rounded-2xl border border-blue-100 bg-blue-50 px-3 py-3 text-xs leading-5 text-blue-800">
+                          <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-xs leading-5 text-slate-600">
                             <span className="font-semibold">Review needed:</span> {request.handoffNote || "Desk should confirm routing or split this request before the guest gets a final answer."}
                           </div>
                         ) : null}
 
                         <div className="mt-3 flex flex-wrap gap-2">
                           {request.status !== "in_progress" && request.status !== "resolved" ? (
-                            <button onClick={() => { actions.updateRequestStatus(request.id, "in_progress"); actions.updateRequestWorkflow(request.id, { resolutionState: "staff_dispatched" }); actions.addTimelineEvent(request.id, { type: "system", text: "Front desk started working the request.", at: "Now" }); }} className="rounded-full bg-[#0060F0] px-3 py-1 text-xs font-medium text-white">Start</button>
+                            <button onClick={() => { actions.updateRequestStatus(request.id, "in_progress"); actions.updateRequestWorkflow(request.id, { resolutionState: "staff_dispatched" }); actions.addTimelineEvent(request.id, { type: "system", text: "Front desk started working the request.", at: "Now" }); }} className={actionChip}>Start</button>
                           ) : null}
                           {request.resolutionState !== "awaiting_verification" && request.status !== "resolved" ? (
-                            <button onClick={() => { actions.updateRequestWorkflow(request.id, { resolutionState: "awaiting_verification" }); actions.addTimelineEvent(request.id, { type: "ai", text: "We believe this is taken care of. Please reply here if anything still needs attention.", at: "Now" }); }} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600">Await verify</button>
+                            <button onClick={() => { actions.updateRequestWorkflow(request.id, { resolutionState: "awaiting_verification" }); actions.addTimelineEvent(request.id, { type: "ai", text: "We believe this is taken care of. Please reply here if anything still needs attention.", at: "Now" }); }} className={actionChip}>Await verify</button>
                           ) : null}
                           {request.status !== "resolved" ? (
-                            <button onClick={() => { actions.updateRequestStatus(request.id, "resolved"); actions.updateRequestWorkflow(request.id, { resolutionState: "closed" }); actions.addTimelineEvent(request.id, { type: "ai", text: "Your request is complete. Let us know if you need anything else.", at: "Now" }); }} className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">Close</button>
+                            <button onClick={() => { actions.updateRequestStatus(request.id, "resolved"); actions.updateRequestWorkflow(request.id, { resolutionState: "closed" }); actions.addTimelineEvent(request.id, { type: "ai", text: "Your request is complete. Let us know if you need anything else.", at: "Now" }); }} className={actionChip}>Close</button>
                           ) : null}
                           {request.assignedTo !== "Front desk" ? (
-                            <button onClick={() => { actions.assignRequest(request.id, "Front desk"); actions.updateRequestWorkflow(request.id, { routeTeam: "Front desk", triageStatus: "approved", dispatcher: "Front desk" }); actions.addTimelineEvent(request.id, { type: "system", text: "Request assigned to front desk.", at: "Now" }); }} className="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 border border-slate-200">Assign desk</button>
+                            <button onClick={() => { actions.assignRequest(request.id, "Front desk"); actions.updateRequestWorkflow(request.id, { routeTeam: "Front desk", triageStatus: "approved", dispatcher: "Front desk" }); actions.addTimelineEvent(request.id, { type: "system", text: "Request assigned to front desk.", at: "Now" }); }} className={actionChip}>Assign desk</button>
                           ) : null}
                           {request.triageStatus === "needs_review" ? (
-                            <button onClick={() => { actions.updateRequestWorkflow(request.id, { triageStatus: "approved", escalationOwner: null, handoffNote: null, dispatcher: "Front desk" }); actions.addTimelineEvent(request.id, { type: "system", text: "Desk reviewed and approved the current routing path.", at: "Now" }); }} className="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 border border-slate-200">Approve routing</button>
+                            <button onClick={() => { actions.updateRequestWorkflow(request.id, { triageStatus: "approved", escalationOwner: null, handoffNote: null, dispatcher: "Front desk" }); actions.addTimelineEvent(request.id, { type: "system", text: "Desk reviewed and approved the current routing path.", at: "Now" }); }} className={actionChip}>Approve routing</button>
                           ) : null}
-                          <Link href={`/hotel/requests/${request.id}`} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600">Open thread</Link>
+                          <Link href={`/hotel/requests/${request.id}`} className={actionChip}>Open thread</Link>
                         </div>
                       </div>
                     );

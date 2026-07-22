@@ -6,6 +6,9 @@ import { useHotelDemoState } from "@/lib/hotel-demo-store";
 export default function HotelInspectionsPage() {
   const { state, actions, loaded } = useHotelDemoState();
 
+  const chipBase = "inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700";
+  const actionChip = "inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700";
+
   if (!loaded) return null;
 
   return (
@@ -14,7 +17,7 @@ export default function HotelInspectionsPage() {
         <HotelPageHeader
           title="Room inspections"
           body="QA the room turn before it goes back into sellable inventory. Catch missed amenities, cleanliness issues, damage, and setup problems before the next guest does."
-          action={<div className="rounded-full bg-[#f7f1e8] px-4 py-2 text-sm font-medium text-black/60">{state.inspections.filter((item) => item.status !== "passed").length} rooms need QA</div>}
+          action={<div className={chipBase}>{state.inspections.filter((item) => item.status !== "passed").length} rooms need QA</div>}
         />
 
         <div className="space-y-3">
@@ -35,7 +38,7 @@ export default function HotelInspectionsPage() {
                 {item.status === "pending" ? (
                   <button
                     onClick={() => actions.updateInspectionStatus(item.id, "in_progress")}
-                    className="rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-medium text-[#1C1A16]"
+                    className={actionChip}
                   >
                     Start inspection
                   </button>
@@ -47,7 +50,7 @@ export default function HotelInspectionsPage() {
                       actions.updateRoomStatus(item.room, "ready");
                       actions.updateRoomNote(item.room, "Inspected and cleared for next arrival.");
                     }}
-                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                    className={actionChip}
                   >
                     Pass room
                   </button>
@@ -59,14 +62,14 @@ export default function HotelInspectionsPage() {
                       actions.updateRoomStatus(item.room, "queued");
                       actions.updateRoomNote(item.room, "Inspection failed; room sent back for correction.");
                     }}
-                    className="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-700"
+                    className={actionChip}
                   >
                     Fail and send back
                   </button>
                 ) : null}
                 <button
                   onClick={() => actions.updateInspectionNote(item.id, `${item.note} Inspector added photo notes and pinged housekeeping by text.`)}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className={actionChip}
                 >
                   Add QA note
                 </button>

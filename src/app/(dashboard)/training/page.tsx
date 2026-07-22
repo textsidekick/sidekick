@@ -78,13 +78,20 @@ function timeAgo(dateStr: string) {
 function statusPill(status: string, currentStep: number, total: number) {
   const pct = total > 0 ? Math.round((currentStep - 1) / total * 100) : 0;
   const styles: Record<string, string> = {
-    completed: "bg-green-100 text-green-800",
-    in_progress: "bg-blue-100 text-blue-800",
-    not_started: "bg-gray-100 text-gray-600",
-    paused: "bg-amber-100 text-amber-800",
+    completed: "bg-white text-slate-700 border border-slate-200",
+    in_progress: "bg-white text-slate-700 border border-slate-200",
+    not_started: "bg-slate-100 text-slate-600 border border-slate-200",
+    paused: "bg-white text-slate-700 border border-slate-200",
+  };
+  const dots: Record<string, string> = {
+    completed: "bg-emerald-500",
+    in_progress: "bg-blue-500",
+    not_started: "bg-slate-400",
+    paused: "bg-amber-500",
   };
   return (
-    <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", styles[status] || "bg-gray-100 text-gray-600")}>
+    <span className={cn("inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium", styles[status] || "bg-slate-100 text-slate-600 border border-slate-200")}>
+      <span className={cn("h-1.5 w-1.5 rounded-full", dots[status] || "bg-slate-400")} />
       {status === "in_progress" ? `Step ${currentStep} · ${pct}%` : status.replace("_", " ")}
     </span>
   );
@@ -276,12 +283,12 @@ function PathDetailModal({
             <h2 className="text-lg font-bold text-gray-900">{path?.name || "Loading..."}</h2>
             <div className="mt-1 flex flex-wrap items-center gap-2">
               {deptName && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-[#F4F7FA] px-2.5 py-0.5 text-xs font-medium text-[#0060F0]">
+                <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
                   <Building2 className="h-3 w-3" /> {deptName}
                 </span>
               )}
               {path?.role && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">
+                <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
                   <Users className="h-3 w-3" /> {path.role}
                 </span>
               )}
@@ -382,7 +389,7 @@ function PathDetailModal({
                           <p className={cn("text-xs", new Date(e.due_date) < new Date() && e.status !== "completed" ? "text-red-500 font-semibold" : "text-gray-400")}>
                             {t("Due date")}: {new Date(e.due_date).toLocaleDateString()}
                             {new Date(e.due_date) < new Date() && e.status !== "completed" && (
-                              <span className="ml-1.5 rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-bold text-red-700">{t("Overdue")}</span>
+                              <span className="ml-1.5 inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">{t("Overdue")}</span>
                             )}
                           </p>
                         )}
@@ -885,12 +892,12 @@ export default function TrainingPage() {
                     {/* Department + Role tags */}
                     <div className="mt-2 flex flex-wrap items-center gap-2">
                       {deptName && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-[#F4F7FA] px-2.5 py-0.5 text-xs font-medium text-[#0060F0]">
+                        <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
                           <Building2 className="h-3 w-3" /> {deptName}
                         </span>
                       )}
                       {path.role && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">
+                        <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
                           <Users className="h-3 w-3" /> {path.role}
                         </span>
                       )}
@@ -908,12 +915,12 @@ export default function TrainingPage() {
                           <Users className="h-3.5 w-3.5" />
                           {path.enrollment.total} worker{path.enrollment.total !== 1 ? "s" : ""} enrolled
                           {path.enrollment.in_progress > 0 && (
-                            <span className="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700">
+                            <span className="ml-1 inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
                               {path.enrollment.in_progress} in progress
                             </span>
                           )}
                           {path.enrollment.completed > 0 && (
-                            <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-700">
+                            <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
                               {path.enrollment.completed} completed
                             </span>
                           )}
