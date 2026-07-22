@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { BedDouble, DoorOpen, Wrench } from "lucide-react";
+import { BedDouble, DoorOpen, MessagesSquare, ClipboardList, Camera, Mic, Wrench } from "lucide-react";
 import { HotelPageHeader, HotelStatusPill } from "@/components/hotel/HotelUi";
 import { useHotelDemoState } from "@/lib/hotel-demo-store";
 
@@ -103,7 +103,7 @@ export default function HotelOverviewPage() {
         />
 
         <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm shadow-slate-200/40">
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
             {todaySummary.map((item) => (
               <div key={item.label} className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
                 <div className="flex items-center justify-between gap-3">
@@ -115,7 +115,16 @@ export default function HotelOverviewPage() {
                 </div>
               </div>
             ))}
-            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 xl:col-span-1">
+            <Link href="/hotel/conversations" className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 transition-colors hover:bg-slate-50">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Conversations</div>
+                  <div className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-[#17202B]">{openRequests.length}</div>
+                </div>
+                <MessagesSquare className="h-5 w-5 text-slate-400" />
+              </div>
+            </Link>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
               <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Staff on shift</div>
               <div className="mt-2 space-y-1.5">
                 {state.staff.slice(0, 3).map((person) => (
@@ -170,6 +179,16 @@ export default function HotelOverviewPage() {
               <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Today</div>
               <h2 className="mt-2 text-lg font-semibold tracking-[-0.03em] text-[#17202B]">Only what matters</h2>
               <div className="mt-4 space-y-4">
+                <div className="grid gap-2">
+                  <Link href="/hotel/conversations" className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-700 hover:bg-slate-50">
+                    <span className="font-medium">Open conversations</span>
+                    <MessagesSquare className="h-4 w-4 text-slate-400" />
+                  </Link>
+                  <Link href="/hotel/tasks" className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-700 hover:bg-slate-50">
+                    <span className="font-medium">Open tasks</span>
+                    <ClipboardList className="h-4 w-4 text-slate-400" />
+                  </Link>
+                </div>
                 <div>
                   <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Arrivals</div>
                   <div className="mt-2 space-y-2">
@@ -207,19 +226,23 @@ export default function HotelOverviewPage() {
             </div>
 
             <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Occupancy</div>
-              <h2 className="mt-2 text-lg font-semibold tracking-[-0.03em] text-[#17202B]">In house</h2>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Reporting + learning</div>
+              <h2 className="mt-2 text-lg font-semibold tracking-[-0.03em] text-[#17202B]">What makes Sidekick different</h2>
+              <div className="mt-3 flex items-center gap-2 text-sm text-slate-600">
+                <Camera className="h-4 w-4 text-slate-400" />
+                Staff can send photos and videos from the field
+              </div>
+              <div className="mt-3 flex items-center gap-2 text-sm text-slate-600">
+                <Mic className="h-4 w-4 text-slate-400" />
+                Voice notes can turn into tracked work and context
+              </div>
               <div className="mt-3 flex items-center gap-2 text-sm text-slate-600">
                 <BedDouble className="h-4 w-4 text-slate-400" />
-                {occupiedRooms.length} occupied · {availableRooms.length} available
+                Every conversation can become hotel memory for next time
               </div>
               <div className="mt-3 flex items-center gap-2 text-sm text-slate-600">
                 <DoorOpen className="h-4 w-4 text-slate-400" />
-                {roomsNeedingAttention.length} rooms need work before they can be sold
-              </div>
-              <div className="mt-3 flex items-center gap-2 text-sm text-slate-600">
-                <Wrench className="h-4 w-4 text-slate-400" />
-                {openRequests.length} open guest or maintenance issues
+                {occupiedRooms.length} occupied · {availableRooms.length} available right now
               </div>
             </div>
 

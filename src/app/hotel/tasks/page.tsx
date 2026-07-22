@@ -24,6 +24,16 @@ export default function HotelTasksPage() {
           action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{openTasks.length} open tasks</div>}
         />
 
+        <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Task model</div>
+          <div className="mt-3 grid gap-3 md:grid-cols-4">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">Created from a guest or staff text</div>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">Carries owner, priority, and status</div>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">Keeps photos, videos, voice, and thread context attached</div>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">Closes the loop back to the guest automatically</div>
+          </div>
+        </div>
+
         <div className="mb-6 grid gap-4 md:grid-cols-4">
           <Metric label="New" value={newTasks.length} detail="Needs routing or owner confirm" />
           <Metric label="Working" value={activeTasks.length} detail="Owner is handling it" />
@@ -57,6 +67,11 @@ export default function HotelTasksPage() {
                     <div className="mt-1"><span className="font-semibold text-[#17202B]">Priority:</span> {task.priority}</div>
                     <div className="mt-1"><span className="font-semibold text-[#17202B]">Status:</span> {task.resolutionState?.replace(/_/g, " ") || "new"}</div>
                     <div className="mt-1"><span className="font-semibold text-[#17202B]">Source:</span> {task.source}</div>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                    <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-600">Conversation-linked</span>
+                    <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-600">Media-ready</span>
+                    <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-600">Learns from follow-up</span>
                   </div>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <Link href={`/hotel/requests/${task.id}`} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">Open conversation</Link>

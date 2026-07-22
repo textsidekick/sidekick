@@ -44,6 +44,21 @@ export default function HotelConversationsPage() {
         />
 
         <div className="mb-6 grid gap-4 md:grid-cols-3">
+          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Guest side</div>
+            <div className="mt-2 text-sm leading-6 text-slate-600">Guests should just text Sidekick for questions, towels, cleaning, issues, or room updates.</div>
+          </div>
+          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Staff side</div>
+            <div className="mt-2 text-sm leading-6 text-slate-600">Housekeeping and maintenance should text updates naturally without learning a heavy tool.</div>
+          </div>
+          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Media-ready</div>
+            <div className="mt-2 text-sm leading-6 text-slate-600">Photos, videos, and voice notes should attach directly to the conversation and carry into the task history.</div>
+          </div>
+        </div>
+
+        <div className="mb-6 grid gap-4 md:grid-cols-3">
           {columns.map((column) => (
             <div key={column.key} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
               <div className="flex items-center justify-between gap-3">
@@ -88,6 +103,7 @@ export default function HotelConversationsPage() {
                       <div className="mt-3 flex flex-wrap gap-2 text-xs">
                         <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-600">Text thread</span>
                         <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-600">Photo / video / voice ready</span>
+                        <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-600">Learns property context</span>
                       </div>
                       <div className="mt-3 flex flex-wrap gap-2">
                         <Link href={`/hotel/requests/${request.id}`} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">Open conversation</Link>
