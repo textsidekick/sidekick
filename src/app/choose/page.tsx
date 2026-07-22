@@ -12,13 +12,9 @@ export default function ChoosePage() {
       background: "#F4F7FA", fontFamily: "'Inter', system-ui, sans-serif", padding: 20,
     }}>
       <div style={{ width: "100%", maxWidth: 480, textAlign: "center" }}>
-        <div style={{
-          width: 56, height: 56, margin: "0 auto 24px",
-          background: "#0060F0", borderRadius: 14,
-          display: "flex", alignItems: "center", justifyContent: "center",
-        }}>
-          <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={36} height={36}
-            style={{ objectFit: "contain", filter: "brightness(0) invert(1)" }} />
+        <div style={{ margin: "0 auto 24px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Image src="/images/logo/sidekick-logo-blue.png" alt="Sidekick" width={42} height={42}
+            style={{ objectFit: "contain" }} />
         </div>
         <h1 style={{ fontSize: 26, fontWeight: 600, color: "#1C1A16", marginBottom: 8, letterSpacing: "-0.02em" }}>
           Welcome back

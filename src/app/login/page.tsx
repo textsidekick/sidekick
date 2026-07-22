@@ -125,12 +125,8 @@ export default function LoginPage() {
         border: "1px solid rgba(28,26,22,0.06)",
       }}>
         <div style={{ textAlign: "center", marginBottom: 36 }}>
-          <div style={{
-            width: 56, height: 56, margin: "0 auto 20px",
-            background: "#0060F0", borderRadius: 14,
-            display: "flex", alignItems: "center", justifyContent: "center", padding: 10,
-          }}>
-            <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={36} height={36} style={{ objectFit: "contain", filter: "brightness(0) invert(1)" }} />
+          <div style={{ margin: "0 auto 20px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Image src="/images/logo/sidekick-logo-blue.png" alt="Sidekick" width={42} height={42} style={{ objectFit: "contain" }} />
           </div>
           <h1 style={{
             fontSize: 26, fontWeight: 600, color: "#17202B", marginBottom: 8,

@@ -128,15 +128,13 @@ export function HotelSidebar() {
       <aside className="fixed left-0 top-0 bottom-0 z-40 hidden w-[250px] border-r border-slate-200 bg-[#182430] lg:block">
         <div className="flex h-full min-h-0 flex-col overflow-hidden">
         <div className="flex h-16 shrink-0 items-center gap-3 border-b border-white/10 px-5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#0060F0] p-1.5 shadow-[0_8px_24px_rgba(0,96,240,0.25)]">
-            <Image
-              src="/images/logo/newsidekicklogo.png"
-              alt="Sidekick"
-              width={28}
-              height={28}
-              style={{ objectFit: "contain", filter: "brightness(0) invert(1)" }}
+          <Image
+            src="/images/logo/newsidekicklogo.png"
+            alt="Sidekick"
+            width={30}
+            height={30}
+            style={{ objectFit: "contain", filter: "brightness(0) invert(1)" }}
           />
-          </div>
           <div>
             <div className="text-[17px] font-semibold tracking-[-0.02em] text-white">Sidekick</div>
             <div className="text-xs text-slate-300">Hotels</div>

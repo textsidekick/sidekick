@@ -24,6 +24,14 @@ function MetricCard({
   previousValue, change, valueClassName, dateRange, isHighlighted = false, accentColor, action,
 }: MetricCardProps) {
   const TrendIcon = change !== undefined ? (change > 0 ? TrendingUp : change < 0 ? TrendingDown : Minus) : null
+  const trendClassName =
+    change === undefined
+      ? 'text-slate-500'
+      : change < 0
+        ? 'text-red-600'
+        : change > 0
+          ? 'text-slate-500'
+          : 'text-slate-400'
 
   const borderClass = isHighlighted ? 'border-blue-200' : 'border-slate-200'
   const accentClass = ''
@@ -43,7 +51,7 @@ function MetricCard({
       <div className="mt-2 flex items-center gap-2">
         {previousValue !== undefined && <span className="text-xs text-slate-400">{previousValue}</span>}
         {change !== undefined && TrendIcon && (
-          <span className="inline-flex items-center gap-0.5 text-xs text-slate-500">
+          <span className={`inline-flex items-center gap-0.5 text-xs ${trendClassName}`}>
             {change > 0 ? '+' : ''}{change.toFixed(1)}%
             <TrendIcon className="h-3 w-3" />
           </span>

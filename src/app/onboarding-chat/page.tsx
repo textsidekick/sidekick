@@ -471,9 +471,7 @@ export default function OnboardingChat() {
       <div style={{ width: LEFT_SIDEBAR_WIDTH, background: "white", borderRight: "1px solid rgba(28,26,22,0.06)", display: "flex", flexDirection: "column", position: "fixed", top: 0, bottom: 0, zIndex: 50 }}>
         {/* Logo */}
         <div style={{ height: 72, display: "flex", alignItems: "center", gap: 14, padding: "0 24px", borderBottom: "1px solid rgba(28,26,22,0.06)" }}>
-          <div style={{ width: 40, height: 40, background: "#0060F0", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", padding: 6 }}>
-            <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={28} height={28} style={{ objectFit: "contain", filter: "brightness(0) invert(1)" }} />
-          </div>
+          <Image src="/images/logo/sidekick-logo-blue.png" alt="Sidekick" width={30} height={30} style={{ objectFit: "contain" }} />
           <span style={{ fontSize: 22, fontWeight: 700, color: "#1C1A16", letterSpacing: "-0.02em" }}>Sidekick</span>
         </div>
 

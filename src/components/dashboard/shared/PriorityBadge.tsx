@@ -10,10 +10,17 @@ type SettingsResponse = {
 };
 
 const PRIORITY_CLASSES: Record<string, string> = {
-  critical: "bg-red-600 text-white",
-  high: "bg-red-50 text-red-800 border border-red-100",
-  medium: "bg-amber-50 text-amber-800 border border-amber-100",
+  critical: "bg-slate-900 text-white border border-slate-900",
+  high: "bg-white text-slate-700 border border-slate-200",
+  medium: "bg-white text-slate-700 border border-slate-200",
   low: "bg-slate-100 text-slate-700 border border-slate-200",
+};
+
+const PRIORITY_DOT_CLASSES: Record<string, string> = {
+  critical: "bg-white/80",
+  high: "bg-red-500",
+  medium: "bg-amber-500",
+  low: "bg-slate-400",
 };
 
 const DEFAULT_PRIORITY_LABELS: PriorityLabels = {
@@ -79,6 +86,7 @@ async function loadPriorityLabels(): Promise<PriorityLabels> {
 export function PriorityBadge({ priority }: { priority: string }) {
   const normalizedPriority = priority.toLowerCase();
   const cls = PRIORITY_CLASSES[normalizedPriority] ?? "bg-slate-100 text-gray-800";
+  const dotCls = PRIORITY_DOT_CLASSES[normalizedPriority] ?? "bg-slate-400";
   const [label, setLabel] = useState(() => cachedPriorityLabels?.[normalizedPriority] || loadPriorityLabelsFromLocalStorage()?.[normalizedPriority] || fallbackLabel(priority));
 
   useEffect(() => {
@@ -92,7 +100,8 @@ export function PriorityBadge({ priority }: { priority: string }) {
   }, [normalizedPriority, priority]);
 
   return (
-    <span className={cn("text-xs font-medium px-2 py-1 rounded-md", cls)}>
+    <span className={cn("inline-flex items-center gap-2 text-xs font-medium px-2.5 py-1 rounded-md", cls)}>
+      <span className={cn("h-1.5 w-1.5 rounded-full", dotCls)} />
       {label}
     </span>
   );

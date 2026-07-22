@@ -112,9 +112,7 @@ export function Sidebar() {
     <div className="fixed left-0 top-0 bottom-0 w-[220px] bg-[#182430] border-r border-white/10 flex flex-col z-50">
       {/* Logo area */}
       <div style={{ height: 64, display: 'flex', alignItems: 'center', gap: 12, padding: '0 20px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-        <div style={{ width: 36, height: 36, background: '#0060F0', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 5 }}>
-          <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={26} height={26} style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
-        </div>
+        <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={30} height={30} style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
         <span style={{ fontSize: 18, fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.02em' }}>Sidekick</span>
         {/* Mobile close button */}
         <button

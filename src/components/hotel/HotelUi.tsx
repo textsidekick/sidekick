@@ -45,12 +45,25 @@ export function HotelQueueCard({ href, icon: Icon, title, count, detail }: { hre
 
 export function HotelStatusPill({ tone, children }: { tone: "urgent" | "high" | "normal" | "resolved" | "queued"; children: React.ReactNode }) {
   const styles = {
-    urgent: "bg-red-50 text-red-700 border border-red-100",
-    high: "bg-amber-50 text-amber-700 border border-amber-100",
+    urgent: "bg-white text-slate-700 border border-slate-200",
+    high: "bg-white text-slate-700 border border-slate-200",
     normal: "bg-slate-100 text-slate-700 border border-slate-200",
-    resolved: "bg-emerald-50 text-emerald-700 border border-emerald-100",
-    queued: "bg-blue-50 text-blue-700 border border-blue-100",
+    resolved: "bg-white text-slate-700 border border-slate-200",
+    queued: "bg-white text-slate-700 border border-slate-200",
   } as const;
 
-  return <div className={cn("rounded-full px-3 py-1 text-xs font-semibold", styles[tone])}>{children}</div>;
+  const dots = {
+    urgent: "bg-red-500",
+    high: "bg-amber-500",
+    normal: "bg-slate-400",
+    resolved: "bg-emerald-500",
+    queued: "bg-blue-500",
+  } as const;
+
+  return (
+    <div className={cn("inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold", styles[tone])}>
+      <span className={cn("h-1.5 w-1.5 rounded-full", dots[tone])} />
+      {children}
+    </div>
+  );
 }
