@@ -14,7 +14,7 @@ export default function HotelParkingPage() {
         <HotelPageHeader
           title="Parking board"
           body="Front-desk vehicle workflows: oversized vehicles, EV charging access, plate capture, and lot exceptions that can quickly spill into service recovery or safety issues."
-          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.parkingItems.filter((item) => item.status !== "cleared").length} active parking issues</div>}
+          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.parkingItems.filter((item) => item.status !== "cleared").length} active parking issues</div>}
         />
 
         <div className="space-y-3">
@@ -28,12 +28,12 @@ export default function HotelParkingPage() {
                 </div>
                 <HotelStatusPill tone={item.status === "escalated" ? "urgent" : item.status === "pending" ? "queued" : "resolved"}>{item.status}</HotelStatusPill>
               </div>
-              <div className="mt-4 rounded-2xl bg-[#fffdfa] px-4 py-3 text-sm leading-6 text-black/60">{item.note}</div>
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">{item.note}</div>
               <div className="mt-4 flex flex-wrap gap-2">
                 {item.status !== "cleared" ? (
                   <button
                     onClick={() => actions.updateParkingStatus(item.id, "cleared")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Mark cleared
                   </button>
@@ -41,14 +41,14 @@ export default function HotelParkingPage() {
                 {item.status === "pending" ? (
                   <button
                     onClick={() => actions.updateParkingStatus(item.id, "escalated")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Escalate to manager
                   </button>
                 ) : null}
                 <button
                   onClick={() => actions.updateParkingNote(item.id, `${item.note} Plate confirmed and guest comms updated.`)}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Add parking note
                 </button>

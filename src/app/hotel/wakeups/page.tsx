@@ -14,7 +14,7 @@ export default function HotelWakeupsPage() {
         <HotelPageHeader
           title="Wake-up calls"
           body="Front-desk morning follow-through for guest wake-up requests, backup texts, shuttle departures, and early-flight handoff quality."
-          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.wakeupItems.filter((item) => item.status !== "completed").length} active wake-ups</div>}
+          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.wakeupItems.filter((item) => item.status !== "completed").length} active wake-ups</div>}
         />
 
         <div className="space-y-3">
@@ -28,12 +28,12 @@ export default function HotelWakeupsPage() {
                 </div>
                 <HotelStatusPill tone={item.status === "completed" ? "resolved" : item.status === "confirmed" ? "queued" : "high"}>{item.status}</HotelStatusPill>
               </div>
-              <div className="mt-4 rounded-2xl bg-[#fffdfa] px-4 py-3 text-sm leading-6 text-black/60">{item.note}</div>
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">{item.note}</div>
               <div className="mt-4 flex flex-wrap gap-2">
                 {item.status === "scheduled" ? (
                   <button
                     onClick={() => actions.updateWakeupStatus(item.id, "confirmed")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Confirm backup text
                   </button>
@@ -41,14 +41,14 @@ export default function HotelWakeupsPage() {
                 {item.status !== "completed" ? (
                   <button
                     onClick={() => actions.updateWakeupStatus(item.id, "completed")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Mark completed
                   </button>
                 ) : null}
                 <button
                   onClick={() => actions.updateWakeupNote(item.id, `${item.note} Morning follow-up note added.`)}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Add wake-up note
                 </button>

@@ -312,7 +312,7 @@ export default function UpdatesPage() {
       <div className={cn("mt-6 grid gap-6", hasUpdates && "xl:grid-cols-[1.5fr_1fr]")}>
         <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
           <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F4F7FA]">
+            <div className="flex h-10 w-10 items-center justify-center">
               <MessageSquare className="h-5 w-5 text-gray-500" />
             </div>
             <div>
@@ -359,7 +359,7 @@ export default function UpdatesPage() {
             </div>
             <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
               <div className="flex items-start gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F4F7FA]">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center">
                   <Smartphone className="h-4 w-4 text-gray-500" />
                 </div>
                 <div>
@@ -379,7 +379,7 @@ export default function UpdatesPage() {
           <div className="space-y-6">
             <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F4F7FA]">
+                <div className="flex h-10 w-10 items-center justify-center">
                   <Sparkles className="h-5 w-5 text-[#0060F0]" />
                 </div>
                 <div>
@@ -418,7 +418,7 @@ export default function UpdatesPage() {
                         {chips.length > 0 && (
                           <div className="mt-2 flex flex-wrap gap-1.5">
                             {chips.map((chip) => (
-                              <span key={chip} className="rounded-full bg-[#F4F7FA] px-2 py-0.5 text-xs text-gray-700">{chip}</span>
+                              <span key={chip} className="rounded-md border border-slate-200 bg-white px-2 py-0.5 text-xs text-gray-700">{chip}</span>
                             ))}
                           </div>
                         )}

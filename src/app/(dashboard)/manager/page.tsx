@@ -447,7 +447,7 @@ export default function ManagerDashboard() {
                       <div className="mt-1 text-xs text-black/45">Open this queue in Inbox and work through the items from there.</div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="rounded-full bg-white/80 px-2.5 py-1 text-xs font-semibold text-black/65">{queue.count}</span>
+                      <span className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-black/65">{queue.count}</span>
                       <ArrowRight className="h-4 w-4 text-black/25" />
                     </div>
                   </a>

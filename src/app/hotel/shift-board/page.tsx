@@ -79,7 +79,7 @@ export default function HotelShiftBoardPage() {
             <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">Shift snapshot</div>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               {shiftSnapshot.map((item) => (
-                <div key={item} className="rounded-2xl bg-white/90 px-4 py-3 text-sm text-black/65">{item}</div>
+                <div key={item} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">{item}</div>
               ))}
             </div>
           </div>
@@ -93,13 +93,13 @@ export default function HotelShiftBoardPage() {
                   </div>
                   <button
                     onClick={() => actions.updateShiftNote(item.team, `${item.note} Handoff note confirmed.`)}
-                    className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                   >
                     Confirm handoff
                   </button>
                 </div>
 
-                <div className="mt-4 rounded-2xl bg-[#fffdfa] p-4">
+                <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
                   <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/35">Generated handoff priorities</div>
                   <div className="mt-3 space-y-2">
                     {(generatedHandoff[item.team as keyof typeof generatedHandoff] || []).length ? (
@@ -121,7 +121,7 @@ export default function HotelShiftBoardPage() {
                         if (!priorities.length) return;
                         actions.updateShiftNote(item.team, `${item.note} Priority handoff: ${priorities.join(" ")}`);
                       }}
-                      className="rounded-full bg-[#26251e] px-3 py-1.5 text-xs font-medium text-white"
+                      className="rounded-lg bg-slate-700 px-3 py-2 text-xs font-medium text-white hover:bg-slate-800"
                     >
                       Append generated handoff
                     </button>

@@ -125,7 +125,7 @@ export default function HotelRequestDetailPage() {
                     actions.addTimelineEvent(request.id, { type: "staff", text: message.trim(), at: "Now" });
                     setMessage("");
                   }}
-                  className="rounded-full bg-[#26251e] px-4 py-2 text-sm font-medium text-white"
+                  className="rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
                 >
                   Log internal update
                 </button>
@@ -134,7 +134,7 @@ export default function HotelRequestDetailPage() {
                     actions.addTimelineEvent(request.id, { type: "ai", text: "Your request is still being worked on. We’ll update you again shortly.", at: "Now" });
                     actions.updateRequestWorkflow(request.id, { resolutionState: "guest_updated" });
                   }}
-                  className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-medium text-black/60"
+                  className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Send guest update
                 </button>
@@ -146,10 +146,10 @@ export default function HotelRequestDetailPage() {
               <div className="mt-3 space-y-2 text-sm leading-6 text-black/65">
                 {triageSteps.length ? (
                   triageSteps.map((step) => (
-                    <div key={step} className="rounded-2xl bg-[#fffdfa] px-4 py-3">{step}</div>
+                    <div key={step} className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">{step}</div>
                   ))
                 ) : (
-                  <div className="rounded-2xl bg-[#fffdfa] px-4 py-3">Guest is already stable. Keep one final follow-up on the thread and close the loop.</div>
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">Guest is already stable. Keep one final follow-up on the thread and close the loop.</div>
                 )}
               </div>
             </div>
@@ -176,7 +176,7 @@ export default function HotelRequestDetailPage() {
                 <span className="font-semibold">Handoff / review note:</span> {request.handoffNote}
               </div>
             ) : null}
-            <div className="mt-4 flex items-center justify-between rounded-2xl bg-[#fffdfa] px-4 py-3 text-sm text-black/60">
+            <div className="mt-4 flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
               <div>
                 <div className="text-xs font-semibold uppercase tracking-[0.14em] text-black/35">Resolution state</div>
                 <div className="mt-1 text-[#1C1A16]">{request.resolutionState?.replace(/_/g, " ") || "new"}</div>
@@ -184,7 +184,7 @@ export default function HotelRequestDetailPage() {
               <HotelStatusPill tone={resolutionTone}>{request.resolutionState?.replace(/_/g, " ") || "new"}</HotelStatusPill>
             </div>
             {room ? (
-              <div className="mt-4 rounded-2xl bg-[#fffdfa] px-4 py-3 text-sm leading-6 text-black/60">
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
                 <span className="font-semibold text-[#1C1A16]">Room note:</span> {room.note}
               </div>
             ) : null}
@@ -196,13 +196,13 @@ export default function HotelRequestDetailPage() {
               </div>
             ) : null}
             <div className="mt-5 flex flex-wrap gap-2">
-              {request.status !== "resolved" ? <button onClick={() => actions.updateRequestStatus(request.id, "resolved")} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">Resolve</button> : null}
-              {request.status !== "in_progress" && request.status !== "resolved" ? <button onClick={() => actions.updateRequestStatus(request.id, "in_progress")} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">Start</button> : null}
-              {request.assignedTo !== "Front desk" ? <button onClick={() => { actions.assignRequest(request.id, "Front desk"); actions.updateRequestWorkflow(request.id, { routeTeam: "Front desk", triageStatus: "approved", dispatcher: "Front desk" }); actions.addTimelineEvent(request.id, { type: "system", text: "Request routed to front desk from the thread view.", at: "Now" }); }} className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60">Assign front desk</button> : null}
-              {request.assignedTo !== "Housekeeping" ? <button onClick={() => { actions.assignRequest(request.id, "Housekeeping"); actions.updateRequestWorkflow(request.id, { routeTeam: "Housekeeping", triageStatus: "approved", dispatcher: "Front desk" }); actions.addTimelineEvent(request.id, { type: "system", text: "Thread rerouted to housekeeping for room follow-through.", at: "Now" }); }} className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60">Assign housekeeping</button> : null}
-              {request.assignedTo !== "Maintenance" ? <button onClick={() => { actions.assignRequest(request.id, "Maintenance"); actions.updateRequestWorkflow(request.id, { routeTeam: "Maintenance", triageStatus: "approved", dispatcher: "Front desk" }); actions.addTimelineEvent(request.id, { type: "system", text: "Thread rerouted to maintenance with guest-visible follow-up pending.", at: "Now" }); }} className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60">Assign maintenance</button> : null}
-              {request.triageStatus === "needs_review" ? <button onClick={() => { actions.updateRequestWorkflow(request.id, { triageStatus: "approved", escalationOwner: null, handoffNote: null, dispatcher: "Front desk" }); actions.addTimelineEvent(request.id, { type: "system", text: "Desk reviewed and approved the routing from the thread view.", at: "Now" }); }} className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60">Approve routing</button> : null}
-              {request.resolutionState !== "awaiting_verification" && request.status !== "resolved" ? <button onClick={() => { actions.updateRequestWorkflow(request.id, { resolutionState: "awaiting_verification" }); actions.addTimelineEvent(request.id, { type: "staff", text: "Internal work is done. Waiting on guest confirmation before closing.", at: "Now" }); }} className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60">Await guest confirm</button> : null}
+              {request.status !== "resolved" ? <button onClick={() => actions.updateRequestStatus(request.id, "resolved")} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">Resolve</button> : null}
+              {request.status !== "in_progress" && request.status !== "resolved" ? <button onClick={() => actions.updateRequestStatus(request.id, "in_progress")} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">Start</button> : null}
+              {request.assignedTo !== "Front desk" ? <button onClick={() => { actions.assignRequest(request.id, "Front desk"); actions.updateRequestWorkflow(request.id, { routeTeam: "Front desk", triageStatus: "approved", dispatcher: "Front desk" }); actions.addTimelineEvent(request.id, { type: "system", text: "Request routed to front desk from the thread view.", at: "Now" }); }} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">Assign front desk</button> : null}
+              {request.assignedTo !== "Housekeeping" ? <button onClick={() => { actions.assignRequest(request.id, "Housekeeping"); actions.updateRequestWorkflow(request.id, { routeTeam: "Housekeeping", triageStatus: "approved", dispatcher: "Front desk" }); actions.addTimelineEvent(request.id, { type: "system", text: "Thread rerouted to housekeeping for room follow-through.", at: "Now" }); }} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">Assign housekeeping</button> : null}
+              {request.assignedTo !== "Maintenance" ? <button onClick={() => { actions.assignRequest(request.id, "Maintenance"); actions.updateRequestWorkflow(request.id, { routeTeam: "Maintenance", triageStatus: "approved", dispatcher: "Front desk" }); actions.addTimelineEvent(request.id, { type: "system", text: "Thread rerouted to maintenance with guest-visible follow-up pending.", at: "Now" }); }} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">Assign maintenance</button> : null}
+              {request.triageStatus === "needs_review" ? <button onClick={() => { actions.updateRequestWorkflow(request.id, { triageStatus: "approved", escalationOwner: null, handoffNote: null, dispatcher: "Front desk" }); actions.addTimelineEvent(request.id, { type: "system", text: "Desk reviewed and approved the routing from the thread view.", at: "Now" }); }} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">Approve routing</button> : null}
+              {request.resolutionState !== "awaiting_verification" && request.status !== "resolved" ? <button onClick={() => { actions.updateRequestWorkflow(request.id, { resolutionState: "awaiting_verification" }); actions.addTimelineEvent(request.id, { type: "staff", text: "Internal work is done. Waiting on guest confirmation before closing.", at: "Now" }); }} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">Await guest confirm</button> : null}
               {!recoveryCase ? <button onClick={() => {
                 actions.createServiceCase({
                   id: `svc-${request.id}`,
@@ -215,8 +215,8 @@ export default function HotelRequestDetailPage() {
                   valueAtRisk: request.priority === "urgent" ? "$200+ stay risk" : "$100+ review risk",
                 });
                 actions.addTimelineEvent(request.id, { type: "system", text: "Service recovery case opened from the request thread.", at: "Now" });
-              }} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">Open recovery case</button> : null}
-              <Link href="/hotel/guest-requests" className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60">Back to queue</Link>
+              }} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">Open recovery case</button> : null}
+              <Link href="/hotel/guest-requests" className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">Back to queue</Link>
             </div>
           </div>
         </div>

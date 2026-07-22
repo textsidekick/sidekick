@@ -137,7 +137,7 @@ export default function HotelSmsConsolePage() {
         <HotelPageHeader
           title="SMS console"
           body="Backend-backed hotel SMS simulation. Use this to test guest texts, auto-replies, routing, and how requests land in the hotel operations queues."
-          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">Prototype backend active</div>}
+          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">Prototype backend active</div>}
         />
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
@@ -158,7 +158,7 @@ export default function HotelSmsConsolePage() {
               <textarea value={message} onChange={(e) => setMessage(e.target.value)} className="mt-2 min-h-[120px] w-full rounded-2xl border border-black/10 bg-[#fffdfa] px-3 py-3 text-sm text-[#1C1A16] outline-none" />
             </label>
             <div className="mt-4 flex flex-wrap gap-2">
-              <button onClick={submitSms} disabled={submitting} className="rounded-full bg-[#26251e] px-4 py-2 text-sm font-medium text-white disabled:opacity-60">
+              <button onClick={submitSms} disabled={submitting} className="rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60">
                 {submitting ? "Processing…" : "Process SMS"}
               </button>
               {examples.map((preset) => (
@@ -185,7 +185,7 @@ export default function HotelSmsConsolePage() {
                 <div className="mt-4 space-y-3 text-sm text-black/60">
                   <div>
                     <div className="font-semibold text-[#1C1A16]">Assistant reply</div>
-                    <div className="mt-1 rounded-2xl bg-[#fff7ec] px-3 py-3">{lastResult.assistantReply}</div>
+                    <div className="mt-1 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3">{lastResult.assistantReply}</div>
                   </div>
                   <div className="flex items-center justify-between gap-3">
                     <div>
@@ -198,7 +198,7 @@ export default function HotelSmsConsolePage() {
                   </div>
                   <div>Assigned to {lastResult.request.assignedTo}</div>
                   {createdRequest ? (
-                    <div className="flex items-center justify-between gap-3 rounded-2xl bg-[#fffdfa] px-4 py-3">
+                    <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
                       <div>
                         <div className="text-xs font-semibold uppercase tracking-[0.14em] text-black/35">Resolution state</div>
                         <div className="mt-1 text-sm text-[#1C1A16]">{createdRequest.resolutionState?.replace(/_/g, " ") || "new"}</div>
@@ -206,7 +206,7 @@ export default function HotelSmsConsolePage() {
                       <HotelStatusPill tone={resolutionTone}>{createdRequest.resolutionState?.replace(/_/g, " ") || "new"}</HotelStatusPill>
                     </div>
                   ) : null}
-                  <div className="rounded-2xl bg-[#fffdfa] px-4 py-3">
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
                     <div className="text-xs font-semibold uppercase tracking-[0.14em] text-black/35">Operational workflow</div>
                     <div className="mt-2 text-sm"><span className="font-semibold text-[#1C1A16]">Route:</span> {lastResult.workflow.routeTeam}</div>
                     <div className="mt-1 text-sm"><span className="font-semibold text-[#1C1A16]">Routing confidence:</span> {lastResult.workflow.routingConfidence}</div>
@@ -221,7 +221,7 @@ export default function HotelSmsConsolePage() {
                     </div>
                   ) : null}
                   {relatedStay ? (
-                    <div className="rounded-2xl bg-[#fffdfa] px-4 py-3 text-sm text-black/60">
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
                       <div className="text-xs font-semibold uppercase tracking-[0.14em] text-black/35">Stay context</div>
                       <div className="mt-2"><span className="font-semibold text-[#1C1A16]">Guest:</span> {relatedStay.guestName}</div>
                       <div className="mt-1"><span className="font-semibold text-[#1C1A16]">Stay:</span> {relatedStay.status.replace(/_/g, " ")} · {relatedStay.nights} night{relatedStay.nights === 1 ? "" : "s"}</div>

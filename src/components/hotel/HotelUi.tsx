@@ -37,7 +37,7 @@ export function HotelQueueCard({ href, icon: Icon, title, count, detail }: { hre
     <Link href={href} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/50 transition-transform hover:-translate-y-0.5">
       <div className="flex items-start justify-between gap-4">
         <Icon className="h-5 w-5 flex-shrink-0 text-slate-600" />
-        <div className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+        <div className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-600">
           Open <ArrowUpRight className="h-3.5 w-3.5" />
         </div>
       </div>
@@ -52,7 +52,7 @@ export function HotelStatusPill({ tone, children }: { tone: "urgent" | "high" | 
   const styles = {
     urgent: "bg-white text-slate-700 border border-slate-200",
     high: "bg-white text-slate-700 border border-slate-200",
-    normal: "bg-slate-100 text-slate-700 border border-slate-200",
+    normal: "bg-white text-slate-700 border border-slate-200",
     resolved: "bg-white text-slate-700 border border-slate-200",
     queued: "bg-white text-slate-700 border border-slate-200",
   } as const;

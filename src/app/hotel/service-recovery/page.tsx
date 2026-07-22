@@ -37,7 +37,7 @@ export default function HotelServiceRecoveryPage() {
         <HotelPageHeader
           title="Service recovery"
           body="Save-the-stay cases, refund handling, and high-risk guest issues before they turn into bad reviews, chargebacks, or lost repeat business."
-          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{openCases.length} open recovery cases</div>}
+          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{openCases.length} open recovery cases</div>}
         />
 
         <div className="mb-6 grid gap-4 md:grid-cols-4">
@@ -71,11 +71,11 @@ export default function HotelServiceRecoveryPage() {
                         });
                         actions.addTimelineEvent(request.id, { type: "system", text: "Service recovery case opened from the recovery watchlist.", at: "Now" });
                       }}
-                      className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                      className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                     >
                       Open recovery case
                     </button>
-                    <Link href={`/hotel/requests/${request.id}`} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
+                    <Link href={`/hotel/requests/${request.id}`} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">
                       Open request
                     </Link>
                   </div>
@@ -107,12 +107,12 @@ export default function HotelServiceRecoveryPage() {
                 <HotelStatusPill tone={item.status === "saved" || item.status === "closed" ? "resolved" : item.status === "offered" ? "queued" : "high"}>{item.status}</HotelStatusPill>
               </div>
 
-              <div className="mt-4 rounded-2xl bg-[#fffdfa] px-4 py-3 text-sm leading-6 text-black/60">
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
                 <span className="font-semibold text-[#1C1A16]">Recovery plan:</span> {item.recovery}
               </div>
 
               <div className="mt-4 grid gap-3 md:grid-cols-2">
-                <div className="rounded-2xl bg-[#fffdfa] px-4 py-3 text-sm text-black/60">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
                   <div className="text-xs font-semibold uppercase tracking-[0.14em] text-black/35">Linked request</div>
                   {linkedRequest ? (
                     <>
@@ -123,7 +123,7 @@ export default function HotelServiceRecoveryPage() {
                     <div className="mt-2">No active request thread linked yet.</div>
                   )}
                 </div>
-                <div className="rounded-2xl bg-[#fffdfa] px-4 py-3 text-sm text-black/60">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
                   <div className="text-xs font-semibold uppercase tracking-[0.14em] text-black/35">Stay context</div>
                   {linkedStay ? (
                     <>
@@ -145,7 +145,7 @@ export default function HotelServiceRecoveryPage() {
                         actions.addTimelineEvent(linkedRequest.id, { type: "staff", text: "Service recovery was offered to protect the stay while the issue is still active.", at: "Now" });
                       }
                     }}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Offer recovery
                   </button>
@@ -159,7 +159,7 @@ export default function HotelServiceRecoveryPage() {
                         actions.addTimelineEvent(linkedRequest.id, { type: "ai", text: "We’ve taken care of this and added a make-good on our side. Please let us know if anything still feels off.", at: "Now" });
                       }
                     }}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Mark saved
                   </button>
@@ -172,7 +172,7 @@ export default function HotelServiceRecoveryPage() {
                         actions.addTimelineEvent(linkedRequest.id, { type: "system", text: "Service recovery case closed. Confirm the guest is stable before ending the request thread.", at: "Now" });
                       }
                     }}
-                    className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                   >
                     Close case
                   </button>
@@ -184,12 +184,12 @@ export default function HotelServiceRecoveryPage() {
                       actions.addTimelineEvent(linkedRequest.id, { type: "staff", text: "Recovery plan expanded with guest follow-up text and manager callback window.", at: "Now" });
                     }
                   }}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Add follow-up plan
                 </button>
                 {linkedRequest ? (
-                  <Link href={`/hotel/requests/${linkedRequest.id}`} className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60">
+                  <Link href={`/hotel/requests/${linkedRequest.id}`} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">
                     Open request thread
                   </Link>
                 ) : null}

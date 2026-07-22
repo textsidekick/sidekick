@@ -305,7 +305,7 @@ export default function SopsPage() {
                   {sop.tags?.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-1">
                       {sop.tags.map((t) => (
-                        <span key={t} className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">{t}</span>
+                        <span key={t} className="rounded-md border border-slate-200 bg-white px-2 py-0.5 text-xs text-gray-500">{t}</span>
                       ))}
                     </div>
                   )}

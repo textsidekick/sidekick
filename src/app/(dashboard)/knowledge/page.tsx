@@ -311,7 +311,7 @@ function SopsTab({ companyId }: { companyId: string }) {
                 </div>
                 {sop.tags?.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1">
-                    {sop.tags.map((t) => <span key={t} className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">{t}</span>)}
+                    {sop.tags.map((t) => <span key={t} className="rounded-md border border-slate-200 bg-white px-2 py-0.5 text-xs text-gray-500">{t}</span>)}
                   </div>
                 )}
               </div>
@@ -573,7 +573,7 @@ function ArticlesTab({ companyId }: { companyId: string }) {
                     </div>
                     {article.tags?.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-1">
-                        {article.tags.map((tag) => <span key={tag} className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">{tag}</span>)}
+                        {article.tags.map((tag) => <span key={tag} className="rounded-md border border-slate-200 bg-white px-2 py-0.5 text-xs text-gray-600">{tag}</span>)}
                       </div>
                     )}
                   </div>
@@ -732,7 +732,7 @@ function GapsTab({ companyId }: { companyId: string }) {
                 <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-slate-600" />
                 <p className="text-sm text-gray-800">{gap.topic || gap.question}</p>
               </div>
-              <span className="ml-4 flex-shrink-0 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700">{gap.frequency || gap.count}x asked</span>
+              <span className="ml-4 flex-shrink-0 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700">{gap.frequency || gap.count}x asked</span>
             </div>
           ))}
         </div>
@@ -878,7 +878,7 @@ function TerminologyTab({ companyId }: { companyId: string }) {
                     {term.synonyms?.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-1">
                         {term.synonyms.map((s) => (
-                          <span key={s} className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">{s}</span>
+                          <span key={s} className="rounded-md border border-slate-200 bg-white px-2 py-0.5 text-xs text-gray-500">{s}</span>
                         ))}
                       </div>
                     )}

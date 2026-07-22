@@ -14,7 +14,7 @@ export default function HotelLaundryPage() {
         <HotelPageHeader
           title="Laundry board"
           body="Track linen and towel turnaround so housekeeping can release rooms on time, protect guest comfort stock, and catch vendor delays before arrivals stack up."
-          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.laundryItems.filter((item) => item.status !== "delivered").length} active laundry gaps</div>}
+          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.laundryItems.filter((item) => item.status !== "delivered").length} active laundry gaps</div>}
         />
 
         <div className="space-y-3">
@@ -28,12 +28,12 @@ export default function HotelLaundryPage() {
                 </div>
                 <HotelStatusPill tone={item.status === "delivered" ? "resolved" : item.status === "washing" ? "queued" : "high"}>{item.status}</HotelStatusPill>
               </div>
-              <div className="mt-4 rounded-2xl bg-[#fffdfa] px-4 py-3 text-sm leading-6 text-black/60">{item.note}</div>
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">{item.note}</div>
               <div className="mt-4 flex flex-wrap gap-2">
                 {item.status === "queued" ? (
                   <button
                     onClick={() => actions.updateLaundryStatus(item.id, "washing")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Start wash cycle
                   </button>
@@ -41,14 +41,14 @@ export default function HotelLaundryPage() {
                 {item.status !== "delivered" ? (
                   <button
                     onClick={() => actions.updateLaundryStatus(item.id, "delivered")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Mark delivered
                   </button>
                 ) : null}
                 <button
                   onClick={() => actions.updateLaundryNote(item.id, `${item.note} Laundry follow-up note added.`)}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Add linen note
                 </button>

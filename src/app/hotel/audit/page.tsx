@@ -14,7 +14,7 @@ export default function HotelAuditPage() {
         <HotelPageHeader
           title="Night audit"
           body="Revenue and compliance exceptions that operators have to close before the day rolls: folio mismatches, OTA variances, missing documentation, and unresolved desk exceptions."
-          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.auditItems.filter((item) => item.status !== "resolved").length} open exceptions</div>}
+          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.auditItems.filter((item) => item.status !== "resolved").length} open exceptions</div>}
         />
 
         <div className="space-y-3">
@@ -28,12 +28,12 @@ export default function HotelAuditPage() {
                 </div>
                 <HotelStatusPill tone={item.status === "resolved" ? "resolved" : item.status === "reviewing" ? "queued" : "high"}>{item.status}</HotelStatusPill>
               </div>
-              <div className="mt-4 rounded-2xl bg-[#fffdfa] px-4 py-3 text-sm leading-6 text-black/60">{item.note}</div>
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">{item.note}</div>
               <div className="mt-4 flex flex-wrap gap-2">
                 {item.status === "open" ? (
                   <button
                     onClick={() => actions.updateAuditStatus(item.id, "reviewing")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Start review
                   </button>
@@ -41,14 +41,14 @@ export default function HotelAuditPage() {
                 {item.status !== "resolved" ? (
                   <button
                     onClick={() => actions.updateAuditStatus(item.id, "resolved")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Resolve exception
                   </button>
                 ) : null}
                 <button
                   onClick={() => actions.updateAuditNote(item.id, `${item.note} Manager summary drafted and supporting notes attached.`)}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Add audit note
                 </button>

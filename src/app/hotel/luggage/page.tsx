@@ -14,7 +14,7 @@ export default function HotelLuggagePage() {
         <HotelPageHeader
           title="Luggage hold"
           body="Front-desk bag storage for early arrivals, post-checkout holds, and secure claim-tag release before bags walk off or guest handoffs get messy."
-          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.luggageItems.filter((item) => item.status !== "released").length} active bag holds</div>}
+          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.luggageItems.filter((item) => item.status !== "released").length} active bag holds</div>}
         />
 
         <div className="space-y-3">
@@ -28,12 +28,12 @@ export default function HotelLuggagePage() {
                 </div>
                 <HotelStatusPill tone={item.status === "released" ? "resolved" : item.status === "claimed" ? "queued" : "high"}>{item.status}</HotelStatusPill>
               </div>
-              <div className="mt-4 rounded-2xl bg-[#fffdfa] px-4 py-3 text-sm leading-6 text-black/60">{item.note}</div>
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">{item.note}</div>
               <div className="mt-4 flex flex-wrap gap-2">
                 {item.status === "stored" ? (
                   <button
                     onClick={() => actions.updateLuggageStatus(item.id, "claimed")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Verify claim tag
                   </button>
@@ -41,14 +41,14 @@ export default function HotelLuggagePage() {
                 {item.status !== "released" ? (
                   <button
                     onClick={() => actions.updateLuggageStatus(item.id, "released")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Release bags
                   </button>
                 ) : null}
                 <button
                   onClick={() => actions.updateLuggageNote(item.id, `${item.note} Front desk release note added.`)}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Add hold note
                 </button>

@@ -28,8 +28,8 @@ export function StatusBadge({ status }: { status: string }) {
   const cls = STATUS_CLASSES[status] ?? "bg-gray-100 text-gray-800";
   const dotCls = STATUS_DOT_CLASSES[status] ?? "bg-slate-400";
   return (
-    <span className={cn("inline-flex items-center gap-2 text-xs font-medium px-2.5 py-1 rounded-full", cls)}>
-      <span className={cn("h-1.5 w-1.5 rounded-full", dotCls)} />
+    <span className={cn("inline-flex items-center gap-2 text-xs font-medium px-2.5 py-1 rounded-md", cls)}>
+      <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", dotCls)} />
       {status.replaceAll("_", " ").toUpperCase()}
     </span>
   );

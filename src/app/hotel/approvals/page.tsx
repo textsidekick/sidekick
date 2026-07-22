@@ -18,7 +18,7 @@ export default function HotelApprovalsPage() {
           title="Approvals"
           body="Manager approvals for late checkout, damage handling, refunds, and other exceptions that need a front-desk or owner decision."
           action={
-            <div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">
+            <div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">
               {approvals.length} pending
             </div>
           }
@@ -44,7 +44,7 @@ export default function HotelApprovalsPage() {
                     actions.addTimelineEvent(request.id, { type: "system", text: "Approval granted by manager.", at: "Now" });
                     actions.addTimelineEvent(request.id, { type: "ai", text: "Good news — your request was approved.", at: "Now" });
                   }}
-                  className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                 >
                   Approve
                 </button>
@@ -54,17 +54,17 @@ export default function HotelApprovalsPage() {
                     actions.assignRequest(request.id, "Front desk");
                     actions.addTimelineEvent(request.id, { type: "system", text: "Approval denied. Front desk follow-up required.", at: "Now" });
                   }}
-                  className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                 >
                   Deny
                 </button>
                 <button
                   onClick={() => { actions.assignRequest(request.id, "Maya"); actions.addTimelineEvent(request.id, { type: "system", text: "Approval task assigned to Maya.", at: "Now" }); }}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Assign Maya
                 </button>
-                <Link href={`/hotel/requests/${request.id}`} className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60">Open thread</Link>
+                <Link href={`/hotel/requests/${request.id}`} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">Open thread</Link>
               </div>
             </div>
           ))}

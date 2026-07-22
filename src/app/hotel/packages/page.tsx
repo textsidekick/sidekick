@@ -14,7 +14,7 @@ export default function HotelPackagesPage() {
         <HotelPageHeader
           title="Package log"
           body="Front-desk package handling for guest deliveries, signature-required items, and secure handoff follow-through before boxes disappear or guests complain."
-          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.packageItems.filter((item) => item.status !== "picked_up").length} open package handoffs</div>}
+          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.packageItems.filter((item) => item.status !== "picked_up").length} open package handoffs</div>}
         />
 
         <div className="space-y-3">
@@ -28,12 +28,12 @@ export default function HotelPackagesPage() {
                 </div>
                 <HotelStatusPill tone={item.status === "picked_up" ? "resolved" : item.status === "notified" ? "queued" : "high"}>{item.status}</HotelStatusPill>
               </div>
-              <div className="mt-4 rounded-2xl bg-[#fffdfa] px-4 py-3 text-sm leading-6 text-black/60">{item.note}</div>
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">{item.note}</div>
               <div className="mt-4 flex flex-wrap gap-2">
                 {item.status === "received" ? (
                   <button
                     onClick={() => actions.updatePackageStatus(item.id, "notified")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Notify guest
                   </button>
@@ -41,14 +41,14 @@ export default function HotelPackagesPage() {
                 {item.status !== "picked_up" ? (
                   <button
                     onClick={() => actions.updatePackageStatus(item.id, "picked_up")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Mark picked up
                   </button>
                 ) : null}
                 <button
                   onClick={() => actions.updatePackageNote(item.id, `${item.note} Front desk handoff note added.`)}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Add handoff note
                 </button>

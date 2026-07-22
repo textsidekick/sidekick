@@ -22,7 +22,7 @@ export default function HotelKnowledgePage() {
                 <div className="text-xs font-semibold uppercase tracking-[0.16em] text-black/40">{item.team}</div>
                 <button
                   onClick={() => actions.addKnowledgeItem({ ...item, usesThisWeek: item.usesThisWeek + 1, title: `${item.title} (follow-up)` })}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Save follow-up
                 </button>

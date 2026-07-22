@@ -14,7 +14,7 @@ export default function HotelMinibarPage() {
         <HotelPageHeader
           title="Minibar & market"
           body="Revenue capture for in-room minibar use and front-desk market sales so housekeeping findings, desk postings, and service-recovery waivers stay synchronized."
-          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.minibarItems.filter((item) => item.status === "captured").length} unposted charges</div>}
+          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.minibarItems.filter((item) => item.status === "captured").length} unposted charges</div>}
         />
 
         <div className="space-y-3">
@@ -28,12 +28,12 @@ export default function HotelMinibarPage() {
                 </div>
                 <HotelStatusPill tone={item.status === "posted" ? "resolved" : item.status === "waived" ? "queued" : "high"}>{item.status}</HotelStatusPill>
               </div>
-              <div className="mt-4 rounded-2xl bg-[#fffdfa] px-4 py-3 text-sm leading-6 text-black/60">{item.note}</div>
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">{item.note}</div>
               <div className="mt-4 flex flex-wrap gap-2">
                 {item.status === "captured" ? (
                   <button
                     onClick={() => actions.updateMinibarStatus(item.id, "posted")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Post to folio
                   </button>
@@ -41,14 +41,14 @@ export default function HotelMinibarPage() {
                 {item.status === "captured" ? (
                   <button
                     onClick={() => actions.updateMinibarStatus(item.id, "waived")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Waive charge
                   </button>
                 ) : null}
                 <button
                   onClick={() => actions.updateMinibarNote(item.id, `${item.note} Charge review note added.`)}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Add revenue note
                 </button>

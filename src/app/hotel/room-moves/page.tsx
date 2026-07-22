@@ -14,7 +14,7 @@ export default function HotelRoomMovesPage() {
         <HotelPageHeader
           title="Room moves"
           body="Cross-team coordination for service recovery moves, noise complaints, maintenance relocations, and VIP swaps so the desk can recover the stay without losing operational control."
-          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.roomMoveItems.filter((item) => item.status !== "completed").length} active room moves</div>}
+          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.roomMoveItems.filter((item) => item.status !== "completed").length} active room moves</div>}
         />
 
         <div className="space-y-3">
@@ -28,12 +28,12 @@ export default function HotelRoomMovesPage() {
                 </div>
                 <HotelStatusPill tone={item.status === "completed" ? "resolved" : item.status === "coordinating" ? "queued" : "high"}>{item.status}</HotelStatusPill>
               </div>
-              <div className="mt-4 rounded-2xl bg-[#fffdfa] px-4 py-3 text-sm leading-6 text-black/60">{item.note}</div>
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">{item.note}</div>
               <div className="mt-4 flex flex-wrap gap-2">
                 {item.status === "requested" ? (
                   <button
                     onClick={() => actions.updateRoomMoveStatus(item.id, "coordinating")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Start coordination
                   </button>
@@ -41,14 +41,14 @@ export default function HotelRoomMovesPage() {
                 {item.status !== "completed" ? (
                   <button
                     onClick={() => actions.updateRoomMoveStatus(item.id, "completed")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Mark move complete
                   </button>
                 ) : null}
                 <button
                   onClick={() => actions.updateRoomMoveNote(item.id, `${item.note} Room move follow-up note added.`)}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Add move note
                 </button>

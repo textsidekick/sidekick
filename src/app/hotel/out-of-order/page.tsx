@@ -14,7 +14,7 @@ export default function HotelOutOfOrderPage() {
         <HotelPageHeader
           title="Out-of-order rooms"
           body="Coordinate blocked inventory, repair progress, cleaning follow-through, and room re-release so maintenance losses and desk sell-outs stay visible in one place."
-          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.outOfOrderItems.filter((item) => item.status !== "released").length} rooms out of order</div>}
+          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.outOfOrderItems.filter((item) => item.status !== "released").length} rooms out of order</div>}
         />
 
         <div className="space-y-3">
@@ -28,12 +28,12 @@ export default function HotelOutOfOrderPage() {
                 </div>
                 <HotelStatusPill tone={item.status === "released" ? "resolved" : item.status === "repairing" ? "queued" : "high"}>{item.status}</HotelStatusPill>
               </div>
-              <div className="mt-4 rounded-2xl bg-[#fffdfa] px-4 py-3 text-sm leading-6 text-black/60">{item.note}</div>
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">{item.note}</div>
               <div className="mt-4 flex flex-wrap gap-2">
                 {item.status === "blocked" ? (
                   <button
                     onClick={() => actions.updateOutOfOrderStatus(item.id, "repairing")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Start repair
                   </button>
@@ -41,14 +41,14 @@ export default function HotelOutOfOrderPage() {
                 {item.status !== "released" ? (
                   <button
                     onClick={() => actions.updateOutOfOrderStatus(item.id, "released")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Reopen inventory
                   </button>
                 ) : null}
                 <button
                   onClick={() => actions.updateOutOfOrderNote(item.id, `${item.note} Out-of-order follow-up note added.`)}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Add blocker note
                 </button>

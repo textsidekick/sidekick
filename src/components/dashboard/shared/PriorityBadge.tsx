@@ -101,7 +101,7 @@ export function PriorityBadge({ priority }: { priority: string }) {
 
   return (
     <span className={cn("inline-flex items-center gap-2 text-xs font-medium px-2.5 py-1 rounded-md", cls)}>
-      <span className={cn("h-1.5 w-1.5 rounded-full", dotCls)} />
+      <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", dotCls)} />
       {label}
     </span>
   );

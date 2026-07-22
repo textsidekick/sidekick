@@ -135,11 +135,11 @@ function KmMetricsSection({ companyId }: { companyId: string }) {
                     <span className="font-bold text-gray-800">{dept.sopCount}</span> SOPs
                   </span>
                   {dept.openGapCount > 0 ? (
-                    <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700">
+                    <span className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700">
                       {dept.openGapCount} gaps
                     </span>
                   ) : (
-                    <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700">
+                    <span className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700">
                       No gaps
                     </span>
                   )}

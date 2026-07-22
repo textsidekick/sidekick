@@ -23,7 +23,7 @@ export default function HotelPeoplePage() {
         <HotelPageHeader
           title="People ops"
           body="Hotel staffing and HR work that should run through the same operating system: training, policy rollout, shift coverage, multilingual onboarding, and manager follow-through."
-          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{openTasks.length} active people tasks</div>}
+          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{openTasks.length} active people tasks</div>}
         />
 
         <div className="grid gap-4 md:grid-cols-2">
@@ -38,13 +38,13 @@ export default function HotelPeoplePage() {
                 <HotelStatusPill tone={task.status === "done" ? "resolved" : toneByKind[task.kind]}>{task.status.replace("_", " ")}</HotelStatusPill>
               </div>
 
-              <div className="mt-4 rounded-2xl bg-[#fffdfa] px-4 py-3 text-sm leading-6 text-black/60">{task.note}</div>
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">{task.note}</div>
 
               <div className="mt-4 flex flex-wrap gap-2">
                 {task.status !== "in_progress" && task.status !== "done" ? (
                   <button
                     onClick={() => actions.updatePeopleTaskStatus(task.id, "in_progress")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Start
                   </button>
@@ -52,20 +52,20 @@ export default function HotelPeoplePage() {
                 {task.status !== "done" ? (
                   <button
                     onClick={() => actions.updatePeopleTaskStatus(task.id, "done")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Mark complete
                   </button>
                 ) : null}
                 <button
                   onClick={() => actions.updatePeopleTaskNote(task.id, `${task.note} SMS reminder sent and manager was updated.`)}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Send reminder
                 </button>
                 <button
                   onClick={() => actions.updatePeopleTaskNote(task.id, `${task.note} Translated SOP and quick reply snippets attached for staff.`)}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Attach SOP help
                 </button>

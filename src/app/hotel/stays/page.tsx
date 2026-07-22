@@ -32,7 +32,7 @@ export default function HotelStaysPage() {
         <HotelPageHeader
           title="Arrivals & departures"
           body="Front desk control center for check-ins, departures, late checkout pressure, and guests who need proactive outreach before they show up."
-          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600">{arriving.length} arriving · {departing.length} departing</div>}
+          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600">{arriving.length} arriving · {departing.length} departing</div>}
         />
 
         <div className="mb-6 grid gap-4 md:grid-cols-3">
@@ -83,21 +83,21 @@ export default function HotelStaysPage() {
                 <div className="mt-4 flex flex-wrap gap-2">
                   <button
                     onClick={() => actions.updateStayNote(stay.id, `${stay.notes} Pre-arrival text sent with arrival expectations and desk contact.`)}
-                    className="rounded-full bg-[#0060F0] px-3 py-1 text-xs font-medium text-white"
+                    className="rounded-lg bg-slate-700 px-3 py-2 text-xs font-medium text-white hover:bg-slate-800"
                   >
                     Send pre-arrival text
                   </button>
                   {room && room.status !== "ready" ? (
                     <button
                       onClick={() => actions.updateRoomNote(stay.room, `${room.note} Front desk escalated this room for arrival readiness.`)}
-                      className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600"
+                      className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                     >
                       Rush room
                     </button>
                   ) : null}
                   <button
                     onClick={() => actions.updateStayStatus(stay.id, "checked_in")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Check in
                   </button>
@@ -115,13 +115,13 @@ export default function HotelStaysPage() {
               <>
                 <button
                   onClick={() => actions.updateStayStatus(stay.id, "checked_in")}
-                  className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                 >
                   Check in
                 </button>
                 <button
                   onClick={() => actions.updateStayNote(stay.id, `${stay.notes} Guest sent pre-arrival text and room was pre-blocked.`)}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Log pre-arrival text
                 </button>
@@ -136,13 +136,13 @@ export default function HotelStaysPage() {
               <>
                 <button
                   onClick={() => actions.updateStayStatus(stay.id, "checked_out")}
-                  className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                 >
                   Check out
                 </button>
                 <button
                   onClick={() => actions.updateStayNote(stay.id, `${stay.notes} Front desk sent checkout reminder and coordinated with housekeeping.`)}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Send checkout reminder
                 </button>
@@ -166,7 +166,7 @@ export default function HotelStaysPage() {
                   }, [
                     { type: "system", text: "Checkout follow-up created from arrivals/departures board.", at: "Now" },
                   ])}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Create desk follow-up
                 </button>
@@ -181,11 +181,11 @@ export default function HotelStaysPage() {
               <>
                 <button
                   onClick={() => actions.updateStayNote(stay.id, `${stay.notes} Guest satisfaction check sent by text.`)}
-                  className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                 >
                   Send satisfaction check
                 </button>
-                <Link href="/hotel/guest-requests" className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60">
+                <Link href="/hotel/guest-requests" className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">
                   Open guest inbox
                 </Link>
               </>

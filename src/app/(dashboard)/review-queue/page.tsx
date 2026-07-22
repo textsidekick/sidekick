@@ -232,7 +232,7 @@ export default function ReviewQueuePage() {
       {/* Stats bar */}
       <div className="mt-6 flex items-center gap-4 flex-wrap">
         <div className="bg-white rounded-xl border border-gray-200 px-5 py-3 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+          <div className="w-10 h-10 flex items-center justify-center">
             <AlertTriangle className="w-5 h-5 text-gray-700" />
           </div>
           <div>

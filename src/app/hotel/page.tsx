@@ -142,7 +142,7 @@ export default function HotelOverviewPage() {
           title={`${state.property.name} operations`}
           body="Separate hotel app prototype. Guests, front desk, housekeeping, and maintenance all coordinate through text, with every request turned into tracked work and reusable operating memory."
           action={
-            <div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600">
+            <div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600">
               {state.property.roomCount} rooms · {state.property.city} · {state.property.occupancyPct}% occupied
             </div>
           }
@@ -190,7 +190,7 @@ export default function HotelOverviewPage() {
                 <h2 className="mt-2 text-3xl font-semibold tracking-[-0.04em] text-[#17202B]">Run the hotel by moments that hurt the guest first</h2>
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">This view is now organized around the small set of things that actually swing the stay: guest communication, room readiness, front-desk exceptions, and property stability.</p>
               </div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600">
+              <div className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">
                 <Clock3 className="h-3.5 w-3.5" /> Shift handoff in 47 min
               </div>
             </div>
@@ -202,7 +202,7 @@ export default function HotelOverviewPage() {
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100">
                       <card.icon className="h-5 w-5 text-[#0060F0]" />
                     </div>
-                    <div className="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">Core pillar</div>
+                    <div className="rounded-md border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">Core pillar</div>
                   </div>
                   <div className="mt-5 text-xl font-semibold text-[#17202B]">{card.title}</div>
                   <p className="mt-2 text-sm leading-6 text-slate-600">{card.summary}</p>
@@ -213,7 +213,7 @@ export default function HotelOverviewPage() {
                   </div>
                   <div className="mt-4 flex flex-wrap gap-2">
                     {card.links.map((link) => (
-                      <span key={link.href} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600">{link.label}</span>
+                      <span key={link.href} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">{link.label}</span>
                     ))}
                   </div>
                 </Link>
@@ -263,7 +263,7 @@ export default function HotelOverviewPage() {
               <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">Supporting views</div>
               <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[#1C1A16]">Specialized tools that support the main operating flow</h2>
             </div>
-            <div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">Useful when needed — not the system of record</div>
+            <div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">Useful when needed — not the system of record</div>
           </div>
 
           <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">

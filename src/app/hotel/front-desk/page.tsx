@@ -59,7 +59,7 @@ export default function HotelFrontDeskPage() {
         <HotelPageHeader
           title="Front desk live queue"
           body="The desk should be able to run the next few hours from here: guest issues, arrivals, departures, approvals, and unresolved follow-through in one place."
-          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600">Authoritative shift queue</div>}
+          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600">Authoritative shift queue</div>}
         />
 
         <div className="mb-6 grid gap-4 md:grid-cols-4">
@@ -107,7 +107,7 @@ export default function HotelFrontDeskPage() {
                               actions.updateRequestWorkflow(item.request.id, { routeTeam: "Front desk", triageStatus: "approved", dispatcher: "Front desk" });
                               actions.addTimelineEvent(item.request.id, { type: "system", text: "Request routed to front desk.", at: "Now" });
                             }}
-                            className="rounded-full bg-[#0060F0] px-3 py-1 text-xs font-medium text-white"
+                            className="rounded-lg bg-slate-700 px-3 py-2 text-xs font-medium text-white hover:bg-slate-800"
                           >
                             Take ownership
                           </button>
@@ -119,7 +119,7 @@ export default function HotelFrontDeskPage() {
                               actions.updateRequestWorkflow(item.request.id, { resolutionState: "staff_dispatched", triageStatus: "approved", dispatcher: "Front desk" });
                               actions.addTimelineEvent(item.request.id, { type: "staff", text: "Front desk is actively working this now.", at: "Now" });
                             }}
-                            className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600"
+                            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                           >
                             Start work
                           </button>
@@ -130,7 +130,7 @@ export default function HotelFrontDeskPage() {
                               actions.updateRequestWorkflow(item.request.id, { resolutionState: "awaiting_verification" });
                               actions.addTimelineEvent(item.request.id, { type: "ai", text: "We believe this is taken care of. Please reply here if anything still needs attention.", at: "Now" });
                             }}
-                            className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600"
+                            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                           >
                             Await guest confirm
                           </button>
@@ -141,7 +141,7 @@ export default function HotelFrontDeskPage() {
                               actions.updateRequestWorkflow(item.request.id, { triageStatus: "approved", escalationOwner: null, handoffNote: null, dispatcher: "Front desk" });
                               actions.addTimelineEvent(item.request.id, { type: "system", text: "Desk reviewed the routing and approved the current plan.", at: "Now" });
                             }}
-                            className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600"
+                            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                           >
                             Approve routing
                           </button>
@@ -153,44 +153,44 @@ export default function HotelFrontDeskPage() {
                               actions.updateRequestWorkflow(item.request.id, { resolutionState: "closed" });
                               actions.addTimelineEvent(item.request.id, { type: "ai", text: "Front desk closed the loop with the guest.", at: "Now" });
                             }}
-                            className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                           >
                             Close loop
                           </button>
                         ) : null}
-                        <Link href={`/hotel/requests/${item.request.id}`} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600">Open thread</Link>
+                        <Link href={`/hotel/requests/${item.request.id}`} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">Open thread</Link>
                       </>
                     ) : item.kind === "arrival" ? (
                       <>
                         <button
                           onClick={() => actions.updateStayNote(item.stay.id, `${item.stay.notes} Front desk sent pre-arrival text and confirmed arrival plan.`)}
-                          className="rounded-full bg-[#0060F0] px-3 py-1 text-xs font-medium text-white"
+                          className="rounded-lg bg-slate-700 px-3 py-2 text-xs font-medium text-white hover:bg-slate-800"
                         >
                           Send pre-arrival text
                         </button>
                         <button
                           onClick={() => actions.updateStayStatus(item.stay.id, "checked_in")}
-                          className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                         >
                           Check in
                         </button>
-                        <Link href="/hotel/stays" className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600">Open arrivals board</Link>
+                        <Link href="/hotel/stays" className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">Open arrivals board</Link>
                       </>
                     ) : (
                       <>
                         <button
                           onClick={() => actions.updateStayNote(item.stay.id, `${item.stay.notes} Front desk sent checkout reminder and coordinated room release.`)}
-                          className="rounded-full bg-[#0060F0] px-3 py-1 text-xs font-medium text-white"
+                          className="rounded-lg bg-slate-700 px-3 py-2 text-xs font-medium text-white hover:bg-slate-800"
                         >
                           Send checkout reminder
                         </button>
                         <button
                           onClick={() => actions.updateStayStatus(item.stay.id, "checked_out")}
-                          className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                         >
                           Check out
                         </button>
-                        <Link href="/hotel/stays" className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600">Open departures board</Link>
+                        <Link href="/hotel/stays" className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">Open departures board</Link>
                       </>
                     )}
                   </div>

@@ -288,12 +288,12 @@ function PathDetailModal({
             <h2 className="text-lg font-bold text-gray-900">{path?.name || "Loading..."}</h2>
             <div className="mt-1 flex flex-wrap items-center gap-2">
               {deptName && (
-                <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
+                <span className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
                   <Building2 className="h-3 w-3" /> {deptName}
                 </span>
               )}
               {path?.role && (
-                <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                <span className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600">
                   <Users className="h-3 w-3" /> {path.role}
                 </span>
               )}
@@ -897,12 +897,12 @@ export default function TrainingPage() {
                     {/* Department + Role tags */}
                     <div className="mt-2 flex flex-wrap items-center gap-2">
                       {deptName && (
-                        <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
+                        <span className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
                           <Building2 className="h-3 w-3" /> {deptName}
                         </span>
                       )}
                       {path.role && (
-                        <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                        <span className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600">
                           <Users className="h-3 w-3" /> {path.role}
                         </span>
                       )}

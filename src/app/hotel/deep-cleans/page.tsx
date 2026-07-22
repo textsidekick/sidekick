@@ -14,7 +14,7 @@ export default function HotelDeepCleansPage() {
         <HotelPageHeader
           title="Deep cleans"
           body="Preventive room resets, damage-recovery cleaning, and heavy-turn housekeeping work that sits between room quality, maintenance prevention, and sellable inventory." 
-          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.deepCleanItems.filter((item) => item.status !== "completed").length} active deep cleans</div>}
+          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.deepCleanItems.filter((item) => item.status !== "completed").length} active deep cleans</div>}
         />
 
         <div className="space-y-3">
@@ -28,12 +28,12 @@ export default function HotelDeepCleansPage() {
                 </div>
                 <HotelStatusPill tone={item.status === "completed" ? "resolved" : item.status === "in_progress" ? "queued" : "high"}>{item.status}</HotelStatusPill>
               </div>
-              <div className="mt-4 rounded-2xl bg-[#fffdfa] px-4 py-3 text-sm leading-6 text-black/60">{item.note}</div>
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">{item.note}</div>
               <div className="mt-4 flex flex-wrap gap-2">
                 {item.status === "scheduled" ? (
                   <button
                     onClick={() => actions.updateDeepCleanStatus(item.id, "in_progress")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Start deep clean
                   </button>
@@ -41,14 +41,14 @@ export default function HotelDeepCleansPage() {
                 {item.status !== "completed" ? (
                   <button
                     onClick={() => actions.updateDeepCleanStatus(item.id, "completed")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Mark completed
                   </button>
                 ) : null}
                 <button
                   onClick={() => actions.updateDeepCleanNote(item.id, `${item.note} Deep-clean follow-up note added.`)}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Add quality note
                 </button>

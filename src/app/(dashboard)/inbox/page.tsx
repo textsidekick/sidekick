@@ -348,7 +348,7 @@ export default function InboxPage() {
       <div className="grid gap-4 md:grid-cols-3">
         <div className="rounded-2xl border border-black/5 bg-white p-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#F4F7FA]">
+            <div className="flex h-11 w-11 items-center justify-center">
               <MessageSquare className="h-5 w-5 text-gray-700" />
             </div>
             <div>
@@ -359,7 +359,7 @@ export default function InboxPage() {
         </div>
         <div className="rounded-2xl border border-black/5 bg-white p-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#F4F7FA]">
+            <div className="flex h-11 w-11 items-center justify-center">
               <ShieldAlert className="h-5 w-5 text-gray-700" />
             </div>
             <div>
@@ -370,7 +370,7 @@ export default function InboxPage() {
         </div>
         <div className="rounded-2xl border border-black/5 bg-white p-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#F4F7FA]">
+            <div className="flex h-11 w-11 items-center justify-center">
               <Bot className="h-5 w-5 text-gray-700" />
             </div>
             <div>
@@ -463,13 +463,13 @@ export default function InboxPage() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full bg-black/[0.04] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-black/55">
+                      <span className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-black/55">
                         {item.kind === "work_order" ? "work order" : item.kind}
                       </span>
                       {item.priority && <PriorityBadge priority={item.priority} />}
                       {item.status && <StatusBadge status={item.status} />}
                       {item.needsManager && (
-                        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-gray-700">
+                        <span className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-gray-700">
                           Needs manager
                         </span>
                       )}

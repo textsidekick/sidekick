@@ -6,8 +6,8 @@ import { useHotelDemoState } from "@/lib/hotel-demo-store";
 export default function HotelInspectionsPage() {
   const { state, actions, loaded } = useHotelDemoState();
 
-  const chipBase = "inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700";
-  const actionChip = "inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700";
+  const chipBase = "inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700";
+  const actionChip = "inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700";
 
   if (!loaded) return null;
 

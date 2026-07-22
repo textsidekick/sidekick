@@ -35,7 +35,7 @@ export default function HotelOnboardingPage() {
         <HotelPageHeader
           title="Hotel onboarding"
           body="This is the clean hotel onboarding story: phone numbers first, policies second, then live guest and staff messaging."
-          action={saved ? <div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">Saved</div> : null}
+          action={saved ? <div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">Saved</div> : null}
         />
 
         <div className="grid gap-4 md:grid-cols-2">
@@ -67,8 +67,8 @@ export default function HotelOnboardingPage() {
               </label>
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
-              <button onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 1200); }} className="rounded-full bg-[#26251e] px-4 py-2 text-sm font-medium text-white">Save demo setup</button>
-              <button onClick={() => actions.reset()} className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-medium text-black/60">Reset demo</button>
+              <button onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 1200); }} className="rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">Save demo setup</button>
+              <button onClick={() => actions.reset()} className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Reset demo</button>
             </div>
           </div>
 

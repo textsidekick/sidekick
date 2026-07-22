@@ -14,7 +14,7 @@ export default function HotelSuppliesPage() {
         <HotelPageHeader
           title="Housekeeping supplies"
           body="Track the stock that quietly breaks hotel operations when it runs low: towels, toiletries, water, pillows, and other guest-comfort essentials."
-          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.supplies.filter((item) => item.stock !== "ok").length} low-stock items</div>}
+          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.supplies.filter((item) => item.stock !== "ok").length} low-stock items</div>}
         />
 
         <div className="grid gap-4 md:grid-cols-2">
@@ -28,13 +28,13 @@ export default function HotelSuppliesPage() {
                 <HotelStatusPill tone={item.stock === "critical" ? "urgent" : item.stock === "low" ? "high" : "resolved"}>{item.stock}</HotelStatusPill>
               </div>
 
-              <div className="mt-4 rounded-2xl bg-[#fffdfa] px-4 py-3 text-sm leading-6 text-black/60">{item.note}</div>
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">{item.note}</div>
 
               <div className="mt-4 flex flex-wrap gap-2">
                 {item.stock !== "ok" ? (
                   <button
                     onClick={() => actions.updateSupplyStock(item.id, "ok")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Mark restocked
                   </button>
@@ -42,14 +42,14 @@ export default function HotelSuppliesPage() {
                 {item.stock !== "critical" ? (
                   <button
                     onClick={() => actions.updateSupplyStock(item.id, "critical")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Escalate shortage
                   </button>
                 ) : null}
                 <button
                   onClick={() => actions.updateSupplyNote(item.id, `${item.note} Purchase run assigned and desk notified.`)}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Add procurement note
                 </button>

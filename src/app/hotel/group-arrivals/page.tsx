@@ -14,7 +14,7 @@ export default function HotelGroupArrivalsPage() {
         <HotelPageHeader
           title="Group arrivals"
           body="Coordinate team blocks, wedding parties, and crew stays so keys, room blocks, breakfast plans, and special logistics are staged before the lobby gets slammed."
-          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.groupArrivalItems.filter((item) => item.status !== "checked_in").length} active group arrivals</div>}
+          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.groupArrivalItems.filter((item) => item.status !== "checked_in").length} active group arrivals</div>}
         />
 
         <div className="space-y-3">
@@ -28,12 +28,12 @@ export default function HotelGroupArrivalsPage() {
                 </div>
                 <HotelStatusPill tone={item.status === "checked_in" ? "resolved" : item.status === "staged" ? "queued" : "high"}>{item.status}</HotelStatusPill>
               </div>
-              <div className="mt-4 rounded-2xl bg-[#fffdfa] px-4 py-3 text-sm leading-6 text-black/60">{item.note}</div>
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">{item.note}</div>
               <div className="mt-4 flex flex-wrap gap-2">
                 {item.status === "planning" ? (
                   <button
                     onClick={() => actions.updateGroupArrivalStatus(item.id, "staged")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Stage arrival packet
                   </button>
@@ -41,14 +41,14 @@ export default function HotelGroupArrivalsPage() {
                 {item.status !== "checked_in" ? (
                   <button
                     onClick={() => actions.updateGroupArrivalStatus(item.id, "checked_in")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Mark group checked in
                   </button>
                 ) : null}
                 <button
                   onClick={() => actions.updateGroupArrivalNote(item.id, `${item.note} Group coordination note added.`)}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Add group note
                 </button>

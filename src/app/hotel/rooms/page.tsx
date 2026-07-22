@@ -48,7 +48,7 @@ export default function HotelRoomsPage() {
         <HotelPageHeader
           title="Room readiness board"
           body="Run sellable inventory from here: what is ready now, what still needs a turn, and what is blocking arrivals or revenue."
-          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600">Inventory control view</div>}
+          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600">Inventory control view</div>}
         />
 
         <div className="mb-6 grid gap-4 md:grid-cols-4">
@@ -73,11 +73,11 @@ export default function HotelRoomsPage() {
                     <div className="mt-3 flex flex-wrap gap-2">
                       <button
                         onClick={() => actions.updateRoomNote(stay.room, `${room?.note || ""} Front desk escalated this room for arrival readiness.`.trim())}
-                        className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                        className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                       >
                         Rush room
                       </button>
-                      <Link href="/hotel/stays" className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
+                      <Link href="/hotel/stays" className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">
                         Open arrivals
                       </Link>
                     </div>
@@ -140,7 +140,7 @@ export default function HotelRoomsPage() {
                             {room.status !== "inspection" && room.status !== "ready" ? (
                               <button
                                 onClick={() => actions.updateRoomStatus(room.room, "inspection")}
-                                className="rounded-full bg-[#0060F0] px-3 py-1 text-xs font-medium text-white"
+                                className="rounded-lg bg-slate-700 px-3 py-2 text-xs font-medium text-white hover:bg-slate-800"
                               >
                                 Move to inspection
                               </button>
@@ -148,14 +148,14 @@ export default function HotelRoomsPage() {
                             {room.status !== "ready" ? (
                               <button
                                 onClick={() => actions.updateRoomStatus(room.room, "ready")}
-                                className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                                className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                               >
                                 Mark sellable
                               </button>
                             ) : null}
                             <button
                               onClick={() => actions.updateRoomNote(room.room, `Room reviewed at ${new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}.`)}
-                              className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600"
+                              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                             >
                               Add review note
                             </button>

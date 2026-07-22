@@ -14,7 +14,7 @@ export default function HotelIncidentsPage() {
         <HotelPageHeader
           title="Incident log"
           body="Safety, liability, and property exceptions that need containment and documentation before they become reviews, claims, or revenue leakage."
-          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.incidentItems.filter((item) => item.status !== "closed").length} active incidents</div>}
+          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.incidentItems.filter((item) => item.status !== "closed").length} active incidents</div>}
         />
 
         <div className="space-y-3">
@@ -28,12 +28,12 @@ export default function HotelIncidentsPage() {
                 </div>
                 <HotelStatusPill tone={item.severity === "critical" ? "urgent" : item.severity === "high" ? "high" : item.status === "contained" ? "queued" : "normal"}>{item.status}</HotelStatusPill>
               </div>
-              <div className="mt-4 rounded-2xl bg-[#fffdfa] px-4 py-3 text-sm leading-6 text-black/60">{item.note}</div>
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">{item.note}</div>
               <div className="mt-4 flex flex-wrap gap-2">
                 {item.status === "open" ? (
                   <button
                     onClick={() => actions.updateIncidentStatus(item.id, "contained")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Mark contained
                   </button>
@@ -41,14 +41,14 @@ export default function HotelIncidentsPage() {
                 {item.status !== "closed" ? (
                   <button
                     onClick={() => actions.updateIncidentStatus(item.id, "closed")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Close incident
                   </button>
                 ) : null}
                 <button
                   onClick={() => actions.updateIncidentNote(item.id, `${item.note} Manager follow-up logged with supporting detail.`)}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Add manager note
                 </button>
