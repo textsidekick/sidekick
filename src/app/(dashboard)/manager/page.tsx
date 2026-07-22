@@ -43,6 +43,7 @@ interface WorkOrder {
 }
 interface Company {
   id: string; name: string; access_code?: string;
+  locations?: { id: string; name: string }[];
 }
 interface Worker {
   phone: string; company_id: string; name?: string;
@@ -61,6 +62,13 @@ export default function ManagerDashboard() {
   const [showDemoMode, setShowDemoMode] = useState(false);
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [loadingWorkOrders, setLoadingWorkOrders] = useState(false);
+
+  const normalizeLocationId = (companyId: string, rawLocationId: string | undefined, companyList: Company[]) => {
+    if (!rawLocationId || rawLocationId === "all") return "all";
+    const company = companyList.find((item) => item.id === companyId);
+    if (!company?.locations?.length) return "all";
+    return company.locations.some((location) => location.id === rawLocationId) ? rawLocationId : "all";
+  };
 
   // Demo mode
   useEffect(() => {
@@ -81,18 +89,29 @@ export default function ManagerDashboard() {
       const sessionCompanyId = session?.companyId;
       const savedAuth = JSON.parse(localStorage.getItem("sidekick_auth") || "{}");
       
+      let nextCompanyId = "";
       if (sessionCompanyId && allCompanies.some((c: any) => c.id === sessionCompanyId)) {
+        nextCompanyId = sessionCompanyId;
         setSelectedCompany(sessionCompanyId);
         savedAuth.companyId = sessionCompanyId;
       } else if (savedAuth.companyId && allCompanies.some((c: any) => c.id === savedAuth.companyId)) {
+        nextCompanyId = savedAuth.companyId;
         setSelectedCompany(savedAuth.companyId);
       } else if (allCompanies.length > 0) {
+        nextCompanyId = allCompanies[0].id;
         setSelectedCompany(allCompanies[0].id);
         savedAuth.companyId = allCompanies[0].id;
       }
 
+      const normalizedLocationId = normalizeLocationId(
+        nextCompanyId,
+        savedAuth.locationId || session?.selectedLocationId || "all",
+        allCompanies,
+      );
+      savedAuth.locationId = normalizedLocationId;
+
       try { localStorage.setItem("sidekick_auth", JSON.stringify(savedAuth)); } catch {}
-      setSelectedLocationId(savedAuth.locationId || session?.selectedLocationId || "all");
+      setSelectedLocationId(normalizedLocationId);
       if (d.workers) setWorkers(d.workers);
     });
   }, []);

@@ -167,7 +167,9 @@ export function Sidebar() {
           >
             <MapPin className="h-4 w-4 text-[#8DB4D9] flex-shrink-0" />
             <span className="flex-1 min-w-0 text-xs font-medium text-white truncate">
-              {selectedLocation?.name || (selectedCompany.locations?.length ? "All locations" : "Single location")}
+              {selectedLocationId === "all"
+                ? (selectedCompany.locations?.length ? "All locations" : "Single location")
+                : (selectedLocation?.name || "All locations")}
             </span>
             {(selectedCompany.locations?.length || 0) > 1 && <ChevronDown className="h-3 w-3 text-slate-400 flex-shrink-0" />}
           </button>
