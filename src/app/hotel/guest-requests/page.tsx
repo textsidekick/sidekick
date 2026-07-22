@@ -16,21 +16,21 @@ export default function HotelGuestRequestsPage() {
     {
       key: "new",
       title: "New",
-      detail: "Fresh guest issues that still need an owner or first update.",
+      detail: "Fresh guest issues that still need routing or a first Sidekick update.",
       items: requests.filter((request) => !request.resolutionState || request.resolutionState === "new" || request.triageStatus === "needs_review"),
       tone: "normal" as const,
     },
     {
       key: "working",
       title: "Working",
-      detail: "Guests have been updated or the owner has already started on the task.",
+      detail: "Sidekick has already updated the guest and the staff owner is working it.",
       items: requests.filter((request) => request.resolutionState === "guest_updated" || request.resolutionState === "staff_dispatched" || request.status === "in_progress"),
       tone: "high" as const,
     },
     {
       key: "verify",
       title: "Awaiting guest confirm",
-      detail: "Internal work is done but the guest has not confirmed the fix yet.",
+      detail: "Internal work is done but Sidekick is still waiting on guest confirmation.",
       items: requests.filter((request) => request.resolutionState === "awaiting_verification"),
       tone: "queued" as const,
     },
@@ -41,7 +41,7 @@ export default function HotelGuestRequestsPage() {
       <div className="mx-auto max-w-6xl">
         <HotelPageHeader
           title="Guest requests"
-          body="This queue is hotel-specific: guest texts, concierge answers, approvals, and task-linked updates. It now behaves more like an operational inbox than a flat list."
+          body="Guests text Sidekick, Sidekick routes the work behind the scenes, and this queue shows what still needs a real human touch."
         />
         <div className="mb-6 grid gap-4 md:grid-cols-3">
           {inboxColumns.map((column) => (
@@ -92,19 +92,19 @@ export default function HotelGuestRequestsPage() {
                         </div>
                         {request.triageStatus === "needs_review" ? (
                           <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-xs leading-5 text-slate-600">
-                            <span className="font-semibold">Review needed:</span> {request.handoffNote || "Desk should confirm routing or split this request before the guest gets a final answer."}
+                            <span className="font-semibold">Review needed:</span> {request.handoffNote || "A manager should confirm routing or split this request before Sidekick sends the final answer."}
                           </div>
                         ) : null}
 
                         <div className="mt-3 flex flex-wrap gap-2">
                           {request.status !== "in_progress" && request.status !== "resolved" ? (
-                            <button onClick={() => { actions.updateRequestStatus(request.id, "in_progress"); actions.updateRequestWorkflow(request.id, { resolutionState: "staff_dispatched" }); actions.addTimelineEvent(request.id, { type: "system", text: "Front desk started working the request.", at: "Now" }); }} className={actionChip}>Start</button>
+                            <button onClick={() => { actions.updateRequestStatus(request.id, "in_progress"); actions.updateRequestWorkflow(request.id, { resolutionState: "staff_dispatched", dispatcher: "Sidekick" }); actions.addTimelineEvent(request.id, { type: "system", text: "Sidekick routed the request to the staff owner and updated the guest.", at: "Now" }); }} className={actionChip}>Start</button>
                           ) : null}
                           {request.resolutionState !== "awaiting_verification" && request.status !== "resolved" ? (
-                            <button onClick={() => { actions.updateRequestWorkflow(request.id, { resolutionState: "awaiting_verification" }); actions.addTimelineEvent(request.id, { type: "ai", text: "We believe this is taken care of. Please reply here if anything still needs attention.", at: "Now" }); }} className={actionChip}>Await verify</button>
+                            <button onClick={() => { actions.updateRequestWorkflow(request.id, { resolutionState: "awaiting_verification", dispatcher: "Sidekick" }); actions.addTimelineEvent(request.id, { type: "ai", text: "We believe this is taken care of. Please reply here if anything still needs attention.", at: "Now" }); }} className={actionChip}>Await verify</button>
                           ) : null}
                           {request.status !== "resolved" ? (
-                            <button onClick={() => { actions.updateRequestStatus(request.id, "resolved"); actions.updateRequestWorkflow(request.id, { resolutionState: "closed" }); actions.addTimelineEvent(request.id, { type: "ai", text: "Your request is complete. Let us know if you need anything else.", at: "Now" }); }} className={actionChip}>Close</button>
+                            <button onClick={() => { actions.updateRequestStatus(request.id, "resolved"); actions.updateRequestWorkflow(request.id, { resolutionState: "closed", dispatcher: "Sidekick" }); actions.addTimelineEvent(request.id, { type: "ai", text: "Your request is complete. Let us know if you need anything else.", at: "Now" }); }} className={actionChip}>Close</button>
                           ) : null}
                           {request.assignedTo !== "Front desk" ? (
                             <button onClick={() => { actions.assignRequest(request.id, "Front desk"); actions.updateRequestWorkflow(request.id, { routeTeam: "Front desk", triageStatus: "approved", dispatcher: "Front desk" }); actions.addTimelineEvent(request.id, { type: "system", text: "Request assigned to front desk.", at: "Now" }); }} className={actionChip}>Assign desk</button>

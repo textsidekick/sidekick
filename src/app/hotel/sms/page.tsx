@@ -53,7 +53,7 @@ export default function HotelSmsConsolePage() {
           ? "Maintenance"
           : data.request.kind === "housekeeping"
             ? "Housekeeping"
-            : "Front desk",
+            : "Guest support",
         `${data.request.title} from room ${room} just came in via SMS and was routed to ${data.request.assignedTo}.`
       );
       setLastResult(data);
@@ -92,15 +92,15 @@ export default function HotelSmsConsolePage() {
     if (!lastResult || !createdRequest) return;
     actions.assignRequest(createdRequest.id, lastResult.request.assignedTo);
     actions.addTimelineEvent(createdRequest.id, { type: "system", text: `${lastResult.request.assignedTo} accepted the task and is working it now.`, at: "Now" });
-    actions.updateRequestWorkflow(createdRequest.id, {
-      resolutionState: "staff_dispatched",
-      routeTeam: lastResult.workflow.routeTeam,
-      sla: lastResult.workflow.suggestedSla,
-      triageStatus: "approved",
-      escalationOwner: null,
-      handoffNote: null,
-      dispatcher: "Front desk",
-    });
+      actions.updateRequestWorkflow(createdRequest.id, {
+        resolutionState: "staff_dispatched",
+        routeTeam: lastResult.workflow.routeTeam,
+        sla: lastResult.workflow.suggestedSla,
+        triageStatus: "approved",
+        escalationOwner: null,
+        handoffNote: null,
+        dispatcher: "Sidekick",
+      });
   }
 
   function openRecoveryCase() {
@@ -136,7 +136,7 @@ export default function HotelSmsConsolePage() {
       <div className="mx-auto max-w-6xl">
         <HotelPageHeader
           title="SMS console"
-          body="Backend-backed hotel SMS simulation. Use this to test guest texts, auto-replies, routing, and how requests land in the hotel operations queues."
+          body="Backend-backed hotel SMS simulation. Use this to test Sidekick as the guest-facing text line, staff routing behind the scenes, and automatic follow-up back to the guest."
           action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">Prototype backend active</div>}
         />
 
@@ -266,9 +266,9 @@ export default function HotelSmsConsolePage() {
             <div className="rounded-3xl border border-black/8 bg-white p-5 shadow-sm">
               <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">Why this matters</div>
               <div className="mt-4 space-y-3 text-sm leading-6 text-black/60">
-                <div>Hotels pay for this when guest texts stop disappearing into the front desk.</div>
+                <div>Hotels pay for this when guest texts stop disappearing between the desk, housekeeping, and maintenance.</div>
                 <div>Every message becomes either an auto-answer, a tracked task, or an escalation with ownership.</div>
-                <div>That directly improves response times, room readiness, and service recovery.</div>
+                <div>That directly improves response times, room readiness, and proactive guest updates.</div>
               </div>
             </div>
           </div>

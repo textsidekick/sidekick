@@ -10,6 +10,35 @@ export default function HotelHousekeepingPage() {
 
   const rooms = state.rooms.filter((room) => ["dirty", "inspection", "queued", "occupied"].includes(room.status));
 
+  function markRoomReady(roomNumber: string) {
+    actions.updateRoomStatus(roomNumber, "ready");
+    actions.updateRoomNote(roomNumber, `Cleaned and guest-ready at ${new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`);
+    actions.updateRoomOwner(roomNumber, "Housekeeping complete");
+
+    const linkedRequest = state.requests.find(
+      (request) => request.room === roomNumber && request.status !== "resolved",
+    );
+
+    if (linkedRequest) {
+      actions.addTimelineEvent(linkedRequest.id, {
+        type: "staff",
+        text: `Housekeeping marked Room ${roomNumber} clean and ready.`,
+        at: "Now",
+      });
+      actions.addTimelineEvent(linkedRequest.id, {
+        type: "ai",
+        text: "Your room is ready now. You can head over whenever you're set, and if you need anything else just text Sidekick here.",
+        at: "Now",
+      });
+      actions.updateRequestStatus(linkedRequest.id, "resolved");
+      actions.updateRequestWorkflow(linkedRequest.id, {
+        resolutionState: "closed",
+        triageStatus: "approved",
+        dispatcher: "Sidekick",
+      });
+    }
+  }
+
   const primaryButton = "inline-flex items-center justify-center rounded-xl bg-[#343A40] px-3 py-2 text-xs font-semibold text-white hover:bg-[#2B3035]";
   const secondaryButton = "inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50";
 
@@ -18,7 +47,7 @@ export default function HotelHousekeepingPage() {
       <div className="mx-auto max-w-6xl">
         <HotelPageHeader
           title="Housekeeping board"
-          body="Room turns, restocks, inspections, damage photos, and room-ready updates all live here."
+          body="Housekeeping texts Sidekick, Sidekick updates the room board, and guests can be notified automatically when a room is ready."
         />
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {rooms.map((room) => (
@@ -42,7 +71,7 @@ export default function HotelHousekeepingPage() {
                 ) : null}
                 {room.status !== "ready" ? (
                   <button
-                    onClick={() => actions.updateRoomStatus(room.room, "ready")}
+                    onClick={() => markRoomReady(room.room)}
                     className={secondaryButton}
                   >
                     Mark Ready
