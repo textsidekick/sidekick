@@ -103,20 +103,22 @@ export default function HotelOverviewPage() {
         />
 
         <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm shadow-slate-200/40">
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
             {todaySummary.map((item) => (
               <div key={item.label} className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
-                <div className="flex items-center justify-between gap-3">
+                <div className="flex flex-col gap-3">
                   <div>
                     <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{item.label}</div>
                     <div className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-[#17202B]">{item.value}</div>
                   </div>
-                  <HotelStatusPill tone={item.tone}>{item.label}</HotelStatusPill>
+                  <div className="self-start">
+                    <HotelStatusPill tone={item.tone}>{item.label}</HotelStatusPill>
+                  </div>
                 </div>
               </div>
             ))}
             <Link href="/hotel/conversations" className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 transition-colors hover:bg-slate-50">
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-col gap-3">
                 <div>
                   <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Conversations</div>
                   <div className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-[#17202B]">{openRequests.length}</div>
@@ -138,7 +140,7 @@ export default function HotelOverviewPage() {
           </div>
         </div>
 
-        <div className="mt-6 grid items-start gap-6 xl:grid-cols-[minmax(0,2.4fr)_280px]">
+        <div className="mt-6 grid items-start gap-6 xl:grid-cols-[minmax(0,2.1fr)_320px]">
           <div className="self-start rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
             <div className="flex items-end justify-between gap-4 border-b border-slate-200 pb-4">
               <div>

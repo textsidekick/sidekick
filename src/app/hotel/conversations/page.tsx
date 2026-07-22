@@ -73,20 +73,24 @@ export default function HotelConversationsPage() {
           ))}
         </div>
 
-        <div className="grid gap-4 xl:grid-cols-3">
+        <div className="space-y-6">
           {columns.map((column) => (
-            <div key={column.key} className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm shadow-slate-200/40">
-              <div className="border-b border-slate-200 px-2 pb-3">
-                <div className="text-sm font-semibold text-[#17202B]">{column.title}</div>
-                <div className="mt-1 text-xs text-slate-500">{column.items.length} threads</div>
+            <section key={column.key} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
+              <div className="flex items-end justify-between gap-4 border-b border-slate-200 pb-4">
+                <div>
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Conversation lane</div>
+                  <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[#17202B]">{column.title}</h2>
+                  <div className="mt-1 text-sm text-slate-600">{column.detail}</div>
+                </div>
+                <div className="text-sm text-slate-500">{column.items.length} threads</div>
               </div>
 
-              <div className="mt-4 space-y-3">
+              <div className="mt-4 grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
                 {column.items.length ? column.items.map((request) => {
                   const stay = state.stays.find((item) => item.room === request.room || item.id === request.stayId);
                   const tone = request.priority === "urgent" ? "urgent" : request.triageStatus === "needs_review" ? "queued" : request.status === "in_progress" ? "high" : "normal";
                   return (
-                    <div key={request.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm shadow-slate-200/30">
+                    <div key={request.id} className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <div className="text-sm font-semibold text-[#17202B]">Room {request.room} · {request.guestName || "Guest"}</div>
@@ -94,7 +98,7 @@ export default function HotelConversationsPage() {
                         </div>
                         <HotelStatusPill tone={tone}>{request.status === "needs_approval" ? "Review" : request.status === "in_progress" ? "Working" : "Open"}</HotelStatusPill>
                       </div>
-                      <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-xs text-slate-600">
+                      <div className="mt-3 rounded-2xl border border-slate-200 bg-white px-3 py-3 text-xs text-slate-600">
                         <div><span className="font-semibold text-[#17202B]">Guest said:</span> {request.detail}</div>
                         <div className="mt-1"><span className="font-semibold text-[#17202B]">Owner:</span> {request.assignedTo}</div>
                         <div className="mt-1"><span className="font-semibold text-[#17202B]">Next promise:</span> {request.sla || "No ETA set"}</div>
@@ -115,7 +119,7 @@ export default function HotelConversationsPage() {
                   <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-sm text-slate-500">Nothing in this lane right now.</div>
                 )}
               </div>
-            </div>
+            </section>
           ))}
         </div>
       </div>

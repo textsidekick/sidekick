@@ -49,7 +49,7 @@ export default function HotelTasksPage() {
             </div>
           </div>
 
-          <div className="mt-4 grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-4 grid gap-3 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3">
             {tasks.map((task) => {
               const tone = task.status === "resolved" ? "resolved" : task.priority === "urgent" ? "urgent" : task.status === "needs_approval" ? "queued" : task.status === "in_progress" ? "high" : "normal";
               return (
