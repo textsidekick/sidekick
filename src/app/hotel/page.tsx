@@ -33,6 +33,14 @@ export default function HotelOverviewPage() {
   const occupiedRooms = rooms.filter((room) => room.status === "occupied");
   const cleaningRooms = rooms.filter((room) => room.status === "dirty" || room.status === "inspection" || room.status === "queued");
   const maintenanceRooms = rooms.filter((room) => room.status === "maintenance");
+  const arrivals = state.stays.filter((stay) => stay.status === "arriving");
+  const departures = state.stays.filter((stay) => stay.status === "departing");
+  const openRequests = state.requests.filter((request) => request.status !== "resolved");
+  const roomRequestMap = new Map(
+    openRequests
+      .filter((request) => /^\d+$/.test(request.room))
+      .map((request) => [request.room, request]),
+  );
 
   const priorityItems = [
     ...maintenanceRooms.map((room) => ({
@@ -110,21 +118,59 @@ export default function HotelOverviewPage() {
             <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {rooms.map((room) => (
                 <div key={room.room} className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
+                  {(() => {
+                    const request = roomRequestMap.get(room.room);
+                    const stay = state.stays.find((item) => item.room === room.room && item.status !== "checked_out");
+                    return (
+                      <>
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <div className="text-lg font-semibold text-[#17202B]">Room {room.room}</div>
-                      <div className="text-xs text-slate-500">{room.type}</div>
+                      <div className="text-xs text-slate-500">{room.type}{stay ? ` · ${stay.guestName}` : ""}</div>
                     </div>
                     <HotelStatusPill tone={roomToneMap[room.status] || "normal"}>{roomLabelMap[room.status] || room.status}</HotelStatusPill>
                   </div>
                   <div className="mt-3 text-sm text-[#1C1A16]">{room.note}</div>
+                  {request ? <div className="mt-2 text-xs font-medium text-slate-600">Issue: {request.title}</div> : null}
                   <div className="mt-2 text-xs text-slate-500">Owner: {room.owner}</div>
+                      </>
+                    );
+                  })()}
                 </div>
               ))}
             </div>
           </div>
 
           <div className="space-y-6">
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/40">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Today</div>
+              <h2 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#17202B]">Arrivals and departures</h2>
+              <div className="mt-4 space-y-4">
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Arrivals</div>
+                  <div className="mt-2 space-y-2">
+                    {arrivals.length === 0 ? <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">No arrivals in play.</div> : arrivals.slice(0, 4).map((stay) => (
+                      <div key={stay.id} className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
+                        <div className="text-sm font-semibold text-[#1C1A16]">{stay.guestName} · Room {stay.room}</div>
+                        <div className="mt-1 text-xs text-slate-500">ETA {stay.eta} · {stay.notes}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Departures</div>
+                  <div className="mt-2 space-y-2">
+                    {departures.length === 0 ? <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">No departures in play.</div> : departures.slice(0, 4).map((stay) => (
+                      <div key={stay.id} className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
+                        <div className="text-sm font-semibold text-[#1C1A16]">{stay.guestName} · Room {stay.room}</div>
+                        <div className="mt-1 text-xs text-slate-500">Departure {stay.eta} · {stay.notes}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/40">
               <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Needs attention now</div>
               <h2 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#17202B]">Only the urgent stuff</h2>
@@ -144,6 +190,19 @@ export default function HotelOverviewPage() {
                     </Link>
                   ))
                 )}
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/40">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Team</div>
+              <h2 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#17202B]">All staff on the board</h2>
+              <div className="mt-4 space-y-2">
+                {state.staff.map((person) => (
+                  <div key={person.phone} className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
+                    <div className="text-sm font-semibold text-[#1C1A16]">{person.name}</div>
+                    <div className="mt-1 text-xs text-slate-500">{person.team} · {person.shift}</div>
+                  </div>
+                ))}
               </div>
             </div>
 
