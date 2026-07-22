@@ -274,7 +274,7 @@ function SopsTab({ companyId }: { companyId: string }) {
       </div>
 
       <div className="mt-4 rounded-xl border border-blue-100 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-        <strong>Text access:</strong> Workers can text <code className="rounded bg-blue-100 px-1">"SOP for [topic]"</code> to get the latest version over SMS instantly.
+        <strong>Text access:</strong> Workers can text <code className="rounded bg-slate-100 px-1">"SOP for [Topic]"</code> to get the latest version over SMS instantly.
       </div>
 
       <div className="mt-5 space-y-3">
@@ -373,7 +373,7 @@ function ProvenanceBadge({ article }: { article: KnowledgeArticle }) {
   if (status === "verified") {
     return (
       <div className="flex flex-col">
-        <span className="inline-flex items-center gap-1 rounded border border-green-200 bg-green-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-700">
+        <span className="inline-flex items-center gap-1 rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-700">
           <CheckCircle2 className="h-3 w-3" /> Verified
         </span>
         <span className="mt-0.5 text-[10px] text-gray-400">
@@ -383,7 +383,7 @@ function ProvenanceBadge({ article }: { article: KnowledgeArticle }) {
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 rounded border border-green-200 bg-green-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-700">
+    <span className="inline-flex items-center gap-1 rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-700">
       <CheckCircle2 className="h-3 w-3" /> Verified
     </span>
   );
@@ -396,7 +396,7 @@ function reviewRisk(article: KnowledgeArticle): "high" | "medium" | "low" {
 }
 
 function reviewRiskBadge(level: "high" | "medium" | "low") {
-  const cls = level === "high" ? "border-red-200 bg-red-100 text-gray-700" : level === "medium" ? "border-amber-200 bg-amber-100 text-gray-700" : "border-green-200 bg-green-100 text-gray-700";
+  const cls = level === "high" ? "border-slate-200 bg-slate-100 text-gray-700" : level === "medium" ? "border-slate-200 bg-slate-100 text-gray-700" : "border-slate-200 bg-slate-100 text-gray-700";
   return <span className={cn("rounded border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide", cls)}>{level} risk</span>;
 }
 
@@ -419,7 +419,7 @@ function RejectModal({ onConfirm, onCancel }: { onConfirm: (reason: string) => v
         <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" placeholder="e.g. Wrong procedure for this machine..." />
         <div className="mt-4 flex justify-end gap-2">
           <button onClick={onCancel} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
-          <button onClick={() => onConfirm(reason)} disabled={!reason.trim()} className="rounded-lg bg-red-500 px-4 py-2 text-sm text-white hover:bg-red-600 disabled:opacity-50">Reject</button>
+          <button onClick={() => onConfirm(reason)} disabled={!reason.trim()} className="rounded-lg bg-slate-500 px-4 py-2 text-sm text-white hover:bg-slate-800 disabled:opacity-50">Reject</button>
         </div>
       </div>
     </div>
@@ -599,23 +599,23 @@ function ArticlesTab({ companyId }: { companyId: string }) {
       {loadingReview ? (
         <div className="mt-6 rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-400 shadow-sm">Loading pending review…</div>
       ) : reviewItems.length > 0 ? (
-        <section className="mt-6 overflow-hidden rounded-2xl border border-amber-200 bg-white shadow-sm">
+        <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <button onClick={() => setReviewExpanded((v) => !v)} className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="text-base font-semibold text-gray-900">Pending review</h2>
-                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-gray-700">{reviewItems.length} items</span>
+                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-gray-700">{reviewItems.length} items</span>
               </div>
               <p className="mt-1 text-sm text-gray-500">Approve auto-generated knowledge before it enters the main library.</p>
             </div>
             {reviewExpanded ? <ChevronUp className="h-5 w-5 text-gray-400" /> : <ChevronDown className="h-5 w-5 text-gray-400" />}
           </button>
           {reviewExpanded && (
-            <div className="border-t border-amber-100 bg-[#FFFCF6] p-4">
+            <div className="border-t border-slate-200 bg-[#FFFCF6] p-4">
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                 <p className="text-sm text-gray-600">Generated from work orders — needs manager review before becoming searchable.</p>
                 {lowRiskCount >= 2 && (
-                  <button onClick={bulkVerify} disabled={actionLoading === "bulk"} className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-green-100 disabled:opacity-50">
+                  <button onClick={bulkVerify} disabled={actionLoading === "bulk"} className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-slate-100 disabled:opacity-50">
                     {actionLoading === "bulk" ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
                     Bulk verify {lowRiskCount} low-risk items
                   </button>
@@ -628,7 +628,7 @@ function ArticlesTab({ companyId }: { companyId: string }) {
                   const isOpen = reviewOpenId === article.id;
                   const isLoading = actionLoading === article.id;
                   return (
-                    <div key={article.id} className={cn("overflow-hidden rounded-xl border bg-white", risk === "high" ? "border-red-200" : risk === "medium" ? "border-amber-200" : "border-gray-200")}>
+                    <div key={article.id} className={cn("overflow-hidden rounded-xl border bg-white", risk === "high" ? "border-slate-200" : risk === "medium" ? "border-slate-200" : "border-gray-200")}>
                       <button onClick={() => setReviewOpenId(isOpen ? null : article.id)} className="flex w-full items-start justify-between gap-3 px-4 py-4 text-left">
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-2">
@@ -659,13 +659,13 @@ function ArticlesTab({ companyId }: { companyId: string }) {
                             </div>
                           )}
                           <div className="flex flex-wrap items-center gap-2 border-t border-gray-100 pt-3">
-                            <button onClick={() => doAction("verify", article.id)} disabled={isLoading} className="inline-flex items-center gap-1.5 rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-white hover:bg-green-600 disabled:opacity-50">
+                            <button onClick={() => doAction("verify", article.id)} disabled={isLoading} className="inline-flex items-center gap-1.5 rounded-lg bg-slate-500 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50">
                               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />} Verify
                             </button>
                             <button onClick={() => setModal({ type: "edit", articleId: article.id, article })} disabled={isLoading} className="inline-flex items-center gap-1.5 rounded-lg bg-[#0060F0] px-4 py-2 text-sm font-medium text-white hover:bg-[#004BB8] disabled:opacity-50">
                               <Edit3 className="h-4 w-4" /> Edit & verify
                             </button>
-                            <button onClick={() => setModal({ type: "reject", articleId: article.id })} disabled={isLoading} className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-red-100 disabled:opacity-50">
+                            <button onClick={() => setModal({ type: "reject", articleId: article.id })} disabled={isLoading} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-slate-100 disabled:opacity-50">
                               <XCircle className="h-4 w-4" /> Reject
                             </button>
                             <button onClick={() => setModal({ type: "snooze", articleId: article.id })} disabled={isLoading} className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 disabled:opacity-50">
@@ -720,7 +720,7 @@ function GapsTab({ companyId }: { companyId: string }) {
         <div className="py-16 text-center text-gray-400">Loading gaps…</div>
       ) : gaps.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-200 bg-white p-12 text-center">
-          <CheckCircle2 className="mx-auto mb-3 h-10 w-10 text-green-400" />
+          <CheckCircle2 className="mx-auto mb-3 h-10 w-10 text-slate-400" />
           <p className="font-medium text-gray-600">No gaps detected</p>
           <p className="mt-1 text-sm text-gray-400">Your knowledge base is covering all worker questions.</p>
         </div>
@@ -729,7 +729,7 @@ function GapsTab({ companyId }: { companyId: string }) {
           {gaps.map((gap, i) => (
             <div key={i} className="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-5 py-3 shadow-sm">
               <div className="flex items-start gap-3 min-w-0">
-                <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-500" />
+                <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-slate-600" />
                 <p className="text-sm text-gray-800">{gap.topic || gap.question}</p>
               </div>
               <span className="ml-4 flex-shrink-0 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700">{gap.frequency || gap.count}x asked</span>
@@ -893,7 +893,7 @@ function TerminologyTab({ companyId }: { companyId: string }) {
                         await fetch(`/api/terminology?id=${term.id}`, { method: "DELETE" });
                         setTerms((prev) => prev.filter((t) => t.id !== term.id));
                       }}
-                      className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-500"
+                      className="rounded p-1 text-gray-400 hover:bg-slate-50 hover:text-slate-600"
                       title="Delete term"
                     >
                       <Trash2 className="h-4 w-4" />

@@ -48,14 +48,14 @@ export default function HotelServiceRecoveryPage() {
         </div>
 
         {urgentWithoutCase.length ? (
-          <div className="mb-6 rounded-3xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-900/70">Recovery watchlist</div>
-            <div className="mt-2 text-xl font-semibold tracking-[-0.03em] text-amber-950">Urgent guest issues that still need a save-the-stay decision</div>
+          <div className="mb-6 rounded-3xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Recovery watchlist</div>
+            <div className="mt-2 text-xl font-semibold tracking-[-0.03em] text-slate-700">Urgent guest issues that still need a save-the-stay decision</div>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               {urgentWithoutCase.slice(0, 4).map((request) => (
-                <div key={request.id} className="rounded-2xl bg-white px-4 py-4 text-sm text-amber-950">
+                <div key={request.id} className="rounded-2xl bg-white px-4 py-4 text-sm text-slate-700">
                   <div className="font-semibold">Room {request.room} · {request.title}</div>
-                  <div className="mt-1 text-amber-900/75">{request.detail}</div>
+                  <div className="mt-1 text-slate-600">{request.detail}</div>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <button
                       onClick={() => {
@@ -75,7 +75,7 @@ export default function HotelServiceRecoveryPage() {
                     >
                       Open recovery case
                     </button>
-                    <Link href={`/hotel/requests/${request.id}`} className="rounded-full border border-amber-200 bg-white px-3 py-1 text-xs font-medium text-amber-900">
+                    <Link href={`/hotel/requests/${request.id}`} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
                       Open request
                     </Link>
                   </div>

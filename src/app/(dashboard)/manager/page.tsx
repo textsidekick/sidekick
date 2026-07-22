@@ -187,7 +187,7 @@ export default function ManagerDashboard() {
       label: "Needs manager",
       count: unansweredCount + openIssuesCount + unassignedWOs.length + blockedWOs.length,
       href: "/inbox?view=needs_manager",
-      tone: "bg-amber-50 text-[#1C1A16] border-amber-100",
+      tone: "bg-slate-50 text-[#1C1A16] border-slate-200",
     },
     {
       label: "Questions",
@@ -199,7 +199,7 @@ export default function ManagerDashboard() {
       label: "Open issues",
       count: openIssuesCount,
       href: "/inbox?view=issues",
-      tone: "bg-red-50 text-[#1C1A16] border-red-100",
+      tone: "bg-slate-50 text-[#1C1A16] border-red-100",
     },
     {
       label: "Unassigned work orders",
@@ -217,7 +217,7 @@ export default function ManagerDashboard() {
       label: "Critical work orders",
       count: criticalHighWOs.length,
       href: "/inbox?view=critical",
-      tone: "bg-red-50 text-[#1C1A16] border-red-100",
+      tone: "bg-slate-50 text-[#1C1A16] border-red-100",
     },
   ].filter((queue) => queue.count > 0);
 
@@ -228,7 +228,7 @@ export default function ManagerDashboard() {
     attentionItems.push({
       type: "blocked", priority: 1, label: "Blocked work orders",
       detail: `${blockedWOs.length} on hold — may need parts, approval, or reassignment`,
-      icon: ShieldAlert, color: "text-red-700", bgColor: "bg-red-50", borderColor: "border-red-200",
+      icon: ShieldAlert, color: "text-slate-700", bgColor: "bg-slate-50", borderColor: "border-slate-200",
       count: blockedWOs.length, href: "/inbox?view=blocked",
     });
   }
@@ -236,7 +236,7 @@ export default function ManagerDashboard() {
     attentionItems.push({
       type: "critical", priority: 2, label: "Critical / high-priority work orders",
       detail: `${criticalHighWOs.length} open — review and assign if needed`,
-      icon: AlertTriangle, color: "text-red-600", bgColor: "bg-red-50/60", borderColor: "border-red-100",
+      icon: AlertTriangle, color: "text-slate-600", bgColor: "bg-slate-50/60", borderColor: "border-red-100",
       count: criticalHighWOs.length, href: "/inbox?view=critical",
     });
   }
@@ -244,7 +244,7 @@ export default function ManagerDashboard() {
     attentionItems.push({
       type: "overdue", priority: 3, label: "Overdue work orders",
       detail: `${overdueWOs.length} open for 7+ days — check status or escalate`,
-      icon: CalendarClock, color: "text-amber-700", bgColor: "bg-amber-50", borderColor: "border-amber-200",
+      icon: CalendarClock, color: "text-slate-700", bgColor: "bg-slate-50", borderColor: "border-slate-200",
       count: overdueWOs.length, href: "/inbox?view=overdue",
     });
   }
@@ -303,7 +303,7 @@ export default function ManagerDashboard() {
             <div className="flex items-center gap-3">
               <h2 className="text-base font-semibold text-[#1C1A16]">Needs Attention</h2>
               {totalAttentionCount > 0 && (
-                <span className="inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-red-100 text-gray-700 text-xs font-bold">
+                <span className="inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-slate-100 text-gray-700 text-xs font-bold">
                   {totalAttentionCount}
                 </span>
               )}
@@ -311,8 +311,8 @@ export default function ManagerDashboard() {
           </div>
 
           {attentionItems.length === 0 ? (
-            <div className="flex items-center gap-3 rounded-xl border border-green-100 bg-green-50/50 p-5">
-              <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+            <div className="flex items-center gap-3 rounded-xl border border-green-100 bg-slate-50/50 p-5">
+              <CheckCircle2 className="h-5 w-5 text-slate-600 flex-shrink-0" />
               <div>
                 <div className="text-sm font-medium text-gray-800">All clear</div>
                 <div className="text-xs text-gray-600 mt-0.5">No blocked work, overdue items, or unanswered questions right now.</div>

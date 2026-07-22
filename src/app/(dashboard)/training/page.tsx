@@ -85,9 +85,9 @@ function statusPill(status: string, currentStep: number, total: number) {
   };
   const dots: Record<string, string> = {
     completed: "bg-emerald-500",
-    in_progress: "bg-blue-500",
+    in_progress: "bg-slate-500",
     not_started: "bg-slate-400",
-    paused: "bg-amber-500",
+    paused: "bg-slate-500",
   };
   const label = status === "in_progress"
     ? `Step ${currentStep} · ${pct}%`
@@ -107,7 +107,7 @@ function WorkerInitials({ name }: { name: string }) {
     .split("")
     .slice(0, 2)
     .join("");
-  const colors = ["bg-blue-500", "bg-purple-500", "bg-green-500", "bg-orange-500", "bg-pink-500"];
+  const colors = ["bg-slate-500", "bg-purple-500", "bg-slate-500", "bg-orange-500", "bg-pink-500"];
   const color = colors[name.charCodeAt(0) % colors.length];
   return (
     <div className={cn("h-7 w-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0", color)}>
@@ -391,7 +391,7 @@ function PathDetailModal({
                         <p className="text-sm font-medium text-gray-800">{e.workers?.name || e.worker_phone}</p>
                         <p className="text-xs text-gray-400">Last active {timeAgo(e.last_activity_at)}</p>
                         {e.due_date && (
-                          <p className={cn("text-xs", new Date(e.due_date) < new Date() && e.status !== "completed" ? "text-red-500 font-semibold" : "text-gray-400")}>
+                          <p className={cn("text-xs", new Date(e.due_date) < new Date() && e.status !== "completed" ? "text-slate-600 font-semibold" : "text-gray-400")}>
                             {t("Due date")}: {new Date(e.due_date).toLocaleDateString()}
                             {new Date(e.due_date) < new Date() && e.status !== "completed" && (
                               <span className="ml-1.5 inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">{t("Overdue")}</span>
@@ -441,9 +441,9 @@ function PathDetailModal({
               const hasAny = filteredRecommended.length + filteredSameDept.length + filteredOther.length > 0;
 
               const knowledgeColor = (level?: string | null) => {
-                if (level === "high") return "text-green-600";
-                if (level === "low") return "text-red-500";
-                return "text-amber-600";
+                if (level === "high") return "text-slate-600";
+                if (level === "low") return "text-slate-600";
+                return "text-slate-600";
               };
 
               const renderWorkerRow = (w: Worker, isRecommended: boolean) => (
@@ -454,10 +454,10 @@ function PathDetailModal({
                   className={cn(
                     "flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-gray-50",
                     selectedWorkerId === w.id && "bg-[#F4F7FA]",
-                    isRecommended && "bg-amber-50/60 hover:bg-amber-50"
+                    isRecommended && "bg-slate-50/60 hover:bg-slate-50"
                   )}
                 >
-                  {isRecommended && <Star className="h-3.5 w-3.5 flex-shrink-0 fill-amber-400 text-amber-400" />}
+                  {isRecommended && <Star className="h-3.5 w-3.5 flex-shrink-0 fill-slate-400 text-amber-400" />}
                   {!isRecommended && <span className="w-3.5" />}
                   <span className="flex-1 min-w-0">
                     <span className="font-medium text-gray-800">{w.name}</span>
@@ -487,7 +487,7 @@ function PathDetailModal({
                         >
                           {selectedWorker && !workerDropdownOpen ? (
                             <>
-                              {recommendedIds.has(selectedWorker.id) && <Star className="h-3.5 w-3.5 flex-shrink-0 fill-amber-400 text-amber-400" />}
+                              {recommendedIds.has(selectedWorker.id) && <Star className="h-3.5 w-3.5 flex-shrink-0 fill-slate-400 text-amber-400" />}
                               <span className="flex-1 truncate text-gray-800">
                                 {selectedWorker.name}{selectedWorker.role ? ` — ${selectedWorker.role}` : ""}
                                 {selectedWorker.knowledgeLevel && (
@@ -557,8 +557,8 @@ function PathDetailModal({
                     )}
                     {/* Recommended badge under dropdown */}
                     {selectedWorkerId && recommendedIds.has(selectedWorkerId) && !workerDropdownOpen && (
-                      <div className="mt-1 flex items-center gap-1 text-xs text-amber-700">
-                        <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                      <div className="mt-1 flex items-center gap-1 text-xs text-slate-700">
+                        <Star className="h-3 w-3 fill-slate-400 text-amber-400" />
                         Recommended for this training
                       </div>
                     )}
@@ -789,15 +789,15 @@ export default function TrainingPage() {
       />
 
       {/* Integrations banner */}
-      <div className="mt-5 flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3">
-        <Link2 className="h-4 w-4 flex-shrink-0 text-blue-500" />
-        <p className="text-sm text-blue-700">
+      <div className="mt-5 flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+        <Link2 className="h-4 w-4 flex-shrink-0 text-slate-600" />
+        <p className="text-sm text-slate-700">
           <span className="font-semibold">Connect your tools</span> to automatically import training materials. Google Drive, SharePoint, Notion, Dropbox, Slack, Confluence, Box, and more.
         </p>
         <div className="ml-auto flex items-center gap-2">
-          <span className="rounded border border-blue-200 bg-white px-2 py-0.5 text-[11px] font-medium text-blue-600"><FolderOpen className="inline h-3 w-3 mr-0.5" />Drive</span>
-          <span className="rounded border border-blue-200 bg-white px-2 py-0.5 text-[11px] font-medium text-blue-600"><FileText className="inline h-3 w-3 mr-0.5" />SharePoint</span>
-          <span className="rounded border border-blue-200 bg-white px-2 py-0.5 text-[11px] font-medium text-blue-600"><BookOpen className="inline h-3 w-3 mr-0.5" />Notion</span>
+          <span className="rounded border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-medium text-slate-700"><FolderOpen className="inline h-3 w-3 mr-0.5" />Drive</span>
+          <span className="rounded border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-medium text-slate-700"><FileText className="inline h-3 w-3 mr-0.5" />SharePoint</span>
+          <span className="rounded border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-medium text-slate-700"><BookOpen className="inline h-3 w-3 mr-0.5" />Notion</span>
         </div>
       </div>
 
@@ -806,9 +806,9 @@ export default function TrainingPage() {
         <>
           <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
-              { label: t("Workers Enrolled"), value: totalEnrolled, icon: Users, color: "text-blue-600" },
-              { label: t("In Progress"), value: totalInProgress, icon: PlayCircle, color: "text-amber-600" },
-              { label: t("Completed"), value: totalCompleted, icon: CheckCircle2, color: "text-green-600" },
+              { label: t("Workers Enrolled"), value: totalEnrolled, icon: Users, color: "text-slate-700" },
+              { label: t("In Progress"), value: totalInProgress, icon: PlayCircle, color: "text-slate-600" },
+              { label: t("Completed"), value: totalCompleted, icon: CheckCircle2, color: "text-slate-600" },
               { label: t("Completion Rate"), value: `${completionPct}%`, icon: Circle, color: "text-[#0060F0]" },
             ].map((m) => (
               <div key={m.label} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">

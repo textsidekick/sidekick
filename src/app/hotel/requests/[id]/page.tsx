@@ -191,8 +191,8 @@ export default function HotelRequestDetailPage() {
             {recoveryCase ? (
               <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
                 <span className="font-semibold">Linked recovery case:</span> {recoveryCase.issue}
-                <div className="mt-1 text-xs text-amber-800/80">Status: {recoveryCase.status} · Risk: {recoveryCase.valueAtRisk}</div>
-                <Link href="/hotel/service-recovery" className="mt-2 inline-block text-xs font-medium text-amber-900 underline underline-offset-2">Open service recovery board</Link>
+                <div className="mt-1 text-xs text-slate-600">Status: {recoveryCase.status} · Risk: {recoveryCase.valueAtRisk}</div>
+                <Link href="/hotel/service-recovery" className="mt-2 inline-block text-xs font-medium text-slate-700 underline underline-offset-2">Open service recovery board</Link>
               </div>
             ) : null}
             <div className="mt-5 flex flex-wrap gap-2">

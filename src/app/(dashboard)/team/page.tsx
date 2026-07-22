@@ -88,7 +88,7 @@ function roleBadge(role?: string | null) {
   if (!normalizedRole) {
     if (!role || !role.trim()) {
       return (
-        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-50 text-gray-600">
+        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-50 text-gray-600">
           Pending role
         </span>
       );
@@ -416,9 +416,9 @@ export default function TeamPage() {
 
             {/* Training Needs Summary Banner */}
             {workersNeedingTraining > 0 && (
-              <div className="mb-4 flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
-                <TrendingUp className="h-4 w-4 text-amber-600 flex-shrink-0" />
-                <p className="text-sm text-amber-800">
+              <div className="mb-4 flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+                <TrendingUp className="h-4 w-4 text-slate-600 flex-shrink-0" />
+                <p className="text-sm text-slate-700">
                   <span className="font-semibold">{workersNeedingTraining} worker{workersNeedingTraining !== 1 ? "s" : ""}</span> have training recommendations based on question patterns.
                 </p>
               </div>
@@ -476,7 +476,7 @@ export default function TeamPage() {
                           <td className="px-4 py-3 hidden md:table-cell">
                             {skills.length > 0 ? (
                               <div className="flex flex-wrap gap-1">
-                                {skills.map(s => <span key={s} className="text-xs px-2 py-0.5 bg-blue-100 text-gray-700 rounded-full">{s}</span>)}
+                                {skills.map(s => <span key={s} className="text-xs px-2 py-0.5 bg-slate-100 text-gray-700 rounded-full">{s}</span>)}
                               </div>
                             ) : (
                               <span className="text-xs text-gray-400">—</span>
@@ -492,14 +492,14 @@ export default function TeamPage() {
                           <td className="px-4 py-3 text-sm text-gray-700 font-medium">{wosCompleted || <span className="text-gray-400">—</span>}</td>
                           <td className="px-4 py-3">
                             {w.verified
-                              ? <span className="flex items-center gap-1 text-green-600 text-xs"><CheckCircle className="h-3.5 w-3.5" /> Active</span>
+                              ? <span className="flex items-center gap-1 text-slate-600 text-xs"><CheckCircle className="h-3.5 w-3.5" /> Active</span>
                               : <span className="flex items-center gap-1 text-orange-500 text-xs"><Clock className="h-3.5 w-3.5" /> Pending</span>}
                           </td>
                           <td className="px-4 py-3 text-gray-400 text-xs">{new Date(w.created_at).toLocaleDateString()}</td>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-1 justify-end">
                               <button onClick={e => { e.stopPropagation(); openEdit(w); }} className="p-1.5 text-gray-400 hover:text-gray-700 rounded"><Edit2 className="h-3.5 w-3.5" /></button>
-                              <button onClick={e => { e.stopPropagation(); setDeleteConfirmId(w.id); }} className="p-1.5 text-gray-400 hover:text-red-500 rounded"><Trash2 className="h-3.5 w-3.5" /></button>
+                              <button onClick={e => { e.stopPropagation(); setDeleteConfirmId(w.id); }} className="p-1.5 text-gray-400 hover:text-slate-600 rounded"><Trash2 className="h-3.5 w-3.5" /></button>
                             </div>
                           </td>
                         </tr>
@@ -517,7 +517,7 @@ export default function TeamPage() {
                                         const valid = new Date(c.expiry_date || c.expiryDate || '') > new Date();
                                         return (
                                           <li key={i} className="flex items-center gap-2 text-xs">
-                                            <span className={`px-2 py-0.5 rounded-full font-medium ${valid ? 'bg-green-100 text-gray-700' : 'bg-red-100 text-gray-700'}`}>{valid ? 'Valid' : 'Expired'}</span>
+                                            <span className={`px-2 py-0.5 rounded-full font-medium ${valid ? 'bg-slate-100 text-gray-700' : 'bg-slate-100 text-gray-700'}`}>{valid ? 'Valid' : 'Expired'}</span>
                                             <span className="text-gray-700">{c.cert_name || c.certType}</span>
                                             <span className="text-gray-400">· {new Date(c.expiry_date || c.expiryDate || '').toLocaleDateString()}</span>
                                           </li>
@@ -536,7 +536,7 @@ export default function TeamPage() {
                                         const passed = c.ppe_ok && c.loto_ok && c.equipment_ok;
                                         return (
                                           <li key={i} className="flex items-center gap-2 text-xs">
-                                            <span className={`px-2 py-0.5 rounded-full font-medium ${passed ? 'bg-green-100 text-gray-700' : 'bg-red-100 text-gray-700'}`}>{passed ? 'Passed' : 'Failed'}</span>
+                                            <span className={`px-2 py-0.5 rounded-full font-medium ${passed ? 'bg-slate-100 text-gray-700' : 'bg-slate-100 text-gray-700'}`}>{passed ? 'Passed' : 'Failed'}</span>
                                             <span className="text-gray-400">{new Date(c.shift_date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                                           </li>
                                         );
@@ -557,7 +557,7 @@ export default function TeamPage() {
                                       <div className="flex flex-wrap gap-2 text-xs">
                                         <span className="text-gray-500">{insight.totalQuestions} question{insight.totalQuestions !== 1 ? "s" : ""} asked</span>
                                         {insight.gapsTriggered > 0 && (
-                                          <span className="flex items-center gap-0.5 text-red-600">
+                                          <span className="flex items-center gap-0.5 text-slate-600">
                                             <AlertTriangle className="h-3 w-3" />
                                             {insight.gapsTriggered} gap{insight.gapsTriggered !== 1 ? "s" : ""}
                                           </span>
@@ -586,7 +586,7 @@ export default function TeamPage() {
                                                     {tr.name}
                                                   </span>
                                                   {msg ? (
-                                                    <span className="text-[10px] text-green-600 font-medium">{msg}</span>
+                                                    <span className="text-[10px] text-slate-600 font-medium">{msg}</span>
                                                   ) : (
                                                     <button
                                                       onClick={() => assignTraining(w.phone, tr.id, tr.name)}
@@ -659,12 +659,12 @@ export default function TeamPage() {
                           <td className="py-2.5 pr-4 text-gray-600">{cert.certName}</td>
                           <td className="py-2.5 pr-4 text-gray-500">{new Date(cert.expiryDate).toLocaleDateString()}</td>
                           <td className="py-2.5">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${valid ? "bg-green-100 text-gray-700" : "bg-red-100 text-gray-700"}`}>
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${valid ? "bg-slate-100 text-gray-700" : "bg-slate-100 text-gray-700"}`}>
                               {valid ? "Valid" : "Expired"}
                             </span>
                           </td>
                           <td className="py-2.5 text-right">
-                            <button onClick={() => deleteCertification(cert.id)} className="text-gray-400 hover:text-red-500">
+                            <button onClick={() => deleteCertification(cert.id)} className="text-gray-400 hover:text-slate-600">
                               <Trash2 className="h-4 w-4" />
                             </button>
                           </td>
@@ -718,7 +718,7 @@ export default function TeamPage() {
                           <td className="py-2.5 text-center">{checkIcon(entry.lotoOk)}</td>
                           <td className="py-2.5 text-center">{checkIcon(entry.equipmentOk)}</td>
                           <td className="py-2.5">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${passed ? "bg-green-100 text-gray-700" : "bg-red-100 text-gray-700"}`}>
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${passed ? "bg-slate-100 text-gray-700" : "bg-slate-100 text-gray-700"}`}>
                               {passed ? "Passed" : "Failed"}
                             </span>
                           </td>
@@ -753,13 +753,13 @@ export default function TeamPage() {
             <DialogTitle>{editWorker ? "Edit Worker" : "Add Worker"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 mt-2">
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && <p className="text-sm text-slate-600">{error}</p>}
             <div>
               <label className="text-sm font-medium text-gray-700 block mb-1">Name</label>
               <input className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="First Last" />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">Phone <span className="text-red-500">*</span></label>
+              <label className="text-sm font-medium text-gray-700 block mb-1">Phone <span className="text-slate-600">*</span></label>
               <input className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-mono text-gray-900" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="+1 555 000 0000" disabled={!!editWorker} />
             </div>
             <div>

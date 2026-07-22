@@ -469,7 +469,7 @@ export default function InboxPage() {
                       {item.priority && <PriorityBadge priority={item.priority} />}
                       {item.status && <StatusBadge status={item.status} />}
                       {item.needsManager && (
-                        <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-gray-700">
+                        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-gray-700">
                           Needs manager
                         </span>
                       )}

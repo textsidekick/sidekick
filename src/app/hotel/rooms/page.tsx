@@ -59,17 +59,17 @@ export default function HotelRoomsPage() {
         </div>
 
         {arrivalPressure.length ? (
-          <div className="mb-6 rounded-3xl border border-amber-200 bg-amber-50 p-5 shadow-sm shadow-amber-100/50">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-900/70">Inventory pressure</div>
-            <div className="mt-2 text-xl font-semibold tracking-[-0.03em] text-amber-950">Arrivals are waiting on room readiness</div>
+          <div className="mb-6 rounded-3xl border border-slate-200 bg-slate-50 p-5 shadow-sm shadow-amber-100/50">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Inventory pressure</div>
+            <div className="mt-2 text-xl font-semibold tracking-[-0.03em] text-slate-700">Arrivals are waiting on room readiness</div>
             <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {arrivalPressure.map((stay) => {
                 const room = state.rooms.find((item) => item.room === stay.room);
                 return (
-                  <div key={stay.id} className="rounded-2xl border border-amber-100 bg-white px-4 py-4 text-sm text-amber-950">
+                  <div key={stay.id} className="rounded-2xl border border-slate-200 bg-white px-4 py-4 text-sm text-slate-700">
                     <div className="font-semibold">{stay.guestName} · Room {stay.room}</div>
-                    <div className="mt-1 text-amber-900/75">ETA {stay.eta} · {room?.status || "unknown"}</div>
-                    <div className="mt-2 text-amber-900/80">{stay.notes}</div>
+                    <div className="mt-1 text-slate-600">ETA {stay.eta} · {room?.status || "unknown"}</div>
+                    <div className="mt-2 text-slate-600">{stay.notes}</div>
                     <div className="mt-3 flex flex-wrap gap-2">
                       <button
                         onClick={() => actions.updateRoomNote(stay.room, `${room?.note || ""} Front desk escalated this room for arrival readiness.`.trim())}
@@ -77,7 +77,7 @@ export default function HotelRoomsPage() {
                       >
                         Rush room
                       </button>
-                      <Link href="/hotel/stays" className="rounded-full border border-amber-200 bg-white px-3 py-1 text-xs font-medium text-amber-900">
+                      <Link href="/hotel/stays" className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
                         Open arrivals
                       </Link>
                     </div>

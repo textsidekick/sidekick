@@ -74,7 +74,7 @@ export default function AssetImportPage() {
         </div>
 
         {result && (
-          <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-6 flex items-start gap-3">
             <CheckCircle className="h-5 w-5 text-gray-600 mt-0.5" />
             <div>
               <p className="font-medium text-gray-700">Import successful!</p>
@@ -84,9 +84,9 @@ export default function AssetImportPage() {
         )}
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
-            <p className="text-sm text-red-700">{error}</p>
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-slate-600 mt-0.5" />
+            <p className="text-sm text-slate-700">{error}</p>
           </div>
         )}
 

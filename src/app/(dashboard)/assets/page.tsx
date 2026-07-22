@@ -67,11 +67,11 @@ type AddAssetForm = {
 function statusPill(status: AssetStatus) {
   const cls =
     status === "operational"
-      ? "bg-green-100 text-gray-700"
+      ? "bg-slate-100 text-gray-700"
       : status === "degraded"
-        ? "bg-amber-100 text-gray-700"
+        ? "bg-slate-100 text-gray-700"
         : status === "down"
-          ? "bg-red-100 text-gray-700"
+          ? "bg-slate-100 text-gray-700"
           : "bg-gray-100 text-gray-700";
   return <span className={cn("text-xs font-medium px-2 py-1 rounded-full", cls)}>{status.toUpperCase()}</span>;
 }
@@ -292,7 +292,7 @@ export default function AssetsPage() {
         </div>
 
         {!!error && (
-          <div className="mt-4 text-sm text-gray-700 bg-red-50 border border-red-200 rounded-xl p-3">{error}</div>
+          <div className="mt-4 text-sm text-gray-700 bg-slate-50 border border-slate-200 rounded-xl p-3">{error}</div>
         )}
 
         <div className="mt-8 rounded-2xl bg-white border border-black/5 p-6">
@@ -376,7 +376,7 @@ export default function AssetsPage() {
                               <div className="text-sm font-medium">{w.short_id} · {w.title}</div>
                               <div className="text-xs text-black/50">{new Date(w.created_at).toLocaleString()}</div>
                             </div>
-                            <span className={cn("text-xs px-2 py-1 rounded-full", w.status === "completed" ? "bg-green-100 text-gray-700" : "bg-black/5 text-black/70")}>
+                            <span className={cn("text-xs px-2 py-1 rounded-full", w.status === "completed" ? "bg-slate-100 text-gray-700" : "bg-black/5 text-black/70")}>
                               {w.status.replaceAll("_", " ")}
                             </span>
                           </div>

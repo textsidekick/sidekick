@@ -104,7 +104,7 @@ function UploadInline({ companyId }: { companyId: string }) {
       </div>
 
       {result && (
-        <div className={cn("mt-3 flex items-center gap-2 rounded-lg px-3 py-2 text-xs", result.ok ? "bg-green-50 text-gray-700" : "bg-red-50 text-gray-700")}>
+        <div className={cn("mt-3 flex items-center gap-2 rounded-lg px-3 py-2 text-xs", result.ok ? "bg-slate-50 text-gray-700" : "bg-slate-50 text-gray-700")}>
           {result.ok ? <CheckCircle2 className="h-3.5 w-3.5" /> : <X className="h-3.5 w-3.5" />}
           {result.ok ? `Uploaded ${result.name}` : result.error}
         </div>
@@ -192,7 +192,7 @@ function VoiceInline({ companyId }: { companyId: string }) {
         ) : recording ? (
           <button
             onClick={stopRecording}
-            className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-red-500 px-3 py-2 text-sm font-medium text-white hover:bg-red-600"
+            className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-slate-500 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800"
           >
             <MicOff className="h-4 w-4" /> Stop · {formatTime(seconds)}
           </button>
@@ -207,7 +207,7 @@ function VoiceInline({ companyId }: { companyId: string }) {
       </div>
 
       {result && (
-        <div className={cn("mt-3 rounded-lg px-3 py-2 text-xs", result.ok ? "bg-green-50 text-gray-700" : "bg-red-50 text-gray-700")}>
+        <div className={cn("mt-3 rounded-lg px-3 py-2 text-xs", result.ok ? "bg-slate-50 text-gray-700" : "bg-slate-50 text-gray-700")}>
           {result.ok ? <CheckCircle2 className="mr-1 inline h-3.5 w-3.5" /> : <X className="mr-1 inline h-3.5 w-3.5" />}
           {result.ok ? "Saved!" : result.error}
           {result.ok && result.preview && <span className="mt-1 block italic text-gray-600">“{result.preview}…”</span>}
@@ -342,7 +342,7 @@ export default function UpdatesPage() {
               placeholder="Example: We hired Alex Kim as a daytime supervisor, phone +1 415 555 0119. Also the line reset SOP now requires a 10-second wait before restart."
               className="min-h-[150px] w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 focus:border-[#0060F0] focus:outline-none focus:ring-2 focus:ring-[#0060F0]/20"
             />
-            {error && <div className="mt-2 text-sm text-red-600">{error}</div>}
+            {error && <div className="mt-2 text-sm text-slate-600">{error}</div>}
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               <VoiceInline companyId={companyId} />
               <UploadInline companyId={companyId} />

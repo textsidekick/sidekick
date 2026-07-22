@@ -43,9 +43,9 @@ function riskLevel(article: ReviewArticle): "high" | "medium" | "low" {
 }
 
 function riskBadge(level: "high" | "medium" | "low") {
-  const cls = level === "high" ? "bg-red-100 text-gray-700 border-red-200"
-    : level === "medium" ? "bg-amber-100 text-gray-700 border-amber-200"
-    : "bg-green-100 text-gray-700 border-green-200";
+  const cls = level === "high" ? "bg-slate-100 text-gray-700 border-slate-200"
+    : level === "medium" ? "bg-slate-100 text-gray-700 border-slate-200"
+    : "bg-slate-100 text-gray-700 border-slate-200";
   return (
     <span className={cn("text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded border", cls)}>
       {level} risk
@@ -93,7 +93,7 @@ function RejectModal({ onConfirm, onCancel }: { onConfirm: (reason: string) => v
         <textarea value={reason} onChange={e => setReason(e.target.value)} rows={3} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" placeholder="e.g. Wrong procedure for this machine, outdated parts list..." />
         <div className="flex justify-end gap-2 mt-4">
           <button onClick={onCancel} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
-          <button onClick={() => onConfirm(reason)} disabled={!reason.trim()} className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50">Reject</button>
+          <button onClick={() => onConfirm(reason)} disabled={!reason.trim()} className="px-4 py-2 text-sm bg-slate-500 text-white rounded-lg hover:bg-slate-800 disabled:opacity-50">Reject</button>
         </div>
       </div>
     </div>
@@ -232,7 +232,7 @@ export default function ReviewQueuePage() {
       {/* Stats bar */}
       <div className="mt-6 flex items-center gap-4 flex-wrap">
         <div className="bg-white rounded-xl border border-gray-200 px-5 py-3 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
             <AlertTriangle className="w-5 h-5 text-gray-700" />
           </div>
           <div>
@@ -244,7 +244,7 @@ export default function ReviewQueuePage() {
           <button
             onClick={bulkVerify}
             disabled={actionLoading === "bulk"}
-            className="rounded-xl border border-green-200 bg-green-50 hover:bg-green-100 px-5 py-3 flex items-center gap-3 transition text-left disabled:opacity-50"
+            className="rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 px-5 py-3 flex items-center gap-3 transition text-left disabled:opacity-50"
           >
             <CheckCircle2 className="w-5 h-5 text-gray-700" />
             <div>
@@ -261,7 +261,7 @@ export default function ReviewQueuePage() {
           <div className="text-center py-12 text-gray-400">Loading review queue…</div>
         ) : items.length === 0 ? (
           <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-            <CheckCircle2 className="w-12 h-12 text-green-500/40 mx-auto mb-3" />
+            <CheckCircle2 className="w-12 h-12 text-slate-400 mx-auto mb-3" />
             <p className="text-gray-700 font-semibold">All caught up!</p>
             <p className="text-gray-400 text-sm mt-1">No knowledge items need review right now.</p>
           </div>
@@ -273,7 +273,7 @@ export default function ReviewQueuePage() {
             const isLoading = actionLoading === article.id;
 
             return (
-              <div key={article.id} className={cn("bg-white rounded-xl border overflow-hidden", risk === "high" ? "border-red-200" : risk === "medium" ? "border-amber-200" : "border-gray-200")}>
+              <div key={article.id} className={cn("bg-white rounded-xl border overflow-hidden", risk === "high" ? "border-slate-200" : risk === "medium" ? "border-slate-200" : "border-gray-200")}>
                 {/* Header */}
                 <button onClick={() => setExpanded(isExpanded ? null : article.id)} className="w-full px-5 py-4 flex items-start justify-between text-left">
                   <div className="flex-1 min-w-0">
@@ -336,7 +336,7 @@ export default function ReviewQueuePage() {
                       <button
                         onClick={() => doAction("verify", article.id)}
                         disabled={isLoading}
-                        className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 transition-colors"
+                        className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium bg-slate-500 text-white rounded-lg hover:bg-slate-800 disabled:opacity-50 transition-colors"
                       >
                         {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />} Verify
                       </button>
@@ -350,7 +350,7 @@ export default function ReviewQueuePage() {
                       <button
                         onClick={() => setModal({ type: "reject", articleId: article.id })}
                         disabled={isLoading}
-                        className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 disabled:opacity-50 transition-colors"
+                        className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-700 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100 disabled:opacity-50 transition-colors"
                       >
                         <XCircle className="w-4 h-4" /> Reject
                       </button>
