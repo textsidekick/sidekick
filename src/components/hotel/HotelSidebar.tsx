@@ -3,67 +3,27 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { BedDouble, ConciergeBell, Sparkles, Wrench, ClipboardList, Hotel, ArrowLeft, DoorOpen, Settings, BadgeCheck, BellRing, MessageSquareText, CalendarClock, UsersRound, HeartHandshake, SearchCheck, ClipboardCheck, Package2, ReceiptText, ShieldAlert, CarFront, PackageCheck, BriefcaseBusiness, AlarmClockCheck, WashingMachine, BusFront, ArrowRightLeft, Refrigerator, Crown, Users, Ban, SprayCan, Coffee, Menu } from "lucide-react";
+import { BedDouble, ConciergeBell, Wrench, Hotel, ArrowLeft, DoorOpen, CalendarClock, UsersRound, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_GROUPS = [
   {
-    label: "Run the shift",
+    label: "Main views",
     items: [
-      { label: "Overview", href: "/hotel", icon: Hotel, detail: "Shift summary" },
-      { label: "Front Desk Live Queue", href: "/hotel/front-desk", icon: BellRing, detail: "Authoritative now view" },
-      { label: "Guest Inbox", href: "/hotel/guest-requests", icon: ConciergeBell, detail: "Workflow lanes" },
-      { label: "Arrivals & Departures", href: "/hotel/stays", icon: CalendarClock, detail: "Next wave execution" },
-      { label: "SMS Console", href: "/hotel/sms", icon: MessageSquareText, detail: "Test the text loop" },
-      { label: "Service Recovery", href: "/hotel/service-recovery", icon: HeartHandshake, detail: "Escalations + make-goods" },
-    ],
-  },
-  {
-    label: "Property views",
-    items: [
+      { label: "Overview", href: "/hotel", icon: Hotel, detail: "Rooms, availability, arrivals, team" },
       { label: "Room Board", href: "/hotel/rooms", icon: DoorOpen, detail: "Inventory + readiness" },
+      { label: "Arrivals & Departures", href: "/hotel/stays", icon: CalendarClock, detail: "Who is coming and going" },
+      { label: "Guest Requests", href: "/hotel/guest-requests", icon: ConciergeBell, detail: "Open guest issues" },
       { label: "Housekeeping", href: "/hotel/housekeeping", icon: BedDouble, detail: "Turns + service" },
       { label: "Maintenance", href: "/hotel/maintenance", icon: Wrench, detail: "Defects + fixes" },
-      { label: "Inspections", href: "/hotel/inspections", icon: ClipboardCheck, detail: "Quality gates" },
-      { label: "Out of Order", href: "/hotel/out-of-order", icon: Ban, detail: "Blocked revenue" },
-      { label: "Deep Cleans", href: "/hotel/deep-cleans", icon: SprayCan, detail: "Recurring reset work" },
-    ],
-  },
-  {
-    label: "Supporting tools",
-    items: [
-      { label: "Approvals", href: "/hotel/approvals", icon: BadgeCheck, detail: "Desk exceptions" },
-      { label: "Parking", href: "/hotel/parking", icon: CarFront, detail: "Vehicle edge cases" },
-      { label: "Packages", href: "/hotel/packages", icon: PackageCheck, detail: "Deliveries" },
-      { label: "Luggage Hold", href: "/hotel/luggage", icon: BriefcaseBusiness, detail: "Bell desk tasks" },
-      { label: "Breakfast", href: "/hotel/breakfast", icon: Coffee, detail: "Morning service" },
-      { label: "Wake-up Calls", href: "/hotel/wakeups", icon: AlarmClockCheck, detail: "Guest reminders" },
-      { label: "Shuttles", href: "/hotel/shuttles", icon: BusFront, detail: "Transport timing" },
-    ],
-  },
-  {
-    label: "Reference + edge cases",
-    items: [
-      { label: "VIP Arrivals", href: "/hotel/vip-arrivals", icon: Crown, detail: "Special handling" },
-      { label: "Group Arrivals", href: "/hotel/group-arrivals", icon: Users, detail: "Bulk check-in prep" },
-      { label: "Room Moves", href: "/hotel/room-moves", icon: ArrowRightLeft, detail: "Relocation cases" },
-      { label: "Minibar & Market", href: "/hotel/minibar", icon: Refrigerator, detail: "Retail exceptions" },
-      { label: "Laundry", href: "/hotel/laundry", icon: WashingMachine, detail: "Linens + guest items" },
-      { label: "Supplies", href: "/hotel/supplies", icon: Package2, detail: "Par levels" },
-      { label: "Night Audit", href: "/hotel/audit", icon: ReceiptText, detail: "End-of-day controls" },
-      { label: "Incident Log", href: "/hotel/incidents", icon: ShieldAlert, detail: "Safety + security" },
-      { label: "Lost & Found", href: "/hotel/lost-found", icon: SearchCheck, detail: "Claim tracking" },
       { label: "People Ops", href: "/hotel/people", icon: UsersRound, detail: "Coverage + training" },
-      { label: "Operating Memory", href: "/hotel/knowledge", icon: Sparkles, detail: "Reusable know-how" },
-      { label: "Shift Board", href: "/hotel/shift-board", icon: ClipboardList, detail: "Handoff summary" },
-      { label: "Onboarding", href: "/hotel/onboarding", icon: Settings, detail: "New staff setup" },
     ],
   },
 ];
 
 export function HotelSidebar() {
   const pathname = usePathname();
-  const mobilePrimary = NAV_GROUPS.flatMap((group) => group.items).filter((item) => ["/hotel", "/hotel/front-desk", "/hotel/guest-requests", "/hotel/rooms", "/hotel/sms"].includes(item.href));
+  const mobilePrimary = NAV_GROUPS.flatMap((group) => group.items).filter((item) => ["/hotel", "/hotel/rooms", "/hotel/stays", "/hotel/guest-requests"].includes(item.href));
   const moreItems = NAV_GROUPS.flatMap((group) => group.items).filter((item) => !mobilePrimary.some((primary) => primary.href === item.href));
 
   return (
@@ -144,7 +104,7 @@ export function HotelSidebar() {
           <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
             <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Demo Property</div>
             <div className="mt-1 text-sm font-semibold text-white">Pacific Stay Motel</div>
-            <div className="mt-1 text-xs leading-5 text-slate-300">48 rooms · multilingual staff · one shift system for desk, rooms, and guest messaging</div>
+            <div className="mt-1 text-xs leading-5 text-slate-300">48 rooms · small motel view · rooms, guests, and staff</div>
           </div>
         </div>
 
