@@ -10,6 +10,9 @@ export default function HotelHousekeepingPage() {
 
   const rooms = state.rooms.filter((room) => ["dirty", "inspection", "queued", "occupied"].includes(room.status));
 
+  const primaryButton = "inline-flex items-center justify-center rounded-xl bg-[#343A40] px-3 py-2 text-xs font-semibold text-white hover:bg-[#2B3035]";
+  const secondaryButton = "inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50";
+
   return (
     <div className="min-h-screen px-6 py-8 sm:px-8 lg:px-10">
       <div className="mx-auto max-w-6xl">
@@ -32,24 +35,24 @@ export default function HotelHousekeepingPage() {
                 {room.status !== "inspection" ? (
                   <button
                     onClick={() => actions.updateRoomStatus(room.room, "inspection")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className={primaryButton}
                   >
-                    Mark cleaned
+                    Move To Inspection
                   </button>
                 ) : null}
                 {room.status !== "ready" ? (
                   <button
                     onClick={() => actions.updateRoomStatus(room.room, "ready")}
-                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                    className={secondaryButton}
                   >
-                    Mark ready
+                    Mark Ready
                   </button>
                 ) : null}
                 <button
                   onClick={() => actions.updateRoomNote(room.room, `Restocked and checked at ${new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`)}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60"
+                  className={secondaryButton}
                 >
-                  Add restock note
+                  Add Restock Note
                 </button>
               </div>
             </div>
