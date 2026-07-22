@@ -3,24 +3,33 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { Hotel, ArrowLeft, DoorOpen, CalendarClock, UsersRound, Menu } from "lucide-react";
+import { Hotel, ArrowLeft, DoorOpen, CalendarClock, UsersRound, Menu, MessagesSquare, ClipboardList, BrainCircuit, UploadCloud } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_GROUPS = [
   {
-    label: "Main views",
+    label: "Core workflow",
     items: [
       { label: "Today", href: "/hotel", icon: Hotel, detail: "The live motel board" },
+      { label: "Conversations", href: "/hotel/conversations", icon: MessagesSquare, detail: "Guest + staff threads" },
+      { label: "Tasks", href: "/hotel/tasks", icon: ClipboardList, detail: "Tracked work from texts" },
       { label: "Rooms", href: "/hotel/rooms", icon: DoorOpen, detail: "Inventory + readiness" },
+    ],
+  },
+  {
+    label: "Hotel memory",
+    items: [
       { label: "Arrivals", href: "/hotel/stays", icon: CalendarClock, detail: "Incoming guests" },
       { label: "Staff", href: "/hotel/people", icon: UsersRound, detail: "Coverage + team" },
+      { label: "Knowledge", href: "/hotel/knowledge", icon: BrainCircuit, detail: "Policies + learned answers" },
+      { label: "Onboarding", href: "/hotel/onboarding", icon: UploadCloud, detail: "Docs, rules, phone numbers" },
     ],
   },
 ];
 
 export function HotelSidebar() {
   const pathname = usePathname();
-  const mobilePrimary = NAV_GROUPS.flatMap((group) => group.items).filter((item) => ["/hotel", "/hotel/rooms", "/hotel/stays", "/hotel/people"].includes(item.href));
+  const mobilePrimary = NAV_GROUPS.flatMap((group) => group.items).filter((item) => ["/hotel", "/hotel/conversations", "/hotel/tasks", "/hotel/rooms"].includes(item.href));
   const moreItems = NAV_GROUPS.flatMap((group) => group.items).filter((item) => !mobilePrimary.some((primary) => primary.href === item.href));
 
   return (

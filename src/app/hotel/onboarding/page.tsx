@@ -15,11 +15,11 @@ const steps = [
   },
   {
     title: "3. Load property knowledge",
-    detail: "Late checkout policy, Wi-Fi instructions, housekeeping standards, maintenance escalation steps, and refund/guest issue rules.",
+    detail: "Late checkout policy, Wi-Fi instructions, housekeeping standards, maintenance escalation steps, refund rules, and anything guests commonly ask.",
   },
   {
     title: "4. Go live on one property",
-    detail: "Start with guest requests, room-ready updates, housekeeping flags, and maintenance routing. Expand once one property is working.",
+    detail: "Start with guest texting, room-ready updates, housekeeping flags, and maintenance routing. Expand once one property is working.",
   },
 ];
 
@@ -34,7 +34,7 @@ export default function HotelOnboardingPage() {
       <div className="mx-auto max-w-5xl">
         <HotelPageHeader
           title="Hotel onboarding"
-          body="This is the clean hotel onboarding story: phone numbers first, policies second, then live guest and staff messaging."
+          body="This is the clean hotel onboarding story: phone numbers first, property rules second, then live guest and staff texting through Sidekick."
           action={saved ? <div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">Saved</div> : null}
         />
 
@@ -78,6 +78,26 @@ export default function HotelOnboardingPage() {
               <p className="mt-3 text-sm leading-6 text-black/55">{step.detail}</p>
             </div>
           ))}
+        </div>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <div className="rounded-3xl border border-black/8 bg-white p-6 shadow-sm">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">What to upload</div>
+            <div className="mt-3 space-y-2 text-sm text-black/60">
+              <div>Hotel information and FAQs</div>
+              <div>Breakfast, parking, Wi-Fi, checkout, refund, and late-checkout rules</div>
+              <div>Cleaning procedures and maintenance escalation steps</div>
+              <div>Vendor lists, PDFs, maps, and emergency procedures</div>
+            </div>
+          </div>
+          <div className="rounded-3xl border border-black/8 bg-white p-6 shadow-sm">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">Why this matters</div>
+            <div className="mt-3 space-y-2 text-sm text-black/60">
+              <div>Sidekick can answer guests immediately from the property’s own rules.</div>
+              <div>Staff can work by text without needing a heavy rollout.</div>
+              <div>Every exception and follow-up adds to the hotel’s memory over time.</div>
+            </div>
+          </div>
         </div>
 
         <div className="mt-8 rounded-3xl border border-[#eadfce] bg-[#faf5ee] p-6">

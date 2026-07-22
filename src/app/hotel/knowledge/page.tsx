@@ -13,8 +13,22 @@ export default function HotelKnowledgePage() {
       <div className="mx-auto max-w-6xl">
         <HotelPageHeader
           title="Operating memory"
-          body="This is where hotel-specific knowledge compounds: guest policies, exception handling, repeat fixes, room issues, and staff know-how."
+          body="This is where the hotel’s institutional knowledge compounds: guest policies, repeat fixes, room history, staff know-how, and the answers Sidekick can reuse instantly next time."
         />
+        <div className="mb-6 grid gap-4 md:grid-cols-3">
+          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Guest knowledge</div>
+            <div className="mt-2 text-sm text-slate-600">Breakfast, parking, Wi-Fi, late checkout, refunds, and common questions.</div>
+          </div>
+          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Operational memory</div>
+            <div className="mt-2 text-sm text-slate-600">Maintenance history, room issues, cleaning patterns, and property-specific exceptions.</div>
+          </div>
+          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Auto-learning</div>
+            <div className="mt-2 text-sm text-slate-600">Every conversation and follow-up should make the next answer faster and more property-specific.</div>
+          </div>
+        </div>
         <div className="grid gap-4 md:grid-cols-2">
           {state.knowledge.map((item) => (
             <div key={item.title} className="rounded-3xl border border-black/8 bg-white p-5 shadow-sm">

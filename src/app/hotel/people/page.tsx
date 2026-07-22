@@ -21,10 +21,19 @@ export default function HotelPeoplePage() {
     <div className="min-h-screen px-6 py-8 sm:px-8 lg:px-10">
       <div className="mx-auto max-w-6xl">
         <HotelPageHeader
-          title="People ops"
-          body="Hotel staffing and HR work that should run through the same operating system: training, policy rollout, shift coverage, multilingual onboarding, and manager follow-through."
+          title="Staff"
+          body="The staff side should stay as simple as the guest side. Team members should be able to work through text, get reminders, receive SOP help, and stay aligned without heavy software training."
           action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{openTasks.length} active people tasks</div>}
         />
+
+        <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">SMS-native staff workflow</div>
+          <div className="mt-3 grid gap-3 md:grid-cols-3">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">Housekeepers and maintenance should be able to text updates naturally.</div>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">Sidekick should turn those texts into visible status updates and tracked work.</div>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">Managers should only step in when routing, policy, or escalation needs a person.</div>
+          </div>
+        </div>
 
         <div className="grid gap-4 md:grid-cols-2">
           {state.peopleTasks.map((task) => (

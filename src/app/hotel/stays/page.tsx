@@ -30,16 +30,26 @@ export default function HotelStaysPage() {
     <div className="min-h-screen px-6 py-8 sm:px-8 lg:px-10">
       <div className="mx-auto max-w-7xl">
         <HotelPageHeader
-          title="Arrivals & departures"
-          body="Front desk control center for check-ins, departures, late checkout pressure, and guests who need proactive outreach before they show up."
-          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600">{arriving.length} arriving · {departing.length} departing</div>}
+          title="Arrivals"
+          body="This is the pre-arrival and check-in flow. The goal is simple: invite guests into the Sidekick text line fast, make sure the room is ready, and remove front-desk coordination work before the guest shows up."
+          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600">{arriving.length} arriving · QR + text onboarding</div>}
         />
+
+        <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/40">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Guest onboarding</div>
+          <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[#17202B]">Scan a QR code. Text Sidekick. No app download.</h2>
+          <div className="mt-4 grid gap-3 md:grid-cols-3">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">1. Guest gets a QR code at check-in</div>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">2. Guest texts Sidekick for Wi-Fi, towels, issues, or updates</div>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">3. Sidekick answers or routes the work automatically</div>
+          </div>
+        </div>
 
         <div className="mb-6 grid gap-4 md:grid-cols-3">
           <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/50">
             <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Next 2–4 hours</div>
             <div className="mt-2 text-3xl font-bold tracking-[-0.03em] text-[#17202B]">{arriving.length}</div>
-            <div className="mt-1 text-sm text-slate-600">Arrivals that still need a ready room, guest outreach, or special handling.</div>
+            <div className="mt-1 text-sm text-slate-600">Arrivals that still need a room, guest text, or special handling.</div>
           </div>
           <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/50">
             <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Room readiness gaps</div>
@@ -49,7 +59,7 @@ export default function HotelStaysPage() {
           <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/50">
             <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Departure pressure</div>
             <div className="mt-2 text-3xl font-bold tracking-[-0.03em] text-[#17202B]">{departureExecution.filter((item) => item.dependentArrival).length}</div>
-            <div className="mt-1 text-sm text-slate-600">Departures directly blocking a same-room arrival or desk promise later today.</div>
+            <div className="mt-1 text-sm text-slate-600">Quiet departure pressure that could still block a room for an arrival.</div>
           </div>
         </div>
 
@@ -57,7 +67,7 @@ export default function HotelStaysPage() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Execution view</div>
-              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[#17202B]">What the desk has to line up before the next wave hits</h2>
+              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[#17202B]">What has to be true before the next arrivals hit</h2>
             </div>
             <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-600">{arrivalsNeedingPrep.length} arrivals need special prep</div>
           </div>
@@ -85,7 +95,7 @@ export default function HotelStaysPage() {
                     onClick={() => actions.updateStayNote(stay.id, `${stay.notes} Pre-arrival text sent with arrival expectations and desk contact.`)}
                     className="rounded-lg bg-slate-700 px-3 py-2 text-xs font-medium text-white hover:bg-slate-800"
                   >
-                    Send pre-arrival text
+                    Send Sidekick intro
                   </button>
                   {room && room.status !== "ready" ? (
                     <button
@@ -130,7 +140,7 @@ export default function HotelStaysPage() {
           />
 
           <Section
-            title="Departing / at-risk"
+            title="Departures in the background"
             items={departing}
             renderActions={(stay) => (
               <>
@@ -144,7 +154,7 @@ export default function HotelStaysPage() {
                   onClick={() => actions.updateStayNote(stay.id, `${stay.notes} Front desk sent checkout reminder and coordinated with housekeeping.`)}
                   className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
-                  Send checkout reminder
+                  Handle quietly
                 </button>
                 <button
                   onClick={() => actions.createRequest({
@@ -168,7 +178,7 @@ export default function HotelStaysPage() {
                   ])}
                   className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                 >
-                  Create desk follow-up
+                  Create follow-up
                 </button>
               </>
             )}
@@ -185,8 +195,8 @@ export default function HotelStaysPage() {
                 >
                   Send satisfaction check
                 </button>
-                <Link href="/hotel/guest-requests" className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">
-                  Open guest inbox
+                <Link href="/hotel/conversations" className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">
+                  Open conversations
                 </Link>
               </>
             )}
