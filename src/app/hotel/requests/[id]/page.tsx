@@ -5,12 +5,15 @@ import { useParams } from "next/navigation";
 import { Camera, Mic, Video } from "lucide-react";
 import { HotelPageHeader, HotelStatusPill } from "@/components/hotel/HotelUi";
 import { useHotelDemoState } from "@/lib/hotel-demo-store";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export default function HotelRequestDetailPage() {
   const params = useParams<{ id: string }>();
   const { state, actions, loaded } = useHotelDemoState();
   const [message, setMessage] = useState("");
+  const [attachments, setAttachments] = useState<Array<{ name: string; kind: "media" | "voice" }>>([]);
+  const mediaInputRef = useRef<HTMLInputElement | null>(null);
+  const voiceInputRef = useRef<HTMLInputElement | null>(null);
 
   if (!loaded) return null;
 
@@ -47,6 +50,20 @@ export default function HotelRequestDetailPage() {
         : request.resolutionState === "staff_dispatched"
           ? "high"
           : "normal";
+
+  function attachFiles(files: FileList | null, kind: "media" | "voice") {
+    if (!files?.length) return;
+    const added = Array.from(files).map((file) => ({ name: file.name, kind }));
+    setAttachments((current) => [...added, ...current]);
+    actions.addTimelineEvent(request.id, {
+      type: "staff",
+      text:
+        kind === "voice"
+          ? `Attached voice note: ${added.map((file) => file.name).join(", ")}.`
+          : `Attached media evidence: ${added.map((file) => file.name).join(", ")}.`,
+      at: "Now",
+    });
+  }
 
   return (
     <div className="min-h-screen px-6 py-8 sm:px-8 lg:px-10">
@@ -118,6 +135,21 @@ export default function HotelRequestDetailPage() {
 
             <div className="rounded-2xl border border-black/8 bg-[#fffdfa] p-4">
               <div className="text-xs font-semibold uppercase tracking-[0.14em] text-black/35">Add manager/staff update</div>
+              <input
+                ref={mediaInputRef}
+                type="file"
+                accept="image/*,video/*"
+                multiple
+                className="hidden"
+                onChange={(e) => attachFiles(e.target.files, "media")}
+              />
+              <input
+                ref={voiceInputRef}
+                type="file"
+                accept="audio/*"
+                className="hidden"
+                onChange={(e) => attachFiles(e.target.files, "voice")}
+              />
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -144,9 +176,21 @@ export default function HotelRequestDetailPage() {
                 >
                   Send guest update
                 </button>
-                <button className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Attach photo note</button>
-                <button className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Attach voice note</button>
+                <button onClick={() => mediaInputRef.current?.click()} className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Attach photo / video</button>
+                <button onClick={() => voiceInputRef.current?.click()} className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Attach voice note</button>
               </div>
+              {attachments.length ? (
+                <div className="mt-4 space-y-2">
+                  <div className="text-xs font-semibold uppercase tracking-[0.14em] text-black/35">Attached evidence</div>
+                  <div className="flex flex-wrap gap-2">
+                    {attachments.map((attachment) => (
+                      <div key={`${attachment.kind}-${attachment.name}`} className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-600">
+                        {attachment.kind === "voice" ? "Voice" : "Media"}: {attachment.name}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
             </div>
 
             <div className="rounded-2xl border border-black/8 bg-white p-4">

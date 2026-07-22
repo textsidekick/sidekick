@@ -1,62 +1,15 @@
 "use client";
 
-import { HotelPageHeader, HotelStatusPill } from "@/components/hotel/HotelUi";
-import { useHotelDemoState } from "@/lib/hotel-demo-store";
+import { HotelLegacyRedirectPage } from "@/components/hotel/HotelLegacyRedirectPage";
 
-export default function HotelAuditPage() {
-  const { state, actions, loaded } = useHotelDemoState();
-
-  if (!loaded) return null;
-
+export default function Page() {
   return (
-    <div className="min-h-screen px-6 py-8 sm:px-8 lg:px-10">
-      <div className="mx-auto max-w-6xl">
-        <HotelPageHeader
-          title="Night audit"
-          body="Revenue and compliance exceptions that operators have to close before the day rolls: folio mismatches, OTA variances, missing documentation, and unresolved desk exceptions."
-          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.auditItems.filter((item) => item.status !== "resolved").length} open exceptions</div>}
-        />
-
-        <div className="space-y-3">
-          {state.auditItems.map((item) => (
-            <div key={item.id} className="rounded-3xl border border-black/8 bg-white p-5 shadow-sm">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <div className="text-xs font-semibold uppercase tracking-[0.16em] text-black/40">{item.bucket}</div>
-                  <div className="mt-2 text-lg font-semibold text-[#1C1A16]">{item.title}</div>
-                  <div className="mt-1 text-xs text-black/45">Owner: {item.owner} · Impact: {item.impact}</div>
-                </div>
-                <HotelStatusPill tone={item.status === "resolved" ? "resolved" : item.status === "reviewing" ? "queued" : "high"}>{item.status}</HotelStatusPill>
-              </div>
-              <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">{item.note}</div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {item.status === "open" ? (
-                  <button
-                    onClick={() => actions.updateAuditStatus(item.id, "reviewing")}
-                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                  >
-                    Start review
-                  </button>
-                ) : null}
-                {item.status !== "resolved" ? (
-                  <button
-                    onClick={() => actions.updateAuditStatus(item.id, "resolved")}
-                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                  >
-                    Resolve exception
-                  </button>
-                ) : null}
-                <button
-                  onClick={() => actions.updateAuditNote(item.id, `${item.note} Manager summary drafted and supporting notes attached.`)}
-                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
-                >
-                  Add audit note
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+    <HotelLegacyRedirectPage
+      title='Audit follow-through'
+      body='Audit issues now feed into tracked work instead of living in a separate hotel board.'
+      targetHref='/hotel/tasks'
+      targetLabel='Tasks'
+      reason='If an audit finds a problem, it should become a task with an owner and visible follow-up.'
+    />
   );
 }

@@ -36,9 +36,9 @@ export default function HotelRoomsPage() {
 
   const summary = [
     { label: "Available", value: rooms.filter((room) => room.status === "ready").length },
-    { label: "Occupied", value: rooms.filter((room) => room.status === "occupied").length },
     { label: "Not ready", value: rooms.filter((room) => ["dirty", "inspection", "queued"].includes(room.status)).length },
     { label: "Maintenance", value: rooms.filter((room) => room.status === "maintenance").length },
+    { label: "Needs attention", value: rooms.filter((room) => room.status !== "ready" && room.status !== "occupied").length },
   ];
 
   return (
@@ -47,7 +47,7 @@ export default function HotelRoomsPage() {
         <HotelPageHeader
           eyebrow="Rooms"
           title="Room board"
-          body="One simple inventory view: what is sellable, what is occupied, and what is blocking a room from being used."
+          body="One simple inventory view: what is sellable now, what still needs work, and what is blocking a room from being turned over."
           action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600">{state.property.roomCount} rooms</div>}
         />
 

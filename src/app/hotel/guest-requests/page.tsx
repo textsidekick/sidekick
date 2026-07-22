@@ -1,131 +1,15 @@
 "use client";
 
-import Link from "next/link";
-import { HotelPageHeader, HotelStatusPill } from "@/components/hotel/HotelUi";
-import { useHotelDemoState } from "@/lib/hotel-demo-store";
+import { HotelLegacyRedirectPage } from "@/components/hotel/HotelLegacyRedirectPage";
 
-export default function HotelGuestRequestsPage() {
-  const { state, actions, loaded } = useHotelDemoState();
-
-  const actionChip = "inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700";
-
-  if (!loaded) return null;
-
-  const requests = state.requests.filter((item) => item.kind === "guest" || item.source === "guest sms" || item.kind === "front_desk");
-  const inboxColumns = [
-    {
-      key: "new",
-      title: "New",
-      detail: "New guest texts that still need a first response or a routing decision.",
-      items: requests.filter((request) => !request.resolutionState || request.resolutionState === "new" || request.triageStatus === "needs_review"),
-      tone: "normal" as const,
-    },
-    {
-      key: "working",
-      title: "Working",
-      detail: "Sidekick already updated the guest and the owner is handling the work.",
-      items: requests.filter((request) => request.resolutionState === "guest_updated" || request.resolutionState === "staff_dispatched" || request.status === "in_progress"),
-      tone: "high" as const,
-    },
-    {
-      key: "verify",
-      title: "Waiting on guest",
-      detail: "Internal work is done and Sidekick is waiting for the guest to confirm everything is good.",
-      items: requests.filter((request) => request.resolutionState === "awaiting_verification"),
-      tone: "queued" as const,
-    },
-  ];
-
+export default function Page() {
   return (
-    <div className="min-h-screen px-6 py-8 sm:px-8 lg:px-10">
-      <div className="mx-auto max-w-6xl">
-        <HotelPageHeader
-          title="Guest conversations"
-          body="Guests text Sidekick. Sidekick answers what it can, routes the rest to staff, and keeps the guest updated without forcing the desk to coordinate everything manually."
-        />
-        <div className="mb-6 grid gap-4 md:grid-cols-3">
-          {inboxColumns.map((column) => (
-            <div key={column.key} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/50">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Conversation lane</div>
-                  <div className="mt-2 text-lg font-semibold text-[#17202B]">{column.title}</div>
-                </div>
-                <HotelStatusPill tone={column.tone}>{column.items.length}</HotelStatusPill>
-              </div>
-              <div className="mt-2 text-sm leading-6 text-slate-600">{column.detail}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="grid gap-4 xl:grid-cols-3">
-          {inboxColumns.map((column) => (
-            <div key={column.key} className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm shadow-slate-200/50">
-              <div className="border-b border-slate-200 px-2 pb-3">
-                <div className="text-sm font-semibold text-[#17202B]">{column.title}</div>
-                <div className="mt-1 text-xs text-slate-500">{column.items.length} items in this lane</div>
-              </div>
-
-              <div className="mt-4 space-y-3">
-                {column.items.length ? (
-                  column.items.map((request) => {
-                    const stay = state.stays.find((item) => item.room === request.room || item.id === request.stayId);
-                    const resolutionLabel = request.resolutionState?.replace(/_/g, " ") || "new";
-                    const statusTone = request.status === "resolved" ? "resolved" : request.triageStatus === "needs_review" || request.status === "needs_approval" ? "queued" : request.priority === "urgent" ? "urgent" : request.priority === "high" || request.resolutionState === "staff_dispatched" ? "high" : "normal";
-
-                    return (
-                      <div key={request.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm shadow-slate-200/30">
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <div className="text-sm font-semibold text-[#17202B]">Room {request.room} · {request.title}</div>
-                            <div className="mt-1 text-xs text-slate-500">{request.detail}</div>
-                          </div>
-                          <HotelStatusPill tone={statusTone}>{request.status === "needs_approval" ? "Needs approval" : request.status === "in_progress" ? "In progress" : request.status === "resolved" ? "Resolved" : "Open"}</HotelStatusPill>
-                        </div>
-
-                        <div className="mt-3 grid gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-xs text-slate-500">
-                          <div><span className="font-semibold text-[#17202B]">Sidekick state:</span> {resolutionLabel}</div>
-                          <div><span className="font-semibold text-[#17202B]">Owner:</span> {request.assignedTo} · {request.routeTeam || "Unrouted"}</div>
-                          <div><span className="font-semibold text-[#17202B]">Next promise:</span> {request.sla || "No ETA set yet"}</div>
-                          <div><span className="font-semibold text-[#17202B]">Guest context:</span> {stay ? `${stay.status.replace(/_/g, " ")} · ${stay.nights} night${stay.nights === 1 ? "" : "s"}` : "No stay context"}</div>
-                        </div>
-                        {request.triageStatus === "needs_review" ? (
-                          <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-xs leading-5 text-slate-600">
-                            <span className="font-semibold">Review needed:</span> {request.handoffNote || "A manager should confirm routing before Sidekick sends the guest a firm answer."}
-                          </div>
-                        ) : null}
-
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {request.status !== "in_progress" && request.status !== "resolved" ? (
-                            <button onClick={() => { actions.updateRequestStatus(request.id, "in_progress"); actions.updateRequestWorkflow(request.id, { resolutionState: "staff_dispatched", dispatcher: "Sidekick" }); actions.addTimelineEvent(request.id, { type: "system", text: "Sidekick routed the request to the staff owner and updated the guest.", at: "Now" }); }} className={actionChip}>Dispatch</button>
-                          ) : null}
-                          {request.resolutionState !== "awaiting_verification" && request.status !== "resolved" ? (
-                            <button onClick={() => { actions.updateRequestWorkflow(request.id, { resolutionState: "awaiting_verification", dispatcher: "Sidekick" }); actions.addTimelineEvent(request.id, { type: "ai", text: "We believe this is taken care of. Please reply here if anything still needs attention.", at: "Now" }); }} className={actionChip}>Ask guest to confirm</button>
-                          ) : null}
-                          {request.status !== "resolved" ? (
-                            <button onClick={() => { actions.updateRequestStatus(request.id, "resolved"); actions.updateRequestWorkflow(request.id, { resolutionState: "closed", dispatcher: "Sidekick" }); actions.addTimelineEvent(request.id, { type: "ai", text: "Your request is complete. Let us know if you need anything else.", at: "Now" }); }} className={actionChip}>Close loop</button>
-                          ) : null}
-                          {request.assignedTo !== "Front desk" ? (
-                            <button onClick={() => { actions.assignRequest(request.id, "Front desk"); actions.updateRequestWorkflow(request.id, { routeTeam: "Front desk", triageStatus: "approved", dispatcher: "Front desk" }); actions.addTimelineEvent(request.id, { type: "system", text: "Request assigned to front desk.", at: "Now" }); }} className={actionChip}>Assign desk</button>
-                          ) : null}
-                          {request.triageStatus === "needs_review" ? (
-                            <button onClick={() => { actions.updateRequestWorkflow(request.id, { triageStatus: "approved", escalationOwner: null, handoffNote: null, dispatcher: "Front desk" }); actions.addTimelineEvent(request.id, { type: "system", text: "Desk reviewed and approved the current routing path.", at: "Now" }); }} className={actionChip}>Approve routing</button>
-                          ) : null}
-                          <Link href={`/hotel/requests/${request.id}`} className={actionChip}>Open conversation</Link>
-                        </div>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-sm text-slate-500">
-                    Nothing in this lane right now.
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+    <HotelLegacyRedirectPage
+      title='Guest conversations'
+      body='Guest requests now live in the unified conversation view.'
+      targetHref='/hotel/conversations'
+      targetLabel='Conversations'
+      reason='There should be one thread model for guest issues, updates, and routed work rather than multiple inbox concepts.'
+    />
   );
 }

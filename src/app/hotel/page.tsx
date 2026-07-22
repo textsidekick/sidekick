@@ -30,7 +30,6 @@ export default function HotelOverviewPage() {
 
   const rooms = [...state.rooms].sort((a, b) => a.room.localeCompare(b.room, undefined, { numeric: true }));
   const availableRooms = rooms.filter((room) => room.status === "ready");
-  const occupiedRooms = rooms.filter((room) => room.status === "occupied");
   const cleaningRooms = rooms.filter((room) => room.status === "dirty" || room.status === "inspection" || room.status === "queued");
   const maintenanceRooms = rooms.filter((room) => room.status === "maintenance");
   const arrivals = state.stays.filter((stay) => stay.status === "arriving");
@@ -97,7 +96,7 @@ export default function HotelOverviewPage() {
           body="A simple motel board: guests text Sidekick, staff text Sidekick, and this board shows what is open, what needs work, and what matters today."
           action={
             <div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600">
-              {state.property.roomCount} rooms · {state.property.occupancyPct}% occupied
+              {state.property.roomCount} rooms · {availableRooms.length} available now
             </div>
           }
         />
@@ -146,7 +145,7 @@ export default function HotelOverviewPage() {
               <div>
                 <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Room board</div>
                 <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[#17202B]">All rooms and availability</h2>
-                <p className="mt-2 text-sm text-slate-600">This is the main view. A manager should be able to glance once and know what needs attention.</p>
+                <p className="mt-2 text-sm text-slate-600">This is the main view. A manager should be able to glance once and know what is sellable now and what still needs work.</p>
               </div>
               <div className="hidden text-sm text-slate-500 xl:block">{roomsNeedingAttention.length} rooms need work</div>
             </div>
@@ -244,7 +243,7 @@ export default function HotelOverviewPage() {
               </div>
               <div className="mt-3 flex items-center gap-2 text-sm text-slate-600">
                 <DoorOpen className="h-4 w-4 text-slate-400" />
-                {occupiedRooms.length} occupied · {availableRooms.length} available right now
+                {availableRooms.length} available now · {roomsNeedingAttention.length} still need work
               </div>
             </div>
 

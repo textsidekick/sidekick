@@ -12,7 +12,6 @@ export default function HotelStaysPage() {
 
   const arriving = state.stays.filter((stay) => stay.status === "arriving");
   const departing = state.stays.filter((stay) => stay.status === "departing");
-  const inHouse = state.stays.filter((stay) => stay.status === "checked_in");
   const arrivalExecution = arriving.map((stay) => {
     const room = state.rooms.find((item) => item.room === stay.room);
     const blocked = state.outOfOrderItems.find((item) => item.room === stay.room && item.status !== "released");
@@ -57,9 +56,9 @@ export default function HotelStaysPage() {
             <div className="mt-1 text-sm text-slate-600">Arrivals tied to rooms that are still blocked, queued, under maintenance, or waiting on inspection.</div>
           </div>
           <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/50">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Departure pressure</div>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Quiet turnover risk</div>
             <div className="mt-2 text-3xl font-bold tracking-[-0.03em] text-[#17202B]">{departureExecution.filter((item) => item.dependentArrival).length}</div>
-            <div className="mt-1 text-sm text-slate-600">Quiet departure pressure that could still block a room for an arrival.</div>
+            <div className="mt-1 text-sm text-slate-600">Background turnovers that could still block an incoming room.</div>
           </div>
         </div>
 
@@ -184,23 +183,14 @@ export default function HotelStaysPage() {
             )}
           />
 
-          <Section
-            title="In house watchlist"
-            items={inHouse}
-            renderActions={(stay) => (
-              <>
-                <button
-                  onClick={() => actions.updateStayNote(stay.id, `${stay.notes} Guest satisfaction check sent by text.`)}
-                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                >
-                  Send satisfaction check
-                </button>
-                <Link href="/hotel/conversations" className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">
-                  Open conversations
-                </Link>
-              </>
-            )}
-          />
+          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/50">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Why departures are secondary here</div>
+            <div className="mt-3 space-y-3 text-sm leading-6 text-slate-600">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">This motel version should optimize for arrivals, room readiness, and guest/staff texting — not for detailed occupancy forecasting.</div>
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">Departures only matter when they block the next arrival or create follow-through work.</div>
+              <Link href="/hotel/conversations" className="inline-flex rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">Open conversations</Link>
+            </div>
+          </div>
         </div>
       </div>
     </div>
