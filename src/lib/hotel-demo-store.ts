@@ -358,11 +358,11 @@ function defaultState(): HotelDemoState {
     shiftBoard: [...hotelShiftBoard],
     staff: [...hotelStaff],
     stays: [
-      { id: "stay-118", room: "118", guestName: "Walk-in guest", status: "checked_in", eta: "In house", nights: 1, notes: "Text-capable guest; asked for towels.", source: "walk-in" },
-      { id: "stay-214", room: "214", guestName: "R. Patel", status: "checked_in", eta: "In house", nights: 2, notes: "Maintenance issue active in room.", source: "booking.com" },
-      { id: "stay-302", room: "302", guestName: "J. Mendoza", status: "departing", eta: "Checkout by 11:00 AM", nights: 1, notes: "Late checkout requested.", source: "expedia" },
-      { id: "stay-127", room: "127", guestName: "D. Chen", status: "arriving", eta: "7:10 PM", nights: 2, notes: "Oversized vehicle; needs parking instructions.", source: "direct" },
-      { id: "stay-401", room: "401", guestName: "L. Brooks", status: "arriving", eta: "8:00 PM", nights: 3, notes: "Repeat guest; prefers quiet room near top floor.", source: "phone" },
+      { id: "stay-111", room: "111", guestName: "—", status: "checked_out", eta: "Earlier today", nights: 1, notes: "Front desk entered checkout-style cleaning for this room.", source: "front desk entry" },
+      { id: "stay-118", room: "118", guestName: "Walk-in guest", status: "checked_in", eta: "In house", nights: 1, notes: "Guest opted into text updates and requested extra towels.", source: "front desk entry" },
+      { id: "stay-127", room: "127", guestName: "D. Chen", status: "checked_in", eta: "In house", nights: 2, notes: "Guest asked for oversized vehicle parking instructions through Sidekick.", source: "front desk entry" },
+      { id: "stay-218", room: "218", guestName: "—", status: "checked_in", eta: "In house", nights: 2, notes: "Maintenance concern was reported from a staff voice note tied to this room.", source: "manager entry" },
+      { id: "stay-304", room: "304", guestName: "K. Morgan", status: "checked_in", eta: "In house", nights: 2, notes: "Requested room cleaning while away and asked to be notified when complete.", source: "front desk entry" },
     ],
     peopleTasks: [
       { id: "people-1", staffName: "Maya", team: "Front desk", kind: "policy", title: "Refund exception script review", status: "open", due: "Tonight", note: "Manager wants tighter refund language for charge disputes." },
@@ -467,15 +467,46 @@ function defaultState(): HotelDemoState {
       { id: "bf-crew", guestName: "North Coast roofing crew", room: "5 rooms", order: "10 hot breakfast vouchers", pickup: "6:30 AM", status: "delivered", owner: "Maya", note: "Crew leader already received voucher packet and dining-room opening reminder." }
     ],
     requestTimelines: {
-      "req-214-shower": [
-        { id: "t1", type: "guest", text: "The shower in room 214 isn't draining and water is pooling.", at: "5:31 PM" },
-        { id: "t2", type: "ai", text: "I’ve alerted maintenance and will update you as soon as they’re on the way.", at: "5:31 PM" },
-        { id: "t3", type: "system", text: "Maintenance task created and assigned to Julio.", at: "5:32 PM" },
+      "req-111-cleaning": [
+        { id: "t1", type: "system", text: "Front desk created a checkout-style cleaning task for Room 111.", at: "11:02 AM" },
+        { id: "t2", type: "ai", text: "Sidekick assigned Room 111 to Maria and asked for acknowledgment.", at: "11:03 AM" },
       ],
-      "req-302-checkout": [
-        { id: "t1", type: "guest", text: "Can I get a late checkout until 1 PM? My flight got delayed.", at: "5:40 PM" },
-        { id: "t2", type: "ai", text: "I’m checking that for you now.", at: "5:40 PM" },
-        { id: "t3", type: "system", text: "Approval requested from front desk manager.", at: "5:41 PM" },
+      "req-118-towels": [
+        { id: "t1", type: "guest", text: "Can you send a couple more towels to room 118?", at: "4:52 PM" },
+        { id: "t2", type: "ai", text: "Absolutely. I’ve sent that to housekeeping and will update you here.", at: "4:52 PM" },
+        { id: "t3", type: "system", text: "Housekeeping task created and assigned to Elena.", at: "4:53 PM" },
+      ],
+      "req-127-parking": [
+        { id: "t1", type: "guest", text: "Can I park an oversized vehicle here overnight?", at: "1:14 PM" },
+        { id: "t2", type: "ai", text: "Yes — oversized vehicles use the east overflow row. Please reply with your plate number so the desk can log it before 10 PM.", at: "1:14 PM" },
+        { id: "t3", type: "system", text: "Resolved from Hotel Knowledge without creating a staff task.", at: "1:14 PM" },
+      ],
+      "req-204-lamp": [
+        { id: "t1", type: "staff", text: "Photo uploaded from Room 204. Lamp looks damaged near the base.", at: "4:37 PM" },
+        { id: "t2", type: "system", text: "Sidekick suggested damaged fixture and routed the report to maintenance.", at: "4:38 PM" },
+        { id: "t3", type: "system", text: "Manager review requested before closing the issue.", at: "4:39 PM" },
+      ],
+      "req-218-water": [
+        { id: "t1", type: "staff", text: "Julio voice note (Spanish): Hay agua juntándose cerca del zócalo del baño en la 218.", at: "5:07 PM" },
+        { id: "t2", type: "system", text: "Translated from Spanish: Water is collecting near the bathroom baseboard in Room 218.", at: "5:08 PM" },
+        { id: "t3", type: "system", text: "Sidekick detected a possible water-related issue and marked it urgent pending manager confirmation.", at: "5:08 PM" },
+      ],
+      "req-304-cleaning": [
+        { id: "t1", type: "guest", text: "Can someone clean my room while I’m out?", at: "12:41 PM" },
+        { id: "t2", type: "ai", text: "Absolutely. I’ve sent the request to housekeeping and will let you know when it is complete.", at: "12:41 PM" },
+        { id: "t3", type: "system", text: "Housekeeping task created and assigned to Elena.", at: "12:42 PM" },
+        { id: "t4", type: "staff", text: "Room 304 done.", at: "2:18 PM" },
+        { id: "t5", type: "system", text: "Elena acknowledged the task and marked Room 304 reported clean.", at: "2:18 PM" },
+        { id: "t6", type: "ai", text: "Your room has been cleaned and is ready. Let me know if you need anything else.", at: "2:19 PM" },
+        { id: "t7", type: "system", text: "Guest notification delivered and task closed.", at: "2:19 PM" },
+      ],
+      "req-117-carpet": [
+        { id: "t1", type: "staff", text: "Photo uploaded from Room 117. Carpet stain near the desk area.", at: "3:56 PM" },
+        { id: "t2", type: "system", text: "Awaiting classification and follow-up instruction.", at: "3:57 PM" },
+      ],
+      "req-lobby-ice": [
+        { id: "t1", type: "system", text: "Front desk logged repeat complaints about the second-floor ice machine.", at: "2:47 PM" },
+        { id: "t2", type: "staff", text: "Julio is checking the unit and waiting on a parts decision.", at: "3:02 PM" },
       ],
     },
   };

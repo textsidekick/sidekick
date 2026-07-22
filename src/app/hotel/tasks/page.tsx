@@ -1,98 +1,142 @@
 "use client";
 
-import Link from "next/link";
-import { HotelPageHeader, HotelStatusPill } from "@/components/hotel/HotelUi";
+import { useMemo, useState } from "react";
+import { HotelPageHeader, HotelMetric, HotelSourcePill, HotelStatusPill } from "@/components/hotel/HotelUi";
 import { useHotelDemoState } from "@/lib/hotel-demo-store";
+import { maintenanceIssues, operationsRows } from "@/lib/hotel-demo-view";
+
+const taskRows = [
+  { id: "req-111-cleaning", title: "Checkout-style cleaning entered", location: "Room 111", category: "Housekeeping", reporter: "Front desk", assigned: "Maria", department: "Housekeeping", priority: "High", status: "Assigned", created: "11:02 AM", deadline: "11:20 AM", completed: "—", guestStatus: "No guest linked", source: "Front desk entry" },
+  { id: "req-118-towels", title: "Extra towels requested", location: "Room 118", category: "Guest request", reporter: "Walk-in guest", assigned: "Elena", department: "Housekeeping", priority: "Normal", status: "Assigned", created: "4:52 PM", deadline: "5:05 PM", completed: "—", guestStatus: "Waiting for update", source: "Guest SMS" },
+  { id: "req-204-lamp", title: "Lamp damage photo review", location: "Room 204", category: "Damage report", reporter: "Elena", assigned: "Maya", department: "Management", priority: "High", status: "Escalated", created: "4:37 PM", deadline: "5:00 PM", completed: "—", guestStatus: "No guest linked", source: "Uploaded photo" },
+  { id: "req-218-water", title: "Possible water issue near bathroom", location: "Room 218", category: "Safety", reporter: "Julio", assigned: "Julio", department: "Maintenance", priority: "Urgent", status: "Escalated", created: "5:07 PM", deadline: "Immediate", completed: "—", guestStatus: "Manager review pending", source: "Spanish voice note" },
+  { id: "req-304-cleaning", title: "Room cleaning request", location: "Room 304", category: "Housekeeping", reporter: "K. Morgan", assigned: "Elena", department: "Housekeeping", priority: "Normal", status: "Guest notified", created: "12:41 PM", deadline: "1:30 PM", completed: "2:18 PM", guestStatus: "Delivered", source: "Guest SMS + staff SMS" },
+  { id: "req-117-carpet", title: "Carpet stain photo awaiting classification", location: "Room 117", category: "Inspection", reporter: "Housekeeping", assigned: "Housekeeping", department: "Housekeeping", priority: "High", status: "Awaiting confirmation", created: "3:56 PM", deadline: "4:30 PM", completed: "—", guestStatus: "No guest linked", source: "Uploaded photo" },
+  { id: "req-lobby-ice", title: "Ice machine offline", location: "2nd floor ice alcove", category: "Maintenance", reporter: "Maya", assigned: "Julio", department: "Maintenance", priority: "High", status: "In progress", created: "2:47 PM", deadline: "3:30 PM", completed: "—", guestStatus: "Guest-visible issue", source: "Manager entry" },
+];
+
+const lifecycle = ["Received", "Assigned", "Acknowledged", "In progress", "Completed", "Guest notified"];
 
 export default function HotelTasksPage() {
-  const { state, loaded } = useHotelDemoState();
+  const { loaded } = useHotelDemoState();
+  const [activeId, setActiveId] = useState("req-218-water");
 
   if (!loaded) return null;
 
-  const tasks = state.requests;
-  const openTasks = tasks.filter((task) => task.status !== "resolved");
-  const newTasks = openTasks.filter((task) => task.status === "new" || task.status === "needs_approval");
-  const activeTasks = openTasks.filter((task) => task.status === "in_progress");
-  const closedTasks = tasks.filter((task) => task.status === "resolved");
+  const activeTask = taskRows.find((task) => task.id === activeId) || taskRows[0];
+  const relatedOperation = operationsRows.find((row) => row.id === activeId);
+  const relatedMaintenance = maintenanceIssues.find((issue) => issue.id === activeId);
+
+  const metrics = useMemo(() => ([
+    { label: "New", value: 1, detail: "Waiting for first human acknowledgment" },
+    { label: "Assigned", value: 2, detail: "Routed but not yet acknowledged" },
+    { label: "In progress", value: 2, detail: "Human work actively underway" },
+    { label: "Escalated", value: 2, detail: "Needs manager or high-priority follow-up" },
+  ]), []);
 
   return (
     <div className="min-h-screen px-6 py-8 sm:px-8 lg:px-10">
-      <div className="mx-auto max-w-[1400px]">
+      <div className="mx-auto max-w-[1460px]">
         <HotelPageHeader
-          title="Tasks"
-          body="Texts become tracked work. Every guest issue, housekeeping update, and maintenance request becomes a task with an owner, status, priority, and conversation history."
-          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{openTasks.length} open tasks</div>}
+          eyebrow="Tasks"
+          title="Operational record of every request requiring human action"
+          body="Sidekick creates tasks from guest and staff messages, managers can create them manually, and the full lifecycle stays visible from receipt to guest-notified closeout."
+          action={<button className="rounded-[10px] bg-[#287A65] px-4 py-2 text-sm font-medium text-white">Create task</button>}
         />
 
-        <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Task model</div>
-          <div className="mt-3 grid gap-3 md:grid-cols-4">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">Created from a guest or staff text</div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">Carries owner, priority, and status</div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">Keeps photos, videos, voice, and thread context attached</div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">Closes the loop back to the guest automatically</div>
-          </div>
+        <div className="mb-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {metrics.map((metric) => <HotelMetric key={metric.label} label={metric.label} value={metric.value} sub={metric.detail} />)}
         </div>
 
-        <div className="mb-6 grid gap-4 md:grid-cols-4">
-          <Metric label="New" value={newTasks.length} detail="Needs routing or owner confirm" />
-          <Metric label="Working" value={activeTasks.length} detail="Owner is handling it" />
-          <Metric label="Closed" value={closedTasks.length} detail="Loop was completed" />
-          <Metric label="Urgent" value={openTasks.filter((task) => task.priority === "urgent").length} detail="Immediate attention" />
-        </div>
-
-        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
-          <div className="flex items-end justify-between gap-4 border-b border-slate-200 pb-4">
-            <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Unified task board</div>
-              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[#17202B]">All tracked work</h2>
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_420px]">
+          <section className="rounded-2xl border border-[#E1E5E2] bg-white p-5">
+            <div className="border-b border-[#E1E5E2] pb-4">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#5C6975]">Task board</div>
+              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[#18222C]">All tracked work</h2>
             </div>
-          </div>
-
-          <div className="mt-4 grid gap-3 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3">
-            {tasks.map((task) => {
-              const tone = task.status === "resolved" ? "resolved" : task.priority === "urgent" ? "urgent" : task.status === "needs_approval" ? "queued" : task.status === "in_progress" ? "high" : "normal";
-              return (
-                <div key={task.id} className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+            <div className="mt-4 space-y-3">
+              {taskRows.map((task) => (
+                <button key={task.id} onClick={() => setActiveId(task.id)} className={task.id === activeTask.id ? "w-full rounded-2xl border border-[#CFE4DB] bg-[#F3FBF7] p-4 text-left" : "w-full rounded-2xl border border-[#E1E5E2] bg-[#FCFCFB] p-4 text-left"}>
                   <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{task.kind.replace(/_/g, " ")} · Room {task.room}</div>
-                      <div className="mt-2 text-sm font-semibold text-[#17202B]">{task.title}</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-semibold text-[#18222C]">{task.title}</div>
+                      <div className="mt-1 text-xs text-[#5C6975]">{task.location} · {task.category}</div>
+                      <div className="mt-2 grid gap-1 text-sm text-[#5C6975] md:grid-cols-2">
+                        <div>Reporter: {task.reporter}</div>
+                        <div>Assigned: {task.assigned}</div>
+                        <div>Deadline: {task.deadline}</div>
+                        <div>Source: {task.source}</div>
+                      </div>
                     </div>
-                    <HotelStatusPill tone={tone}>{task.status.replace(/_/g, " ")}</HotelStatusPill>
+                    <div className="flex flex-col items-end gap-2">
+                      <HotelStatusPill tone={task.priority === "Urgent" ? "urgent" : task.status === "Guest notified" ? "resolved" : task.status === "Assigned" || task.status === "Awaiting confirmation" || task.status === "Escalated" ? "queued" : "high"}>{task.status}</HotelStatusPill>
+                      <div className="text-xs text-[#5C6975]">{task.priority}</div>
+                    </div>
                   </div>
-                  <div className="mt-3 text-sm text-slate-600">{task.detail}</div>
-                  <div className="mt-3 rounded-2xl border border-slate-200 bg-white px-3 py-3 text-xs text-slate-600">
-                    <div><span className="font-semibold text-[#17202B]">Owner:</span> {task.assignedTo}</div>
-                    <div className="mt-1"><span className="font-semibold text-[#17202B]">Priority:</span> {task.priority}</div>
-                    <div className="mt-1"><span className="font-semibold text-[#17202B]">Status:</span> {task.resolutionState?.replace(/_/g, " ") || "new"}</div>
-                    <div className="mt-1"><span className="font-semibold text-[#17202B]">Source:</span> {task.source}</div>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="rounded-2xl border border-[#E1E5E2] bg-white p-5">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#5C6975]">Task detail</div>
+            <h2 className="mt-2 text-xl font-semibold text-[#18222C]">{activeTask.title}</h2>
+            <div className="mt-3 flex flex-wrap gap-2 text-xs text-[#5C6975]">
+              <HotelSourcePill>{activeTask.location}</HotelSourcePill>
+              <HotelSourcePill>{activeTask.department}</HotelSourcePill>
+              <HotelSourcePill>{activeTask.source}</HotelSourcePill>
+            </div>
+
+            <div className="mt-4 space-y-3 text-sm text-[#5C6975]">
+              <div><span className="font-semibold text-[#18222C]">Reporter:</span> {activeTask.reporter}</div>
+              <div><span className="font-semibold text-[#18222C]">Response deadline:</span> {activeTask.deadline}</div>
+              <div><span className="font-semibold text-[#18222C]">Guest notification:</span> {activeTask.guestStatus}</div>
+              <div><span className="font-semibold text-[#18222C]">Completion time:</span> {activeTask.completed}</div>
+            </div>
+
+            <div className="mt-5 rounded-2xl border border-[#E1E5E2] bg-[#FCFCFB] p-4">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#5C6975]">Lifecycle</div>
+              <div className="mt-3 space-y-2">
+                {lifecycle.map((step) => (
+                  <div key={step} className="flex items-center gap-3 rounded-xl border border-[#E1E5E2] bg-white px-3 py-2 text-sm text-[#18222C]">
+                    <span className={step === activeTask.status || (step === "Guest notified" && activeTask.status === "Closed") ? "h-2 w-2 rounded-full bg-[#287A65]" : "h-2 w-2 rounded-full bg-[#D0D6DB]"} />
+                    {step}
                   </div>
-                  <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                    <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-600">Conversation-linked</span>
-                    <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-600">Media-ready</span>
-                    <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-600">Learns from follow-up</span>
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <Link href={`/hotel/requests/${task.id}`} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">Open conversation</Link>
-                    <Link href="/hotel/rooms" className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">Open room</Link>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                ))}
+              </div>
+            </div>
+
+            {relatedOperation ? (
+              <div className="mt-5 rounded-2xl border border-[#E1E5E2] bg-[#FCFCFB] p-4 text-sm text-[#5C6975]">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#5C6975]">Current coordination view</div>
+                <div className="mt-2 font-semibold text-[#18222C]">{relatedOperation.location} — {relatedOperation.title}</div>
+                <div className="mt-2">{relatedOperation.detail}</div>
+              </div>
+            ) : null}
+
+            {relatedMaintenance ? (
+              <div className="mt-5 rounded-2xl border border-[#E1E5E2] bg-[#FCFCFB] p-4 text-sm text-[#5C6975]">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#5C6975]">Suggested category and severity</div>
+                <div className="mt-2"><span className="font-semibold text-[#18222C]">Category:</span> {relatedMaintenance.suggestedCategory}</div>
+                <div className="mt-1"><span className="font-semibold text-[#18222C]">Severity:</span> {relatedMaintenance.suggestedSeverity}</div>
+              </div>
+            ) : null}
+
+            <div className="mt-5 flex flex-wrap gap-2">
+              {[
+                "Create manual task",
+                "Reassign",
+                "Change priority",
+                "Escalate",
+                "Add internal note",
+                "Mark resolved",
+              ].map((action) => (
+                <button key={action} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">{action}</button>
+              ))}
+            </div>
+          </section>
         </div>
       </div>
-    </div>
-  );
-}
-
-function Metric({ label, value, detail }: { label: string; value: number; detail: string }) {
-  return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
-      <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</div>
-      <div className="mt-2 text-3xl font-bold tracking-[-0.03em] text-[#17202B]">{value}</div>
-      <div className="mt-1 text-sm text-slate-600">{detail}</div>
     </div>
   );
 }

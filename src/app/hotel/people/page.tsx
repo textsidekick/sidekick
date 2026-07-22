@@ -1,86 +1,78 @@
 "use client";
 
-import { HotelPageHeader, HotelStatusPill } from "@/components/hotel/HotelUi";
+import { HotelPageHeader, HotelSourcePill, HotelStatusPill } from "@/components/hotel/HotelUi";
 import { useHotelDemoState } from "@/lib/hotel-demo-store";
+import { teamRoutingRules } from "@/lib/hotel-demo-view";
 
-const toneByKind = {
-  training: "high",
-  coverage: "queued",
-  policy: "normal",
-  onboarding: "high",
-} as const;
+const teamMeta: Record<string, { role: string; department: string; preferredLanguage: string; status: string; currentTasks: string; lastResponse: string; notificationMethod: string; permissions: string }> = {
+  Maya: { role: "Manager on duty", department: "Management", preferredLanguage: "English", status: "On shift", currentTasks: "Room 204 manager review · Room 218 escalation", lastResponse: "2 minutes ago", notificationMethod: "SMS + dashboard", permissions: "Manager" },
+  Elena: { role: "Lead housekeeper", department: "Housekeeping", preferredLanguage: "English / Spanish", status: "On shift", currentTasks: "Room 118 towels · Room 304 complete · Room 204 photo", lastResponse: "5 minutes ago", notificationMethod: "SMS", permissions: "Staff" },
+  Maria: { role: "Room attendant", department: "Housekeeping", preferredLanguage: "Spanish", status: "Unknown", currentTasks: "Room 111 checkout-style cleaning", lastResponse: "18 minutes ago", notificationMethod: "SMS", permissions: "Staff" },
+  Julio: { role: "Maintenance technician", department: "Maintenance", preferredLanguage: "Spanish", status: "On shift", currentTasks: "Room 218 water issue · Ice machine offline", lastResponse: "4 minutes ago", notificationMethod: "Voice note + SMS", permissions: "Staff" },
+  Nadia: { role: "Front desk", department: "Front desk", preferredLanguage: "English", status: "Off shift", currentTasks: "No active tasks", lastResponse: "1 hour ago", notificationMethod: "SMS", permissions: "Desk" },
+};
+
+const groups = ["Management", "Front desk", "Housekeeping", "Maintenance"];
 
 export default function HotelPeoplePage() {
-  const { state, actions, loaded } = useHotelDemoState();
+  const { state, loaded } = useHotelDemoState();
 
   if (!loaded) return null;
 
-  const openTasks = state.peopleTasks.filter((task) => task.status !== "done");
-
   return (
     <div className="min-h-screen px-6 py-8 sm:px-8 lg:px-10">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-[1460px]">
         <HotelPageHeader
-          title="Staff"
-          body="The staff side should stay as simple as the guest side. Team members should be able to work through text, get reminders, receive SOP help, and stay aligned without heavy software training."
-          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{openTasks.length} active people tasks</div>}
+          eyebrow="Team"
+          title="The routing model behind the hotel"
+          body="Sidekick should know who owns what, how to route requests by department, who is likely on shift, and how each person prefers to be notified."
         />
 
-        <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">SMS-native staff workflow</div>
-          <div className="mt-3 grid gap-3 md:grid-cols-3">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">Housekeepers and maintenance should be able to text updates naturally.</div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">Sidekick should turn those texts into visible status updates and tracked work.</div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">Managers should only step in when routing, policy, or escalation needs a person.</div>
-          </div>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          {state.peopleTasks.map((task) => (
-            <div key={task.id} className="rounded-3xl border border-black/8 bg-white p-5 shadow-sm">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <div className="text-xs font-semibold uppercase tracking-[0.16em] text-black/40">{task.team} · {task.kind}</div>
-                  <div className="mt-2 text-lg font-semibold text-[#1C1A16]">{task.title}</div>
-                  <div className="mt-2 text-sm text-black/55">{task.staffName} · due {task.due}</div>
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_360px]">
+          <section className="space-y-6">
+            {groups.map((group) => (
+              <div key={group} className="rounded-2xl border border-[#E1E5E2] bg-white p-5">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#5C6975]">{group}</div>
+                <div className="mt-4 grid gap-3 lg:grid-cols-2">
+                  {state.staff.filter((person) => (teamMeta[person.name]?.department || person.team) === group).map((person) => {
+                    const meta = teamMeta[person.name];
+                    return (
+                      <div key={person.phone} className="rounded-2xl border border-[#E1E5E2] bg-[#FCFCFB] p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <div className="text-sm font-semibold text-[#18222C]">{person.name}</div>
+                            <div className="mt-1 text-sm text-[#5C6975]">{meta?.role || person.team}</div>
+                          </div>
+                          <HotelStatusPill tone={meta?.status === "On shift" ? "resolved" : meta?.status === "Unknown" ? "queued" : "normal"}>{meta?.status || "Unknown"}</HotelStatusPill>
+                        </div>
+                        <div className="mt-3 space-y-1 text-sm text-[#5C6975]">
+                          <div>Department: {meta?.department || person.team}</div>
+                          <div>Phone: {person.phone}</div>
+                          <div>Preferred language: {meta?.preferredLanguage || "English"}</div>
+                          <div>Current tasks: {meta?.currentTasks || "No active tasks"}</div>
+                          <div>Last response: {meta?.lastResponse || "Unknown"}</div>
+                          <div>Notification method: {meta?.notificationMethod || "SMS"}</div>
+                          <div>Permissions: {meta?.permissions || "Staff"}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-                <HotelStatusPill tone={task.status === "done" ? "resolved" : toneByKind[task.kind]}>{task.status.replace("_", " ")}</HotelStatusPill>
               </div>
+            ))}
+          </section>
 
-              <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">{task.note}</div>
-
-              <div className="mt-4 flex flex-wrap gap-2">
-                {task.status !== "in_progress" && task.status !== "done" ? (
-                  <button
-                    onClick={() => actions.updatePeopleTaskStatus(task.id, "in_progress")}
-                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                  >
-                    Start
-                  </button>
-                ) : null}
-                {task.status !== "done" ? (
-                  <button
-                    onClick={() => actions.updatePeopleTaskStatus(task.id, "done")}
-                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                  >
-                    Mark complete
-                  </button>
-                ) : null}
-                <button
-                  onClick={() => actions.updatePeopleTaskNote(task.id, `${task.note} SMS reminder sent and manager was updated.`)}
-                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
-                >
-                  Send reminder
-                </button>
-                <button
-                  onClick={() => actions.updatePeopleTaskNote(task.id, `${task.note} Translated SOP and quick reply snippets attached for staff.`)}
-                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
-                >
-                  Attach SOP help
-                </button>
-              </div>
+          <section className="rounded-2xl border border-[#E1E5E2] bg-white p-5">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#5C6975]">Routing rules</div>
+            <div className="mt-4 space-y-2">
+              {teamRoutingRules.map((rule) => (
+                <div key={rule} className="rounded-xl border border-[#E1E5E2] bg-[#FCFCFB] px-4 py-3 text-sm text-[#18222C]">{rule}</div>
+              ))}
             </div>
-          ))}
+            <div className="mt-4 flex flex-wrap gap-2">
+              <HotelSourcePill>Rules should become configurable in Settings</HotelSourcePill>
+            </div>
+          </section>
         </div>
       </div>
     </div>

@@ -1,126 +1,167 @@
 "use client";
 
-import Link from "next/link";
-import { HotelPageHeader, HotelStatusPill } from "@/components/hotel/HotelUi";
+import { useMemo, useState } from "react";
+import { HotelPageHeader, HotelSourcePill, HotelStatusPill } from "@/components/hotel/HotelUi";
 import { useHotelDemoState } from "@/lib/hotel-demo-store";
+import { askSidekickExamples } from "@/lib/hotel-demo-view";
+
+const tabs = ["All", "Guests", "Staff", "Escalated", "Unresolved", "AI Resolved"] as const;
+
+const conversationMeta: Record<string, { person: string; role: string; language: string; urgency: string; unread?: boolean; latest: string; assignedTo: string; status: string; translated?: boolean }> = {
+  "req-111-cleaning": { person: "Front desk", role: "Staff", language: "English", urgency: "High", unread: true, latest: "Checkout-style cleaning entered for Room 111.", assignedTo: "Maria", status: "Awaiting acknowledgment" },
+  "req-118-towels": { person: "Walk-in guest", role: "Guest", language: "English", urgency: "Normal", unread: true, latest: "Can you send a couple more towels to room 118?", assignedTo: "Elena", status: "Assigned" },
+  "req-127-parking": { person: "D. Chen", role: "Guest", language: "English", urgency: "Low", latest: "Can I park an oversized vehicle here overnight?", assignedTo: "AI resolved", status: "AI Resolved" },
+  "req-204-lamp": { person: "Elena", role: "Staff", language: "English", urgency: "High", unread: true, latest: "Photo uploaded from Room 204. Lamp looks damaged near the base.", assignedTo: "Maya", status: "Manager review" },
+  "req-218-water": { person: "Julio", role: "Staff", language: "Spanish", urgency: "Urgent", unread: true, latest: "Hay agua juntándose cerca del zócalo del baño en la 218.", assignedTo: "Julio + Maya", status: "Escalated", translated: true },
+  "req-304-cleaning": { person: "K. Morgan", role: "Guest", language: "English", urgency: "Normal", latest: "Can someone clean my room while I’m out?", assignedTo: "Elena", status: "Closed" },
+  "req-117-carpet": { person: "Housekeeping", role: "Staff", language: "English", urgency: "High", latest: "Photo uploaded from Room 117. Carpet stain near the desk area.", assignedTo: "Housekeeping", status: "Awaiting verification" },
+  "req-lobby-ice": { person: "Maya", role: "Manager", language: "English", urgency: "High", latest: "Repeat guest complaints about the ice machine.", assignedTo: "Julio", status: "In progress" },
+};
 
 export default function HotelConversationsPage() {
   const { state, loaded } = useHotelDemoState();
+  const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>("All");
+  const [activeId, setActiveId] = useState("req-218-water");
 
   if (!loaded) return null;
 
-  const threads = state.requests.filter((item) => item.status !== "resolved");
-  const columns = [
-    {
-      key: "new",
-      title: "New",
-      detail: "New texts that Sidekick still needs to answer or route.",
-      items: threads.filter((request) => !request.resolutionState || request.resolutionState === "new" || request.triageStatus === "needs_review"),
-      tone: "normal" as const,
-    },
-    {
-      key: "active",
-      title: "Active",
-      detail: "Sidekick has replied and the owner is working the request.",
-      items: threads.filter((request) => request.status === "in_progress" || request.resolutionState === "guest_updated" || request.resolutionState === "staff_dispatched"),
-      tone: "high" as const,
-    },
-    {
-      key: "waiting",
-      title: "Waiting on guest",
-      detail: "Internal work is done and Sidekick is waiting for the guest reply.",
-      items: threads.filter((request) => request.resolutionState === "awaiting_verification"),
-      tone: "queued" as const,
-    },
-  ];
+  const allConversations = state.requests.map((request) => ({
+    ...request,
+    ...(conversationMeta[request.id] || {
+      person: request.guestName || request.assignedTo,
+      role: request.guestName ? "Guest" : "Staff",
+      language: "English",
+      urgency: request.priority,
+      latest: request.detail,
+      assignedTo: request.assignedTo,
+      status: request.status,
+    }),
+  }));
+
+  const filtered = useMemo(() => {
+    return allConversations.filter((item) => {
+      if (activeTab === "All") return true;
+      if (activeTab === "Guests") return item.role === "Guest";
+      if (activeTab === "Staff") return item.role !== "Guest";
+      if (activeTab === "Escalated") return item.status === "Escalated" || item.status === "Manager review";
+      if (activeTab === "Unresolved") return item.status !== "Closed" && item.status !== "AI Resolved";
+      if (activeTab === "AI Resolved") return item.status === "AI Resolved";
+      return true;
+    });
+  }, [activeTab, allConversations]);
+
+  const activeConversation = filtered.find((item) => item.id === activeId) || filtered[0];
+  const timeline = activeConversation ? state.requestTimelines[activeConversation.id] || [] : [];
 
   return (
     <div className="min-h-screen px-6 py-8 sm:px-8 lg:px-10">
-      <div className="mx-auto max-w-[1400px]">
+      <div className="mx-auto max-w-[1460px]">
         <HotelPageHeader
-          title="Conversations"
-          body="One inbox for the hotel. Guests and staff text Sidekick, Sidekick keeps the thread, routes the work, and gives management one live view of what is still open."
-          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{threads.length} open threads</div>}
+          eyebrow="Inbox"
+          title="One message workspace for the whole property"
+          body="Guest conversations, housekeeping updates, maintenance notes, manager instructions, and Sidekick actions all live in one operational inbox."
+          action={<div className="rounded-[10px] border border-[#E1E5E2] bg-white px-4 py-2 text-sm font-medium text-[#18222C]">{filtered.length} conversations</div>}
         />
 
-        <div className="mb-6 grid gap-4 md:grid-cols-3">
-          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Guest side</div>
-            <div className="mt-2 text-sm leading-6 text-slate-600">Guests should just text Sidekick for questions, towels, cleaning, issues, or room updates.</div>
-          </div>
-          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Staff side</div>
-            <div className="mt-2 text-sm leading-6 text-slate-600">Housekeeping and maintenance should text updates naturally without learning a heavy tool.</div>
-          </div>
-          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Media-ready</div>
-            <div className="mt-2 text-sm leading-6 text-slate-600">Photos, videos, and voice notes should attach directly to the conversation and carry into the task history.</div>
-          </div>
-        </div>
-
-        <div className="mb-6 grid gap-4 md:grid-cols-3">
-          {columns.map((column) => (
-            <div key={column.key} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Conversation lane</div>
-                  <div className="mt-2 text-lg font-semibold text-[#17202B]">{column.title}</div>
-                </div>
-                <HotelStatusPill tone={column.tone}>{column.items.length}</HotelStatusPill>
-              </div>
-              <div className="mt-2 text-sm leading-6 text-slate-600">{column.detail}</div>
-            </div>
+        <div className="mb-5 flex flex-wrap gap-2">
+          {tabs.map((tab) => (
+            <button key={tab} onClick={() => setActiveTab(tab)} className={activeTab === tab ? "rounded-full bg-[#18222C] px-3 py-1.5 text-xs font-semibold text-white" : "rounded-full border border-[#E1E5E2] bg-white px-3 py-1.5 text-xs font-semibold text-[#5C6975]"}>
+              {tab}
+            </button>
           ))}
         </div>
 
-        <div className="space-y-6">
-          {columns.map((column) => (
-            <section key={column.key} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
-              <div className="flex items-end justify-between gap-4 border-b border-slate-200 pb-4">
+        <div className="grid gap-6 xl:grid-cols-[420px_minmax(0,1fr)]">
+          <section className="rounded-2xl border border-[#E1E5E2] bg-white p-4">
+            <div className="space-y-3">
+              {filtered.map((conversation) => (
+                <button key={conversation.id} onClick={() => setActiveId(conversation.id)} className={conversation.id === activeConversation?.id ? "w-full rounded-2xl border border-[#CFE4DB] bg-[#F3FBF7] p-4 text-left" : "w-full rounded-2xl border border-[#E1E5E2] bg-[#FCFCFB] p-4 text-left"}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <div className="truncate text-sm font-semibold text-[#18222C]">{conversation.person}</div>
+                        <HotelSourcePill>{conversation.role}</HotelSourcePill>
+                        {conversation.unread ? <span className="h-2 w-2 rounded-full bg-[#287A65]" /> : null}
+                      </div>
+                      <div className="mt-1 text-xs text-[#5C6975]">{conversation.room ? `Room ${conversation.room}` : "Property"} · {conversation.language}</div>
+                      <div className="mt-2 line-clamp-2 text-sm text-[#5C6975]">{conversation.latest}</div>
+                    </div>
+                    <div className="flex flex-col items-end gap-2">
+                      <HotelStatusPill tone={conversation.urgency === "Urgent" || conversation.priority === "urgent" ? "urgent" : conversation.status === "AI Resolved" || conversation.status === "Closed" ? "resolved" : conversation.status === "Manager review" || conversation.status === "Awaiting acknowledgment" || conversation.status === "Escalated" ? "queued" : "normal"}>{conversation.status}</HotelStatusPill>
+                      <div className="text-xs text-[#5C6975]">{conversation.assignedTo}</div>
+                    </div>
+                  </div>
+                  {conversation.translated ? <div className="mt-2 text-xs text-[#3976A8]">Translated from Spanish · View original</div> : null}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {activeConversation ? (
+            <section className="rounded-2xl border border-[#E1E5E2] bg-white p-5">
+              <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[#E1E5E2] pb-4">
                 <div>
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Conversation lane</div>
-                  <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[#17202B]">{column.title}</h2>
-                  <div className="mt-1 text-sm text-slate-600">{column.detail}</div>
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#5C6975]">Active conversation</div>
+                  <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[#18222C]">{activeConversation.person} · {activeConversation.room ? `Room ${activeConversation.room}` : "Property"}</h2>
+                  <div className="mt-2 flex flex-wrap gap-2 text-xs text-[#5C6975]">
+                    <HotelSourcePill>{activeConversation.role}</HotelSourcePill>
+                    <HotelSourcePill>{activeConversation.assignedTo}</HotelSourcePill>
+                    <HotelSourcePill>{activeConversation.language}</HotelSourcePill>
+                  </div>
                 </div>
-                <div className="text-sm text-slate-500">{column.items.length} threads</div>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    "Take over",
+                    "Pause AI replies",
+                    "Send direct response",
+                    "Reassign",
+                    "Change priority",
+                    "Escalate",
+                    "Add internal note",
+                    "Mark resolved",
+                    "Request guest confirmation",
+                  ].map((action) => (
+                    <button key={action} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">{action}</button>
+                  ))}
+                </div>
               </div>
 
-              <div className="mt-4 grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
-                {column.items.length ? column.items.map((request) => {
-                  const stay = state.stays.find((item) => item.room === request.room || item.id === request.stayId);
-                  const tone = request.priority === "urgent" ? "urgent" : request.triageStatus === "needs_review" ? "queued" : request.status === "in_progress" ? "high" : "normal";
-                  return (
-                    <div key={request.id} className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <div className="text-sm font-semibold text-[#17202B]">Room {request.room} · {request.guestName || "Guest"}</div>
-                          <div className="mt-1 text-xs text-slate-500">{request.title}</div>
-                        </div>
-                        <HotelStatusPill tone={tone}>{request.status === "needs_approval" ? "Review" : request.status === "in_progress" ? "Working" : "Open"}</HotelStatusPill>
-                      </div>
-                      <div className="mt-3 rounded-2xl border border-slate-200 bg-white px-3 py-3 text-xs text-slate-600">
-                        <div><span className="font-semibold text-[#17202B]">Guest said:</span> {request.detail}</div>
-                        <div className="mt-1"><span className="font-semibold text-[#17202B]">Owner:</span> {request.assignedTo}</div>
-                        <div className="mt-1"><span className="font-semibold text-[#17202B]">Next promise:</span> {request.sla || "No ETA set"}</div>
-                        <div className="mt-1"><span className="font-semibold text-[#17202B]">Context:</span> {stay ? `${stay.status.replace(/_/g, " ")} · ${stay.nights} night stay` : "No stay context"}</div>
-                      </div>
-                      <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                        <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-600">Text thread</span>
-                        <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-600">Photo / video / voice ready</span>
-                        <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-600">Learns property context</span>
-                      </div>
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        <Link href={`/hotel/requests/${request.id}`} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">Open conversation</Link>
-                        <Link href="/hotel/tasks" className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">Open task</Link>
-                      </div>
-                    </div>
-                  );
-                }) : (
-                  <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-sm text-slate-500">Nothing in this lane right now.</div>
-                )}
+              <div className="mt-4 space-y-3">
+                {timeline.map((event) => (
+                  <div key={event.id} className={event.type === "guest" ? "ml-auto max-w-[80%] rounded-2xl bg-[#3976A8] px-4 py-3 text-sm text-white" : event.type === "ai" ? "max-w-[80%] rounded-2xl bg-[#EFF6FB] px-4 py-3 text-sm text-[#18222C]" : event.type === "staff" ? "max-w-[80%] rounded-2xl bg-[#FFF7EC] px-4 py-3 text-sm text-[#18222C]" : "rounded-2xl border border-[#E1E5E2] bg-[#F8F9F7] px-4 py-3 text-sm text-[#18222C]"}>
+                    <div>{event.text}</div>
+                    {activeConversation.id === "req-218-water" && event.id === "t1" ? <div className="mt-2 text-xs opacity-80">Translated from Spanish · <span className="underline underline-offset-2">View original</span></div> : null}
+                    <div className="mt-2 text-[11px] opacity-70">{event.at}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-5 rounded-2xl border border-[#E1E5E2] bg-[#FCFCFB] p-4">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#5C6975]">Sidekick operational actions</div>
+                <div className="mt-3 grid gap-3 md:grid-cols-2">
+                  {[
+                    "Sidekick created a housekeeping task",
+                    "Assigned to Elena",
+                    "Elena acknowledged the task",
+                    "Elena reported Room 304 clean",
+                    "Sidekick notified the guest",
+                    "Task closed",
+                  ].map((line) => (
+                    <div key={line} className="rounded-xl border border-[#E1E5E2] bg-white px-3 py-3 text-sm text-[#5C6975]">{line}</div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-5 rounded-2xl border border-[#E1E5E2] bg-[#FCFCFB] p-4">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#5C6975]">Suggested follow-ups</div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {askSidekickExamples.slice(0, 4).map((prompt) => (
+                    <div key={prompt} className="rounded-full border border-[#E1E5E2] bg-white px-3 py-1.5 text-xs text-[#5C6975]">{prompt}</div>
+                  ))}
+                </div>
               </div>
             </section>
-          ))}
+          ) : null}
         </div>
       </div>
     </div>
