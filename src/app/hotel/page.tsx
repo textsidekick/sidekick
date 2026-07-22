@@ -94,7 +94,7 @@ export default function HotelOverviewPage() {
         <HotelPageHeader
           eyebrow="Hotel overview"
           title={state.property.name}
-          body="A simple motel board: what is open, what needs work, and what matters today."
+          body="A simple motel board: guests text Sidekick, staff text Sidekick, and this board shows what is open, what needs work, and what matters today."
           action={
             <div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600">
               {state.property.roomCount} rooms · {state.property.occupancyPct}% occupied

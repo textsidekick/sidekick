@@ -46,9 +46,17 @@ export default function HotelHousekeepingPage() {
     <div className="min-h-screen px-6 py-8 sm:px-8 lg:px-10">
       <div className="mx-auto max-w-6xl">
         <HotelPageHeader
-          title="Housekeeping board"
-          body="Housekeeping texts Sidekick, Sidekick updates the room board, and guests can be notified automatically when a room is ready."
+          title="Housekeeping via text"
+          body="Housekeepers should be able to text things like ‘started room 304’ or ‘finished room 304.’ Sidekick updates the room board and can notify the guest automatically when the room is ready."
         />
+        <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Simple workflow</div>
+          <div className="mt-3 grid gap-3 md:grid-cols-3">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">1. Housekeeper texts Sidekick from the field</div>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">2. Sidekick updates room status and keeps the work visible</div>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">3. Sidekick updates the guest when the room is ready</div>
+          </div>
+        </div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {rooms.map((room) => (
             <div key={room.room} className="rounded-3xl border border-black/8 bg-white p-5 shadow-sm">
@@ -66,7 +74,7 @@ export default function HotelHousekeepingPage() {
                     onClick={() => actions.updateRoomStatus(room.room, "inspection")}
                     className={primaryButton}
                   >
-                    Move To Inspection
+                    Move to inspection
                   </button>
                 ) : null}
                 {room.status !== "ready" ? (
@@ -74,7 +82,7 @@ export default function HotelHousekeepingPage() {
                     onClick={() => markRoomReady(room.room)}
                     className={secondaryButton}
                   >
-                    Mark Ready
+                    Mark ready
                   </button>
                 ) : null}
                 <button

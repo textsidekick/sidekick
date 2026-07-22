@@ -10,7 +10,7 @@ const NAV_GROUPS = [
   {
     label: "Main views",
     items: [
-      { label: "Overview", href: "/hotel", icon: Hotel, detail: "Today’s motel board" },
+      { label: "Today", href: "/hotel", icon: Hotel, detail: "The live motel board" },
       { label: "Rooms", href: "/hotel/rooms", icon: DoorOpen, detail: "Inventory + readiness" },
       { label: "Arrivals", href: "/hotel/stays", icon: CalendarClock, detail: "Incoming guests" },
       { label: "Staff", href: "/hotel/people", icon: UsersRound, detail: "Coverage + team" },
@@ -101,7 +101,7 @@ export function HotelSidebar() {
           <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
             <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Demo Property</div>
             <div className="mt-1 text-sm font-semibold text-white">Pacific Stay Motel</div>
-            <div className="mt-1 text-xs leading-5 text-slate-300">48 rooms · small motel view · rooms, guests, and staff</div>
+            <div className="mt-1 text-xs leading-5 text-slate-300">48 rooms · guests and staff text Sidekick · live room board</div>
           </div>
         </div>
 

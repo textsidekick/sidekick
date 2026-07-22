@@ -135,14 +135,14 @@ export default function HotelSmsConsolePage() {
     <div className="min-h-screen px-6 py-8 sm:px-8 lg:px-10">
       <div className="mx-auto max-w-6xl">
         <HotelPageHeader
-          title="SMS console"
-          body="Backend-backed hotel SMS simulation. Use this to test Sidekick as the guest-facing text line, staff routing behind the scenes, and automatic follow-up back to the guest."
-          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">Prototype backend active</div>}
+          title="Sidekick text line"
+          body="This is the guest-facing and staff-facing communication layer. Test how Sidekick answers, routes work, and closes the loop without forcing the team into heavyweight software."
+          action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">SMS workflow active</div>}
         />
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
           <div className="rounded-3xl border border-black/8 bg-white p-5 shadow-sm">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">Simulate inbound guest SMS</div>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">Simulate an incoming text to Sidekick</div>
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               <label className="text-sm text-black/60">
                 Room
@@ -159,7 +159,7 @@ export default function HotelSmsConsolePage() {
             </label>
             <div className="mt-4 flex flex-wrap gap-2">
               <button onClick={submitSms} disabled={submitting} className="rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60">
-                {submitting ? "Processing…" : "Process SMS"}
+                {submitting ? "Processing…" : "Process text"}
               </button>
               {examples.map((preset) => (
                 <button
@@ -180,16 +180,16 @@ export default function HotelSmsConsolePage() {
 
           <div className="space-y-4">
             <div className="rounded-3xl border border-black/8 bg-white p-5 shadow-sm">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">What the backend returns</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">What Sidekick does</div>
               {lastResult ? (
                 <div className="mt-4 space-y-3 text-sm text-black/60">
                   <div>
-                    <div className="font-semibold text-[#1C1A16]">Assistant reply</div>
+                    <div className="font-semibold text-[#1C1A16]">Reply to guest</div>
                     <div className="mt-1 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3">{lastResult.assistantReply}</div>
                   </div>
                   <div className="flex items-center justify-between gap-3">
                     <div>
-                      <div className="font-semibold text-[#1C1A16]">Created request</div>
+                      <div className="font-semibold text-[#1C1A16]">Created work</div>
                       <div className="mt-1">{lastResult.request.title}</div>
                     </div>
                     <HotelStatusPill tone={lastResult.request.status === "resolved" ? "resolved" : lastResult.request.status === "needs_approval" ? "queued" : lastResult.request.priority === "urgent" ? "urgent" : lastResult.request.priority === "high" ? "high" : "normal"}>
@@ -207,11 +207,10 @@ export default function HotelSmsConsolePage() {
                     </div>
                   ) : null}
                   <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                    <div className="text-xs font-semibold uppercase tracking-[0.14em] text-black/35">Operational workflow</div>
+                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-black/35">What happens next</div>
                     <div className="mt-2 text-sm"><span className="font-semibold text-[#1C1A16]">Route:</span> {lastResult.workflow.routeTeam}</div>
-                    <div className="mt-1 text-sm"><span className="font-semibold text-[#1C1A16]">Routing confidence:</span> {lastResult.workflow.routingConfidence}</div>
-                    <div className="mt-1 text-sm"><span className="font-semibold text-[#1C1A16]">Triage:</span> {lastResult.workflow.triageStatus?.replace(/_/g, " ")}</div>
-                    <div className="mt-1 text-sm"><span className="font-semibold text-[#1C1A16]">SLA:</span> {lastResult.workflow.suggestedSla}</div>
+                    <div className="mt-1 text-sm"><span className="font-semibold text-[#1C1A16]">ETA to guest:</span> {lastResult.workflow.suggestedSla}</div>
+                    <div className="mt-1 text-sm"><span className="font-semibold text-[#1C1A16]">Review state:</span> {lastResult.workflow.triageStatus?.replace(/_/g, " ")}</div>
                     <div className="mt-1 text-sm leading-6"><span className="font-semibold text-[#1C1A16]">Next step:</span> {lastResult.workflow.nextInternalStep}</div>
                   </div>
                   {lastResult.workflow.humanReviewRequired ? (
@@ -231,19 +230,19 @@ export default function HotelSmsConsolePage() {
                   <div className="flex flex-wrap gap-2">
                     <button onClick={sendGuestUpdateFromWorkflow} className="rounded-full bg-[#26251e] px-3 py-2 text-xs font-medium text-white">Send guest update</button>
                     <button onClick={dispatchOwner} className="rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-medium text-black/60">Dispatch owner</button>
-                    <button onClick={markAwaitingGuestConfirmation} className="rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-medium text-black/60">Await guest confirm</button>
-                <button onClick={closeResolvedLoop} className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700">Close Resolved Loop</button>
+                    <button onClick={markAwaitingGuestConfirmation} className="rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-medium text-black/60">Wait for guest confirm</button>
+                <button onClick={closeResolvedLoop} className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700">Close loop</button>
                     {createdRequest?.triageStatus === "needs_review" ? (
                       <button onClick={dispatchOwner} className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700">Approve + dispatch</button>
                     ) : null}
                     {lastResult.workflow.escalationRecommended ? (
                 <button onClick={openRecoveryCase} className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700">Open Recovery Case</button>
                     ) : null}
-                    <Link href={`/hotel/requests/${lastResult.request.id}`} className="rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-medium text-black/60">Open live thread</Link>
+                    <Link href={`/hotel/requests/${lastResult.request.id}`} className="rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-medium text-black/60">Open conversation</Link>
                   </div>
                 </div>
               ) : (
-                <div className="mt-4 text-sm text-black/45">Run a test message to see the backend classification, auto-reply, and queue routing.</div>
+                <div className="mt-4 text-sm text-black/45">Run a test message to see how Sidekick answers, creates work, and keeps the guest updated.</div>
               )}
             </div>
 
