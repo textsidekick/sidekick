@@ -125,7 +125,7 @@ export default function ManagerDashboard() {
     if (!selectedCompany) return;
     setLoadingStats(true);
     const analyticsUrl = scopedQuery("/api/analytics") + "&timeRange=all";
-    const res = await fetch(analyticsUrl);
+    const res = await fetch(analyticsUrl, { cache: "no-store" });
     const data = await res.json();
     setStats(data);
     setLoadingStats(false);
@@ -135,10 +135,10 @@ export default function ManagerDashboard() {
     if (!selectedCompany) return;
     setLoadingIssues(true);
     try {
-      const res = await fetch(scopedQuery("/api/issues"));
+      const res = await fetch(scopedQuery("/api/issues"), { cache: "no-store" });
       const data = await res.json();
       setIssues(data.issues || []);
-      const qRes = await fetch(scopedQuery("/api/analytics") + "&timeRange=all");
+      const qRes = await fetch(scopedQuery("/api/analytics") + "&timeRange=all", { cache: "no-store" });
       const qData = await qRes.json();
       setUnansweredQuestions((qData.recentQuestions || []).filter((q: any) => !q.answer));
     } catch (error) { console.error("Failed to load issues:", error); }
@@ -149,7 +149,7 @@ export default function ManagerDashboard() {
     if (!selectedCompany) return;
     setLoadingWorkOrders(true);
     try {
-      const res = await fetch(scopedQuery("/api/operations/work-orders"));
+      const res = await fetch(scopedQuery("/api/operations/work-orders"), { cache: "no-store" });
       const data = await res.json();
       setWorkOrders(data.workOrders || []);
     } catch (error) { console.error("Failed to load work orders:", error); }
