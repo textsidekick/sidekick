@@ -18,9 +18,7 @@ export function UnansweredQuestionModal({ question, onClose, answer, setAnswer, 
         <div className="px-6 py-4 border-b border-gray-100">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-100">
-                <MessageSquare className="w-5 h-5 text-[#0060F0]" />
-              </div>
+              <MessageSquare className="w-5 h-5 flex-shrink-0 text-slate-600" />
               <div>
                 <p className="font-semibold text-gray-900">{question.worker_name || "Worker"}</p>
                 <p className="text-xs text-gray-400">{question.created_at ? new Date(question.created_at).toLocaleString() : ""}</p>

@@ -94,11 +94,7 @@ function EmptyState({ sectionId }: { sectionId: SectionId }) {
     <div style={{
       padding: "32px 16px", textAlign: "center", color: "rgba(28,26,22,0.35)",
     }}>
-      <div style={{
-        width: 48, height: 48, borderRadius: 12,
-        background: "rgba(0,96,240,0.08)", margin: "0 auto 12px",
-        display: "flex", alignItems: "center", justifyContent: "center",
-      }}>
+      <div style={{ margin: "0 auto 12px", display: "flex", alignItems: "center", justifyContent: "center" }}>
         {React.createElement(SECTION_ICONS[sectionId], { size: 22, color: "#94A3B8" })}
       </div>
       <p style={{ fontSize: 13, lineHeight: 1.5, maxWidth: 200, margin: "0 auto" }}>{hints[sectionId]}</p>
@@ -146,13 +142,7 @@ function AssetPanel({ data }: { data: Asset[] }) {
           background: "white", border: "1px solid rgba(28,26,22,0.08)",
           display: "flex", alignItems: "center", gap: 12,
         }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: 8,
-            background: "rgba(0,96,240,0.08)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
-            <Wrench size={16} style={{ color: "#0060F0" }} />
-          </div>
+          <Wrench size={16} style={{ color: "#64748B", flexShrink: 0 }} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 14, fontWeight: 600, color: "#1C1A16" }}>{asset.name}</div>
             {(asset.type || asset.location) && (
@@ -309,13 +299,7 @@ export default function DataPanel({ activeSectionId, data, integrationSelector, 
         height: 72, display: "flex", alignItems: "center", gap: 12,
         padding: "0 20px", borderBottom: "1px solid rgba(28,26,22,0.06)",
       }}>
-        <div style={{
-          width: 36, height: 36, borderRadius: 10,
-          background: "rgba(0,96,240,0.08)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-        }}>
-          <Icon size={18} style={{ color: "#0060F0" }} />
-        </div>
+        <Icon size={18} style={{ color: "#64748B", flexShrink: 0 }} />
         <div>
           <div style={{ fontSize: 15, fontWeight: 700, color: "#1C1A16" }}>
             {SECTION_TITLES[activeSectionId]}

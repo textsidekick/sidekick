@@ -113,9 +113,7 @@ export default function HotelsPage() {
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {useCases.map(({ icon: Icon, title, body }) => (
               <div key={title} className="rounded-3xl border border-black/8 bg-white p-6 shadow-sm">
-                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-[#f7f3ec]">
-                  <Icon className="h-5 w-5 text-[#26251e]" />
-                </div>
+                <Icon className="mb-4 h-5 w-5 text-black/55" />
                 <h3 className="text-lg font-semibold">{title}</h3>
                 <p className="mt-2 text-sm leading-6 text-black/65">{body}</p>
               </div>
