@@ -35,9 +35,16 @@ export async function GET(request: NextRequest) {
         let preventiveWOsCreated = 0;
         for (const prediction of report.predictions) {
           if (prediction.probability > 0.7) {
+            const { data: asset } = await supabase
+              .from("assets")
+              .select("location_id")
+              .eq("id", prediction.assetId)
+              .single();
+
             const { error } = await supabase.from("work_orders").insert({
               company_id: company.id,
               asset_id: prediction.assetId,
+              location_id: asset?.location_id || null,
               title: `[PREDICTIVE] ${prediction.prediction}`,
               description: `AI-generated preventive work order. ${prediction.assetName} has a ${Math.round(prediction.probability * 100)}% probability of failure within ${prediction.timeframe}. Recommended: inspect and address proactively.`,
               priority: prediction.probability > 0.85 ? "high" : "medium",

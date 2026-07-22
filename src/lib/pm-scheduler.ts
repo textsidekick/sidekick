@@ -189,6 +189,7 @@ ${message}`;
       company_id: (wo as any).company_id,
       asset_id: (wo as any).asset_id,
       asset_name: (wo as any).asset_name,
+      location_id: (wo as any).location_id || null,
       category: (wo as any).category || "other",
       priority: "medium",
       title: `Follow-up: ${(wo as any).title}`.slice(0, 120),

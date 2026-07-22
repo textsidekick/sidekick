@@ -159,7 +159,7 @@ export default function ManagerDashboard() {
       setIssues(data.issues || []);
       const qRes = await fetch(scopedQuery("/api/analytics") + "&timeRange=all", { cache: "no-store" });
       const qData = await qRes.json();
-      setUnansweredQuestions((qData.recentQuestions || []).filter((q: any) => !q.answer));
+      setUnansweredQuestions((qData.recentQuestions || []).filter((q: any) => !q.answer || (q.confidence || 0) < 50));
     } catch (error) { console.error("Failed to load issues:", error); }
     setLoadingIssues(false);
   };

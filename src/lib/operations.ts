@@ -79,7 +79,7 @@ export async function listWorkOrders(companyId: UUID, opts?: { status?: string; 
   if (opts?.status) q = q.eq("status", opts.status);
   if (opts?.priority) q = q.eq("priority", opts.priority);
   if (opts?.assetId) q = q.eq("asset_id", opts.assetId);
-  if (opts?.locationId && opts.locationId !== "all") q = q.eq("location_id", opts.locationId);
+  if (opts?.locationId && opts.locationId !== "all") q = q.or(`location_id.eq.${opts.locationId},location_id.is.null`);
 
   const { data, error } = await q.order("created_at", { ascending: false });
   if (error) throw error;

@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     let pmSchedulesQuery = supabase.from("pm_schedules").select("id, next_due_at, status").eq("company_id", companyId);
 
     if (locationId && locationId !== "all") {
-      workOrdersQuery = workOrdersQuery.eq("location_id", locationId);
+      workOrdersQuery = workOrdersQuery.or(`location_id.eq.${locationId},location_id.is.null`);
       assetsQuery = assetsQuery.eq("location_id", locationId);
       pmSchedulesQuery = pmSchedulesQuery.eq("location_id", locationId);
     }
