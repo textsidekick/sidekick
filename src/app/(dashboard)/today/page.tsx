@@ -89,7 +89,7 @@ function KmMetricsSection({ companyId }: { companyId: string }) {
           label="Active SOPs"
           value={metrics.activeSops}
           sub={`${metrics.totalSops} total procedures`}
-          accent="text-[#C96442]"
+          accent="text-[#0060F0]"
         />
         <StatCard
           icon={HelpCircle}

@@ -49,10 +49,10 @@ function WORelatedKnowledge({ workOrderId, assetId }: { workOrderId: string; ass
   if (articles.length === 0) return null;
   return (
     <div className="mt-4 rounded-xl border border-black/5 bg-white p-4">
-      <div className="text-sm font-medium flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-[#C96442]" /> Generated Knowledge</div>
+      <div className="text-sm font-medium flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-[#0060F0]" /> Generated Knowledge</div>
       <div className="mt-2 space-y-1.5">
         {articles.map(a => (
-          <a key={a.id} href="/knowledge" className="block text-sm text-[#C96442] hover:underline truncate">{a.title}</a>
+          <a key={a.id} href="/knowledge" className="block text-sm text-[#0060F0] hover:underline truncate">{a.title}</a>
         ))}
       </div>
     </div>
@@ -421,7 +421,7 @@ export default function WorkOrdersPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search work orders, assets, categories, assignees..."
-              className="w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 text-sm text-[#1C1A16] outline-none focus:border-[#C96442]/35"
+              className="w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 text-sm text-[#1C1A16] outline-none focus:border-[#0060F0]/35"
             />
           </div>
 
@@ -593,7 +593,7 @@ export default function WorkOrdersPage() {
           </DialogHeader>
 
           {activeWO ? (
-            <div className="rounded-xl border border-black/5 bg-[#F7F3EC] px-4 py-3 text-sm text-black/65">
+            <div className="rounded-xl border border-black/5 bg-[#F4F7FA] px-4 py-3 text-sm text-black/65">
               <div className="flex flex-wrap items-center gap-2">
                 <PriorityBadge priority={actionPriority} />
                 <StatusBadge status={actionStatus} />
@@ -604,7 +604,7 @@ export default function WorkOrdersPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {recommendedTech && actionAssignTo === "unassigned" ? (
-              <div className="md:col-span-2 rounded-xl border border-[#C96442]/15 bg-[#FFF7F1] p-3 text-sm text-black/65">
+              <div className="md:col-span-2 rounded-xl border border-[#0060F0]/15 bg-[#F8FBFF] p-3 text-sm text-black/65">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="font-medium text-[#1C1A16]">Suggested assignee: {recommendedTech.name || recommendedTech.phone || "Technician"}</div>
@@ -615,7 +615,7 @@ export default function WorkOrdersPage() {
                   <button
                     type="button"
                     onClick={() => setActionAssignTo(recommendedTech.id)}
-                    className="rounded-lg border border-[#C96442]/20 bg-white px-3 py-2 text-xs font-medium text-[#1C1A16] hover:bg-[#FFF1E8]"
+                    className="rounded-lg border border-[#0060F0]/20 bg-white px-3 py-2 text-xs font-medium text-[#1C1A16] hover:bg-[#EEF4FF]"
                   >
                     Use suggestion
                   </button>

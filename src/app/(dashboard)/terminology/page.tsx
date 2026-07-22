@@ -69,7 +69,7 @@ function TermForm({ companyId, onSave, onClose }: {
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Term *</label>
             <input
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/40"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/40"
               value={term}
               onChange={e => setTerm(e.target.value)}
               placeholder="e.g. Mattress Spring"
@@ -78,7 +78,7 @@ function TermForm({ companyId, onSave, onClose }: {
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Definition</label>
             <textarea
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/40 min-h-[80px]"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/40 min-h-[80px]"
               value={definition}
               onChange={e => setDefinition(e.target.value)}
               placeholder="Enter a definition for this term..."
@@ -87,7 +87,7 @@ function TermForm({ companyId, onSave, onClose }: {
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Synonyms — Comma separated</label>
             <input
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/40"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/40"
               value={synonymsRaw}
               onChange={e => setSynonymsRaw(e.target.value)}
               placeholder="spring, coil spring"
@@ -96,7 +96,7 @@ function TermForm({ companyId, onSave, onClose }: {
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Language</label>
             <select
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/40"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/40"
               value={language}
               onChange={e => setLanguage(e.target.value)}
             >
@@ -117,7 +117,7 @@ function TermForm({ companyId, onSave, onClose }: {
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 px-4 py-2 rounded-lg bg-[#C96442] text-white text-sm font-medium hover:bg-[#b05538] disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2 rounded-lg bg-[#0060F0] text-white text-sm font-medium hover:bg-[#004BB8] disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {saving && <Loader2 className="h-3 w-3 animate-spin" />}
               Save
@@ -135,7 +135,7 @@ function TermCard({ t }: { t: Term }) {
       <div className="flex items-start justify-between gap-2">
         <h3 className="text-lg font-bold text-[#1C1A16] leading-tight">{t.term}</h3>
         {t.language && (
-          <span className="text-[10px] font-semibold uppercase tracking-wide bg-[#F7F3EC] text-[#C96442] rounded px-2 py-0.5 flex-shrink-0">
+          <span className="text-[10px] font-semibold uppercase tracking-wide bg-[#F4F7FA] text-[#0060F0] rounded px-2 py-0.5 flex-shrink-0">
             {t.language}
           </span>
         )}
@@ -148,9 +148,9 @@ function TermCard({ t }: { t: Term }) {
           {t.synonyms.map((s, i) => (
             <span
               key={i}
-              className="inline-flex items-center gap-1 bg-[#F7F3EC] text-[#1C1A16] text-[11px] font-medium rounded-full px-2.5 py-0.5"
+              className="inline-flex items-center gap-1 bg-[#F4F7FA] text-[#1C1A16] text-[11px] font-medium rounded-full px-2.5 py-0.5"
             >
-              <Tag className="h-2.5 w-2.5 text-[#C96442]" />
+              <Tag className="h-2.5 w-2.5 text-[#0060F0]" />
               {s}
             </span>
           ))}
@@ -197,14 +197,14 @@ export default function TerminologyPage() {
   });
 
   return (
-    <div className="flex-1 min-h-screen bg-[#F7F3EC]">
+    <div className="flex-1 min-h-screen bg-[#F4F7FA]">
       <SectionHeader
         title="Terminology"
         subtitle={`Terminology · ${terms.length} terms`}
         action={
           <button
             onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-[#C96442] text-white text-sm font-medium rounded-lg hover:bg-[#b05538] transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-[#0060F0] text-white text-sm font-medium rounded-lg hover:bg-[#004BB8] transition-colors"
           >
             <Plus className="h-4 w-4" />
             Add Term
@@ -217,7 +217,7 @@ export default function TerminologyPage() {
         <div className="relative max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
-            className="w-full pl-9 pr-4 py-2 bg-white border border-[rgba(28,26,22,0.08)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30"
+            className="w-full pl-9 pr-4 py-2 bg-white border border-[rgba(28,26,22,0.08)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30"
             placeholder="Search terms..."
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -235,7 +235,7 @@ export default function TerminologyPage() {
         {/* Grid */}
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-[#C96442]" />
+            <Loader2 className="h-8 w-8 animate-spin text-[#0060F0]" />
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
@@ -246,7 +246,7 @@ export default function TerminologyPage() {
             {!search && (
               <button
                 onClick={() => setShowForm(true)}
-                className="mt-2 px-4 py-2 bg-[#C96442] text-white text-sm font-medium rounded-lg hover:bg-[#b05538]"
+                className="mt-2 px-4 py-2 bg-[#0060F0] text-white text-sm font-medium rounded-lg hover:bg-[#004BB8]"
               >
                 Add your first term
               </button>

@@ -35,13 +35,13 @@ export function AllQuestionsModal({ open, onClose, filteredQuestions, questionSe
                 placeholder="Search questions or workers..."
                 value={questionSearch}
                 onChange={(e) => setQuestionSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C96442]"
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0060F0]"
               />
             </div>
             <select
               value={questionFilter}
               onChange={(e) => setQuestionFilter(e.target.value as any)}
-              className="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C96442]"
+              className="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0060F0]"
             >
               <option value="all">All</option>
               <option value="answered">Answered</option>

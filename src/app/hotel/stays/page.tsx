@@ -83,7 +83,7 @@ export default function HotelStaysPage() {
                 <div className="mt-4 flex flex-wrap gap-2">
                   <button
                     onClick={() => actions.updateStayNote(stay.id, `${stay.notes} Pre-arrival text sent with arrival expectations and desk contact.`)}
-                    className="rounded-full bg-[#2F5D8A] px-3 py-1 text-xs font-medium text-white"
+                    className="rounded-full bg-[#0060F0] px-3 py-1 text-xs font-medium text-white"
                   >
                     Send pre-arrival text
                   </button>

@@ -90,7 +90,7 @@ function RejectModal({ onConfirm, onCancel }: { onConfirm: (reason: string) => v
       <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl" onClick={e => e.stopPropagation()}>
         <h3 className="font-semibold text-gray-900 mb-2">Reject Knowledge Item</h3>
         <p className="text-sm text-gray-500 mb-3">Why is this item incorrect or not useful?</p>
-        <textarea value={reason} onChange={e => setReason(e.target.value)} rows={3} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" placeholder="e.g. Wrong procedure for this machine, outdated parts list..." />
+        <textarea value={reason} onChange={e => setReason(e.target.value)} rows={3} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" placeholder="e.g. Wrong procedure for this machine, outdated parts list..." />
         <div className="flex justify-end gap-2 mt-4">
           <button onClick={onCancel} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
           <button onClick={() => onConfirm(reason)} disabled={!reason.trim()} className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50">Reject</button>
@@ -110,14 +110,14 @@ function SnoozeModal({ onConfirm, onCancel }: { onConfirm: (days: number) => voi
         <p className="text-sm text-gray-500 mb-3">Come back to this item later.</p>
         <div className="flex gap-2">
           {[1, 3, 7, 14, 30].map(d => (
-            <button key={d} onClick={() => setDays(d)} className={cn("px-3 py-1.5 text-sm rounded-lg border", days === d ? "border-[#C96442]/20 bg-[#F7F3EC] text-gray-700" : "border-gray-200 text-gray-600 hover:bg-gray-50")}>
+            <button key={d} onClick={() => setDays(d)} className={cn("px-3 py-1.5 text-sm rounded-lg border", days === d ? "border-[#0060F0]/20 bg-[#F4F7FA] text-gray-700" : "border-gray-200 text-gray-600 hover:bg-gray-50")}>
               {d}d
             </button>
           ))}
         </div>
         <div className="flex justify-end gap-2 mt-4">
           <button onClick={onCancel} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
-          <button onClick={() => onConfirm(days)} className="px-4 py-2 text-sm bg-[#C96442] text-white rounded-lg hover:bg-[#B0532F]">Snooze {days}d</button>
+          <button onClick={() => onConfirm(days)} className="px-4 py-2 text-sm bg-[#0060F0] text-white rounded-lg hover:bg-[#004BB8]">Snooze {days}d</button>
         </div>
       </div>
     </div>
@@ -138,24 +138,24 @@ function EditVerifyModal({ article, onConfirm, onCancel }: { article: ReviewArti
         <div className="space-y-3">
           <div>
             <label className="text-xs font-semibold text-gray-500 uppercase">Title</label>
-            <input value={title} onChange={e => setTitle(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" />
+            <input value={title} onChange={e => setTitle(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" />
           </div>
           <div>
             <label className="text-xs font-semibold text-gray-500 uppercase">Problem</label>
-            <textarea value={problem} onChange={e => setProblem(e.target.value)} rows={2} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" />
+            <textarea value={problem} onChange={e => setProblem(e.target.value)} rows={2} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" />
           </div>
           <div>
             <label className="text-xs font-semibold text-gray-500 uppercase">Symptoms</label>
-            <textarea value={symptoms} onChange={e => setSymptoms(e.target.value)} rows={2} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" />
+            <textarea value={symptoms} onChange={e => setSymptoms(e.target.value)} rows={2} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" />
           </div>
           <div>
             <label className="text-xs font-semibold text-gray-500 uppercase">Solution</label>
-            <textarea value={solution} onChange={e => setSolution(e.target.value)} rows={4} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" />
+            <textarea value={solution} onChange={e => setSolution(e.target.value)} rows={4} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" />
           </div>
         </div>
         <div className="flex justify-end gap-2 mt-4">
           <button onClick={onCancel} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
-          <button onClick={() => onConfirm({ title, problem, solution, symptoms })} className="px-4 py-2 text-sm bg-[#C96442] text-white rounded-lg hover:bg-[#B0532F] flex items-center gap-1.5">
+          <button onClick={() => onConfirm({ title, problem, solution, symptoms })} className="px-4 py-2 text-sm bg-[#0060F0] text-white rounded-lg hover:bg-[#004BB8] flex items-center gap-1.5">
             <CheckCircle2 className="w-4 h-4" /> Save & Verify
           </button>
         </div>
@@ -288,7 +288,7 @@ export default function ReviewQueuePage() {
                       {article.asset_name && <span className="flex items-center gap-1"><Wrench className="w-3 h-3" />{article.asset_name}</span>}
                       <span>{timeAgo(article.created_at)}</span>
                       {article.source_work_order_id && (
-                        <a href={`/work-orders?id=${article.source_work_order_id}`} className="text-[#C96442] underline hover:text-[#B0532F] flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                        <a href={`/work-orders?id=${article.source_work_order_id}`} className="text-[#0060F0] underline hover:text-[#004BB8] flex items-center gap-1" onClick={e => e.stopPropagation()}>
                           <Link2 className="w-3 h-3" /> Source WO
                         </a>
                       )}
@@ -343,7 +343,7 @@ export default function ReviewQueuePage() {
                       <button
                         onClick={() => setModal({ type: "edit", articleId: article.id, article })}
                         disabled={isLoading}
-                        className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium bg-[#C96442] text-white rounded-lg hover:bg-[#B0532F] disabled:opacity-50 transition-colors"
+                        className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium bg-[#0060F0] text-white rounded-lg hover:bg-[#004BB8] disabled:opacity-50 transition-colors"
                       >
                         <Edit3 className="w-4 h-4" /> Edit & Verify
                       </button>

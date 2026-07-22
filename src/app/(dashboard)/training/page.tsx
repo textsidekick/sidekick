@@ -276,7 +276,7 @@ function PathDetailModal({
             <h2 className="text-lg font-bold text-gray-900">{path?.name || "Loading..."}</h2>
             <div className="mt-1 flex flex-wrap items-center gap-2">
               {deptName && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-[#F7F3EC] px-2.5 py-0.5 text-xs font-medium text-[#C96442]">
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#F4F7FA] px-2.5 py-0.5 text-xs font-medium text-[#0060F0]">
                   <Building2 className="h-3 w-3" /> {deptName}
                 </span>
               )}
@@ -441,7 +441,7 @@ function PathDetailModal({
                   onClick={() => { setSelectedWorkerId(w.id); setWorkerDropdownOpen(false); setWorkerSearch(""); }}
                   className={cn(
                     "flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-gray-50",
-                    selectedWorkerId === w.id && "bg-[#F7F3EC]",
+                    selectedWorkerId === w.id && "bg-[#F4F7FA]",
                     isRecommended && "bg-amber-50/60 hover:bg-amber-50"
                   )}
                 >
@@ -470,7 +470,7 @@ function PathDetailModal({
                       <>
                         {/* Search input / selected display */}
                         <div
-                          className="flex cursor-text items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus-within:ring-2 focus-within:ring-[#C96442]/30"
+                          className="flex cursor-text items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus-within:ring-2 focus-within:ring-[#0060F0]/30"
                           onClick={() => setWorkerDropdownOpen(true)}
                         >
                           {selectedWorker && !workerDropdownOpen ? (
@@ -554,7 +554,7 @@ function PathDetailModal({
                   <button
                     onClick={handleEnroll}
                     disabled={enrolling || !selectedWorkerId}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white hover:bg-[#B0532F] disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-[#0060F0] px-4 py-2 text-sm font-medium text-white hover:bg-[#004BB8] disabled:opacity-50"
                   >
                     {enrolling ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
                     {t("Assign")}
@@ -570,7 +570,7 @@ function PathDetailModal({
                 <select
                   value={reminderFrequency}
                   onChange={(e) => setReminderFrequency(e.target.value)}
-                  className="flex-1 rounded border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#C96442]/30"
+                  className="flex-1 rounded border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#0060F0]/30"
                 >
                   <option value="none">{t("No reminders")}</option>
                   <option value="daily">{t("Daily")}</option>
@@ -580,7 +580,7 @@ function PathDetailModal({
                   <select
                     value={reminderTime}
                     onChange={(e) => setReminderTime(e.target.value)}
-                    className="rounded border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#C96442]/30"
+                    className="rounded border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#0060F0]/30"
                   >
                     {["06:00","07:00","08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00"].map((h) => (
                       <option key={h} value={h}>{new Date(`2000-01-01T${h}`).toLocaleTimeString([], { hour: "numeric", hour12: true })}</option>
@@ -594,7 +594,7 @@ function PathDetailModal({
                   type="date"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  className="rounded border border-gray-200 px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#C96442]/30"
+                  className="rounded border border-gray-200 px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#0060F0]/30"
                 />
               </div>
             </div>
@@ -607,7 +607,7 @@ function PathDetailModal({
               <select
                 value={enrollDept}
                 onChange={(e) => setEnrollDept(e.target.value)}
-                className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30"
+                className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30"
               >
                 <option value="">Select department...</option>
                 {departments.map((d) => (
@@ -617,7 +617,7 @@ function PathDetailModal({
               <button
                 onClick={handleEnrollDept}
                 disabled={enrollingDept || !enrollDept}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white hover:bg-[#B0532F] disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-[#0060F0] px-4 py-2 text-sm font-medium text-white hover:bg-[#004BB8] disabled:opacity-50"
               >
                 {enrollingDept ? <Loader2 className="h-4 w-4 animate-spin" /> : <Building2 className="h-4 w-4" />}
                 Assign All
@@ -681,21 +681,21 @@ function NewPathForm({ companyId, onSave, onClose }: { companyId: string; onSave
         <div className="space-y-4">
           <div>
             <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Path Name *</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} required className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" placeholder="e.g. New Production Worker Onboarding" />
+            <input value={name} onChange={(e) => setName(e.target.value)} required className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" placeholder="e.g. New Production Worker Onboarding" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Role / Target</label>
-              <input value={role} onChange={(e) => setRole(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" placeholder="e.g. Line operator, Inspector" />
+              <input value={role} onChange={(e) => setRole(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" placeholder="e.g. Line operator, Inspector" />
             </div>
             <div>
               <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Estimated Days</label>
-              <input type="number" value={estimatedDays} onChange={(e) => setEstimatedDays(Number(e.target.value))} min={1} max={90} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" />
+              <input type="number" value={estimatedDays} onChange={(e) => setEstimatedDays(Number(e.target.value))} min={1} max={90} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" />
             </div>
           </div>
           <div>
             <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Description</label>
-            <input value={description} onChange={(e) => setDescription(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" placeholder="What will workers learn?" />
+            <input value={description} onChange={(e) => setDescription(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" placeholder="What will workers learn?" />
           </div>
 
           {/* Learning Steps removed for cleaner UI */}
@@ -703,7 +703,7 @@ function NewPathForm({ companyId, onSave, onClose }: { companyId: string; onSave
 
         <div className="mt-6 flex justify-end gap-3">
           <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
-          <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-[#C96442] px-5 py-2 text-sm font-medium text-white hover:bg-[#B0532F] disabled:opacity-50">
+          <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-[#0060F0] px-5 py-2 text-sm font-medium text-white hover:bg-[#004BB8] disabled:opacity-50">
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />} Create Path
           </button>
         </div>
@@ -797,7 +797,7 @@ export default function TrainingPage() {
               { label: t("Workers Enrolled"), value: totalEnrolled, icon: Users, color: "text-blue-600" },
               { label: t("In Progress"), value: totalInProgress, icon: PlayCircle, color: "text-amber-600" },
               { label: t("Completed"), value: totalCompleted, icon: CheckCircle2, color: "text-green-600" },
-              { label: t("Completion Rate"), value: `${completionPct}%`, icon: Circle, color: "text-[#C96442]" },
+              { label: t("Completion Rate"), value: `${completionPct}%`, icon: Circle, color: "text-[#0060F0]" },
             ].map((m) => (
               <div key={m.label} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
                 <div className="flex items-center gap-2">
@@ -815,7 +815,7 @@ export default function TrainingPage() {
                 <span className="font-semibold">{totalEnrolled}</span> workers enrolled,{" "}
                 <span className="font-semibold">{totalCompleted}</span> completed
                 {" — "}
-                <span className="font-semibold text-[#C96442]">{completionPct}%</span> completion rate
+                <span className="font-semibold text-[#0060F0]">{completionPct}%</span> completion rate
               </div>
               {avgDays !== null && (
                 <div className="text-xs text-gray-500">
@@ -824,7 +824,7 @@ export default function TrainingPage() {
               )}
             </div>
             <div className="h-2 w-full rounded-full bg-gray-100">
-              <div className="h-2 rounded-full bg-[#C96442] transition-all" style={{ width: `${completionPct}%` }} />
+              <div className="h-2 rounded-full bg-[#0060F0] transition-all" style={{ width: `${completionPct}%` }} />
             </div>
           </div>
         </>
@@ -836,13 +836,13 @@ export default function TrainingPage() {
           <select
             value={filterDept}
             onChange={(e) => setFilterDept(e.target.value)}
-            className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30"
+            className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30"
           >
             <option value="">All departments</option>
             {departments.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
           </select>
         )}
-        <button onClick={() => setShowForm(true)} className="inline-flex items-center gap-2 rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white hover:bg-[#B0532F]">
+        <button onClick={() => setShowForm(true)} className="inline-flex items-center gap-2 rounded-lg bg-[#0060F0] px-4 py-2 text-sm font-medium text-white hover:bg-[#004BB8]">
           <Plus className="h-4 w-4" /> New Training Path
         </button>
       </div>
@@ -855,7 +855,7 @@ export default function TrainingPage() {
             <GraduationCap className="mx-auto mb-3 h-10 w-10 text-gray-300" />
             <p className="font-medium text-gray-600">No training paths yet</p>
             <p className="mt-1 text-sm text-gray-400">Create structured learning programs. Workers receive each step over text — no app needed.</p>
-            <button onClick={() => setShowForm(true)} className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white hover:bg-[#B0532F]">
+            <button onClick={() => setShowForm(true)} className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#0060F0] px-4 py-2 text-sm font-medium text-white hover:bg-[#004BB8]">
               <Plus className="h-4 w-4" /> Create first training path
             </button>
           </div>
@@ -871,13 +871,13 @@ export default function TrainingPage() {
             return (
               <div
                 key={path.id}
-                className="cursor-pointer rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:border-[#C96442]/30 hover:shadow-md transition-all"
+                className="cursor-pointer rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:border-[#0060F0]/30 hover:shadow-md transition-all"
                 onClick={() => setSelectedPathId(path.id)}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <GraduationCap className="h-4 w-4 text-[#C96442]" />
+                      <GraduationCap className="h-4 w-4 text-[#0060F0]" />
                       <span className="font-semibold text-gray-900">{path.name}</span>
                       {!path.is_active && <span className="rounded bg-gray-100 px-2 py-0.5 text-[10px] text-gray-500">Inactive</span>}
                     </div>
@@ -885,7 +885,7 @@ export default function TrainingPage() {
                     {/* Department + Role tags */}
                     <div className="mt-2 flex flex-wrap items-center gap-2">
                       {deptName && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-[#F7F3EC] px-2.5 py-0.5 text-xs font-medium text-[#C96442]">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[#F4F7FA] px-2.5 py-0.5 text-xs font-medium text-[#0060F0]">
                           <Building2 className="h-3 w-3" /> {deptName}
                         </span>
                       )}

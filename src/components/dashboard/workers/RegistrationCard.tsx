@@ -44,7 +44,7 @@ function RegistrationCard({ joinCode, smsNumber = '+1 (888) 707-4659' }: Registr
             Workers text this to join:
           </p>
           {joinCode ? (
-            <p className="font-mono text-2xl font-bold text-[#C96442] tracking-wider">
+            <p className="font-mono text-2xl font-bold text-[#0060F0] tracking-wider">
               JOIN {joinCode}
             </p>
           ) : (

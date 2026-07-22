@@ -128,25 +128,25 @@ function SOPForm({ departments, companyId, onSave, onClose }: {
         <div className="space-y-4">
           <div>
             <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Title *</label>
-            <input value={title} onChange={(e) => setTitle(e.target.value)} required className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" placeholder="e.g. Machine A Startup Procedure" />
+            <input value={title} onChange={(e) => setTitle(e.target.value)} required className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" placeholder="e.g. Machine A Startup Procedure" />
           </div>
           <div>
             <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Description</label>
-            <input value={description} onChange={(e) => setDescription(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" placeholder="Brief summary of what this covers" />
+            <input value={description} onChange={(e) => setDescription(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" placeholder="Brief summary of what this covers" />
           </div>
           <div>
             <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Content *</label>
             <p className="mb-1 text-xs text-gray-400">Workers will receive this over SMS when they text "SOP for [topic]". Keep steps clear and concise.</p>
-            <textarea value={content} onChange={(e) => setContent(e.target.value)} required rows={8} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" placeholder="Step 1: ...\nStep 2: ...\nStep 3: ..." />
+            <textarea value={content} onChange={(e) => setContent(e.target.value)} required rows={8} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" placeholder="Step 1: ...\nStep 2: ...\nStep 3: ..." />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Category</label>
-              <input value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" placeholder="e.g. Safety, Maintenance" />
+              <input value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" placeholder="e.g. Safety, Maintenance" />
             </div>
             <div>
               <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Department</label>
-              <select value={departmentId} onChange={(e) => setDepartmentId(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30">
+              <select value={departmentId} onChange={(e) => setDepartmentId(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30">
                 <option value="">All departments</option>
                 {departments.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
               </select>
@@ -155,7 +155,7 @@ function SOPForm({ departments, companyId, onSave, onClose }: {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Language</label>
-              <select value={language} onChange={(e) => setLanguage(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30">
+              <select value={language} onChange={(e) => setLanguage(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30">
                 <option value="en">English</option>
                 <option value="ko">Korean (한국어)</option>
                 <option value="es">Spanish (Español)</option>
@@ -165,14 +165,14 @@ function SOPForm({ departments, companyId, onSave, onClose }: {
             </div>
             <div>
               <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Tags (comma-separated)</label>
-              <input value={tags} onChange={(e) => setTags(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" placeholder="startup, safety, machine-a" />
+              <input value={tags} onChange={(e) => setTags(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" placeholder="startup, safety, machine-a" />
             </div>
           </div>
         </div>
 
         <div className="mt-6 flex justify-end gap-3">
           <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
-          <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-[#C96442] px-5 py-2 text-sm font-medium text-white hover:bg-[#B0532F] disabled:opacity-50">
+          <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-[#0060F0] px-5 py-2 text-sm font-medium text-white hover:bg-[#004BB8] disabled:opacity-50">
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
             Publish SOP
           </button>
@@ -237,24 +237,24 @@ export default function SopsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search SOPs..."
-            className="w-full rounded-lg border border-gray-200 pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30"
+            className="w-full rounded-lg border border-gray-200 pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30"
           />
         </div>
-        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30">
+        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30">
           <option value="active">Active</option>
           <option value="draft">Drafts</option>
           <option value="deprecated">Deprecated</option>
           <option value="all">All</option>
         </select>
         {departments.length > 0 && (
-          <select value={filterDept} onChange={(e) => setFilterDept(e.target.value)} className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30">
+          <select value={filterDept} onChange={(e) => setFilterDept(e.target.value)} className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30">
             <option value="">All departments</option>
             {departments.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
           </select>
         )}
         <button
           onClick={() => setShowForm(true)}
-          className="ml-auto inline-flex items-center gap-2 rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white hover:bg-[#B0532F]"
+          className="ml-auto inline-flex items-center gap-2 rounded-lg bg-[#0060F0] px-4 py-2 text-sm font-medium text-white hover:bg-[#004BB8]"
         >
           <Plus className="h-4 w-4" /> New SOP
         </button>
@@ -274,7 +274,7 @@ export default function SopsPage() {
             <FileText className="mx-auto mb-3 h-10 w-10 text-gray-300" />
             <p className="font-medium text-gray-600">No SOPs yet</p>
             <p className="mt-1 text-sm text-gray-400">Add your first procedure so workers can access it over text.</p>
-            <button onClick={() => setShowForm(true)} className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white hover:bg-[#B0532F]">
+            <button onClick={() => setShowForm(true)} className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#0060F0] px-4 py-2 text-sm font-medium text-white hover:bg-[#004BB8]">
               <Plus className="h-4 w-4" /> Create first SOP
             </button>
           </div>
@@ -287,7 +287,7 @@ export default function SopsPage() {
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <FileText className="h-4 w-4 text-[#C96442] flex-shrink-0" />
+                    <FileText className="h-4 w-4 text-[#0060F0] flex-shrink-0" />
                     <span className="font-semibold text-gray-900">{sop.title}</span>
                     <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-500">v{sop.version_number}</span>
                     {statusBadge(sop.status)}

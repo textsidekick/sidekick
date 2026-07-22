@@ -19,7 +19,7 @@ export default function HotelRequestDetailPage() {
       <div className="min-h-screen px-6 py-8 sm:px-8 lg:px-10">
         <div className="mx-auto max-w-4xl rounded-3xl border border-black/8 bg-white p-8 shadow-sm">
           <div className="text-lg font-semibold text-[#1C1A16]">Request not found</div>
-          <Link href="/hotel/guest-requests" className="mt-4 inline-block text-sm text-[#C96442]">Back to guest requests</Link>
+          <Link href="/hotel/guest-requests" className="mt-4 inline-block text-sm text-[#0060F0]">Back to guest requests</Link>
         </div>
       </div>
     );

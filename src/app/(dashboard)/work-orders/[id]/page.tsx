@@ -85,7 +85,7 @@ function AITriageCard({ triage }: { triage: AITriage | null | undefined }) {
           <div className="text-xs font-semibold uppercase tracking-wide text-black/35">Suggested parts</div>
           <div className="mt-2 flex flex-wrap gap-2">
             {triage.suggested_parts.map((part) => (
-              <span key={part} className="rounded-full bg-[#F7F3EC] px-3 py-1 text-xs font-medium text-black/60">
+              <span key={part} className="rounded-full bg-[#F4F7FA] px-3 py-1 text-xs font-medium text-black/60">
                 {part}
               </span>
             ))}
@@ -382,12 +382,12 @@ export default function WorkOrderDetailPage() {
         <div className="space-y-6">
           <div className="rounded-2xl border border-black/5 bg-white p-5">
             <div className="flex items-center gap-2 text-sm font-semibold text-[#1C1A16]">
-              <MessageSquare className="h-4 w-4 text-[#C96442]" /> Work thread
+              <MessageSquare className="h-4 w-4 text-[#0060F0]" /> Work thread
             </div>
             <div className="mt-5 space-y-4">
               {threadEvents.map((event) => (
                 <div key={event.id} className={`flex ${event.kind === "worker" ? "justify-start" : "justify-end"}`}>
-                  <div className={`max-w-[85%] rounded-2xl px-4 py-3 ${event.kind === "worker" ? "bg-[#F7F3EC] text-[#1C1A16]" : event.kind === "assistant" ? "bg-white border border-[#C96442]/15 text-[#1C1A16]" : "bg-black/[0.04] text-black/65"}`}>
+                  <div className={`max-w-[85%] rounded-2xl px-4 py-3 ${event.kind === "worker" ? "bg-[#F4F7FA] text-[#1C1A16]" : event.kind === "assistant" ? "bg-white border border-[#0060F0]/15 text-[#1C1A16]" : "bg-black/[0.04] text-black/65"}`}>
                     <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-black/35">
                       <span>{event.author}</span>
                       <span>·</span>
@@ -407,7 +407,7 @@ export default function WorkOrderDetailPage() {
               <div className="text-sm font-semibold text-[#1C1A16]">Manager correction history</div>
               <div className="mt-4 space-y-3">
                 {(((workOrder.ai_triage || {}) as AITriage).manager_corrections || []).slice().reverse().map((entry, index) => (
-                  <div key={`${entry.at || index}`} className="rounded-xl bg-[#F7F3EC] px-4 py-3 text-sm text-black/65">
+                  <div key={`${entry.at || index}`} className="rounded-xl bg-[#F4F7FA] px-4 py-3 text-sm text-black/65">
                     <div className="text-xs font-semibold uppercase tracking-wide text-black/40">
                       {entry.at ? new Date(entry.at).toLocaleString() : "Manager correction"}
                     </div>
@@ -426,7 +426,7 @@ export default function WorkOrderDetailPage() {
             <p className="mt-1 text-sm text-black/50">Update assignment, priority, and status from one place.</p>
 
             {recommendedTech && actionAssignTo === "unassigned" ? (
-              <div className="mt-4 rounded-xl border border-[#C96442]/15 bg-[#FFF7F1] p-3 text-sm text-black/65">
+              <div className="mt-4 rounded-xl border border-[#0060F0]/15 bg-[#F8FBFF] p-3 text-sm text-black/65">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="font-medium text-[#1C1A16]">Suggested assignee: {recommendedTech.name || recommendedTech.phone || "Technician"}</div>
@@ -437,7 +437,7 @@ export default function WorkOrderDetailPage() {
                   <button
                     type="button"
                     onClick={() => setActionAssignTo(recommendedTech.id)}
-                    className="rounded-lg border border-[#C96442]/20 bg-white px-3 py-2 text-xs font-medium text-[#1C1A16] hover:bg-[#FFF1E8]"
+                    className="rounded-lg border border-[#0060F0]/20 bg-white px-3 py-2 text-xs font-medium text-[#1C1A16] hover:bg-[#EEF4FF]"
                   >
                     Use suggestion
                   </button>
@@ -579,11 +579,11 @@ export default function WorkOrderDetailPage() {
           {relatedKnowledge.length > 0 && (
             <div className="rounded-2xl border border-black/5 bg-white p-5">
               <div className="flex items-center gap-2 text-sm font-semibold text-[#1C1A16]">
-                <BookOpen className="h-4 w-4 text-[#C96442]" /> Related knowledge
+                <BookOpen className="h-4 w-4 text-[#0060F0]" /> Related knowledge
               </div>
               <div className="mt-4 space-y-2">
                 {relatedKnowledge.map((article) => (
-                  <a key={article.id} href="/knowledge" className="block text-sm text-[#C96442] hover:underline">
+                  <a key={article.id} href="/knowledge" className="block text-sm text-[#0060F0] hover:underline">
                     {article.title}
                   </a>
                 ))}

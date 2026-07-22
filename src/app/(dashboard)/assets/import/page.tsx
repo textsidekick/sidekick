@@ -68,7 +68,7 @@ export default function AssetImportPage() {
             <ArrowLeft className="h-3.5 w-3.5" /> Back to Assets
           </a>
           <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
-            <Upload className="h-6 w-6 text-[#C96442]" /> Import Assets (CSV)
+            <Upload className="h-6 w-6 text-[#0060F0]" /> Import Assets (CSV)
           </h1>
           <p className="text-sm text-gray-500 mt-1">Bulk upload assets from a CSV file</p>
         </div>
@@ -101,7 +101,7 @@ export default function AssetImportPage() {
         </div>
 
         {/* Upload zone */}
-        <div className="bg-white rounded-xl border-2 border-dashed border-gray-200 p-8 text-center mb-6 cursor-pointer hover:border-[#C96442] transition-colors" onClick={() => inputRef.current?.click()}>
+        <div className="bg-white rounded-xl border-2 border-dashed border-gray-200 p-8 text-center mb-6 cursor-pointer hover:border-[#0060F0] transition-colors" onClick={() => inputRef.current?.click()}>
           <input ref={inputRef} type="file" accept=".csv,text/csv" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
           <Upload className="h-8 w-8 mx-auto text-gray-300 mb-3" />
           {file ? (
@@ -134,7 +134,7 @@ export default function AssetImportPage() {
           </div>
         )}
 
-        <Button onClick={handleUpload} disabled={!file || uploading} className="w-full bg-[#C96442] hover:bg-[#B0532F] text-white">
+        <Button onClick={handleUpload} disabled={!file || uploading} className="w-full bg-[#0060F0] hover:bg-[#004BB8] text-white">
           {uploading ? "Uploading…" : "Import Assets"}
         </Button>
       </div>

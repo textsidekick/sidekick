@@ -200,7 +200,7 @@ export default function HotelOverviewPage() {
                 <Link key={card.title} href={card.href} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40 transition-transform hover:-translate-y-0.5">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100">
-                      <card.icon className="h-5 w-5 text-[#2F5D8A]" />
+                      <card.icon className="h-5 w-5 text-[#0060F0]" />
                     </div>
                     <div className="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">Core pillar</div>
                   </div>
@@ -248,10 +248,10 @@ export default function HotelOverviewPage() {
               <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">Hospitality lens</div>
               <h2 className="mt-2 text-xl font-semibold tracking-[-0.03em]">Why this should feel different</h2>
               <div className="mt-5 space-y-4 text-sm leading-6 text-black/60">
-                <div className="flex gap-3"><BedDouble className="mt-0.5 h-4 w-4 text-[#C96442]" /> Sellable room inventory matters more than raw task counts.</div>
-                <div className="flex gap-3"><ConciergeBell className="mt-0.5 h-4 w-4 text-[#C96442]" /> Guest perception changes with every update, ETA, and make-good.</div>
-                <div className="flex gap-3"><Languages className="mt-0.5 h-4 w-4 text-[#C96442]" /> Staff and guest messaging needs bilingual, role-based, text-first coordination.</div>
-                <div className="flex gap-3"><Sparkles className="mt-0.5 h-4 w-4 text-[#C96442]" /> Good hotel software should feel calm, warm, and exception-aware—not industrial.</div>
+                <div className="flex gap-3"><BedDouble className="mt-0.5 h-4 w-4 text-[#0060F0]" /> Sellable room inventory matters more than raw task counts.</div>
+                <div className="flex gap-3"><ConciergeBell className="mt-0.5 h-4 w-4 text-[#0060F0]" /> Guest perception changes with every update, ETA, and make-good.</div>
+                <div className="flex gap-3"><Languages className="mt-0.5 h-4 w-4 text-[#0060F0]" /> Staff and guest messaging needs bilingual, role-based, text-first coordination.</div>
+                <div className="flex gap-3"><Sparkles className="mt-0.5 h-4 w-4 text-[#0060F0]" /> Good hotel software should feel calm, precise, and operational—not gimmicky.</div>
               </div>
             </div>
           </div>

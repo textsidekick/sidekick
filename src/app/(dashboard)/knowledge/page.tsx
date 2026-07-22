@@ -164,25 +164,25 @@ function SOPForm({ departments, companyId, onSave, onClose }: {
         <div className="space-y-4">
           <div>
             <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Title *</label>
-            <input value={title} onChange={(e) => setTitle(e.target.value)} required className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" placeholder="e.g. Machine A Startup Procedure" />
+            <input value={title} onChange={(e) => setTitle(e.target.value)} required className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" placeholder="e.g. Machine A Startup Procedure" />
           </div>
           <div>
             <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Description</label>
-            <input value={description} onChange={(e) => setDescription(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" placeholder="Brief summary" />
+            <input value={description} onChange={(e) => setDescription(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" placeholder="Brief summary" />
           </div>
           <div>
             <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Content *</label>
             <p className="mb-1 text-xs text-gray-400">Workers receive this over SMS. Keep steps clear and concise.</p>
-            <textarea value={content} onChange={(e) => setContent(e.target.value)} required rows={8} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" placeholder={"Step 1: ...\nStep 2: ...\nStep 3: ..."} />
+            <textarea value={content} onChange={(e) => setContent(e.target.value)} required rows={8} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" placeholder={"Step 1: ...\nStep 2: ...\nStep 3: ..."} />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Category</label>
-              <input value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" placeholder="e.g. Safety, Maintenance" />
+              <input value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" placeholder="e.g. Safety, Maintenance" />
             </div>
             <div>
               <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Department</label>
-              <select value={departmentId} onChange={(e) => setDepartmentId(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30">
+              <select value={departmentId} onChange={(e) => setDepartmentId(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30">
                 <option value="">All departments</option>
                 {departments.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
               </select>
@@ -191,7 +191,7 @@ function SOPForm({ departments, companyId, onSave, onClose }: {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Language</label>
-              <select value={language} onChange={(e) => setLanguage(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30">
+              <select value={language} onChange={(e) => setLanguage(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30">
                 <option value="en">English</option>
                 <option value="ko">Korean (한국어)</option>
                 <option value="es">Spanish (Español)</option>
@@ -201,13 +201,13 @@ function SOPForm({ departments, companyId, onSave, onClose }: {
             </div>
             <div>
               <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Tags (comma-separated)</label>
-              <input value={tags} onChange={(e) => setTags(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" placeholder="startup, safety, machine-a" />
+              <input value={tags} onChange={(e) => setTags(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" placeholder="startup, safety, machine-a" />
             </div>
           </div>
         </div>
         <div className="mt-6 flex justify-end gap-3">
           <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
-          <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-[#C96442] px-5 py-2 text-sm font-medium text-white hover:bg-[#B0532F] disabled:opacity-50">
+          <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-[#0060F0] px-5 py-2 text-sm font-medium text-white hover:bg-[#004BB8] disabled:opacity-50">
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
             Publish SOP
           </button>
@@ -254,21 +254,21 @@ function SopsTab({ companyId }: { companyId: string }) {
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search SOPs..." className="w-full rounded-lg border border-gray-200 pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" />
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search SOPs..." className="w-full rounded-lg border border-gray-200 pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" />
         </div>
-        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30">
+        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30">
           <option value="active">Active</option>
           <option value="draft">Drafts</option>
           <option value="deprecated">Deprecated</option>
           <option value="all">All</option>
         </select>
         {departments.length > 0 && (
-          <select value={filterDept} onChange={(e) => setFilterDept(e.target.value)} className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30">
+          <select value={filterDept} onChange={(e) => setFilterDept(e.target.value)} className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30">
             <option value="">All departments</option>
             {departments.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
           </select>
         )}
-        <button onClick={() => setShowForm(true)} className="ml-auto inline-flex items-center gap-2 rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white hover:bg-[#B0532F]">
+        <button onClick={() => setShowForm(true)} className="ml-auto inline-flex items-center gap-2 rounded-lg bg-[#0060F0] px-4 py-2 text-sm font-medium text-white hover:bg-[#004BB8]">
           <Plus className="h-4 w-4" /> New SOP
         </button>
       </div>
@@ -285,7 +285,7 @@ function SopsTab({ companyId }: { companyId: string }) {
             <FileText className="mx-auto mb-3 h-10 w-10 text-gray-300" />
             <p className="font-medium text-gray-600">No SOPs yet</p>
             <p className="mt-1 text-sm text-gray-400">Add your first procedure so workers can access it over text.</p>
-            <button onClick={() => setShowForm(true)} className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white hover:bg-[#B0532F]">
+            <button onClick={() => setShowForm(true)} className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#0060F0] px-4 py-2 text-sm font-medium text-white hover:bg-[#004BB8]">
               <Plus className="h-4 w-4" /> Create first SOP
             </button>
           </div>
@@ -294,7 +294,7 @@ function SopsTab({ companyId }: { companyId: string }) {
             <button onClick={() => setExpanded(expanded === sop.id ? null : sop.id)} className="flex w-full items-start justify-between gap-4 px-5 py-4 text-left">
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <FileText className="h-4 w-4 text-[#C96442] flex-shrink-0" />
+                  <FileText className="h-4 w-4 text-[#0060F0] flex-shrink-0" />
                   <span className="font-semibold text-gray-900">{sop.title}</span>
                   <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-500">v{sop.version_number}</span>
                   {statusBadge(sop.status)}
@@ -416,7 +416,7 @@ function RejectModal({ onConfirm, onCancel }: { onConfirm: (reason: string) => v
       <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
         <h3 className="mb-2 font-semibold text-gray-900">Reject knowledge item</h3>
         <p className="mb-3 text-sm text-gray-500">Why is this item incorrect or not useful?</p>
-        <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" placeholder="e.g. Wrong procedure for this machine..." />
+        <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" placeholder="e.g. Wrong procedure for this machine..." />
         <div className="mt-4 flex justify-end gap-2">
           <button onClick={onCancel} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
           <button onClick={() => onConfirm(reason)} disabled={!reason.trim()} className="rounded-lg bg-red-500 px-4 py-2 text-sm text-white hover:bg-red-600 disabled:opacity-50">Reject</button>
@@ -435,12 +435,12 @@ function SnoozeModal({ onConfirm, onCancel }: { onConfirm: (days: number) => voi
         <p className="mb-3 text-sm text-gray-500">Come back to this item later.</p>
         <div className="flex gap-2">
           {[1, 3, 7, 14, 30].map((value) => (
-            <button key={value} onClick={() => setDays(value)} className={cn("rounded-lg border px-3 py-1.5 text-sm", days === value ? "border-[#C96442]/20 bg-[#F7F3EC] text-gray-700" : "border-gray-200 text-gray-600 hover:bg-gray-50")}>{value}d</button>
+            <button key={value} onClick={() => setDays(value)} className={cn("rounded-lg border px-3 py-1.5 text-sm", days === value ? "border-[#0060F0]/20 bg-[#F4F7FA] text-gray-700" : "border-gray-200 text-gray-600 hover:bg-gray-50")}>{value}d</button>
           ))}
         </div>
         <div className="mt-4 flex justify-end gap-2">
           <button onClick={onCancel} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
-          <button onClick={() => onConfirm(days)} className="rounded-lg bg-[#C96442] px-4 py-2 text-sm text-white hover:bg-[#B0532F]">Snooze {days}d</button>
+          <button onClick={() => onConfirm(days)} className="rounded-lg bg-[#0060F0] px-4 py-2 text-sm text-white hover:bg-[#004BB8]">Snooze {days}d</button>
         </div>
       </div>
     </div>
@@ -457,14 +457,14 @@ function EditVerifyModal({ article, onConfirm, onCancel }: { article: KnowledgeA
       <div className="w-full max-w-2xl rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
         <h3 className="mb-4 font-semibold text-gray-900">Edit & verify</h3>
         <div className="space-y-3">
-          <div><label className="text-xs font-semibold uppercase text-gray-500">Title</label><input value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" /></div>
-          <div><label className="text-xs font-semibold uppercase text-gray-500">Problem</label><textarea value={problem} onChange={(e) => setProblem(e.target.value)} rows={2} className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" /></div>
-          <div><label className="text-xs font-semibold uppercase text-gray-500">Symptoms</label><textarea value={symptoms} onChange={(e) => setSymptoms(e.target.value)} rows={2} className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" /></div>
-          <div><label className="text-xs font-semibold uppercase text-gray-500">Solution</label><textarea value={solution} onChange={(e) => setSolution(e.target.value)} rows={4} className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" /></div>
+          <div><label className="text-xs font-semibold uppercase text-gray-500">Title</label><input value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" /></div>
+          <div><label className="text-xs font-semibold uppercase text-gray-500">Problem</label><textarea value={problem} onChange={(e) => setProblem(e.target.value)} rows={2} className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" /></div>
+          <div><label className="text-xs font-semibold uppercase text-gray-500">Symptoms</label><textarea value={symptoms} onChange={(e) => setSymptoms(e.target.value)} rows={2} className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" /></div>
+          <div><label className="text-xs font-semibold uppercase text-gray-500">Solution</label><textarea value={solution} onChange={(e) => setSolution(e.target.value)} rows={4} className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" /></div>
         </div>
         <div className="mt-4 flex justify-end gap-2">
           <button onClick={onCancel} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
-          <button onClick={() => onConfirm({ title, problem, solution, symptoms })} className="flex items-center gap-1.5 rounded-lg bg-[#C96442] px-4 py-2 text-sm text-white hover:bg-[#B0532F]">
+          <button onClick={() => onConfirm({ title, problem, solution, symptoms })} className="flex items-center gap-1.5 rounded-lg bg-[#0060F0] px-4 py-2 text-sm text-white hover:bg-[#004BB8]">
             <CheckCircle2 className="h-4 w-4" /> Save & verify
           </button>
         </div>
@@ -536,8 +536,8 @@ function ArticlesTab({ companyId }: { companyId: string }) {
   return (
     <div>
       <div className="grid grid-cols-2 gap-3 mb-6">
-        <a href="/training" className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm hover:border-[#C96442]/40 hover:shadow-md transition-all">
-          <Users className="h-5 w-5 text-[#C96442] flex-shrink-0" />
+        <a href="/training" className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm hover:border-[#0060F0]/40 hover:shadow-md transition-all">
+          <Users className="h-5 w-5 text-[#0060F0] flex-shrink-0" />
           <div>
             <p className="text-sm font-semibold text-gray-800">Training Paths</p>
             <p className="text-xs text-gray-400">Guide new hires step-by-step over SMS</p>
@@ -641,7 +641,7 @@ function ArticlesTab({ companyId }: { companyId: string }) {
                             <span className="inline-flex items-center gap-1"><Sparkles className="h-3 w-3" /> Auto-generated</span>
                             {article.asset_name && <span className="inline-flex items-center gap-1"><Wrench className="h-3 w-3" />{article.asset_name}</span>}
                             <span>{timeAgo(article.created_at)}</span>
-                            {article.source_work_order_id && <span className="inline-flex items-center gap-1 text-[#C96442]"><Link2 className="h-3 w-3" /> Source WO linked</span>}
+                            {article.source_work_order_id && <span className="inline-flex items-center gap-1 text-[#0060F0]"><Link2 className="h-3 w-3" /> Source WO linked</span>}
                           </div>
                         </div>
                         {isOpen ? <ChevronUp className="mt-1 h-5 w-5 text-gray-400" /> : <ChevronDown className="mt-1 h-5 w-5 text-gray-400" />}
@@ -662,7 +662,7 @@ function ArticlesTab({ companyId }: { companyId: string }) {
                             <button onClick={() => doAction("verify", article.id)} disabled={isLoading} className="inline-flex items-center gap-1.5 rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-white hover:bg-green-600 disabled:opacity-50">
                               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />} Verify
                             </button>
-                            <button onClick={() => setModal({ type: "edit", articleId: article.id, article })} disabled={isLoading} className="inline-flex items-center gap-1.5 rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white hover:bg-[#B0532F] disabled:opacity-50">
+                            <button onClick={() => setModal({ type: "edit", articleId: article.id, article })} disabled={isLoading} className="inline-flex items-center gap-1.5 rounded-lg bg-[#0060F0] px-4 py-2 text-sm font-medium text-white hover:bg-[#004BB8] disabled:opacity-50">
                               <Edit3 className="h-4 w-4" /> Edit & verify
                             </button>
                             <button onClick={() => setModal({ type: "reject", articleId: article.id })} disabled={isLoading} className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-red-100 disabled:opacity-50">
@@ -818,12 +818,12 @@ function TerminologyTab({ companyId }: { companyId: string }) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search terms..."
-            className="w-full rounded-lg border border-gray-200 pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30"
+            className="w-full rounded-lg border border-gray-200 pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30"
           />
         </div>
         <button
           onClick={() => setShowForm((v) => !v)}
-          className="inline-flex items-center gap-2 rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white hover:bg-[#B0532F]"
+          className="inline-flex items-center gap-2 rounded-lg bg-[#0060F0] px-4 py-2 text-sm font-medium text-white hover:bg-[#004BB8]"
         >
           <Plus className="h-4 w-4" /> New Term
         </button>
@@ -836,20 +836,20 @@ function TerminologyTab({ companyId }: { companyId: string }) {
           <div className="space-y-3">
             <div>
               <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Term *</label>
-              <input value={newTerm} onChange={(e) => setNewTerm(e.target.value)} required className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" placeholder="e.g. 스프링 유닛" />
+              <input value={newTerm} onChange={(e) => setNewTerm(e.target.value)} required className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" placeholder="e.g. 스프링 유닛" />
             </div>
             <div>
               <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Definition (정의)</label>
-              <textarea value={newDef} onChange={(e) => setNewDef(e.target.value)} rows={3} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" placeholder="Clear definition for workers" />
+              <textarea value={newDef} onChange={(e) => setNewDef(e.target.value)} rows={3} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" placeholder="Clear definition for workers" />
             </div>
             <div>
               <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Synonyms / 동의어 (comma-separated)</label>
-              <input value={newSynonyms} onChange={(e) => setNewSynonyms(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30" placeholder="spring unit, spring assembly" />
+              <input value={newSynonyms} onChange={(e) => setNewSynonyms(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0060F0]/30" placeholder="spring unit, spring assembly" />
             </div>
           </div>
           <div className="mt-4 flex justify-end gap-2">
             <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
-            <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-[#C96442] px-5 py-2 text-sm font-medium text-white hover:bg-[#B0532F] disabled:opacity-50">
+            <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-[#0060F0] px-5 py-2 text-sm font-medium text-white hover:bg-[#004BB8] disabled:opacity-50">
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />} Save Term
             </button>
           </div>
@@ -949,15 +949,15 @@ function SOPVersionHistory({ slug, companyId }: { slug: string; companyId: strin
             <div key={v.id} className="relative flex items-start gap-3">
               <div className={cn(
                 "absolute -left-3 mt-1 h-3 w-3 rounded-full border-2 bg-white",
-                v.is_current ? "border-[#C96442]" : "border-gray-300"
+                v.is_current ? "border-[#0060F0]" : "border-gray-300"
               )} />
               <div className="min-w-0 flex-1 pl-2">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className={cn("text-xs font-semibold", v.is_current ? "text-[#C96442]" : "text-gray-600")}>
+                  <span className={cn("text-xs font-semibold", v.is_current ? "text-[#0060F0]" : "text-gray-600")}>
                     v{v.version_number}
                   </span>
                   {v.is_current && (
-                    <span className="rounded bg-[#C96442]/10 px-1.5 py-0.5 text-[10px] font-medium text-[#C96442]">Current</span>
+                    <span className="rounded bg-[#0060F0]/10 px-1.5 py-0.5 text-[10px] font-medium text-[#0060F0]">Current</span>
                   )}
                   {statusBadge(v.status)}
                   <span className="text-[11px] text-gray-400">{timeAgo(v.created_at)}</span>
@@ -1020,7 +1020,7 @@ export default function KnowledgePage() {
             className={cn(
               "px-5 py-2.5 text-sm font-medium border-b-2 transition-colors",
               activeTab === tab.id
-                ? "border-[#C96442] text-[#C96442]"
+                ? "border-[#0060F0] text-[#0060F0]"
                 : "border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300"
             )}
           >

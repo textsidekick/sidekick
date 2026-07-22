@@ -95,7 +95,7 @@ export default function LoginPage() {
     boxSizing: "border-box" as const,
     fontFamily: "'Inter', system-ui, sans-serif",
     backgroundColor: "#ffffff",
-    color: "#1C1A16",
+    color: "#17202B",
     transition: "border-color 0.2s, box-shadow 0.2s",
     letterSpacing: step === "code" ? "0.3em" : "normal",
     textAlign: step === "code" ? "center" as const : "left" as const,
@@ -107,7 +107,7 @@ export default function LoginPage() {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      background: "#F7F3EC",
+      background: "#F4F7FA",
       fontFamily: "'Inter', system-ui, sans-serif",
       padding: 20,
     }}>
@@ -127,18 +127,18 @@ export default function LoginPage() {
         <div style={{ textAlign: "center", marginBottom: 36 }}>
           <div style={{
             width: 56, height: 56, margin: "0 auto 20px",
-            background: "#C96442", borderRadius: 14,
+            background: "#0060F0", borderRadius: 14,
             display: "flex", alignItems: "center", justifyContent: "center", padding: 10,
           }}>
             <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={36} height={36} style={{ objectFit: "contain", filter: "brightness(0) invert(1)" }} />
           </div>
           <h1 style={{
-            fontSize: 26, fontWeight: 600, color: "#1C1A16", marginBottom: 8,
+            fontSize: 26, fontWeight: 600, color: "#17202B", marginBottom: 8,
             letterSpacing: "-0.02em",
           }}>
             {step === "phone" ? "Welcome to Sidekick" : "Enter your code"}
           </h1>
-          <p style={{ color: "rgba(28,26,22,0.5)", fontSize: 15 }}>
+          <p style={{ color: "#5C6B7D", fontSize: 15 }}>
             {step === "phone"
               ? "Enter your phone number to get started"
               : `We sent a 6-digit code to ${phone}`}
@@ -150,12 +150,12 @@ export default function LoginPage() {
             <div style={{ marginBottom: 24 }}>
               <label style={{
                 display: "block", fontSize: 13, fontWeight: 500,
-                color: "#1C1A16", marginBottom: 8, letterSpacing: "0.01em",
+                color: "#17202B", marginBottom: 8, letterSpacing: "0.01em",
               }}>Phone number</label>
               <div style={{ position: "relative" }}>
                 <span style={{
                   position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)",
-                  color: "rgba(28,26,22,0.4)", fontSize: 15, fontWeight: 500,
+                  color: "#6B7280", fontSize: 15, fontWeight: 500,
                 }}>+1</span>
                 <input
                   type="tel"
@@ -164,7 +164,7 @@ export default function LoginPage() {
                   placeholder="(555) 123-4567"
                   required
                   style={{ ...inputStyle, paddingLeft: 44 }}
-                  onFocus={(e) => { e.target.style.borderColor = "#C96442"; e.target.style.boxShadow = "0 0 0 3px rgba(201,100,66,0.1)"; }}
+                  onFocus={(e) => { e.target.style.borderColor = "#0060F0"; e.target.style.boxShadow = "0 0 0 3px rgba(0,96,240,0.12)"; }}
                   onBlur={(e) => { e.target.style.borderColor = "rgba(28,26,22,0.15)"; e.target.style.boxShadow = "none"; }}
                 />
               </div>
@@ -172,15 +172,15 @@ export default function LoginPage() {
 
             {error && (
               <div style={{
-                padding: "12px 16px", background: "rgba(201,100,66,0.08)",
-                border: "1px solid rgba(201,100,66,0.2)", borderRadius: 10,
-                color: "#A74D30", fontSize: 14, marginBottom: 20, textAlign: "center",
+                padding: "12px 16px", background: "rgba(239,68,68,0.08)",
+                border: "1px solid rgba(239,68,68,0.18)", borderRadius: 10,
+                color: "#B42318", fontSize: 14, marginBottom: 20, textAlign: "center",
               }}>{error}</div>
             )}
 
             <button type="submit" disabled={isLoading} style={{
-              width: "100%", padding: "14px", background: isLoading ? "rgba(28,26,22,0.4)" : "#1C1A16",
-              color: "#F7F3EC", border: "none", borderRadius: 12, fontSize: 15, fontWeight: 600,
+              width: "100%", padding: "14px", background: isLoading ? "#9DB9E8" : "#0060F0",
+              color: "#FFFFFF", border: "none", borderRadius: 12, fontSize: 15, fontWeight: 600,
               cursor: isLoading ? "not-allowed" : "pointer", letterSpacing: "-0.01em",
             }}>
               {isLoading ? "Sending..." : "Send verification code"}
@@ -191,7 +191,7 @@ export default function LoginPage() {
             <div style={{ marginBottom: 24 }}>
               <label style={{
                 display: "block", fontSize: 13, fontWeight: 500,
-                color: "#1C1A16", marginBottom: 8, letterSpacing: "0.01em",
+                color: "#17202B", marginBottom: 8, letterSpacing: "0.01em",
               }}>Verification code</label>
               <input
                 type="text"
@@ -201,7 +201,7 @@ export default function LoginPage() {
                 required
                 maxLength={6}
                 style={inputStyle}
-                onFocus={(e) => { e.target.style.borderColor = "#C96442"; e.target.style.boxShadow = "0 0 0 3px rgba(201,100,66,0.1)"; }}
+                onFocus={(e) => { e.target.style.borderColor = "#0060F0"; e.target.style.boxShadow = "0 0 0 3px rgba(0,96,240,0.12)"; }}
                 onBlur={(e) => { e.target.style.borderColor = "rgba(28,26,22,0.15)"; e.target.style.boxShadow = "none"; }}
                 autoFocus
               />
@@ -209,16 +209,16 @@ export default function LoginPage() {
 
             {error && (
               <div style={{
-                padding: "12px 16px", background: "rgba(201,100,66,0.08)",
-                border: "1px solid rgba(201,100,66,0.2)", borderRadius: 10,
-                color: "#A74D30", fontSize: 14, marginBottom: 20, textAlign: "center",
+                padding: "12px 16px", background: "rgba(239,68,68,0.08)",
+                border: "1px solid rgba(239,68,68,0.18)", borderRadius: 10,
+                color: "#B42318", fontSize: 14, marginBottom: 20, textAlign: "center",
               }}>{error}</div>
             )}
 
             <button type="submit" disabled={isLoading || code.length < 6} style={{
               width: "100%", padding: "14px",
-              background: (isLoading || code.length < 6) ? "rgba(28,26,22,0.4)" : "#1C1A16",
-              color: "#F7F3EC", border: "none", borderRadius: 12, fontSize: 15, fontWeight: 600,
+              background: (isLoading || code.length < 6) ? "#9DB9E8" : "#0060F0",
+              color: "#FFFFFF", border: "none", borderRadius: 12, fontSize: 15, fontWeight: 600,
               cursor: (isLoading || code.length < 6) ? "not-allowed" : "pointer", letterSpacing: "-0.01em",
             }}>
               {isLoading ? "Verifying..." : "Verify & sign in"}
@@ -229,7 +229,7 @@ export default function LoginPage() {
               onClick={() => { setStep("phone"); setCode(""); setError(""); }}
               style={{
                 width: "100%", padding: "12px", background: "transparent",
-                color: "rgba(28,26,22,0.5)", border: "none", fontSize: 14,
+                color: "#5C6B7D", border: "none", fontSize: 14,
                 cursor: "pointer", marginTop: 12,
               }}
             >
@@ -240,11 +240,11 @@ export default function LoginPage() {
 
         <p style={{
           textAlign: "center", marginTop: 24, fontSize: 13,
-          color: "rgba(28,26,22,0.4)",
+          color: "#6B7280",
         }}>
           {step === "phone" && (
             <>
-              <a href="https://textsidekick.com/#contact" style={{ color: "#C96442", textDecoration: "none", fontWeight: 500 }}>
+              <a href="https://textsidekick.com/#contact" style={{ color: "#0060F0", textDecoration: "none", fontWeight: 500 }}>
                 Book a demo
               </a>
             </>

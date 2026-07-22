@@ -40,10 +40,10 @@ function RelatedKnowledge({ assetName, equipmentType }: { assetName: string; equ
   if (articles.length === 0) return null;
   return (
     <div className="rounded-xl border border-black/5 p-4">
-      <div className="text-sm font-medium flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-[#C96442]" /> Related Knowledge</div>
+      <div className="text-sm font-medium flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-[#0060F0]" /> Related Knowledge</div>
       <div className="mt-2 space-y-1.5">
         {articles.map(a => (
-          <a key={a.id} href="/knowledge" className="block text-sm text-[#C96442] hover:underline truncate">{a.title}</a>
+          <a key={a.id} href="/knowledge" className="block text-sm text-[#0060F0] hover:underline truncate">{a.title}</a>
         ))}
       </div>
     </div>

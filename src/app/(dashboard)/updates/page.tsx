@@ -96,7 +96,7 @@ function UploadInline({ companyId }: { companyId: string }) {
         <button
           onClick={() => fileRef.current?.click()}
           disabled={uploading}
-          className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 hover:border-[#C96442]/40 hover:bg-[#FBF7F1] disabled:opacity-50"
+          className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 hover:border-[#0060F0]/40 hover:bg-[#F8FBFF] disabled:opacity-50"
         >
           {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
           {uploading ? "Uploading…" : "Choose file"}
@@ -312,7 +312,7 @@ export default function UpdatesPage() {
       <div className={cn("mt-6 grid gap-6", hasUpdates && "xl:grid-cols-[1.5fr_1fr]")}>
         <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
           <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F7F3EC]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F4F7FA]">
               <MessageSquare className="h-5 w-5 text-gray-500" />
             </div>
             <div>
@@ -340,7 +340,7 @@ export default function UpdatesPage() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Example: We hired Alex Kim as a daytime supervisor, phone +1 415 555 0119. Also the line reset SOP now requires a 10-second wait before restart."
-              className="min-h-[150px] w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 focus:border-[#C96442] focus:outline-none focus:ring-2 focus:ring-[#C96442]/20"
+              className="min-h-[150px] w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 focus:border-[#0060F0] focus:outline-none focus:ring-2 focus:ring-[#0060F0]/20"
             />
             {error && <div className="mt-2 text-sm text-red-600">{error}</div>}
             <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -351,7 +351,7 @@ export default function UpdatesPage() {
               <button
                 onClick={() => sendUpdate(input)}
                 disabled={sending || !input.trim()}
-                className="inline-flex items-center gap-2 rounded-xl bg-[#C96442] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#B85736] disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#0060F0] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#004BB8] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 Save update
@@ -359,7 +359,7 @@ export default function UpdatesPage() {
             </div>
             <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
               <div className="flex items-start gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F7F3EC]">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F4F7FA]">
                   <Smartphone className="h-4 w-4 text-gray-500" />
                 </div>
                 <div>
@@ -379,8 +379,8 @@ export default function UpdatesPage() {
           <div className="space-y-6">
             <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F7F3EC]">
-                  <Sparkles className="h-5 w-5 text-[#C96442]" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F4F7FA]">
+                  <Sparkles className="h-5 w-5 text-[#0060F0]" />
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-gray-900">{updates.length}</div>
@@ -418,7 +418,7 @@ export default function UpdatesPage() {
                         {chips.length > 0 && (
                           <div className="mt-2 flex flex-wrap gap-1.5">
                             {chips.map((chip) => (
-                              <span key={chip} className="rounded-full bg-[#F7F3EC] px-2 py-0.5 text-xs text-gray-700">{chip}</span>
+                              <span key={chip} className="rounded-full bg-[#F4F7FA] px-2 py-0.5 text-xs text-gray-700">{chip}</span>
                             ))}
                           </div>
                         )}
@@ -436,7 +436,7 @@ export default function UpdatesPage() {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-2xl">
             <div className="flex items-center gap-2">
-              <FileText className="h-4 w-4 text-[#C96442]" />
+              <FileText className="h-4 w-4 text-[#0060F0]" />
               <h2 className="text-base font-semibold text-gray-900">Connected sources</h2>
             </div>
             <p className="mt-2 text-sm text-gray-500">Keep every integration together here. This is where Sidekick pulls docs, team context, and operating knowledge from the tools you already use.</p>

@@ -193,7 +193,7 @@ export default function ManagerDashboard() {
       label: "Questions",
       count: unansweredCount,
       href: "/inbox?view=questions",
-      tone: "bg-[#F7F3EC] text-[#1C1A16] border-[#E8D6CC]",
+      tone: "bg-[#F4F7FA] text-[#1C1A16] border-[#BFDBFE]",
     },
     {
       label: "Open issues",
@@ -388,7 +388,7 @@ export default function ManagerDashboard() {
             <SectionHeader
               title="Recent Work Orders"
               subtitle="Latest maintenance and task activity"
-              action={<a href="/work-orders" className="text-xs text-[#C96442] hover:underline font-medium">View all →</a>}
+              action={<a href="/work-orders" className="text-xs text-[#0060F0] hover:underline font-medium">View all →</a>}
             />
             <div className="mt-2 space-y-2">
               {loadingWorkOrders && <div className="text-sm text-black/40 py-4 text-center">Loading…</div>}
@@ -406,7 +406,7 @@ export default function ManagerDashboard() {
                   <a
                     key={wo.id}
                     href={`/work-orders/${wo.id}`}
-                    className="flex items-start justify-between gap-3 rounded-xl border border-black/5 p-3 hover:bg-[#F7F3EC] transition-colors"
+                    className="flex items-start justify-between gap-3 rounded-xl border border-black/5 p-3 hover:bg-[#F4F7FA] transition-colors"
                   >
                     <div className="min-w-0 flex-1">
                       <div className="text-sm font-medium text-[#1C1A16] truncate">{wo.short_id} · {wo.title}</div>
@@ -424,7 +424,7 @@ export default function ManagerDashboard() {
 
           {/* Inbox queues */}
           <div className="rounded-2xl bg-white border border-[rgba(28,26,22,0.06)] p-6">
-            <SectionHeader title="Inbox Queues" subtitle="Use Inbox to work through questions, issues, and work that still needs a decision" action={<a href="/inbox" className="text-xs text-[#C96442] hover:underline font-medium">Open inbox →</a>} />
+            <SectionHeader title="Inbox Queues" subtitle="Use Inbox to work through questions, issues, and work that still needs a decision" action={<a href="/inbox" className="text-xs text-[#0060F0] hover:underline font-medium">Open inbox →</a>} />
             <div className="mt-2 space-y-2">
               {inboxQueues.length === 0 ? (
                 <EmptyState
@@ -438,7 +438,7 @@ export default function ManagerDashboard() {
                     key={queue.label}
                     href={queue.href}
                     className={cn(
-                      "flex items-center justify-between gap-3 rounded-xl border p-3 transition-colors hover:bg-[#F7F3EC]",
+                      "flex items-center justify-between gap-3 rounded-xl border p-3 transition-colors hover:bg-[#F4F7FA]",
                       queue.tone
                     )}
                   >

@@ -323,7 +323,7 @@ export default function InboxPage() {
                   value={managerAnswer}
                   onChange={(e) => setManagerAnswer(e.target.value)}
                   placeholder="Write the answer Sidekick should learn from..."
-                  className="mt-2 min-h-[140px] w-full rounded-xl border border-black/10 px-3 py-3 text-sm outline-none focus:border-[#C96442]/40"
+                  className="mt-2 min-h-[140px] w-full rounded-xl border border-black/10 px-3 py-3 text-sm outline-none focus:border-[#0060F0]/40"
                 />
               </div>
             </div>
@@ -331,7 +331,7 @@ export default function InboxPage() {
               <div className="text-xs text-black/40">This saves the answer into Sidekick's knowledge for future questions.</div>
               <div className="flex items-center gap-2">
                 <button onClick={() => setSelectedQuestion(null)} className="rounded-lg px-4 py-2 text-sm text-black/55 hover:bg-black/[0.04]">Cancel</button>
-                <button onClick={handleTeachSidekick} disabled={savingAnswer || !managerAnswer.trim()} className="rounded-lg bg-[#C96442] px-4 py-2 text-sm font-medium text-white disabled:opacity-50">
+                <button onClick={handleTeachSidekick} disabled={savingAnswer || !managerAnswer.trim()} className="rounded-lg bg-[#0060F0] px-4 py-2 text-sm font-medium text-white disabled:opacity-50">
                   {savingAnswer ? "Saving…" : "Save answer"}
                 </button>
               </div>
@@ -348,7 +348,7 @@ export default function InboxPage() {
       <div className="grid gap-4 md:grid-cols-3">
         <div className="rounded-2xl border border-black/5 bg-white p-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#F7F3EC]">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#F4F7FA]">
               <MessageSquare className="h-5 w-5 text-gray-700" />
             </div>
             <div>
@@ -359,7 +359,7 @@ export default function InboxPage() {
         </div>
         <div className="rounded-2xl border border-black/5 bg-white p-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#F7F3EC]">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#F4F7FA]">
               <ShieldAlert className="h-5 w-5 text-gray-700" />
             </div>
             <div>
@@ -370,7 +370,7 @@ export default function InboxPage() {
         </div>
         <div className="rounded-2xl border border-black/5 bg-white p-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#F7F3EC]">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#F4F7FA]">
               <Bot className="h-5 w-5 text-gray-700" />
             </div>
             <div>
@@ -387,7 +387,7 @@ export default function InboxPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search questions, issues, work orders, workers..."
-            className="w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 text-sm text-[#1C1A16] outline-none focus:border-[#C96442]/35"
+            className="w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 text-sm text-[#1C1A16] outline-none focus:border-[#0060F0]/35"
           />
         </div>
 
@@ -407,7 +407,7 @@ export default function InboxPage() {
               className={cn(
                 "rounded-full border px-4 py-2 text-sm font-medium transition-colors",
                 active
-                  ? "border-[#C96442]/20 bg-[#C96442]/10 text-[#1C1A16]"
+                  ? "border-[#0060F0]/20 bg-[#0060F0]/10 text-[#1C1A16]"
                   : "border-black/10 bg-white text-black/55 hover:bg-black/[0.03]"
               )}
             >
@@ -432,7 +432,7 @@ export default function InboxPage() {
                 className={cn(
                   "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
                   active
-                    ? "border-[#C96442]/20 bg-[#C96442]/10 text-[#1C1A16]"
+                    ? "border-[#0060F0]/20 bg-[#0060F0]/10 text-[#1C1A16]"
                     : "border-black/10 bg-white text-black/55 hover:bg-black/[0.03]"
                 )}
               >
@@ -459,7 +459,7 @@ export default function InboxPage() {
         ) : (
           <div className="divide-y divide-black/[0.05]">
             {filteredItems.map((item) => (
-              <div key={item.id} className="p-5 transition-colors hover:bg-[#FBF7F1]">
+              <div key={item.id} className="p-5 transition-colors hover:bg-[#F8FBFF]">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">

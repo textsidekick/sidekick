@@ -442,9 +442,9 @@ export default function OnboardingChat() {
   // Show error state
   if (completionError) {
     return (
-      <div style={{ minHeight: "100vh", background: "#F7F3EC", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+      <div style={{ minHeight: "100vh", background: "#F4F7FA", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
         <div style={{ background: "white", borderRadius: 16, border: "1px solid rgba(239,68,68,0.2)", padding: 32, textAlign: "center", maxWidth: 480 }}>
-          <h2 style={{ color: "#C96442", marginBottom: 8, fontSize: 20, fontWeight: 600 }}>Almost there!</h2>
+          <h2 style={{ color: "#0060F0", marginBottom: 8, fontSize: 20, fontWeight: 600 }}>Almost there!</h2>
           <p style={{ color: "#6b7280", marginBottom: 24, fontSize: 14 }}>We had trouble finishing setup. You can try again or go straight to the dashboard.</p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
             <button
@@ -455,7 +455,7 @@ export default function OnboardingChat() {
             </button>
             <button
               onClick={() => { window.location.href = "/today"; }}
-              style={{ background: "#C96442", color: "white", padding: "12px 24px", borderRadius: 10, border: "none", cursor: "pointer", fontWeight: 600, fontSize: 14 }}
+              style={{ background: "#0060F0", color: "white", padding: "12px 24px", borderRadius: 10, border: "none", cursor: "pointer", fontWeight: 600, fontSize: 14 }}
             >
               Go to Dashboard
             </button>
@@ -471,7 +471,7 @@ export default function OnboardingChat() {
       <div style={{ width: LEFT_SIDEBAR_WIDTH, background: "white", borderRight: "1px solid rgba(28,26,22,0.06)", display: "flex", flexDirection: "column", position: "fixed", top: 0, bottom: 0, zIndex: 50 }}>
         {/* Logo */}
         <div style={{ height: 72, display: "flex", alignItems: "center", gap: 14, padding: "0 24px", borderBottom: "1px solid rgba(28,26,22,0.06)" }}>
-          <div style={{ width: 40, height: 40, background: "#C96442", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", padding: 6 }}>
+          <div style={{ width: 40, height: 40, background: "#0060F0", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", padding: 6 }}>
             <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={28} height={28} style={{ objectFit: "contain", filter: "brightness(0) invert(1)" }} />
           </div>
           <span style={{ fontSize: 22, fontWeight: 700, color: "#1C1A16", letterSpacing: "-0.02em" }}>Sidekick</span>
@@ -480,13 +480,13 @@ export default function OnboardingChat() {
         {/* Progress */}
         <div style={{ padding: "20px 24px 12px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(28,26,22,0.4)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Core Setup</span>
-            <span style={{ fontSize: 14, fontWeight: 600, color: "#C96442" }}>{completedCount}/{primarySections.length}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.05em" }}>Core Setup</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: "#0060F0" }}>{completedCount}/{primarySections.length}</span>
           </div>
           <div style={{ height: 6, background: "rgba(28,26,22,0.06)", borderRadius: 3 }}>
-            <div style={{ height: 6, background: "#C96442", borderRadius: 3, width: `${progressPct}%`, transition: "width 0.3s" }} />
+            <div style={{ height: 6, background: "#0060F0", borderRadius: 3, width: `${progressPct}%`, transition: "width 0.3s" }} />
           </div>
-          <p style={{ marginTop: 10, fontSize: 13, lineHeight: 1.5, color: "rgba(28,26,22,0.45)" }}>
+          <p style={{ marginTop: 10, fontSize: 13, lineHeight: 1.5, color: "#5C6B7D" }}>
             Get the basics live first: company, assets, team, and knowledge. Imports can wait.
           </p>
         </div>
@@ -503,20 +503,20 @@ export default function OnboardingChat() {
                   onClick={() => goToSection(section.id)}
                   style={{
                     display: "flex", alignItems: "center", gap: 14, padding: "12px 16px", borderRadius: 10,
-                    background: isActive ? "rgba(201,100,66,0.1)" : "transparent",
+                    background: isActive ? "rgba(0,96,240,0.08)" : "transparent",
                     border: "none", cursor: "pointer", textAlign: "left", width: "100%",
                     transition: "background 0.15s",
                   }}
                 >
-                  <Icon size={20} style={{ color: isActive ? "#C96442" : "rgba(28,26,22,0.4)", flexShrink: 0 }} />
+                  <Icon size={20} style={{ color: isActive ? "#0060F0" : "#64748B", flexShrink: 0 }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 15, fontWeight: 600, color: isActive ? "#C96442" : "#1C1A16" }}>{section.label}</div>
-                    <div style={{ fontSize: 13, color: "rgba(28,26,22,0.35)", marginTop: 2 }}>{section.description}</div>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: isActive ? "#0060F0" : "#17202B" }}>{section.label}</div>
+                    <div style={{ fontSize: 13, color: "#64748B", marginTop: 2 }}>{section.description}</div>
                   </div>
                   {section.status === "complete" ? (
                     <CheckCircle2 size={18} style={{ color: "#22c55e", flexShrink: 0 }} />
                   ) : section.status === "in_progress" ? (
-                    <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#C96442", flexShrink: 0 }} />
+                    <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#0060F0", flexShrink: 0 }} />
                   ) : (
                     <Circle size={18} style={{ color: "rgba(28,26,22,0.15)", flexShrink: 0 }} />
                   )}
@@ -526,7 +526,7 @@ export default function OnboardingChat() {
           </div>
 
           <div style={{ marginTop: 16, padding: "12px 16px", borderTop: "1px solid rgba(28,26,22,0.06)" }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(28,26,22,0.35)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 10 }}>Optional Imports</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 10 }}>Optional Imports</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {optionalSections.map((section) => {
                 const Icon = section.icon;
@@ -537,14 +537,14 @@ export default function OnboardingChat() {
                     onClick={() => goToSection(section.id)}
                     style={{
                       display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 12,
-                      background: isActive ? "rgba(201,100,66,0.1)" : "#FAF7F2",
+                      background: isActive ? "rgba(0,96,240,0.08)" : "#F8FBFF",
                       border: "1px solid rgba(28,26,22,0.06)", cursor: "pointer", width: "100%", textAlign: "left",
                     }}
                   >
-                    <Icon size={18} style={{ color: isActive ? "#C96442" : "rgba(28,26,22,0.45)", flexShrink: 0 }} />
+                    <Icon size={18} style={{ color: isActive ? "#0060F0" : "#64748B", flexShrink: 0 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, color: "#1C1A16" }}>{section.label}</div>
-                      <div style={{ fontSize: 12, color: "rgba(28,26,22,0.4)", marginTop: 2 }}>{section.description}</div>
+                      <div style={{ fontSize: 12, color: "#64748B", marginTop: 2 }}>{section.description}</div>
                     </div>
                   </button>
                 );
@@ -560,7 +560,7 @@ export default function OnboardingChat() {
             style={{
               display: "flex", alignItems: "center", gap: 10,
               padding: "10px 16px", borderRadius: 10, fontSize: 15, fontWeight: 500,
-              color: "rgba(28,26,22,0.5)", border: "1px solid rgba(28,26,22,0.08)",
+              color: "#5C6B7D", border: "1px solid rgba(28,26,22,0.08)",
               textDecoration: "none", background: "white", width: "100%",
             }}
           >
@@ -571,7 +571,7 @@ export default function OnboardingChat() {
             style={{
               display: "flex", alignItems: "center", gap: 10,
               padding: "10px 16px", borderRadius: 10, fontSize: 15, fontWeight: 500,
-              color: "rgba(28,26,22,0.5)", border: "1px solid rgba(28,26,22,0.08)",
+              color: "#5C6B7D", border: "1px solid rgba(28,26,22,0.08)",
               background: "white", cursor: "pointer", width: "100%",
             }}
           >
@@ -581,7 +581,7 @@ export default function OnboardingChat() {
       </div>
 
       {/* ── Main Content ────────────────────────────────────── */}
-      <div style={{ marginLeft: LEFT_SIDEBAR_WIDTH, marginRight: RIGHT_SIDEBAR_WIDTH, flex: 1, background: "#F7F3EC", display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <div style={{ marginLeft: LEFT_SIDEBAR_WIDTH, marginRight: RIGHT_SIDEBAR_WIDTH, flex: 1, background: "#F4F7FA", display: "flex", flexDirection: "column", minHeight: "100vh" }}>
 
         {/* Chat area */}
         <div style={{ flex: 1, overflow: "auto", padding: "32px 24px", display: "flex", flexDirection: "column" }}>
@@ -597,7 +597,7 @@ export default function OnboardingChat() {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16 }}>
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "#C96442", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#0060F0", textTransform: "uppercase", letterSpacing: "0.08em" }}>
                       {PRIMARY_SECTION_IDS.includes(activeSectionId) ? "Core setup" : "Optional import"}
                     </span>
                     {activeSection?.status === "complete" && (
@@ -605,7 +605,7 @@ export default function OnboardingChat() {
                     )}
                   </div>
                   <h1 style={{ margin: 0, fontSize: 28, lineHeight: 1.1, letterSpacing: "-0.03em", color: "#1C1A16" }}>{activeSection?.label}</h1>
-                  <p style={{ margin: "10px 0 0", fontSize: 15, lineHeight: 1.6, color: "rgba(28,26,22,0.55)" }}>{SECTION_HELP[activeSectionId]}</p>
+                  <p style={{ margin: "10px 0 0", fontSize: 15, lineHeight: 1.6, color: "#5C6B7D" }}>{SECTION_HELP[activeSectionId]}</p>
                 </div>
                 <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
                   {PRIMARY_SECTION_IDS.includes(activeSectionId) && (
@@ -614,7 +614,7 @@ export default function OnboardingChat() {
                       disabled={PRIMARY_SECTION_IDS.indexOf(activeSectionId) === PRIMARY_SECTION_IDS.length - 1}
                       style={{
                         padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(28,26,22,0.08)",
-                        background: "white", color: "rgba(28,26,22,0.65)", fontSize: 14, fontWeight: 600,
+                        background: "white", color: "#475569", fontSize: 14, fontWeight: 600,
                         cursor: PRIMARY_SECTION_IDS.indexOf(activeSectionId) === PRIMARY_SECTION_IDS.length - 1 ? "default" : "pointer",
                         opacity: PRIMARY_SECTION_IDS.indexOf(activeSectionId) === PRIMARY_SECTION_IDS.length - 1 ? 0.5 : 1,
                       }}
@@ -625,8 +625,8 @@ export default function OnboardingChat() {
                 </div>
               </div>
               <div style={{ marginTop: 14, display: "flex", flexWrap: "wrap", gap: 8 }}>
-                <span style={{ fontSize: 13, color: "rgba(28,26,22,0.45)", background: "rgba(28,26,22,0.04)", padding: "8px 10px", borderRadius: 999 }}>Upload docs or spreadsheets</span>
-                <span style={{ fontSize: 13, color: "rgba(28,26,22,0.45)", background: "rgba(28,26,22,0.04)", padding: "8px 10px", borderRadius: 999 }}>Use voice if that's faster</span>
+                <span style={{ fontSize: 13, color: "#5C6B7D", background: "rgba(28,26,22,0.04)", padding: "8px 10px", borderRadius: 999 }}>Upload docs or spreadsheets</span>
+                <span style={{ fontSize: 13, color: "#5C6B7D", background: "rgba(28,26,22,0.04)", padding: "8px 10px", borderRadius: 999 }}>Use voice if that's faster</span>
               </div>
             </div>
 
@@ -647,8 +647,8 @@ export default function OnboardingChat() {
                       maxWidth: "85%",
                       padding: msg.role === "user" ? "12px 18px" : "14px 18px",
                       borderRadius: msg.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
-                      background: msg.role === "user" ? "#C96442" : "white",
-                      color: msg.role === "user" ? "white" : "#1C1A16",
+                      background: msg.role === "user" ? "#0060F0" : "white",
+                      color: msg.role === "user" ? "#FFFFFF" : "#17202B",
                       fontSize: 15, lineHeight: "1.6",
                       border: msg.role === "user" ? "none" : "1px solid rgba(28,26,22,0.1)",
                       boxShadow: "0 1px 3px rgba(0, 0, 0, 0.06)",
@@ -669,15 +669,15 @@ export default function OnboardingChat() {
                         disabled={loading || isComplete}
                         style={{
                           padding: '8px 16px', borderRadius: 20,
-                          border: '1.5px solid rgba(201,100,66,0.35)',
-                          background: 'rgba(201,100,66,0.06)',
-                          color: '#C96442', fontSize: 14, fontWeight: 500,
+                          border: '1.5px solid rgba(0,96,240,0.24)',
+                          background: 'rgba(0,96,240,0.06)',
+                          color: '#0060F0', fontSize: 14, fontWeight: 500,
                           cursor: loading || isComplete ? 'default' : 'pointer',
                           opacity: loading || isComplete ? 0.5 : 1,
                           transition: 'all 0.15s',
                         }}
-                        onMouseEnter={e => { if (isLastAssistant && !loading && !isComplete) { (e.target as HTMLButtonElement).style.background = 'rgba(201,100,66,0.15)'; } }}
-                        onMouseLeave={e => { (e.target as HTMLButtonElement).style.background = 'rgba(201,100,66,0.06)'; }}
+                        onMouseEnter={e => { if (isLastAssistant && !loading && !isComplete) { (e.target as HTMLButtonElement).style.background = 'rgba(0,96,240,0.12)'; } }}
+                        onMouseLeave={e => { (e.target as HTMLButtonElement).style.background = 'rgba(0,96,240,0.06)'; }}
                       >
                         {s}
                       </button>
@@ -691,7 +691,7 @@ export default function OnboardingChat() {
               <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: 20 }}>
                 <div style={{
                   padding: "14px 18px", borderRadius: "18px 18px 18px 4px", background: "white",
-                  color: "rgba(28,26,22,0.5)", border: "1px solid rgba(28,26,22,0.1)",
+                  color: "#5C6B7D", border: "1px solid rgba(28,26,22,0.1)",
                   display: "flex", alignItems: "center", gap: 10, boxShadow: "0 1px 3px rgba(0, 0, 0, 0.06)",
                 }}>
                   <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} />
@@ -709,8 +709,8 @@ export default function OnboardingChat() {
             {uploadedFiles.map((file, i) => (
               <div key={i} style={{
                 display: "flex", alignItems: "center", gap: 6,
-                background: "rgba(201,100,66,0.1)", border: "1px solid rgba(201,100,66,0.2)",
-                borderRadius: 8, padding: "4px 10px", fontSize: 13, color: "#C96442",
+                background: "rgba(0,96,240,0.08)", border: "1px solid rgba(0,96,240,0.16)",
+                borderRadius: 8, padding: "4px 10px", fontSize: 13, color: "#0060F0",
               }}>
                 <FileText size={14} />
                 <span style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file.name}</span>
@@ -732,7 +732,7 @@ export default function OnboardingChat() {
                 disabled={loading || isComplete}
                 style={{
                   display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 999,
-                  border: "1px solid rgba(28,26,22,0.08)", background: "#FAF7F2", color: "rgba(28,26,22,0.6)",
+                  border: "1px solid rgba(28,26,22,0.08)", background: "#F8FBFF", color: "#5C6B7D",
                   fontSize: 13, fontWeight: 600, cursor: loading || isComplete ? "default" : "pointer", opacity: loading || isComplete ? 0.6 : 1,
                 }}
               >
@@ -742,7 +742,7 @@ export default function OnboardingChat() {
                 onClick={() => goToSection("integrations")}
                 style={{
                   display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 999,
-                  border: "1px solid rgba(28,26,22,0.08)", background: "#FAF7F2", color: "rgba(28,26,22,0.6)",
+                  border: "1px solid rgba(28,26,22,0.08)", background: "#F8FBFF", color: "#5C6B7D",
                   fontSize: 13, fontWeight: 600, cursor: "pointer",
                 }}
               >
@@ -754,7 +754,7 @@ export default function OnboardingChat() {
                   disabled={loading}
                   style={{
                     display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 999,
-                    border: "1px solid rgba(201,100,66,0.3)", background: "rgba(201,100,66,0.08)", color: "#C96442",
+                    border: "1px solid rgba(0,96,240,0.18)", background: "rgba(0,96,240,0.08)", color: "#0060F0",
                     fontSize: 13, fontWeight: 600, cursor: loading ? "default" : "pointer",
                     opacity: loading ? 0.6 : 1,
                   }}
@@ -776,7 +776,7 @@ export default function OnboardingChat() {
                   flex: 1, padding: "14px 18px", borderRadius: 14,
                   border: isRecording ? "2px solid #ef4444" : "1px solid rgba(28,26,22,0.15)",
                   fontSize: 15, outline: "none", color: "#1C1A16",
-                  background: loading ? "#F0EBE3" : "white",
+                  background: loading ? "#EEF4FF" : "white",
                   cursor: loading || isRecording ? "not-allowed" : "text",
                 }}
               />
@@ -788,7 +788,7 @@ export default function OnboardingChat() {
                 style={{
                   width: 52, height: 52, borderRadius: 14,
                   border: isRecording ? "1px solid rgba(239,68,68,0.25)" : "1px solid rgba(28,26,22,0.1)",
-                  background: isRecording ? "rgba(239,68,68,0.12)" : "#FAF7F2",
+                  background: isRecording ? "rgba(239,68,68,0.12)" : "#F8FBFF",
                   color: isRecording ? "#ef4444" : "rgba(28,26,22,0.6)",
                   cursor: loading || isComplete ? "default" : "pointer",
                   opacity: loading || isComplete ? 0.6 : 1,
@@ -802,7 +802,7 @@ export default function OnboardingChat() {
                 disabled={loading || !input.trim() || isComplete}
                 style={{
                   padding: "14px 22px", borderRadius: 14,
-                  background: !loading && input.trim() && !isComplete ? "#C96442" : "#F0EBE3",
+                  background: !loading && input.trim() && !isComplete ? "#0060F0" : "#D8E6FF",
                   color: !loading && input.trim() && !isComplete ? "white" : "rgba(28,26,22,0.35)",
                   border: "1px solid rgba(28,26,22,0.1)",
                   cursor: !loading && input.trim() && !isComplete ? "pointer" : "not-allowed",

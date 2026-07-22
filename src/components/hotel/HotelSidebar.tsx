@@ -92,7 +92,7 @@ export function HotelSidebar() {
                         active ? "bg-blue-50 text-[#17202B]" : "text-slate-600 hover:bg-slate-100 hover:text-[#17202B]"
                       )}
                     >
-                      <item.icon className={cn("h-4 w-4", active ? "text-[#2F5D8A]" : "text-slate-500")} />
+                      <item.icon className={cn("h-4 w-4", active ? "text-[#0060F0]" : "text-slate-500")} />
                       <div className="min-w-0">
                         <div>{item.label}</div>
                         <div className="truncate text-[11px] font-normal text-slate-500">{item.detail}</div>
@@ -126,8 +126,9 @@ export function HotelSidebar() {
       </div>
 
       <aside className="fixed left-0 top-0 bottom-0 z-40 hidden w-[250px] border-r border-slate-200 bg-[#182430] lg:block">
-        <div className="flex h-16 items-center gap-3 border-b border-white/10 px-5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2F5D8A] p-1.5">
+        <div className="flex h-full min-h-0 flex-col overflow-hidden">
+        <div className="flex h-16 shrink-0 items-center gap-3 border-b border-white/10 px-5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#0060F0] p-1.5 shadow-[0_8px_24px_rgba(0,96,240,0.25)]">
             <Image
               src="/images/logo/newsidekicklogo.png"
               alt="Sidekick"
@@ -137,12 +138,12 @@ export function HotelSidebar() {
           />
           </div>
           <div>
-            <div className="text-[15px] font-semibold tracking-[-0.02em] text-white">Sidekick Hotels</div>
-            <div className="text-xs text-slate-300">Hotel operations OS</div>
+            <div className="text-[17px] font-semibold tracking-[-0.02em] text-white">Sidekick</div>
+            <div className="text-xs text-slate-300">Hotels</div>
           </div>
         </div>
 
-        <div className="border-b border-white/10 px-4 py-4">
+        <div className="shrink-0 border-b border-white/10 px-4 py-4">
           <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
             <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Demo Property</div>
             <div className="mt-1 text-sm font-semibold text-white">Pacific Stay Motel</div>
@@ -150,7 +151,7 @@ export function HotelSidebar() {
           </div>
         </div>
 
-        <nav className="space-y-4 overflow-y-auto p-3 pb-24">
+        <nav className="min-h-0 flex-1 space-y-4 overflow-y-auto p-3 pb-6">
           {NAV_GROUPS.map((group) => (
             <div key={group.label}>
               <div className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">{group.label}</div>
@@ -181,7 +182,7 @@ export function HotelSidebar() {
           ))}
         </nav>
 
-        <div className="absolute inset-x-0 bottom-0 border-t border-white/10 p-3">
+        <div className="shrink-0 border-t border-white/10 p-3">
           <Link
             href="/choose"
             className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-300 transition-colors hover:bg-white/5 hover:text-white"
@@ -189,6 +190,7 @@ export function HotelSidebar() {
             <ArrowLeft className="h-4 w-4" />
             Back to project chooser
           </Link>
+        </div>
         </div>
       </aside>
     </>

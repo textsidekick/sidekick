@@ -9,12 +9,12 @@ export default function ChoosePage() {
   return (
     <div style={{
       minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
-      background: "#F7F3EC", fontFamily: "'Inter', system-ui, sans-serif", padding: 20,
+      background: "#F4F7FA", fontFamily: "'Inter', system-ui, sans-serif", padding: 20,
     }}>
       <div style={{ width: "100%", maxWidth: 480, textAlign: "center" }}>
         <div style={{
           width: 56, height: 56, margin: "0 auto 24px",
-          background: "#C96442", borderRadius: 14,
+          background: "#0060F0", borderRadius: 14,
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>
           <Image src="/images/logo/newsidekicklogo.png" alt="Sidekick" width={36} height={36}
@@ -41,7 +41,7 @@ export default function ChoosePage() {
               width: 44, height: 44, borderRadius: 12, background: "rgba(201,100,66,0.1)",
               display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
             }}>
-              <LayoutDashboard size={22} style={{ color: "#C96442" }} />
+              <LayoutDashboard size={22} style={{ color: "#0060F0" }} />
             </div>
             <div>
               <div style={{ fontSize: 16, fontWeight: 600, color: "#1C1A16" }}>Go to Dashboard</div>
@@ -62,7 +62,7 @@ export default function ChoosePage() {
               width: 44, height: 44, borderRadius: 12, background: "rgba(201,100,66,0.1)",
               display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
             }}>
-              <MessageCircle size={22} style={{ color: "#C96442" }} />
+              <MessageCircle size={22} style={{ color: "#0060F0" }} />
             </div>
             <div>
               <div style={{ fontSize: 16, fontWeight: 600, color: "#1C1A16" }}>Set Up New Facility</div>

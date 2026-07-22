@@ -102,7 +102,7 @@ function roleBadge(role?: string | null) {
   }
 
   const cls: Record<string, string> = {
-    manager: "bg-[#C96442]/10 text-gray-700",
+    manager: "bg-[#0060F0]/10 text-gray-700",
     supervisor: "bg-slate-100 text-slate-700",
     technician: "bg-gray-100 text-gray-700",
     operator: "bg-gray-100 text-gray-700",
@@ -405,11 +405,11 @@ export default function TeamPage() {
             <div className="flex items-center justify-between mb-6 mt-6">
               <div>
                 <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
-                  <Users className="h-6 w-6 text-[#C96442]" /> Team
+                  <Users className="h-6 w-6 text-[#0060F0]" /> Team
                 </h1>
                 <p className="text-sm text-gray-500 mt-1">{workers.length} worker{workers.length !== 1 ? "s" : ""} enrolled</p>
               </div>
-              <Button onClick={() => { setEditWorker(null); setForm({ name: "", phone: "", role: "operator" }); setShowAdd(true); }} className="bg-[#C96442] hover:bg-[#B0532F] text-white">
+              <Button onClick={() => { setEditWorker(null); setForm({ name: "", phone: "", role: "operator" }); setShowAdd(true); }} className="bg-[#0060F0] hover:bg-[#004BB8] text-white">
                 <Plus className="h-4 w-4 mr-1" /> Add Worker
               </Button>
             </div>
@@ -582,7 +582,7 @@ export default function TeamPage() {
                                               return (
                                                 <div key={tr.id} className="flex items-center justify-between gap-2">
                                                   <span className="text-xs text-gray-700 flex items-center gap-1">
-                                                    <BookOpen className="h-3 w-3 text-[#C96442]" />
+                                                    <BookOpen className="h-3 w-3 text-[#0060F0]" />
                                                     {tr.name}
                                                   </span>
                                                   {msg ? (
@@ -591,7 +591,7 @@ export default function TeamPage() {
                                                     <button
                                                       onClick={() => assignTraining(w.phone, tr.id, tr.name)}
                                                       disabled={assigningTraining === key}
-                                                      className="text-[10px] font-medium px-2 py-0.5 rounded bg-[#C96442]/10 text-[#C96442] hover:bg-[#C96442]/20 disabled:opacity-50"
+                                                      className="text-[10px] font-medium px-2 py-0.5 rounded bg-[#0060F0]/10 text-[#0060F0] hover:bg-[#0060F0]/20 disabled:opacity-50"
                                                     >
                                                       {assigningTraining === key ? <Loader2 className="h-2.5 w-2.5 animate-spin" /> : "Assign"}
                                                     </button>
@@ -628,7 +628,7 @@ export default function TeamPage() {
               action={
                 <button
                   onClick={() => setShowAddCertModal(true)}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-[#C96442] text-white rounded-lg text-sm font-medium hover:opacity-90"
+                  className="flex items-center gap-2 px-3 py-1.5 bg-[#0060F0] text-white rounded-lg text-sm font-medium hover:opacity-90"
                 >
                   <Plus className="h-4 w-4" /> Add
                 </button>
@@ -769,7 +769,7 @@ export default function TeamPage() {
               </select>
             </div>
             <div className="flex gap-2 pt-1">
-              <Button onClick={handleSave} disabled={saving} className="flex-1 bg-[#C96442] hover:bg-[#B0532F] text-white">
+              <Button onClick={handleSave} disabled={saving} className="flex-1 bg-[#0060F0] hover:bg-[#004BB8] text-white">
                 {saving ? "Saving…" : editWorker ? "Save Changes" : "Add Worker"}
               </Button>
               <Button variant="outline" onClick={() => { setShowAdd(false); setEditWorker(null); }} className="flex-1">Cancel</Button>

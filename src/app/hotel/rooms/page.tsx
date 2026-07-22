@@ -140,7 +140,7 @@ export default function HotelRoomsPage() {
                             {room.status !== "inspection" && room.status !== "ready" ? (
                               <button
                                 onClick={() => actions.updateRoomStatus(room.room, "inspection")}
-                                className="rounded-full bg-[#2F5D8A] px-3 py-1 text-xs font-medium text-white"
+                                className="rounded-full bg-[#0060F0] px-3 py-1 text-xs font-medium text-white"
                               >
                                 Move to inspection
                               </button>

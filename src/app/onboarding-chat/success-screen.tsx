@@ -64,27 +64,27 @@ export default function SuccessScreen({
   const smsLink = `sms:${onboardingResult.twilioNumber.replace(/[^0-9]/g, "")}?body=${encodeURIComponent("JOIN " + currentAccessCode)}`;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F7F3EC", display: "flex", flexDirection: "column" }}>
+    <div style={{ minHeight: "100vh", background: "#F4F7FA", display: "flex", flexDirection: "column" }}>
       {/* Header */}
       <header
         style={{
           background: "white",
-          borderBottom: "1px solid rgba(28,26,22,0.1)",
+          borderBottom: "1px solid rgba(148,163,184,0.22)",
           padding: "16px 24px",
         }}
       >
         <div style={{ maxWidth: "1200px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <img src="/images/logo/sidekick-logo-blue.png" alt="Sidekick" style={{ width: "32px", height: "32px" }} />
-            <span style={{ fontWeight: 700, fontSize: "18px", color: "#1C1A16" }}>Sidekick</span>
+            <span style={{ fontWeight: 700, fontSize: "18px", color: "#17202B" }}>Sidekick</span>
           </div>
           <Link
             href="/"
             style={{
               padding: "10px 14px",
               borderRadius: "8px",
-              background: "#F0EBE3",
-              color: "#1C1A16",
+              background: "#EEF4FF",
+              color: "#17202B",
               textDecoration: "none",
               display: "flex",
               alignItems: "center",
@@ -108,7 +108,7 @@ export default function SuccessScreen({
                 width: "80px",
                 height: "80px",
                 borderRadius: "50%",
-                background: "rgba(201,100,66,0.12)",
+                background: "rgba(0,96,240,0.10)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -117,42 +117,42 @@ export default function SuccessScreen({
             >
               <CheckCircle2 size={48} color="#9CA3AF" />
             </div>
-            <h1 style={{ fontSize: "32px", fontWeight: "bold", color: "#1C1A16", marginBottom: "12px" }}>You're all set</h1>
-            <p style={{ fontSize: "16px", color: "rgba(28,26,22,0.5)" }}>{onboardingResult.companyName}'s operating memory is live. Your crew can start texting questions now.</p>
+            <h1 style={{ fontSize: "32px", fontWeight: "bold", color: "#17202B", marginBottom: "12px" }}>You're all set</h1>
+            <p style={{ fontSize: "16px", color: "#5C6B7D" }}>{onboardingResult.companyName}'s operating memory is live. Your crew can start texting questions now.</p>
           </div>
 
 
 
           {/* Worker Join Instructions — code + phone number */}
-          <div style={{ background: "white", border: "1px solid rgba(28,26,22,0.1)", borderRadius: "12px", padding: "32px", marginBottom: "24px" }}>
-            <h3 style={{ fontWeight: 600, color: "#1C1A16", fontSize: "16px", marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
+          <div style={{ background: "white", border: "1px solid rgba(148,163,184,0.22)", borderRadius: "12px", padding: "32px", marginBottom: "24px" }}>
+            <h3 style={{ fontWeight: 600, color: "#17202B", fontSize: "16px", marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
               <Smartphone size={18} />
               Workers: Text to Join
             </h3>
-            <p style={{ fontSize: "14px", color: "rgba(28,26,22,0.5)", marginBottom: "20px" }}>Workers text this command to the number below:</p>
+            <p style={{ fontSize: "14px", color: "#5C6B7D", marginBottom: "20px" }}>Workers text this command to the number below:</p>
 
-            <div style={{ background: "#F7F3EC", borderRadius: "8px", padding: "24px", border: "1px solid rgba(28,26,22,0.1)", textAlign: "center", marginBottom: "12px" }}>
-              <div style={{ fontSize: "36px", fontWeight: "bold", color: "#1C1A16", fontFamily: "monospace", letterSpacing: "4px", marginBottom: "16px" }}>
+            <div style={{ background: "#F4F7FA", borderRadius: "8px", padding: "24px", border: "1px solid rgba(148,163,184,0.22)", textAlign: "center", marginBottom: "12px" }}>
+              <div style={{ fontSize: "36px", fontWeight: "bold", color: "#17202B", fontFamily: "monospace", letterSpacing: "4px", marginBottom: "16px" }}>
                 {currentJoinCommand}
               </div>
-              <div style={{ fontSize: "36px", fontWeight: "bold", color: "#1C1A16", fontFamily: "monospace" }}>
+              <div style={{ fontSize: "36px", fontWeight: "bold", color: "#17202B", fontFamily: "monospace" }}>
                 {formatPhoneForDisplay(onboardingResult.twilioNumber)}
               </div>
             </div>
           </div>
 
           {/* QR Code */}
-          <div style={{ background: "white", border: "1px solid rgba(28,26,22,0.1)", borderRadius: "12px", padding: "32px", marginBottom: "24px", textAlign: "center" }}>
-            <h3 style={{ fontWeight: 600, color: "#1C1A16", fontSize: "16px", marginBottom: "8px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+          <div style={{ background: "white", border: "1px solid rgba(148,163,184,0.22)", borderRadius: "12px", padding: "32px", marginBottom: "24px", textAlign: "center" }}>
+            <h3 style={{ fontWeight: 600, color: "#17202B", fontSize: "16px", marginBottom: "8px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
               <QrCode size={18} />
               Scan to Join
             </h3>
-            <p style={{ fontSize: "14px", color: "rgba(28,26,22,0.5)", marginBottom: "16px" }}>Workers scan this QR code to send the JOIN text automatically.</p>
-            <div style={{ display: "inline-block", padding: "16px", background: "white", borderRadius: "8px", border: "1px solid rgba(28,26,22,0.1)" }}>
+            <p style={{ fontSize: "14px", color: "#5C6B7D", marginBottom: "16px" }}>Workers scan this QR code to send the JOIN text automatically.</p>
+            <div style={{ display: "inline-block", padding: "16px", background: "white", borderRadius: "8px", border: "1px solid rgba(148,163,184,0.22)" }}>
               <QRCodeSVG value={smsLink} size={200} level="M" />
             </div>
             <div style={{ marginTop: "12px" }}>
-              <a href={smsLink} style={{ fontSize: "13px", color: "#C96442", textDecoration: "none" }}>Or tap here to send via SMS →</a>
+              <a href={smsLink} style={{ fontSize: "13px", color: "#0060F0", textDecoration: "none" }}>Or tap here to send via SMS →</a>
             </div>
           </div>
 
@@ -162,8 +162,8 @@ export default function SuccessScreen({
               href="/today"
               style={{
                 display: "inline-block",
-                background: "#1C1A16",
-                color: "#F7F3EC",
+                background: "#0060F0",
+                color: "#FFFFFF",
                 padding: "14px 32px",
                 borderRadius: "10px",
                 fontWeight: "600",

@@ -107,7 +107,7 @@ export default function HotelFrontDeskPage() {
                               actions.updateRequestWorkflow(item.request.id, { routeTeam: "Front desk", triageStatus: "approved", dispatcher: "Front desk" });
                               actions.addTimelineEvent(item.request.id, { type: "system", text: "Request routed to front desk.", at: "Now" });
                             }}
-                            className="rounded-full bg-[#2F5D8A] px-3 py-1 text-xs font-medium text-white"
+                            className="rounded-full bg-[#0060F0] px-3 py-1 text-xs font-medium text-white"
                           >
                             Take ownership
                           </button>
@@ -164,7 +164,7 @@ export default function HotelFrontDeskPage() {
                       <>
                         <button
                           onClick={() => actions.updateStayNote(item.stay.id, `${item.stay.notes} Front desk sent pre-arrival text and confirmed arrival plan.`)}
-                          className="rounded-full bg-[#2F5D8A] px-3 py-1 text-xs font-medium text-white"
+                          className="rounded-full bg-[#0060F0] px-3 py-1 text-xs font-medium text-white"
                         >
                           Send pre-arrival text
                         </button>
@@ -180,7 +180,7 @@ export default function HotelFrontDeskPage() {
                       <>
                         <button
                           onClick={() => actions.updateStayNote(item.stay.id, `${item.stay.notes} Front desk sent checkout reminder and coordinated room release.`)}
-                          className="rounded-full bg-[#2F5D8A] px-3 py-1 text-xs font-medium text-white"
+                          className="rounded-full bg-[#0060F0] px-3 py-1 text-xs font-medium text-white"
                         >
                           Send checkout reminder
                         </button>

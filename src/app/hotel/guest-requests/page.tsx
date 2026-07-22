@@ -96,7 +96,7 @@ export default function HotelGuestRequestsPage() {
 
                         <div className="mt-3 flex flex-wrap gap-2">
                           {request.status !== "in_progress" && request.status !== "resolved" ? (
-                            <button onClick={() => { actions.updateRequestStatus(request.id, "in_progress"); actions.updateRequestWorkflow(request.id, { resolutionState: "staff_dispatched" }); actions.addTimelineEvent(request.id, { type: "system", text: "Front desk started working the request.", at: "Now" }); }} className="rounded-full bg-[#2F5D8A] px-3 py-1 text-xs font-medium text-white">Start</button>
+                            <button onClick={() => { actions.updateRequestStatus(request.id, "in_progress"); actions.updateRequestWorkflow(request.id, { resolutionState: "staff_dispatched" }); actions.addTimelineEvent(request.id, { type: "system", text: "Front desk started working the request.", at: "Now" }); }} className="rounded-full bg-[#0060F0] px-3 py-1 text-xs font-medium text-white">Start</button>
                           ) : null}
                           {request.resolutionState !== "awaiting_verification" && request.status !== "resolved" ? (
                             <button onClick={() => { actions.updateRequestWorkflow(request.id, { resolutionState: "awaiting_verification" }); actions.addTimelineEvent(request.id, { type: "ai", text: "We believe this is taken care of. Please reply here if anything still needs attention.", at: "Now" }); }} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600">Await verify</button>
