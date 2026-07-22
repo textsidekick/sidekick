@@ -12,7 +12,7 @@ const NAV_GROUPS = [
     items: [
       { label: "Overview", href: "/hotel", icon: Hotel, detail: "Rooms, availability, arrivals, team" },
       { label: "Room Board", href: "/hotel/rooms", icon: DoorOpen, detail: "Inventory + readiness" },
-      { label: "Arrivals & Departures", href: "/hotel/stays", icon: CalendarClock, detail: "Who is coming and going" },
+      { label: "Arrivals", href: "/hotel/stays", icon: CalendarClock, detail: "Today’s incoming guests" },
       { label: "Guest Requests", href: "/hotel/guest-requests", icon: ConciergeBell, detail: "Open guest issues" },
       { label: "Housekeeping", href: "/hotel/housekeeping", icon: BedDouble, detail: "Turns + service" },
       { label: "Maintenance", href: "/hotel/maintenance", icon: Wrench, detail: "Defects + fixes" },

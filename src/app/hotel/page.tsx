@@ -34,7 +34,9 @@ export default function HotelOverviewPage() {
   const cleaningRooms = rooms.filter((room) => room.status === "dirty" || room.status === "inspection" || room.status === "queued");
   const maintenanceRooms = rooms.filter((room) => room.status === "maintenance");
   const arrivals = state.stays.filter((stay) => stay.status === "arriving");
-  const departures = state.stays.filter((stay) => stay.status === "departing");
+  const lateCheckoutRequests = state.requests.filter(
+    (request) => request.status !== "resolved" && request.title.toLowerCase().includes("checkout"),
+  );
   const openRequests = state.requests.filter((request) => request.status !== "resolved");
   const roomRequestMap = new Map(
     openRequests
@@ -144,7 +146,7 @@ export default function HotelOverviewPage() {
           <div className="space-y-6">
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/40">
               <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Today</div>
-              <h2 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#17202B]">Arrivals and departures</h2>
+              <h2 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#17202B]">Arrivals and turnover exceptions</h2>
               <div className="mt-4 space-y-4">
                 <div>
                   <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Arrivals</div>
@@ -158,12 +160,12 @@ export default function HotelOverviewPage() {
                   </div>
                 </div>
                 <div>
-                  <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Departures</div>
+                  <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Turnover exceptions</div>
                   <div className="mt-2 space-y-2">
-                    {departures.length === 0 ? <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">No departures in play.</div> : departures.slice(0, 4).map((stay) => (
-                      <div key={stay.id} className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
-                        <div className="text-sm font-semibold text-[#1C1A16]">{stay.guestName} · Room {stay.room}</div>
-                        <div className="mt-1 text-xs text-slate-500">Departure {stay.eta} · {stay.notes}</div>
+                    {lateCheckoutRequests.length === 0 ? <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">No turnover exceptions right now.</div> : lateCheckoutRequests.slice(0, 4).map((request) => (
+                      <div key={request.id} className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
+                        <div className="text-sm font-semibold text-[#1C1A16]">Room {request.room} · {request.title}</div>
+                        <div className="mt-1 text-xs text-slate-500">{request.detail}</div>
                       </div>
                     ))}
                   </div>
