@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { BedDouble, ConciergeBell, DoorOpen, Wrench } from "lucide-react";
+import { BedDouble, DoorOpen, Wrench } from "lucide-react";
 import { HotelPageHeader, HotelStatusPill } from "@/components/hotel/HotelUi";
 import { useHotelDemoState } from "@/lib/hotel-demo-store";
 
@@ -38,6 +38,7 @@ export default function HotelOverviewPage() {
     (request) => request.status !== "resolved" && request.title.toLowerCase().includes("checkout"),
   );
   const openRequests = state.requests.filter((request) => request.status !== "resolved");
+  const roomsNeedingAttention = rooms.filter((room) => room.status !== "ready" && room.status !== "occupied");
   const roomRequestMap = new Map(
     openRequests
       .filter((request) => /^\d+$/.test(request.room))
@@ -81,7 +82,7 @@ export default function HotelOverviewPage() {
           }
         />
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-3">
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500"><DoorOpen className="h-4 w-4" /> Available now</div>
             <div className="mt-2 text-3xl font-bold tracking-[-0.03em] text-[#17202B]">{availableRooms.length}</div>
@@ -93,24 +94,19 @@ export default function HotelOverviewPage() {
             <div className="mt-1 text-xs text-slate-500">Rooms with guests in house</div>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
-            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500"><ConciergeBell className="h-4 w-4" /> Needs service</div>
-            <div className="mt-2 text-3xl font-bold tracking-[-0.03em] text-[#17202B]">{cleaningRooms.length}</div>
-            <div className="mt-1 text-xs text-slate-500">Cleaning, inspection, or queued rooms</div>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
-            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500"><Wrench className="h-4 w-4" /> Out with maintenance</div>
-            <div className="mt-2 text-3xl font-bold tracking-[-0.03em] text-[#17202B]">{maintenanceRooms.length}</div>
-            <div className="mt-1 text-xs text-slate-500">Rooms blocked by repairs</div>
+            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500"><Wrench className="h-4 w-4" /> Needs attention</div>
+            <div className="mt-2 text-3xl font-bold tracking-[-0.03em] text-[#17202B]">{roomsNeedingAttention.length}</div>
+            <div className="mt-1 text-xs text-slate-500">Dirty, inspection, queued, or maintenance</div>
           </div>
         </div>
 
-        <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.65fr)_360px]">
+        <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.8fr)_320px]">
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/40">
             <div className="flex items-end justify-between gap-4">
               <div>
                 <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Room board</div>
                 <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[#17202B]">All rooms and availability</h2>
-                <p className="mt-2 text-sm text-slate-600">This should be the main thing a small hotel checks: what is open, what is occupied, and what is blocking a room from being sold.</p>
+                <p className="mt-2 text-sm text-slate-600">Start here: what is open, what is occupied, and what is blocking a room from being sold.</p>
               </div>
               <Link href="/hotel/rooms" className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">
                 Open room board
@@ -128,13 +124,12 @@ export default function HotelOverviewPage() {
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <div className="text-lg font-semibold text-[#17202B]">Room {room.room}</div>
-                      <div className="text-xs text-slate-500">{room.type}{stay ? ` · ${stay.guestName}` : ""}</div>
+                      <div className="text-xs text-slate-500">{stay ? stay.guestName : room.type}</div>
                     </div>
                     <HotelStatusPill tone={roomToneMap[room.status] || "normal"}>{roomLabelMap[room.status] || room.status}</HotelStatusPill>
                   </div>
-                  <div className="mt-3 text-sm text-[#1C1A16]">{room.note}</div>
-                  {request ? <div className="mt-2 text-xs font-medium text-slate-600">Issue: {request.title}</div> : null}
-                  <div className="mt-2 text-xs text-slate-500">Owner: {room.owner}</div>
+                  <div className="mt-3 text-sm text-[#1C1A16]">{request ? request.title : room.note}</div>
+                  <div className="mt-2 text-xs text-slate-500">{room.owner}</div>
                       </>
                     );
                   })()}
@@ -146,7 +141,7 @@ export default function HotelOverviewPage() {
           <div className="space-y-6">
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/40">
               <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Today</div>
-              <h2 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#17202B]">Arrivals and turnover exceptions</h2>
+              <h2 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#17202B]">What matters today</h2>
               <div className="mt-4 space-y-4">
                 <div>
                   <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Arrivals</div>
@@ -175,7 +170,7 @@ export default function HotelOverviewPage() {
 
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/40">
               <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Needs attention now</div>
-              <h2 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#17202B]">Only the urgent stuff</h2>
+              <h2 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#17202B]">Urgent only</h2>
               <div className="mt-4 space-y-3">
                 {priorityItems.length === 0 ? (
                   <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-600">Nothing urgent right now.</div>
@@ -197,7 +192,7 @@ export default function HotelOverviewPage() {
 
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/40">
               <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Team</div>
-              <h2 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#17202B]">All staff on the board</h2>
+              <h2 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#17202B]">Staff on shift</h2>
               <div className="mt-4 space-y-2">
                 {state.staff.map((person) => (
                   <div key={person.phone} className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
@@ -208,15 +203,6 @@ export default function HotelOverviewPage() {
               </div>
             </div>
 
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/40">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Quick links</div>
-              <div className="mt-4 grid gap-3">
-                <Link href="/hotel/guest-requests" className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50">Guest requests</Link>
-                <Link href="/hotel/housekeeping" className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50">Housekeeping</Link>
-                <Link href="/hotel/front-desk" className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50">Front desk</Link>
-                <Link href="/hotel/maintenance" className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50">Maintenance</Link>
-              </div>
-            </div>
           </div>
         </div>
       </div>
