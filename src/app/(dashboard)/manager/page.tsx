@@ -92,7 +92,7 @@ export default function ManagerDashboard() {
       }
 
       try { localStorage.setItem("sidekick_auth", JSON.stringify(savedAuth)); } catch {}
-      setSelectedLocationId(session?.selectedLocationId || savedAuth.locationId || "all");
+      setSelectedLocationId(savedAuth.locationId || session?.selectedLocationId || "all");
       if (d.workers) setWorkers(d.workers);
     });
   }, []);
