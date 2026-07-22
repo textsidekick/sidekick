@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { Camera, Mic, Video } from "lucide-react";
 import { HotelPageHeader, HotelStatusPill } from "@/components/hotel/HotelUi";
 import { useHotelDemoState } from "@/lib/hotel-demo-store";
 import { useState } from "react";
@@ -19,7 +20,7 @@ export default function HotelRequestDetailPage() {
       <div className="min-h-screen px-6 py-8 sm:px-8 lg:px-10">
         <div className="mx-auto max-w-4xl rounded-3xl border border-black/8 bg-white p-8 shadow-sm">
           <div className="text-lg font-semibold text-[#1C1A16]">Request not found</div>
-          <Link href="/hotel/guest-requests" className="mt-4 inline-block text-sm text-[#0060F0]">Back to guest requests</Link>
+          <Link href="/hotel/conversations" className="mt-4 inline-block text-sm text-[#0060F0]">Back to conversations</Link>
         </div>
       </div>
     );
@@ -51,7 +52,7 @@ export default function HotelRequestDetailPage() {
     <div className="min-h-screen px-6 py-8 sm:px-8 lg:px-10">
       <div className="mx-auto max-w-5xl">
         <HotelPageHeader
-          eyebrow="Request thread"
+          eyebrow="Conversation + task"
           title={`Room ${request.room} · ${request.title}`}
           body={request.detail}
           action={<HotelStatusPill tone={request.status === "resolved" ? "resolved" : request.status === "needs_approval" ? "queued" : request.priority === "urgent" ? "urgent" : request.priority === "high" ? "high" : "normal"}>{request.status}</HotelStatusPill>}
@@ -67,6 +68,11 @@ export default function HotelRequestDetailPage() {
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
           <div className="space-y-6">
             <div className="rounded-3xl border border-black/8 bg-white p-5 shadow-sm">
+              <div className="mb-4 grid gap-3 md:grid-cols-3">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600"><Camera className="mb-2 h-4 w-4 text-slate-400" />Photos should stay attached to this thread and task.</div>
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600"><Video className="mb-2 h-4 w-4 text-slate-400" />Video should preserve what staff found in the room.</div>
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600"><Mic className="mb-2 h-4 w-4 text-slate-400" />Voice notes should become searchable hotel memory.</div>
+              </div>
               <div className="mb-4 flex items-start justify-between gap-4">
                 <div>
                   <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">Guest conversation</div>
@@ -138,6 +144,8 @@ export default function HotelRequestDetailPage() {
                 >
                   Send guest update
                 </button>
+                <button className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Attach photo note</button>
+                <button className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Attach voice note</button>
               </div>
             </div>
 
@@ -157,6 +165,9 @@ export default function HotelRequestDetailPage() {
 
           <div className="rounded-3xl border border-black/8 bg-white p-5 shadow-sm self-start">
             <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">Request details</div>
+            <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+              This thread should be the source of truth for guest updates, internal work, attached media, and what Sidekick learns for next time.
+            </div>
             <div className="mt-4 space-y-3 text-sm text-black/60">
               <div><span className="font-semibold text-[#1C1A16]">Owner:</span> {request.assignedTo}</div>
               <div><span className="font-semibold text-[#1C1A16]">Route team:</span> {request.routeTeam || "Not set"}</div>
@@ -216,7 +227,7 @@ export default function HotelRequestDetailPage() {
                 });
                 actions.addTimelineEvent(request.id, { type: "system", text: "Service recovery case opened from the request thread.", at: "Now" });
               }} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">Open recovery case</button> : null}
-              <Link href="/hotel/guest-requests" className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">Back to queue</Link>
+              <Link href="/hotel/conversations" className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">Back to conversations</Link>
             </div>
           </div>
         </div>

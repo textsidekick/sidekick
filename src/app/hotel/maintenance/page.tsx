@@ -17,8 +17,17 @@ export default function HotelMaintenancePage() {
       <div className="mx-auto max-w-6xl">
         <HotelPageHeader
           title="Maintenance queue"
-          body="Hotel-specific maintenance: shower, HVAC, TV, plumbing, key card, lighting, and safety issues."
+          body="Maintenance should run as text-driven work: issue comes in through Sidekick, staff update the thread naturally, and the guest gets progress without the desk having to babysit it."
         />
+        <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Maintenance workflow</div>
+          <div className="mt-3 grid gap-3 md:grid-cols-4">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">1. Guest or staff texts the issue</div>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">2. Sidekick creates and routes the task</div>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">3. Staff can attach photos, videos, or voice notes</div>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">4. Sidekick closes the loop with the guest</div>
+          </div>
+        </div>
         <div className="space-y-3">
           {issues.map((issue) => (
             <div key={issue.id} className="rounded-3xl border border-black/8 bg-white px-5 py-4 shadow-sm">

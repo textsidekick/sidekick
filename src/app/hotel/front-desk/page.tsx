@@ -58,9 +58,18 @@ export default function HotelFrontDeskPage() {
       <div className="mx-auto max-w-7xl">
         <HotelPageHeader
           title="Front desk live queue"
-          body="The desk should be able to run the next few hours from here: guest issues, arrivals, departures, approvals, and unresolved follow-through in one place."
+          body="The desk should only need one live queue: arrivals, guest exceptions, approvals, and anything Sidekick could not close automatically."
           action={<div className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600">Authoritative shift queue</div>}
         />
+
+        <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Desk role in the MVP</div>
+          <div className="mt-3 grid gap-3 md:grid-cols-3">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">Sidekick should answer most routine guest questions directly.</div>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">The desk should step in for approvals, exceptions, and unclear routing.</div>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">The live queue exists so the desk does not have to hunt across multiple surfaces.</div>
+          </div>
+        </div>
 
         <div className="mb-6 grid gap-4 md:grid-cols-4">
           <MetricCard label="Desk queue" value={deskItems.length} detail="Requests or exceptions owned by the desk" />
