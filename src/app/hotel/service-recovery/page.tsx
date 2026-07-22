@@ -4,6 +4,10 @@ import Link from "next/link";
 import { HotelPageHeader, HotelStatusPill } from "@/components/hotel/HotelUi";
 import { useHotelDemoState } from "@/lib/hotel-demo-store";
 
+function formatLabel(value: string) {
+  return value.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 export default function HotelServiceRecoveryPage() {
   const { state, actions, loaded } = useHotelDemoState();
 
@@ -117,7 +121,7 @@ export default function HotelServiceRecoveryPage() {
                   {linkedRequest ? (
                     <>
                       <div className="mt-2 font-semibold text-[#1C1A16]">{linkedRequest.title}</div>
-                      <div className="mt-1">{linkedRequest.resolutionState?.replace(/_/g, " ") || "new"} · {linkedRequest.sla || "No SLA"}</div>
+                      <div className="mt-1">{formatLabel(linkedRequest.resolutionState || "new")} · {linkedRequest.sla || "No SLA"}</div>
                     </>
                   ) : (
                     <div className="mt-2">No active request thread linked yet.</div>
@@ -127,7 +131,7 @@ export default function HotelServiceRecoveryPage() {
                   <div className="text-xs font-semibold uppercase tracking-[0.14em] text-black/35">Stay context</div>
                   {linkedStay ? (
                     <>
-                      <div className="mt-2 font-semibold text-[#1C1A16]">{linkedStay.status.replace(/_/g, " ")} · ETA {linkedStay.eta}</div>
+                      <div className="mt-2 font-semibold text-[#1C1A16]">{formatLabel(linkedStay.status)} · ETA {linkedStay.eta}</div>
                       <div className="mt-1">{linkedStay.nights} night{linkedStay.nights === 1 ? "" : "s"} · {linkedStay.notes}</div>
                     </>
                   ) : (
