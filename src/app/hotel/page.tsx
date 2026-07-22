@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { BedDouble, DoorOpen, Wrench } from "lucide-react";
 import { HotelPageHeader, HotelStatusPill } from "@/components/hotel/HotelUi";
 import { useHotelDemoState } from "@/lib/hotel-demo-store";
