@@ -137,7 +137,6 @@ export function HotelSidebar() {
           />
           <div>
             <div className="text-[17px] font-semibold tracking-[-0.02em] text-white">Sidekick</div>
-            <div className="text-xs text-slate-300">Hotels</div>
           </div>
         </div>
 
