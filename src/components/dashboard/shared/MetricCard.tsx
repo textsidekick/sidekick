@@ -25,30 +25,30 @@ function MetricCard({
 }: MetricCardProps) {
   const TrendIcon = change !== undefined ? (change > 0 ? TrendingUp : change < 0 ? TrendingDown : Minus) : null
 
-  const borderClass = isHighlighted ? 'border-blue-200' : 'border-gray-200'
+  const borderClass = isHighlighted ? 'border-blue-200' : 'border-slate-200'
   const accentClass = ''
 
   return (
-    <div className={`rounded-xl border bg-white p-5 ${borderClass} ${accentClass}`}>
+    <div className={`rounded-xl border bg-white p-5 shadow-sm shadow-slate-200/40 ${borderClass} ${accentClass}`}>
       <div className="flex items-start justify-between">
         <div>
-          <span className="text-xs font-medium uppercase tracking-wide text-gray-500">{label}</span>
-          {dateRange && <p className="mt-0.5 text-[10px] text-gray-400">{dateRange}</p>}
+          <span className="text-xs font-medium uppercase tracking-wide text-slate-500">{label}</span>
+          {dateRange && <p className="mt-0.5 text-[10px] text-slate-400">{dateRange}</p>}
         </div>
         <Icon className={iconClassName} />
       </div>
-      <div className={'mt-2 text-3xl font-bold leading-none ' + (valueClassName || 'text-gray-900')}>
+      <div className={'mt-2 text-3xl font-bold leading-none ' + (valueClassName || 'text-[#17202B]')}>
         {value}
       </div>
       <div className="mt-2 flex items-center gap-2">
-        {previousValue !== undefined && <span className="text-xs text-gray-400">{previousValue}</span>}
+        {previousValue !== undefined && <span className="text-xs text-slate-400">{previousValue}</span>}
         {change !== undefined && TrendIcon && (
-          <span className="inline-flex items-center gap-0.5 text-xs text-gray-500">
+          <span className="inline-flex items-center gap-0.5 text-xs text-slate-500">
             {change > 0 ? '+' : ''}{change.toFixed(1)}%
             <TrendIcon className="h-3 w-3" />
           </span>
         )}
-        {subtext && !previousValue && <p className="text-xs text-gray-400">{subtext}</p>}
+        {subtext && !previousValue && <p className="text-xs text-slate-400">{subtext}</p>}
       </div>
       {action && <div className="mt-2">{action}</div>}
     </div>

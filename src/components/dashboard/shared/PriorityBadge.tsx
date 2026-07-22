@@ -11,9 +11,9 @@ type SettingsResponse = {
 
 const PRIORITY_CLASSES: Record<string, string> = {
   critical: "bg-red-600 text-white",
-  high: "bg-red-100 text-gray-800",
-  medium: "bg-amber-100 text-gray-800",
-  low: "bg-slate-100 text-gray-800",
+  high: "bg-red-50 text-red-800 border border-red-100",
+  medium: "bg-amber-50 text-amber-800 border border-amber-100",
+  low: "bg-slate-100 text-slate-700 border border-slate-200",
 };
 
 const DEFAULT_PRIORITY_LABELS: PriorityLabels = {

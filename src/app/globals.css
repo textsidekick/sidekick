@@ -2,9 +2,9 @@
 
 /* ── Brand tokens ────────────────────────────────────────────────────────── */
 @theme inline {
-  --color-cream: #F7F3EC;
-  --color-cream-2: #FAF6EE;
-  --color-ink: #1C1A16;
+  --color-cream: #F4F7FA;
+  --color-cream-2: #FFFFFF;
+  --color-ink: #17202B;
   --color-accent: #0060F0;
   --color-accent-hover: #004BB8;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -13,8 +13,8 @@
 
 :root {
   color-scheme: light;
-  --background: #F7F3EC;
-  --foreground: #1C1A16;
+  --background: #F4F7FA;
+  --foreground: #17202B;
 }
 
 body {
@@ -78,9 +78,9 @@ body {
 /* ── Brand utilities ─────────────────────────────────────────────────────── */
 @layer utilities {
   .bg-cream { background-color: #F7F3EC; }
-  .bg-cream2 { background-color: #FAF6EE; }
-  .bg-cream\/85 { background-color: rgba(247,243,236,0.85); }
-  .text-ink { color: #1C1A16; }
+  .bg-cream2 { background-color: #FFFFFF; }
+  .bg-cream\/85 { background-color: rgba(244,247,250,0.85); }
+  .text-ink { color: #17202B; }
   .text-ink\/5 { color: rgba(28,26,22,0.05); }
   .text-ink\/10 { color: rgba(28,26,22,0.1); }
   .text-ink\/50 { color: rgba(28,26,22,0.5); }
