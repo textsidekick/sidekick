@@ -44,6 +44,7 @@ import { isWhatsAppMessage, stripWhatsAppPrefix } from "@/lib/whatsapp";
 import { detectLanguageFast, buildLanguageDirective, resolveLang } from "@/lib/korean";
 import { getSopAnswerContext } from "@/lib/sop-retrieval";
 import { getWorkerPositionContext, buildPositionPromptBlock } from "@/lib/position-context";
+import { buildCompanyAssistantDescriptor } from "@/lib/company-vertical";
 
 async function getPrimaryCompanyLocationId(companyId: string): Promise<string | null> {
   const { data } = await supabase
@@ -687,9 +688,11 @@ export async function POST(request: NextRequest) {
         .map((s: any) => `## ${s.title} (v${s.version_number})\n${s.content}`)
         .join("\n\n");
 
-      const systemPrompt = `You are Sidekick, an AI assistant for frontline workers at ${company?.name || "Ace Bed"} (mattress manufacturing).
-Answer the worker's question using the SOPs below. Be concise (under 480 chars), practical, and cite the SOP name and version.
-If the SOPs don't cover the question, give your best practical answer and suggest asking a supervisor.
+      const companyContext = buildCompanyAssistantDescriptor(company);
+      const systemPrompt = `You are Sidekick, an AI assistant for frontline workers at ${companyContext.descriptor}.
+${companyContext.operatingContext}
+Answer the worker's question using the SOPs below. Be concise (under 480 chars), practical, and cite the SOP name and version when relevant.
+If the SOPs don't cover the question, give your best practical answer and suggest asking a supervisor or manager.
 Respond in the same language the worker uses.
 
 SOPs:\n${sopBlock || "(no SOPs loaded)"}`;
