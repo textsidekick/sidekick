@@ -1,6 +1,7 @@
 "use client";
 
-import { BedDouble, ConciergeBell, Wrench, Clock3, Languages, Sparkles, DoorOpen, BellRing, MessageSquareText, CalendarClock, UsersRound, HeartHandshake, SearchCheck, ClipboardCheck, Package2, ReceiptText, ShieldAlert, CarFront, PackageCheck, BriefcaseBusiness, AlarmClockCheck, WashingMachine, BusFront, ArrowRightLeft, Refrigerator, Crown, Users, Ban, SprayCan } from "lucide-react";
+import Link from "next/link";
+import { BedDouble, ConciergeBell, Wrench, Clock3, Languages, Sparkles, DoorOpen, BellRing, MessageSquareText, CalendarClock, HeartHandshake, ShieldAlert, CarFront, AlarmClockCheck, Crown, Users, Ban } from "lucide-react";
 import { HotelPageHeader, HotelMetric, HotelQueueCard, HotelStatusPill } from "@/components/hotel/HotelUi";
 import { useHotelDemoState } from "@/lib/hotel-demo-store";
 
@@ -17,6 +18,122 @@ export default function HotelOverviewPage() {
     })
     .slice(0, 5);
 
+  const arrivalsAtRisk = state.stays.filter((stay) => stay.status === "arriving").length;
+  const departuresInPlay = state.stays.filter((stay) => stay.status === "departing").length;
+  const blockedRooms = state.outOfOrderItems.filter((item) => item.status !== "released").length;
+  const deskExceptions = state.requests.filter((r) => r.kind === "front_desk" || r.status === "needs_approval").length;
+  const activeRecovery = state.serviceCases.filter((item) => item.status !== "closed").length;
+  const nextTwoHoursFeed = [
+    ...state.stays
+      .filter((stay) => stay.status === "arriving" || stay.status === "departing")
+      .slice(0, 4)
+      .map((stay) => ({
+        id: `stay-${stay.id}`,
+        time: stay.eta,
+        label: stay.status === "arriving" ? "Arrival in play" : "Departure in play",
+        title: `${stay.guestName} · Room ${stay.room}`,
+        detail: stay.notes,
+        tone: stay.status === "arriving" ? "high" : "queued" as const,
+      })),
+    ...state.requests
+      .filter((request) => request.priority === "urgent" || request.status === "needs_approval")
+      .slice(0, 3)
+      .map((request) => ({
+        id: `request-${request.id}`,
+        time: `${request.waitMinutes} min`,
+        label: request.status === "needs_approval" ? "Decision due" : "Urgent guest issue",
+        title: `Room ${request.room} · ${request.title}`,
+        detail: request.detail,
+        tone: request.priority === "urgent" ? "urgent" : "queued" as const,
+      })),
+    ...state.outOfOrderItems
+      .filter((item) => item.status !== "released")
+      .slice(0, 2)
+      .map((item) => ({
+        id: `ooo-${item.id}`,
+        time: "Tonight",
+        label: "Revenue blocked",
+        title: `Room ${item.room} out of order`,
+        detail: `${item.issue} · ${item.revenueAtRisk}`,
+        tone: "high" as const,
+      })),
+  ].slice(0, 6);
+  const operationsCards = [
+    {
+      title: "Guest",
+      summary: "Texts, arrivals, and at-risk stays that need guest-facing follow-through.",
+      href: "/hotel/guest-requests",
+      icon: ConciergeBell,
+      metrics: [
+        `${metrics.openGuestRequests} open requests`,
+        `${arrivalsAtRisk} arrivals at risk`,
+        `${activeRecovery} recovery cases`,
+      ],
+      links: [
+        { label: "Guest requests", href: "/hotel/guest-requests" },
+        { label: "SMS console", href: "/hotel/sms" },
+        { label: "Service recovery", href: "/hotel/service-recovery" },
+      ],
+    },
+    {
+      title: "Rooms",
+      summary: "Sellable inventory, turns, inspections, and rooms blocked by maintenance or quality issues.",
+      href: "/hotel/rooms",
+      icon: DoorOpen,
+      metrics: [
+        `${metrics.roomsNeedingService} rooms need service`,
+        `${blockedRooms} rooms blocked`,
+        `${state.inspections.filter((item) => item.status !== "passed").length} inspections open`,
+      ],
+      links: [
+        { label: "Room board", href: "/hotel/rooms" },
+        { label: "Housekeeping", href: "/hotel/housekeeping" },
+        { label: "Out of order", href: "/hotel/out-of-order" },
+      ],
+    },
+    {
+      title: "Front desk",
+      summary: "Exceptions that hit the desk first: approvals, parking, luggage, breakfast, and departures.",
+      href: "/hotel/front-desk",
+      icon: BellRing,
+      metrics: [
+        `${deskExceptions} desk exceptions`,
+        `${departuresInPlay} departures in play`,
+        `${state.parkingItems.filter((item) => item.status !== "cleared").length} parking issues`,
+      ],
+      links: [
+        { label: "Front desk board", href: "/hotel/front-desk" },
+        { label: "Approvals", href: "/hotel/approvals" },
+        { label: "Breakfast", href: "/hotel/breakfast" },
+      ],
+    },
+    {
+      title: "Property ops",
+      summary: "Maintenance, preventive work, incidents, and operating memory that keep the property stable.",
+      href: "/hotel/maintenance",
+      icon: Wrench,
+      metrics: [
+        `${metrics.openMaintenanceIssues} maintenance issues`,
+        `${state.deepCleanItems.filter((item) => item.status !== "completed").length} deep cleans active`,
+        `${state.incidentItems.filter((item) => item.status !== "closed").length} incident items`,
+      ],
+      links: [
+        { label: "Maintenance", href: "/hotel/maintenance" },
+        { label: "Deep cleans", href: "/hotel/deep-cleans" },
+        { label: "Operating memory", href: "/hotel/knowledge" },
+      ],
+    },
+  ];
+
+  const secondaryTools = [
+    { href: "/hotel/vip-arrivals", icon: Crown, title: "VIP arrivals", count: state.vipArrivalItems.filter((item) => item.status !== "welcomed").length },
+    { href: "/hotel/group-arrivals", icon: Users, title: "Group arrivals", count: state.groupArrivalItems.filter((item) => item.status !== "checked_in").length },
+    { href: "/hotel/parking", icon: CarFront, title: "Parking", count: state.parkingItems.filter((item) => item.status !== "cleared").length },
+    { href: "/hotel/wakeups", icon: AlarmClockCheck, title: "Wake-up calls", count: state.wakeupItems.filter((item) => item.status !== "completed").length },
+    { href: "/hotel/incidents", icon: ShieldAlert, title: "Incident log", count: state.incidentItems.filter((item) => item.status !== "closed").length },
+    { href: "/hotel/out-of-order", icon: Ban, title: "Out of order", count: blockedRooms },
+  ];
+
   return (
     <div className="min-h-screen px-6 py-8 sm:px-8 lg:px-10">
       <div className="mx-auto max-w-7xl">
@@ -25,93 +142,135 @@ export default function HotelOverviewPage() {
           title={`${state.property.name} operations`}
           body="Separate hotel app prototype. Guests, front desk, housekeeping, and maintenance all coordinate through text, with every request turned into tracked work and reusable operating memory."
           action={
-            <div className="rounded-full bg-[#f7f1e8] px-4 py-2 text-sm font-medium text-black/60">
+            <div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600">
               {state.property.roomCount} rooms · {state.property.city} · {state.property.occupancyPct}% occupied
             </div>
           }
         />
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
-          <HotelMetric label="Open guest requests" value={metrics.openGuestRequests} sub="Requests still waiting on action or update" />
-          <HotelMetric label="Rooms needing service" value={metrics.roomsNeedingService} sub="Dirty, inspection, maintenance, or queued" />
-          <HotelMetric label="Open maintenance issues" value={metrics.openMaintenanceIssues} sub="Live room-impacting or property issues" />
-          <HotelMetric label="Approvals pending" value={metrics.approvalsPending} sub="Late checkout, damage, refund, and exception decisions" />
-          <HotelMetric label="Guest response time" value={`${metrics.avgGuestResponseSeconds}s`} sub="Average time to first reply" />
-          <HotelMetric label="Auto-resolved" value={metrics.resolvedAutomatically} sub="Guest questions fully handled by AI concierge" />
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          <HotelMetric label="Arrivals at risk" value={arrivalsAtRisk} sub="Check-ins that still need prep, routing, or follow-up" />
+          <HotelMetric label="Desk exceptions" value={deskExceptions} sub="Late checkout, approvals, parking, and policy edge cases" />
+          <HotelMetric label="Rooms off track" value={metrics.roomsNeedingService} sub="Inventory still blocked by cleaning, inspection, or maintenance" />
+          <HotelMetric label="Recovery in play" value={activeRecovery} sub="Guest issues that could become refunds, reviews, or churn" />
+          <HotelMetric label="Guest first response" value={`${metrics.avgGuestResponseSeconds}s`} sub="Average time to acknowledge a guest text or request" />
         </div>
 
-        <div className="mt-8 grid gap-4 xl:grid-cols-3">
-          <div className="rounded-3xl border border-black/8 bg-white p-6 shadow-sm xl:col-span-2">
+        <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/50">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Next 2 hours</div>
+              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[#17202B]">One operational feed for what can still hurt the stay</h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Use this before diving into boards. It mixes arrivals, departures, urgent guest issues, decision bottlenecks, and revenue-blocking rooms into one shift-level picture.</p>
+            </div>
+            <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-600">{nextTwoHoursFeed.length} items in play</div>
+          </div>
+
+          <div className="mt-5 grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
+            {nextTwoHoursFeed.map((item) => (
+              <div key={item.id} className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{item.time} · {item.label}</div>
+                    <div className="mt-2 text-sm font-semibold text-[#17202B]">{item.title}</div>
+                  </div>
+                  <HotelStatusPill tone={item.tone}>{item.label}</HotelStatusPill>
+                </div>
+                <div className="mt-2 text-sm leading-6 text-slate-600">{item.detail}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-8 grid gap-4 xl:grid-cols-[minmax(0,1.6fr)_minmax(300px,0.9fr)]">
+          <div className="rounded-[32px] border border-slate-200 bg-[linear-gradient(180deg,#ffffff_0%,#f6f8fb_100%)] p-7 shadow-sm shadow-slate-200/50">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">Live desk view</div>
-                <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em]">What needs attention now</h2>
+                <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Shift priority</div>
+                <h2 className="mt-2 text-3xl font-semibold tracking-[-0.04em] text-[#17202B]">Run the hotel by moments that hurt the guest first</h2>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">This view is now organized around the small set of things that actually swing the stay: guest communication, room readiness, front-desk exceptions, and property stability.</p>
               </div>
-              <div className="inline-flex items-center gap-2 rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-medium text-black/55">
+              <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600">
                 <Clock3 className="h-3.5 w-3.5" /> Shift handoff in 47 min
               </div>
             </div>
 
-            <div className="mt-6 space-y-3">
-              {attention.map((item) => (
-                <div key={item.id} className="flex items-start justify-between gap-4 rounded-2xl border border-black/6 bg-[#fffdfa] px-4 py-4">
-                  <div>
-                    <div className="text-sm font-semibold text-[#1C1A16]">
-                      {item.room.startsWith("Room") ? item.room : `Room ${item.room}`} · {item.title}
+            <div className="mt-6 grid gap-3 md:grid-cols-2">
+              {operationsCards.map((card) => (
+                <Link key={card.title} href={card.href} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40 transition-transform hover:-translate-y-0.5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100">
+                      <card.icon className="h-5 w-5 text-[#2F5D8A]" />
                     </div>
-                    <div className="mt-1 text-xs text-black/45">
-                      {item.kind.replace("_", " ")} · {item.detail} · {item.waitMinutes} min waiting
-                    </div>
+                    <div className="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">Core pillar</div>
                   </div>
-                  <HotelStatusPill tone={item.priority === "urgent" ? "urgent" : item.priority === "high" ? "high" : item.status === "needs_approval" ? "queued" : "normal"}>
-                    {item.priority === "urgent" ? "Urgent" : item.status === "needs_approval" ? "Needs approval" : item.status === "in_progress" ? "In progress" : "Open"}
-                  </HotelStatusPill>
-                </div>
+                  <div className="mt-5 text-xl font-semibold text-[#17202B]">{card.title}</div>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">{card.summary}</p>
+                  <div className="mt-4 space-y-2">
+                    {card.metrics.map((metric) => (
+                      <div key={metric} className="rounded-2xl bg-slate-50 px-3 py-2 text-sm text-slate-600">{metric}</div>
+                    ))}
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {card.links.map((link) => (
+                      <span key={link.href} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600">{link.label}</span>
+                    ))}
+                  </div>
+                </Link>
               ))}
             </div>
           </div>
 
-          <div className="rounded-3xl border border-black/8 bg-white p-6 shadow-sm">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">Why this is separate</div>
-            <h2 className="mt-2 text-xl font-semibold tracking-[-0.03em]">Different operating language</h2>
-            <div className="mt-5 space-y-4 text-sm leading-6 text-black/60">
-              <div className="flex gap-3"><BedDouble className="mt-0.5 h-4 w-4 text-[#C96442]" /> Rooms, turns, linen, inspections, minibar, damages</div>
-              <div className="flex gap-3"><ConciergeBell className="mt-0.5 h-4 w-4 text-[#C96442]" /> Guest requests, late checkout, parking, breakfast, lost and found</div>
-              <div className="flex gap-3"><Wrench className="mt-0.5 h-4 w-4 text-[#C96442]" /> Shower, HVAC, key card, TV, plumbing, safety escalation</div>
-              <div className="flex gap-3"><Languages className="mt-0.5 h-4 w-4 text-[#C96442]" /> Multilingual staff texting with one clean manager view</div>
-              <div className="flex gap-3"><Sparkles className="mt-0.5 h-4 w-4 text-[#C96442]" /> Every exception becomes hotel-specific operating memory</div>
+          <div className="space-y-4">
+            <div className="rounded-3xl border border-black/8 bg-white p-6 shadow-sm">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">Live desk view</div>
+              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em]">What needs attention now</h2>
+
+              <div className="mt-5 space-y-3">
+                {attention.map((item) => (
+                  <div key={item.id} className="rounded-2xl border border-black/6 bg-[#fffdfa] px-4 py-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="text-sm font-semibold text-[#1C1A16]">{item.room.startsWith("Room") ? item.room : `Room ${item.room}`} · {item.title}</div>
+                        <div className="mt-1 text-xs text-black/45">{item.kind.replace("_", " ")} · {item.waitMinutes} min waiting</div>
+                      </div>
+                      <HotelStatusPill tone={item.priority === "urgent" ? "urgent" : item.priority === "high" ? "high" : item.status === "needs_approval" ? "queued" : "normal"}>
+                        {item.priority === "urgent" ? "Urgent" : item.status === "needs_approval" ? "Needs approval" : item.status === "in_progress" ? "In progress" : "Open"}
+                      </HotelStatusPill>
+                    </div>
+                    <div className="mt-2 text-sm leading-6 text-black/60">{item.detail}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-black/8 bg-white p-6 shadow-sm">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">Hospitality lens</div>
+              <h2 className="mt-2 text-xl font-semibold tracking-[-0.03em]">Why this should feel different</h2>
+              <div className="mt-5 space-y-4 text-sm leading-6 text-black/60">
+                <div className="flex gap-3"><BedDouble className="mt-0.5 h-4 w-4 text-[#C96442]" /> Sellable room inventory matters more than raw task counts.</div>
+                <div className="flex gap-3"><ConciergeBell className="mt-0.5 h-4 w-4 text-[#C96442]" /> Guest perception changes with every update, ETA, and make-good.</div>
+                <div className="flex gap-3"><Languages className="mt-0.5 h-4 w-4 text-[#C96442]" /> Staff and guest messaging needs bilingual, role-based, text-first coordination.</div>
+                <div className="flex gap-3"><Sparkles className="mt-0.5 h-4 w-4 text-[#C96442]" /> Good hotel software should feel calm, warm, and exception-aware—not industrial.</div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-26">
-          <HotelQueueCard href="/hotel/guest-requests" icon={ConciergeBell} title="Guest requests" count={metrics.openGuestRequests} detail="Open concierge and guest support texts waiting on either an answer, task, or update." />
-          <HotelQueueCard href="/hotel/front-desk" icon={BellRing} title="Front desk board" count={metrics.approvalsPending + state.requests.filter((r) => r.kind === "front_desk" && r.status !== "resolved").length} detail="Check-ins, late checkout calls, policy questions, and approvals waiting on the desk." />
-          <HotelQueueCard href="/hotel/sms" icon={MessageSquareText} title="SMS console" count={state.requests.filter((r) => r.source === "guest sms").length} detail="Simulate inbound guest texts and watch them create requests, escalations, and auto-replies." />
-          <HotelQueueCard href="/hotel/stays" icon={CalendarClock} title="Arrivals & departures" count={state.stays.filter((stay) => stay.status === "arriving" || stay.status === "departing").length} detail="Track check-ins, departures, late checkouts, and rooms that need desk coordination." />
-          <HotelQueueCard href="/hotel/people" icon={UsersRound} title="People ops" count={state.peopleTasks.filter((task) => task.status !== "done").length} detail="Training, coverage, onboarding, and policy rollouts tracked through the same text-first workflow." />
-          <HotelQueueCard href="/hotel/service-recovery" icon={HeartHandshake} title="Service recovery" count={state.serviceCases.filter((item) => item.status !== "closed").length} detail="Save-the-stay cases, refund decisions, and service recovery offers before bad reviews or chargebacks." />
-          <HotelQueueCard href="/hotel/lost-found" icon={SearchCheck} title="Lost & found" count={state.lostFoundItems.filter((item) => item.status !== "shipped").length} detail="Track found items, guest contact, pickup, and shipping follow-through before claims get messy." />
-          <HotelQueueCard href="/hotel/inspections" icon={ClipboardCheck} title="Inspections" count={state.inspections.filter((item) => item.status !== "passed").length} detail="QA room turns before release so missed amenities and defects do not hit the next guest." />
-          <HotelQueueCard href="/hotel/supplies" icon={Package2} title="Supplies" count={state.supplies.filter((item) => item.stock !== "ok").length} detail="Track towels, amenities, and guest-comfort stock before shortages slow turns or hurt recovery." />
-          <HotelQueueCard href="/hotel/audit" icon={ReceiptText} title="Night audit" count={state.auditItems.filter((item) => item.status !== "resolved").length} detail="Catch folio mismatches, OTA exceptions, and compliance gaps before the shift closes." />
-          <HotelQueueCard href="/hotel/incidents" icon={ShieldAlert} title="Incident log" count={state.incidentItems.filter((item) => item.status !== "closed").length} detail="Track safety events, smoking violations, parking incidents, and containment follow-through before exposure grows." />
-          <HotelQueueCard href="/hotel/parking" icon={CarFront} title="Parking" count={state.parkingItems.filter((item) => item.status !== "cleared").length} detail="Manage plate capture, oversized vehicles, EV spots, and post-checkout lot exceptions before they hit the desk." />
-          <HotelQueueCard href="/hotel/packages" icon={PackageCheck} title="Packages" count={state.packageItems.filter((item) => item.status !== "picked_up").length} detail="Track guest deliveries, notification follow-through, and secure pickup so front desk handoffs do not get messy." />
-          <HotelQueueCard href="/hotel/luggage" icon={BriefcaseBusiness} title="Luggage hold" count={state.luggageItems.filter((item) => item.status !== "released").length} detail="Manage bag holds, claim-tag verification, and post-checkout storage so handoffs stay secure during busy shifts." />
-          <HotelQueueCard href="/hotel/wakeups" icon={AlarmClockCheck} title="Wake-up calls" count={state.wakeupItems.filter((item) => item.status !== "completed").length} detail="Track morning wake-ups, backup SMS confirms, and guest follow-through so departures do not start with complaints." />
-          <HotelQueueCard href="/hotel/laundry" icon={WashingMachine} title="Laundry" count={state.laundryItems.filter((item) => item.status !== "delivered").length} detail="Track linen turnaround, delayed pickups, and room-ready laundry gaps before arrivals get blocked." />
-          <HotelQueueCard href="/hotel/shuttles" icon={BusFront} title="Shuttles" count={state.shuttleItems.filter((item) => item.status !== "completed").length} detail="Coordinate airport pickups, conference rides, and departure transports so desk promises actually get executed." />
-          <HotelQueueCard href="/hotel/room-moves" icon={ArrowRightLeft} title="Room moves" count={state.roomMoveItems.filter((item) => item.status !== "completed").length} detail="Coordinate service-recovery moves, noise complaints, key swaps, and housekeeping resets without losing the guest." />
-          <HotelQueueCard href="/hotel/minibar" icon={Refrigerator} title="Minibar & market" count={state.minibarItems.filter((item) => item.status === "captured").length} detail="Capture room-charge items, post market sales, and document waivers before revenue slips through check-out." />
-          <HotelQueueCard href="/hotel/vip-arrivals" icon={Crown} title="VIP arrivals" count={state.vipArrivalItems.filter((item) => item.status !== "welcomed").length} detail="Coordinate preferences, amenities, and personalized arrival prep before high-value stays become recoveries." />
-          <HotelQueueCard href="/hotel/group-arrivals" icon={Users} title="Group arrivals" count={state.groupArrivalItems.filter((item) => item.status !== "checked_in").length} detail="Stage keys, room blocks, breakfast plans, and coach/crew logistics before group check-in overwhelms the desk." />
-          <HotelQueueCard href="/hotel/out-of-order" icon={Ban} title="Out of order" count={state.outOfOrderItems.filter((item) => item.status !== "released").length} detail="Track blocked rooms, repair progress, and reopened inventory so room loss does not disappear between maintenance and the desk." />
-          <HotelQueueCard href="/hotel/deep-cleans" icon={SprayCan} title="Deep cleans" count={state.deepCleanItems.filter((item) => item.status !== "completed").length} detail="Schedule preventive resets, damage-recovery cleaning, and heavy-turn housekeeping before quality slips hit the next guest." />
-          <HotelQueueCard href="/hotel/rooms" icon={DoorOpen} title="Room board" count={state.property.roomCount} detail="Live room readiness, service state, damages, inspections, and maintenance blockers." />
-          <HotelQueueCard href="/hotel/housekeeping" icon={BedDouble} title="Housekeeping board" count={state.rooms.filter((room) => ["dirty", "inspection", "queued"].includes(room.status)).length} detail="Room cleans, inspections, restocks, damage photos, and room-ready status." />
-          <HotelQueueCard href="/hotel/maintenance" icon={Wrench} title="Maintenance queue" count={metrics.openMaintenanceIssues} detail="Broken showers, HVAC issues, key cards, TVs, plumbing, and safety issues." />
-          <HotelQueueCard href="/hotel/knowledge" icon={Sparkles} title="Operating memory" count={state.knowledge.length} detail="Captured fixes, guest policies, exceptions, and property-specific know-how." />
+        <div className="mt-8">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">Supporting views</div>
+              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[#1C1A16]">Specialized tools that support the main operating flow</h2>
+            </div>
+            <div className="rounded-full bg-[#f7f1e8] px-4 py-2 text-sm font-medium text-black/60">Useful when needed — not the system of record</div>
+          </div>
+
+          <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {secondaryTools.map((tool) => (
+              <HotelQueueCard key={tool.href} href={tool.href} icon={tool.icon} title={tool.title} count={tool.count} detail="Use this only when the live queue or arrivals flow needs a deeper supporting view." />
+            ))}
+          </div>
         </div>
       </div>
     </div>

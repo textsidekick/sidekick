@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { HotelPageHeader, HotelStatusPill } from "@/components/hotel/HotelUi";
 import { useHotelDemoState } from "@/lib/hotel-demo-store";
 
@@ -12,7 +13,7 @@ const PRESETS = [
 ];
 
 export default function HotelSmsConsolePage() {
-  const { actions, loaded } = useHotelDemoState();
+  const { actions, state, loaded } = useHotelDemoState();
   const [room, setRoom] = useState("118");
   const [guestName, setGuestName] = useState("Walk-in guest");
   const [message, setMessage] = useState("Can we get 4 more towels and 2 washcloths?");
@@ -61,6 +62,73 @@ export default function HotelSmsConsolePage() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  const createdRequest = lastResult ? state.requests.find((item) => item.id === lastResult.request.id) : null;
+  const createdTimeline = createdRequest ? state.requestTimelines[createdRequest.id] || [] : [];
+  const relatedStay = createdRequest ? state.stays.find((stay) => stay.room === createdRequest.room || stay.id === createdRequest.stayId) : null;
+
+  const resolutionTone =
+    createdRequest?.resolutionState === "closed"
+      ? "resolved"
+      : createdRequest?.resolutionState === "awaiting_verification"
+        ? "queued"
+        : createdRequest?.resolutionState === "staff_dispatched"
+          ? "high"
+          : "normal";
+
+  function sendGuestUpdateFromWorkflow() {
+    if (!lastResult || !createdRequest) return;
+    actions.addTimelineEvent(createdRequest.id, { type: "ai", text: lastResult.workflow.guestUpdate, at: "Now" });
+    actions.updateRequestStatus(createdRequest.id, createdRequest.status === "resolved" ? "resolved" : "in_progress");
+    actions.updateRequestWorkflow(createdRequest.id, {
+      resolutionState: createdRequest.status === "resolved" ? "closed" : "guest_updated",
+      triageStatus: createdRequest.triageStatus === "needs_review" ? "approved" : createdRequest.triageStatus,
+      dispatcher: createdRequest.dispatcher || "Sidekick triage",
+    });
+  }
+
+  function dispatchOwner() {
+    if (!lastResult || !createdRequest) return;
+    actions.assignRequest(createdRequest.id, lastResult.request.assignedTo);
+    actions.addTimelineEvent(createdRequest.id, { type: "system", text: `${lastResult.request.assignedTo} accepted the task and is working it now.`, at: "Now" });
+    actions.updateRequestWorkflow(createdRequest.id, {
+      resolutionState: "staff_dispatched",
+      routeTeam: lastResult.workflow.routeTeam,
+      sla: lastResult.workflow.suggestedSla,
+      triageStatus: "approved",
+      escalationOwner: null,
+      handoffNote: null,
+      dispatcher: "Front desk",
+    });
+  }
+
+  function openRecoveryCase() {
+    if (!lastResult || !createdRequest) return;
+    actions.createServiceCase({
+      id: `svc-${createdRequest.id}`,
+      room: createdRequest.room,
+      guestName: createdRequest.guestName || "Guest",
+      issue: createdRequest.title,
+      recovery: "Apologize quickly, set a visible ETA, and prepare a make-good before checkout if the issue continues.",
+      owner: createdRequest.assignedTo,
+      status: "open",
+      valueAtRisk: createdRequest.priority === "urgent" ? "$200+ stay risk" : "$100+ review risk",
+    });
+    actions.addTimelineEvent(createdRequest.id, { type: "system", text: "Service recovery case opened from SMS triage.", at: "Now" });
+  }
+
+  function markAwaitingGuestConfirmation() {
+    if (!createdRequest) return;
+    actions.updateRequestWorkflow(createdRequest.id, { resolutionState: "awaiting_verification" });
+    actions.addTimelineEvent(createdRequest.id, { type: "staff", text: "Work completed internally. Waiting on guest confirmation before closing the request.", at: "Now" });
+  }
+
+  function closeResolvedLoop() {
+    if (!createdRequest) return;
+    actions.updateRequestStatus(createdRequest.id, "resolved");
+    actions.updateRequestWorkflow(createdRequest.id, { resolutionState: "closed" });
+    actions.addTimelineEvent(createdRequest.id, { type: "ai", text: "Everything should be set now. If anything still looks off, just reply here and we’ll jump back in.", at: "Now" });
   }
 
   return (
@@ -129,9 +197,69 @@ export default function HotelSmsConsolePage() {
                     </HotelStatusPill>
                   </div>
                   <div>Assigned to {lastResult.request.assignedTo}</div>
+                  {createdRequest ? (
+                    <div className="flex items-center justify-between gap-3 rounded-2xl bg-[#fffdfa] px-4 py-3">
+                      <div>
+                        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-black/35">Resolution state</div>
+                        <div className="mt-1 text-sm text-[#1C1A16]">{createdRequest.resolutionState?.replace(/_/g, " ") || "new"}</div>
+                      </div>
+                      <HotelStatusPill tone={resolutionTone}>{createdRequest.resolutionState?.replace(/_/g, " ") || "new"}</HotelStatusPill>
+                    </div>
+                  ) : null}
+                  <div className="rounded-2xl bg-[#fffdfa] px-4 py-3">
+                    <div className="text-xs font-semibold uppercase tracking-[0.14em] text-black/35">Operational workflow</div>
+                    <div className="mt-2 text-sm"><span className="font-semibold text-[#1C1A16]">Route:</span> {lastResult.workflow.routeTeam}</div>
+                    <div className="mt-1 text-sm"><span className="font-semibold text-[#1C1A16]">Routing confidence:</span> {lastResult.workflow.routingConfidence}</div>
+                    <div className="mt-1 text-sm"><span className="font-semibold text-[#1C1A16]">Triage:</span> {lastResult.workflow.triageStatus?.replace(/_/g, " ")}</div>
+                    <div className="mt-1 text-sm"><span className="font-semibold text-[#1C1A16]">SLA:</span> {lastResult.workflow.suggestedSla}</div>
+                    <div className="mt-1 text-sm leading-6"><span className="font-semibold text-[#1C1A16]">Next step:</span> {lastResult.workflow.nextInternalStep}</div>
+                  </div>
+                  {lastResult.workflow.humanReviewRequired ? (
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Fallback review state</div>
+                      <div className="mt-2">{lastResult.workflow.reviewReason || "A human should review this before promising the guest a final answer."}</div>
+                    </div>
+                  ) : null}
+                  {relatedStay ? (
+                    <div className="rounded-2xl bg-[#fffdfa] px-4 py-3 text-sm text-black/60">
+                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-black/35">Stay context</div>
+                      <div className="mt-2"><span className="font-semibold text-[#1C1A16]">Guest:</span> {relatedStay.guestName}</div>
+                      <div className="mt-1"><span className="font-semibold text-[#1C1A16]">Stay:</span> {relatedStay.status.replace(/_/g, " ")} · {relatedStay.nights} night{relatedStay.nights === 1 ? "" : "s"}</div>
+                      <div className="mt-1"><span className="font-semibold text-[#1C1A16]">Note:</span> {relatedStay.notes}</div>
+                    </div>
+                  ) : null}
+                  <div className="flex flex-wrap gap-2">
+                    <button onClick={sendGuestUpdateFromWorkflow} className="rounded-full bg-[#26251e] px-3 py-2 text-xs font-medium text-white">Send guest update</button>
+                    <button onClick={dispatchOwner} className="rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-medium text-black/60">Dispatch owner</button>
+                    <button onClick={markAwaitingGuestConfirmation} className="rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-medium text-black/60">Await guest confirm</button>
+                    <button onClick={closeResolvedLoop} className="rounded-full bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-700">Close resolved loop</button>
+                    {createdRequest?.triageStatus === "needs_review" ? (
+                      <button onClick={dispatchOwner} className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700">Approve + dispatch</button>
+                    ) : null}
+                    {lastResult.workflow.escalationRecommended ? (
+                      <button onClick={openRecoveryCase} className="rounded-full border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-900">Open recovery case</button>
+                    ) : null}
+                    <Link href={`/hotel/requests/${lastResult.request.id}`} className="rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-medium text-black/60">Open live thread</Link>
+                  </div>
                 </div>
               ) : (
                 <div className="mt-4 text-sm text-black/45">Run a test message to see the backend classification, auto-reply, and queue routing.</div>
+              )}
+            </div>
+
+            <div className="rounded-3xl border border-black/8 bg-white p-5 shadow-sm">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">Live request timeline</div>
+              {createdRequest ? (
+                <div className="mt-4 space-y-3">
+                  {createdTimeline.map((event) => (
+                    <div key={event.id} className={`rounded-2xl px-4 py-3 text-sm leading-6 ${event.type === "guest" ? "bg-[#1d6bf3] text-white" : event.type === "ai" ? "bg-[#f3efe4] text-[#26251e]" : event.type === "staff" ? "bg-[#fff4e8] text-[#8a4a2d]" : "border border-black/5 bg-[#f7f7f6] text-black/65"}`}>
+                      <div>{event.text}</div>
+                      <div className={`mt-1 text-[11px] ${event.type === "guest" ? "text-white/75" : "text-black/35"}`}>{event.at}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="mt-4 text-sm text-black/45">Once you process a message, you can watch the guest thread evolve here as you dispatch, update, and recover.</div>
               )}
             </div>
 

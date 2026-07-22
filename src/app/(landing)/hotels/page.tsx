@@ -1,40 +1,40 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { MessageSquare, BedDouble, Wrench, Languages, Sparkles, ArrowRight } from "lucide-react";
+import { MessageSquare, BedDouble, Wrench, Languages, Sparkles, ArrowRight, Clock3, ClipboardList } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Sidekick for Hotels & Motels",
   description:
-    "Guests and staff text naturally. Sidekick answers questions, routes hotel tasks, updates guests, and turns every resolved issue into reusable operating knowledge.",
+    "Sidekick is the guest request and shift coordination layer for hotels and motels. It turns guest messages and room exceptions into owned, time-bound work.",
 };
 
 const bullets = [
-  "Guests text for towels, late checkout, parking, breakfast, or room cleaning",
-  "Housekeeping and maintenance get assigned work by text in any language",
-  "Broken showers, stains, HVAC issues, and restocks become tracked tasks instantly",
-  "Every request, exception, and resolution becomes searchable hotel knowledge",
+  "One live queue for guest requests, arrivals, departures, and desk exceptions",
+  "Every guest message becomes owned, time-bound work with one clear next step",
+  "Housekeeping and maintenance get routed tasks by text in any language",
+  "Resolved issues become reusable hotel operating memory instead of disappearing at shift change",
 ];
 
 const useCases = [
   {
     icon: MessageSquare,
-    title: "Guest requests",
-    body: "Answer common questions instantly, create tasks when needed, and text the guest when the request is done.",
+    title: "Guest request loop",
+    body: "Capture the text, route the work, keep the guest updated, and close the loop only after the stay is actually protected.",
+  },
+  {
+    icon: Clock3,
+    title: "Next 2 hours control",
+    body: "Run the shift by arrivals, departures, blocked rooms, and promised guest follow-through instead of scattered departmental boards.",
   },
   {
     icon: BedDouble,
-    title: "Housekeeping coordination",
-    body: "Send room assignments, mark rooms cleaned, flag damages, request restocks, and handle late service requests over SMS.",
+    title: "Room readiness coordination",
+    body: "Connect guest demand to room status so the desk, housekeeping, and maintenance can recover inventory before the next wave hits.",
   },
   {
-    icon: Wrench,
-    title: "Maintenance routing",
-    body: "Turn texts like 'Room 214 shower broken' into tracked work with escalation, photos, and manager visibility.",
-  },
-  {
-    icon: Languages,
-    title: "Multilingual staff ops",
-    body: "Staff can text in their own language while managers still get one clean operational view.",
+    icon: ClipboardList,
+    title: "Shift handoff",
+    body: "Preserve unresolved work, guest promises, and room blockers so the next shift inherits what matters instead of starting blind.",
   },
 ];
 
@@ -62,10 +62,10 @@ export default function HotelsPage() {
               <Sparkles className="h-3.5 w-3.5" /> New vertical in progress
             </div>
             <h1 className="max-w-4xl text-5xl font-medium tracking-[-0.04em] sm:text-6xl">
-              The text-first operating system for hotels and motels.
+              The guest request and shift coordination layer for hotels and motels.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-black/70">
-              Guests and staff already text. Sidekick turns those messages into answers, tasks, updates, and reusable operating knowledge across the front desk, housekeeping, and maintenance.
+              Guests and staff already text. Sidekick turns every guest message and room exception into owned work, clear updates, and calmer shift execution across the desk, housekeeping, and maintenance.
             </p>
 
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -90,6 +90,9 @@ export default function HotelsPage() {
                 Maintenance task created: <strong>Room 214 shower repair</strong><br />
                 Housekeeping task created: <strong>Deliver extra towels</strong>
               </div>
+              <div className="max-w-[82%] rounded-2xl rounded-bl-md border border-black/5 bg-[#fff7ec] px-4 py-3 text-[#26251e]">
+                Desk note: <strong>Guest updated</strong> · ETA given · service recovery watch enabled until verified.
+              </div>
               <div className="ml-auto max-w-[72%] rounded-2xl rounded-br-md bg-[#e8f0ff] px-4 py-3 text-[#1547a8]">
                 Towels delivered. Shower repair in progress.
               </div>
@@ -103,7 +106,7 @@ export default function HotelsPage() {
           <div className="mb-10 max-w-2xl">
             <h2 className="text-3xl font-medium tracking-[-0.03em]">First MVP scope</h2>
             <p className="mt-3 text-base leading-7 text-black/65">
-              We would start narrow: guest requests, housekeeping coordination, maintenance routing, and automatic guest updates.
+              Start with the operational core: the live guest request loop, arrivals/departures execution, room-readiness coordination, and shift handoff.
             </p>
           </div>
 
@@ -117,6 +120,15 @@ export default function HotelsPage() {
                 <p className="mt-2 text-sm leading-6 text-black/65">{body}</p>
               </div>
             ))}
+          </div>
+
+          <div className="mt-8 rounded-3xl border border-black/8 bg-[#faf6ef] p-6">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">What this is not</div>
+            <div className="mt-3 grid gap-3 md:grid-cols-3 text-sm leading-6 text-black/65">
+              <div className="rounded-2xl bg-white px-4 py-4">Not a full PMS replacement with rates, folios, and reservations at the center.</div>
+              <div className="rounded-2xl bg-white px-4 py-4">Not a giant stack of disconnected hotel boards that each need their own attention.</div>
+              <div className="rounded-2xl bg-white px-4 py-4">Not generic task software — it is built around the moments that actually hurt the stay.</div>
+            </div>
           </div>
         </div>
       </section>

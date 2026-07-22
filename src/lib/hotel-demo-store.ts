@@ -9,11 +9,20 @@ export type HotelDemoRequest = {
   id: string;
   room: string;
   guestName: string | null;
+  stayId?: string | null;
   kind: "guest" | "housekeeping" | "maintenance" | "front_desk";
   title: string;
   detail: string;
   assignedTo: string;
   status: "open" | "in_progress" | "needs_approval" | "resolved";
+  resolutionState?: "new" | "guest_updated" | "staff_dispatched" | "awaiting_verification" | "closed";
+  routeTeam?: string;
+  sla?: string;
+  triageStatus?: "auto_resolved" | "auto_routed" | "needs_review" | "approved" | "escalated";
+  routingConfidence?: "high" | "medium" | "low";
+  escalationOwner?: string | null;
+  handoffNote?: string | null;
+  dispatcher?: string | null;
   priority: string;
   waitMinutes: number;
   source: string;
@@ -252,6 +261,17 @@ export type HotelDeepCleanItem = {
   note: string;
 };
 
+export type HotelBreakfastItem = {
+  id: string;
+  guestName: string;
+  room: string;
+  order: string;
+  pickup: string;
+  status: "prep" | "ready" | "delivered";
+  owner: string;
+  note: string;
+};
+
 export type HotelRequestTimelineEvent = {
   id: string;
   type: "guest" | "ai" | "staff" | "system";
@@ -293,10 +313,35 @@ export type HotelDemoState = {
   groupArrivalItems: HotelGroupArrivalItem[];
   outOfOrderItems: HotelOutOfOrderItem[];
   deepCleanItems: HotelDeepCleanItem[];
+  breakfastItems: HotelBreakfastItem[];
   requestTimelines: Record<string, HotelRequestTimelineEvent[]>;
 };
 
 function defaultState(): HotelDemoState {
+  const normalizedRequests: HotelDemoRequest[] = hotelRequests.map((r) => ({
+    ...r,
+    stayId: `stay-${String(r.room).replace(/\s+/g, "-").toLowerCase()}`,
+    routeTeam:
+      r.kind === "maintenance"
+        ? "Maintenance"
+        : r.kind === "housekeeping"
+          ? "Housekeeping"
+          : "Front desk",
+    sla:
+      r.kind === "maintenance"
+        ? "10 min guest acknowledgment · 20 min ETA"
+        : r.kind === "housekeeping"
+          ? "5 min acknowledgment · 15 min delivery"
+          : r.kind === "front_desk"
+            ? "5 min acknowledgment · 15 min decision"
+            : "5 min acknowledgment",
+    triageStatus: r.assignedTo === "AI concierge" ? "auto_resolved" : r.status === "needs_approval" ? "needs_review" : "auto_routed",
+    routingConfidence: r.assignedTo === "AI concierge" ? "high" : r.kind === "guest" ? "medium" : "high",
+    escalationOwner: r.status === "needs_approval" || r.priority === "urgent" ? "Maya" : null,
+    handoffNote: r.status === "needs_approval" ? "Carry this into the next shift if no desk decision lands before checkout pressure builds." : null,
+    dispatcher: r.source === "guest sms" ? "Sidekick triage" : "Front desk",
+  }));
+
   return {
     property: {
       ...hotelProperty,
@@ -307,7 +352,7 @@ function defaultState(): HotelDemoState {
       checkoutPolicy: "Standard checkout 11 AM. Noon allowed without approval. After noon requires manager approval.",
       parkingNote: "Oversized vehicles use east lot. Overnight parking requires plate capture.",
     },
-    requests: hotelRequests.map((r) => ({ ...r })),
+    requests: normalizedRequests,
     rooms: hotelRooms.map((r) => ({ ...r })),
     knowledge: [...hotelKnowledge],
     shiftBoard: [...hotelShiftBoard],
@@ -416,6 +461,11 @@ function defaultState(): HotelDemoState {
       { id: "dc-204", room: "204", reason: "Damage-review recovery clean", status: "in_progress", owner: "Elena", due: "Tonight", note: "Lamp damage already documented; room now needs carpet extraction and amenity reset before inspection." },
       { id: "dc-118", room: "118", reason: "Monthly preventive refresh", status: "completed", owner: "Housekeeping", due: "Done", note: "Mattress rotation, vent dusting, and grout touch-up completed on preventive cycle." }
     ],
+    breakfastItems: [
+      { id: "bf-214", guestName: "R. Patel", room: "214", order: "2 breakfast boxes + coffee", pickup: "5:15 AM", status: "prep", owner: "Night audit", note: "Airport departure. Boxes need dairy-free yogurt and quick lobby handoff." },
+      { id: "bf-127", guestName: "D. Chen", room: "127", order: "Conference early-start bag + bilingual label", pickup: "6:05 AM", status: "ready", owner: "Front desk", note: "Guest wants shuttle timing tucked into the bag and fruit separated for kids." },
+      { id: "bf-crew", guestName: "North Coast roofing crew", room: "5 rooms", order: "10 hot breakfast vouchers", pickup: "6:30 AM", status: "delivered", owner: "Maya", note: "Crew leader already received voucher packet and dining-room opening reminder." }
+    ],
     requestTimelines: {
       "req-214-shower": [
         { id: "t1", type: "guest", text: "The shower in room 214 isn't draining and water is pooling.", at: "5:31 PM" },
@@ -465,6 +515,7 @@ export function useHotelDemoState() {
             ? {
                 ...request,
                 status,
+                resolutionState: status === "resolved" ? "closed" : request.resolutionState,
                 waitMinutes: status === "resolved" ? 0 : request.waitMinutes,
               }
             : request
@@ -475,7 +526,22 @@ export function useHotelDemoState() {
       setState((prev) => ({
         ...prev,
         requests: prev.requests.map((request) =>
-          request.id === requestId ? { ...request, assignedTo, status: request.status === "resolved" ? request.status : "in_progress" } : request
+          request.id === requestId
+            ? {
+                ...request,
+                assignedTo,
+                status: request.status === "resolved" ? request.status : "in_progress",
+                resolutionState: request.status === "resolved" ? "closed" : "staff_dispatched",
+              }
+            : request
+        ),
+      }));
+    },
+    updateRequestWorkflow(requestId: string, patch: Partial<Pick<HotelDemoRequest, "resolutionState" | "routeTeam" | "sla" | "stayId" | "triageStatus" | "routingConfidence" | "escalationOwner" | "handoffNote" | "dispatcher">>) {
+      setState((prev) => ({
+        ...prev,
+        requests: prev.requests.map((request) =>
+          request.id === requestId ? { ...request, ...patch } : request
         ),
       }));
     },
@@ -500,16 +566,31 @@ export function useHotelDemoState() {
       }));
     },
     createRequest(request: HotelDemoRequest, timeline: Omit<HotelRequestTimelineEvent, "id">[] = []) {
+      const normalizedRequest: HotelDemoRequest = {
+        ...request,
+        resolutionState: request.resolutionState || (request.status === "resolved" ? "closed" : "new"),
+        triageStatus: request.triageStatus || (request.status === "resolved" ? "auto_resolved" : request.status === "needs_approval" ? "needs_review" : "auto_routed"),
+        routingConfidence: request.routingConfidence || "medium",
+        escalationOwner: request.escalationOwner ?? (request.priority === "urgent" || request.status === "needs_approval" ? "Maya" : null),
+        handoffNote: request.handoffNote ?? null,
+        dispatcher: request.dispatcher ?? "Sidekick triage",
+      };
       setState((prev) => ({
         ...prev,
-        requests: [request, ...prev.requests],
+        requests: [normalizedRequest, ...prev.requests],
         requestTimelines: {
           ...prev.requestTimelines,
-          [request.id]: timeline.map((event, index) => ({
+          [normalizedRequest.id]: timeline.map((event, index) => ({
             ...event,
-            id: `${request.id}-seed-${index}`,
+            id: `${normalizedRequest.id}-seed-${index}`,
           })),
         },
+      }));
+    },
+    createServiceCase(serviceCase: HotelServiceCase) {
+      setState((prev) => ({
+        ...prev,
+        serviceCases: [serviceCase, ...prev.serviceCases],
       }));
     },
     updateRoomStatus(roomNumber: string, status: string) {
@@ -783,6 +864,18 @@ export function useHotelDemoState() {
       setState((prev) => ({
         ...prev,
         deepCleanItems: prev.deepCleanItems.map((item) => (item.id === itemId ? { ...item, note } : item)),
+      }));
+    },
+    updateBreakfastStatus(itemId: string, status: HotelBreakfastItem["status"]) {
+      setState((prev) => ({
+        ...prev,
+        breakfastItems: prev.breakfastItems.map((item) => (item.id === itemId ? { ...item, status } : item)),
+      }));
+    },
+    updateBreakfastNote(itemId: string, note: string) {
+      setState((prev) => ({
+        ...prev,
+        breakfastItems: prev.breakfastItems.map((item) => (item.id === itemId ? { ...item, note } : item)),
       }));
     },
     reset() {

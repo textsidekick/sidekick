@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { LayoutDashboard, MessageCircle, Globe, BedDouble } from "lucide-react";
+import { LayoutDashboard, MessageCircle, Globe } from "lucide-react";
 
 export default function ChoosePage() {
   const router = useRouter();
@@ -67,27 +67,6 @@ export default function ChoosePage() {
             <div>
               <div style={{ fontSize: 16, fontWeight: 600, color: "#1C1A16" }}>Set Up New Facility</div>
               <div style={{ fontSize: 13, color: "rgba(28,26,22,0.5)", marginTop: 2 }}>Tell us about your operation and we’ll build your team’s operating memory</div>
-            </div>
-          </button>
-
-          <button
-            onClick={() => router.push("/hotel")}
-            style={{
-              display: "flex", alignItems: "center", gap: 16, padding: "20px 24px",
-              background: "#ffffff", border: "1px solid rgba(28,26,22,0.08)", borderRadius: 16,
-              cursor: "pointer", textAlign: "left", width: "100%",
-              boxShadow: "0 2px 8px rgba(28,26,22,0.04)",
-            }}
-          >
-            <div style={{
-              width: 44, height: 44, borderRadius: 12, background: "rgba(201,100,66,0.1)",
-              display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-            }}>
-              <BedDouble size={22} style={{ color: "#C96442" }} />
-            </div>
-            <div>
-              <div style={{ fontSize: 16, fontWeight: 600, color: "#1C1A16" }}>Open Hotel Project</div>
-              <div style={{ fontSize: 13, color: "rgba(28,26,22,0.5)", marginTop: 2 }}>Jump into the separate hotel and motel app prototype</div>
             </div>
           </button>
 

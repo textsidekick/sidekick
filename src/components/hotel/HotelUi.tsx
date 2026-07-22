@@ -6,9 +6,9 @@ export function HotelPageHeader({ eyebrow, title, body, action }: { eyebrow?: st
   return (
     <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <div>
-        {eyebrow ? <div className="text-sm font-medium text-[#C96442]">{eyebrow}</div> : null}
-        <h1 className="mt-2 text-4xl font-semibold tracking-[-0.04em] text-[#1C1A16]">{title}</h1>
-        {body ? <p className="mt-3 max-w-3xl text-base leading-7 text-black/60">{body}</p> : null}
+        {eyebrow ? <div className="text-sm font-medium text-[#2F5D8A]">{eyebrow}</div> : null}
+        <h1 className="mt-2 text-4xl font-semibold tracking-[-0.04em] text-[#17202B]">{title}</h1>
+        {body ? <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">{body}</p> : null}
       </div>
       {action}
     </div>
@@ -17,39 +17,39 @@ export function HotelPageHeader({ eyebrow, title, body, action }: { eyebrow?: st
 
 export function HotelMetric({ label, value, sub }: { label: string; value: string | number; sub: string }) {
   return (
-    <div className="rounded-2xl border border-black/8 bg-white p-5 shadow-sm">
-      <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">{label}</div>
-      <div className="mt-2 text-3xl font-bold tracking-[-0.03em] text-[#1C1A16]">{value}</div>
-      <div className="mt-1 text-xs text-black/45">{sub}</div>
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/50">
+      <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</div>
+      <div className="mt-2 text-3xl font-bold tracking-[-0.03em] text-[#17202B]">{value}</div>
+      <div className="mt-1 text-xs text-slate-500">{sub}</div>
     </div>
   );
 }
 
 export function HotelQueueCard({ href, icon: Icon, title, count, detail }: { href: string; icon: any; title: string; count: string | number; detail: string }) {
   return (
-    <Link href={href} className="rounded-3xl border border-black/8 bg-white p-6 shadow-sm transition-transform hover:-translate-y-0.5">
+    <Link href={href} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/50 transition-transform hover:-translate-y-0.5">
       <div className="flex items-start justify-between gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f7f1e8]">
-          <Icon className="h-5 w-5 text-[#C96442]" />
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100">
+          <Icon className="h-5 w-5 text-[#2F5D8A]" />
         </div>
-        <div className="inline-flex items-center gap-1 rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-semibold text-black/55">
+        <div className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
           Open <ArrowUpRight className="h-3.5 w-3.5" />
         </div>
       </div>
-      <div className="mt-5 text-lg font-semibold text-[#1C1A16]">{title}</div>
-      <div className="mt-1 text-3xl font-bold tracking-[-0.03em] text-[#1C1A16]">{count}</div>
-      <p className="mt-2 text-sm leading-6 text-black/55">{detail}</p>
+      <div className="mt-5 text-lg font-semibold text-[#17202B]">{title}</div>
+      <div className="mt-1 text-3xl font-bold tracking-[-0.03em] text-[#17202B]">{count}</div>
+      <p className="mt-2 text-sm leading-6 text-slate-600">{detail}</p>
     </Link>
   );
 }
 
 export function HotelStatusPill({ tone, children }: { tone: "urgent" | "high" | "normal" | "resolved" | "queued"; children: React.ReactNode }) {
   const styles = {
-    urgent: "bg-red-50 text-red-700",
-    high: "bg-amber-50 text-amber-700",
-    normal: "bg-[#f7f1e8] text-black/60",
-    resolved: "bg-emerald-50 text-emerald-700",
-    queued: "bg-slate-100 text-slate-700",
+    urgent: "bg-red-50 text-red-700 border border-red-100",
+    high: "bg-amber-50 text-amber-700 border border-amber-100",
+    normal: "bg-slate-100 text-slate-700 border border-slate-200",
+    resolved: "bg-emerald-50 text-emerald-700 border border-emerald-100",
+    queued: "bg-blue-50 text-blue-700 border border-blue-100",
   } as const;
 
   return <div className={cn("rounded-full px-3 py-1 text-xs font-semibold", styles[tone])}>{children}</div>;
