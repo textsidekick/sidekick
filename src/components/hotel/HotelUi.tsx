@@ -67,7 +67,7 @@ export function HotelStatusPill({ tone, children }: { tone: "urgent" | "high" | 
 
   return (
     <div className={cn("inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold", styles[tone])}>
-      <span className={cn("h-1.5 w-1.5 rounded-full", dots[tone])} />
+      <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", dots[tone])} />
       {formatChipLabel(children)}
     </div>
   );
