@@ -3,27 +3,24 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { BedDouble, ConciergeBell, Wrench, Hotel, ArrowLeft, DoorOpen, CalendarClock, UsersRound, Menu } from "lucide-react";
+import { Hotel, ArrowLeft, DoorOpen, CalendarClock, UsersRound, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_GROUPS = [
   {
     label: "Main views",
     items: [
-      { label: "Overview", href: "/hotel", icon: Hotel, detail: "Rooms, availability, arrivals, team" },
-      { label: "Room Board", href: "/hotel/rooms", icon: DoorOpen, detail: "Inventory + readiness" },
-      { label: "Arrivals", href: "/hotel/stays", icon: CalendarClock, detail: "Today’s incoming guests" },
-      { label: "Guest Requests", href: "/hotel/guest-requests", icon: ConciergeBell, detail: "Open guest issues" },
-      { label: "Housekeeping", href: "/hotel/housekeeping", icon: BedDouble, detail: "Turns + service" },
-      { label: "Maintenance", href: "/hotel/maintenance", icon: Wrench, detail: "Defects + fixes" },
-      { label: "People Ops", href: "/hotel/people", icon: UsersRound, detail: "Coverage + training" },
+      { label: "Overview", href: "/hotel", icon: Hotel, detail: "Today’s motel board" },
+      { label: "Rooms", href: "/hotel/rooms", icon: DoorOpen, detail: "Inventory + readiness" },
+      { label: "Arrivals", href: "/hotel/stays", icon: CalendarClock, detail: "Incoming guests" },
+      { label: "Staff", href: "/hotel/people", icon: UsersRound, detail: "Coverage + team" },
     ],
   },
 ];
 
 export function HotelSidebar() {
   const pathname = usePathname();
-  const mobilePrimary = NAV_GROUPS.flatMap((group) => group.items).filter((item) => ["/hotel", "/hotel/rooms", "/hotel/stays", "/hotel/guest-requests"].includes(item.href));
+  const mobilePrimary = NAV_GROUPS.flatMap((group) => group.items).filter((item) => ["/hotel", "/hotel/rooms", "/hotel/stays", "/hotel/people"].includes(item.href));
   const moreItems = NAV_GROUPS.flatMap((group) => group.items).filter((item) => !mobilePrimary.some((primary) => primary.href === item.href));
 
   return (

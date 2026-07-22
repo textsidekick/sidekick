@@ -129,8 +129,8 @@ export default function HotelOverviewPage() {
           </div>
         </div>
 
-        <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,2.4fr)_280px]">
-          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
+        <div className="mt-6 grid items-start gap-6 xl:grid-cols-[minmax(0,2.4fr)_280px]">
+          <div className="self-start rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
             <div className="flex items-end justify-between gap-4 border-b border-slate-200 pb-4">
               <div>
                 <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Room board</div>
@@ -165,7 +165,7 @@ export default function HotelOverviewPage() {
             </div>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-4 self-start">
             <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/40">
               <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Today</div>
               <h2 className="mt-2 text-lg font-semibold tracking-[-0.03em] text-[#17202B]">Only what matters</h2>
