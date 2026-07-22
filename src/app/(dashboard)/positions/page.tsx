@@ -216,7 +216,7 @@ export default function PositionsPage() {
       </div>
 
       {error && (
-        <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+        <div className="mb-4 rounded-lg bg-slate-50 border border-slate-200 px-4 py-3 text-sm text-slate-700">
           {error}
         </div>
       )}
@@ -334,7 +334,7 @@ export default function PositionsPage() {
                           {p.required_skills.map((skill: string) => (
                             <span
                               key={skill}
-                              className="px-2 py-0.5 text-xs rounded-full bg-blue-50 text-blue-700"
+                              className="px-2.5 py-1 text-xs rounded-full border border-slate-200 bg-white text-slate-700"
                             >
                               {skill}
                             </span>

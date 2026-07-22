@@ -14,7 +14,7 @@ export default function HotelDeepCleansPage() {
         <HotelPageHeader
           title="Deep cleans"
           body="Preventive room resets, damage-recovery cleaning, and heavy-turn housekeeping work that sits between room quality, maintenance prevention, and sellable inventory." 
-          action={<div className="rounded-full bg-[#f7f1e8] px-4 py-2 text-sm font-medium text-black/60">{state.deepCleanItems.filter((item) => item.status !== "completed").length} active deep cleans</div>}
+          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.deepCleanItems.filter((item) => item.status !== "completed").length} active deep cleans</div>}
         />
 
         <div className="space-y-3">
@@ -33,7 +33,7 @@ export default function HotelDeepCleansPage() {
                 {item.status === "scheduled" ? (
                   <button
                     onClick={() => actions.updateDeepCleanStatus(item.id, "in_progress")}
-                    className="rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-medium text-[#1C1A16]"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Start deep clean
                   </button>
@@ -41,7 +41,7 @@ export default function HotelDeepCleansPage() {
                 {item.status !== "completed" ? (
                   <button
                     onClick={() => actions.updateDeepCleanStatus(item.id, "completed")}
-                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Mark completed
                   </button>

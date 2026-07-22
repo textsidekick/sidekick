@@ -23,7 +23,7 @@ export default function HotelPeoplePage() {
         <HotelPageHeader
           title="People ops"
           body="Hotel staffing and HR work that should run through the same operating system: training, policy rollout, shift coverage, multilingual onboarding, and manager follow-through."
-          action={<div className="rounded-full bg-[#f7f1e8] px-4 py-2 text-sm font-medium text-black/60">{openTasks.length} active people tasks</div>}
+          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{openTasks.length} active people tasks</div>}
         />
 
         <div className="grid gap-4 md:grid-cols-2">
@@ -44,7 +44,7 @@ export default function HotelPeoplePage() {
                 {task.status !== "in_progress" && task.status !== "done" ? (
                   <button
                     onClick={() => actions.updatePeopleTaskStatus(task.id, "in_progress")}
-                    className="rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-medium text-[#1C1A16]"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Start
                   </button>
@@ -52,7 +52,7 @@ export default function HotelPeoplePage() {
                 {task.status !== "done" ? (
                   <button
                     onClick={() => actions.updatePeopleTaskStatus(task.id, "done")}
-                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Mark complete
                   </button>

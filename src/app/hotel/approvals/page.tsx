@@ -18,7 +18,7 @@ export default function HotelApprovalsPage() {
           title="Approvals"
           body="Manager approvals for late checkout, damage handling, refunds, and other exceptions that need a front-desk or owner decision."
           action={
-            <div className="rounded-full bg-[#f7f1e8] px-4 py-2 text-sm font-medium text-black/60">
+            <div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">
               {approvals.length} pending
             </div>
           }
@@ -44,7 +44,7 @@ export default function HotelApprovalsPage() {
                     actions.addTimelineEvent(request.id, { type: "system", text: "Approval granted by manager.", at: "Now" });
                     actions.addTimelineEvent(request.id, { type: "ai", text: "Good news — your request was approved.", at: "Now" });
                   }}
-                  className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                  className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                 >
                   Approve
                 </button>
@@ -54,7 +54,7 @@ export default function HotelApprovalsPage() {
                     actions.assignRequest(request.id, "Front desk");
                     actions.addTimelineEvent(request.id, { type: "system", text: "Approval denied. Front desk follow-up required.", at: "Now" });
                   }}
-                  className="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-700"
+                  className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                 >
                   Deny
                 </button>

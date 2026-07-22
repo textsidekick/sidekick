@@ -94,7 +94,7 @@ export default function HotelRequestDetailPage() {
                   <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">Internal work log</div>
                   <div className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#1C1A16]">What the hotel team has done behind the scenes</div>
                 </div>
-                <div className="rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-semibold text-black/55">{internalTimeline.length} internal events</div>
+                <div className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700">{internalTimeline.length} internal events</div>
               </div>
               <div className="space-y-3">
                 {internalTimeline.length ? (
@@ -189,15 +189,15 @@ export default function HotelRequestDetailPage() {
               </div>
             ) : null}
             {recoveryCase ? (
-              <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
                 <span className="font-semibold">Linked recovery case:</span> {recoveryCase.issue}
                 <div className="mt-1 text-xs text-amber-800/80">Status: {recoveryCase.status} · Risk: {recoveryCase.valueAtRisk}</div>
                 <Link href="/hotel/service-recovery" className="mt-2 inline-block text-xs font-medium text-amber-900 underline underline-offset-2">Open service recovery board</Link>
               </div>
             ) : null}
             <div className="mt-5 flex flex-wrap gap-2">
-              {request.status !== "resolved" ? <button onClick={() => actions.updateRequestStatus(request.id, "resolved")} className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">Resolve</button> : null}
-              {request.status !== "in_progress" && request.status !== "resolved" ? <button onClick={() => actions.updateRequestStatus(request.id, "in_progress")} className="rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-medium text-[#1C1A16]">Start</button> : null}
+              {request.status !== "resolved" ? <button onClick={() => actions.updateRequestStatus(request.id, "resolved")} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">Resolve</button> : null}
+              {request.status !== "in_progress" && request.status !== "resolved" ? <button onClick={() => actions.updateRequestStatus(request.id, "in_progress")} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">Start</button> : null}
               {request.assignedTo !== "Front desk" ? <button onClick={() => { actions.assignRequest(request.id, "Front desk"); actions.updateRequestWorkflow(request.id, { routeTeam: "Front desk", triageStatus: "approved", dispatcher: "Front desk" }); actions.addTimelineEvent(request.id, { type: "system", text: "Request routed to front desk from the thread view.", at: "Now" }); }} className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60">Assign front desk</button> : null}
               {request.assignedTo !== "Housekeeping" ? <button onClick={() => { actions.assignRequest(request.id, "Housekeeping"); actions.updateRequestWorkflow(request.id, { routeTeam: "Housekeeping", triageStatus: "approved", dispatcher: "Front desk" }); actions.addTimelineEvent(request.id, { type: "system", text: "Thread rerouted to housekeeping for room follow-through.", at: "Now" }); }} className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60">Assign housekeeping</button> : null}
               {request.assignedTo !== "Maintenance" ? <button onClick={() => { actions.assignRequest(request.id, "Maintenance"); actions.updateRequestWorkflow(request.id, { routeTeam: "Maintenance", triageStatus: "approved", dispatcher: "Front desk" }); actions.addTimelineEvent(request.id, { type: "system", text: "Thread rerouted to maintenance with guest-visible follow-up pending.", at: "Now" }); }} className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60">Assign maintenance</button> : null}
@@ -215,7 +215,7 @@ export default function HotelRequestDetailPage() {
                   valueAtRisk: request.priority === "urgent" ? "$200+ stay risk" : "$100+ review risk",
                 });
                 actions.addTimelineEvent(request.id, { type: "system", text: "Service recovery case opened from the request thread.", at: "Now" });
-              }} className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-900">Open recovery case</button> : null}
+              }} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">Open recovery case</button> : null}
               <Link href="/hotel/guest-requests" className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/60">Back to queue</Link>
             </div>
           </div>

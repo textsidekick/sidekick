@@ -14,7 +14,7 @@ export default function HotelOutOfOrderPage() {
         <HotelPageHeader
           title="Out-of-order rooms"
           body="Coordinate blocked inventory, repair progress, cleaning follow-through, and room re-release so maintenance losses and desk sell-outs stay visible in one place."
-          action={<div className="rounded-full bg-[#f7f1e8] px-4 py-2 text-sm font-medium text-black/60">{state.outOfOrderItems.filter((item) => item.status !== "released").length} rooms out of order</div>}
+          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.outOfOrderItems.filter((item) => item.status !== "released").length} rooms out of order</div>}
         />
 
         <div className="space-y-3">
@@ -33,7 +33,7 @@ export default function HotelOutOfOrderPage() {
                 {item.status === "blocked" ? (
                   <button
                     onClick={() => actions.updateOutOfOrderStatus(item.id, "repairing")}
-                    className="rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-medium text-[#1C1A16]"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Start repair
                   </button>
@@ -41,7 +41,7 @@ export default function HotelOutOfOrderPage() {
                 {item.status !== "released" ? (
                   <button
                     onClick={() => actions.updateOutOfOrderStatus(item.id, "released")}
-                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Reopen inventory
                   </button>

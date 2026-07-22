@@ -14,7 +14,7 @@ export default function HotelShuttlesPage() {
         <HotelPageHeader
           title="Shuttle board"
           body="Front-desk transportation coordination for airport pickups, conference shuttle runs, and departure rides that can quickly turn into service recovery if missed."
-          action={<div className="rounded-full bg-[#f7f1e8] px-4 py-2 text-sm font-medium text-black/60">{state.shuttleItems.filter((item) => item.status !== "completed").length} active rides</div>}
+          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.shuttleItems.filter((item) => item.status !== "completed").length} active rides</div>}
         />
 
         <div className="space-y-3">
@@ -33,7 +33,7 @@ export default function HotelShuttlesPage() {
                 {item.status === "scheduled" ? (
                   <button
                     onClick={() => actions.updateShuttleStatus(item.id, "confirmed")}
-                    className="rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-medium text-[#1C1A16]"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Confirm driver
                   </button>
@@ -41,7 +41,7 @@ export default function HotelShuttlesPage() {
                 {item.status !== "completed" ? (
                   <button
                     onClick={() => actions.updateShuttleStatus(item.id, "completed")}
-                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Mark ride complete
                   </button>

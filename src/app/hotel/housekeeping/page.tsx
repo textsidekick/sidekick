@@ -32,7 +32,7 @@ export default function HotelHousekeepingPage() {
                 {room.status !== "inspection" ? (
                   <button
                     onClick={() => actions.updateRoomStatus(room.room, "inspection")}
-                    className="rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-medium text-[#1C1A16]"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Mark cleaned
                   </button>
@@ -40,7 +40,7 @@ export default function HotelHousekeepingPage() {
                 {room.status !== "ready" ? (
                   <button
                     onClick={() => actions.updateRoomStatus(room.room, "ready")}
-                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Mark ready
                   </button>

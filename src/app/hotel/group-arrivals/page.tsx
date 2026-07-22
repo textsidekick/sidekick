@@ -14,7 +14,7 @@ export default function HotelGroupArrivalsPage() {
         <HotelPageHeader
           title="Group arrivals"
           body="Coordinate team blocks, wedding parties, and crew stays so keys, room blocks, breakfast plans, and special logistics are staged before the lobby gets slammed."
-          action={<div className="rounded-full bg-[#f7f1e8] px-4 py-2 text-sm font-medium text-black/60">{state.groupArrivalItems.filter((item) => item.status !== "checked_in").length} active group arrivals</div>}
+          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.groupArrivalItems.filter((item) => item.status !== "checked_in").length} active group arrivals</div>}
         />
 
         <div className="space-y-3">
@@ -33,7 +33,7 @@ export default function HotelGroupArrivalsPage() {
                 {item.status === "planning" ? (
                   <button
                     onClick={() => actions.updateGroupArrivalStatus(item.id, "staged")}
-                    className="rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-medium text-[#1C1A16]"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Stage arrival packet
                   </button>
@@ -41,7 +41,7 @@ export default function HotelGroupArrivalsPage() {
                 {item.status !== "checked_in" ? (
                   <button
                     onClick={() => actions.updateGroupArrivalStatus(item.id, "checked_in")}
-                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Mark group checked in
                   </button>

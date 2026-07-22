@@ -14,7 +14,7 @@ export default function HotelPackagesPage() {
         <HotelPageHeader
           title="Package log"
           body="Front-desk package handling for guest deliveries, signature-required items, and secure handoff follow-through before boxes disappear or guests complain."
-          action={<div className="rounded-full bg-[#f7f1e8] px-4 py-2 text-sm font-medium text-black/60">{state.packageItems.filter((item) => item.status !== "picked_up").length} open package handoffs</div>}
+          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.packageItems.filter((item) => item.status !== "picked_up").length} open package handoffs</div>}
         />
 
         <div className="space-y-3">
@@ -33,7 +33,7 @@ export default function HotelPackagesPage() {
                 {item.status === "received" ? (
                   <button
                     onClick={() => actions.updatePackageStatus(item.id, "notified")}
-                    className="rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-medium text-[#1C1A16]"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Notify guest
                   </button>
@@ -41,7 +41,7 @@ export default function HotelPackagesPage() {
                 {item.status !== "picked_up" ? (
                   <button
                     onClick={() => actions.updatePackageStatus(item.id, "picked_up")}
-                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Mark picked up
                   </button>

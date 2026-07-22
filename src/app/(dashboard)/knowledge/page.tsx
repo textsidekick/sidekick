@@ -103,7 +103,7 @@ type ReviewModalState =
 
 function statusBadge(status: string) {
   const styles: Record<string, string> = {
-    active: "bg-green-100 text-green-800 border-green-200",
+    active: "bg-white text-slate-700 border-slate-200",
     draft: "bg-yellow-100 text-yellow-800 border-yellow-200",
     deprecated: "bg-gray-100 text-gray-500 border-gray-200 line-through",
   };
@@ -160,7 +160,7 @@ function SOPForm({ departments, companyId, onSave, onClose }: {
           <h2 className="text-lg font-bold text-gray-900">New SOP / Procedure</h2>
           <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600"><XCircle className="h-5 w-5" /></button>
         </div>
-        {error && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+        {error && <p className="mb-4 rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700 border border-slate-200">{error}</p>}
         <div className="space-y-4">
           <div>
             <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Title *</label>
@@ -273,7 +273,7 @@ function SopsTab({ companyId }: { companyId: string }) {
         </button>
       </div>
 
-      <div className="mt-4 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+      <div className="mt-4 rounded-xl border border-blue-100 bg-slate-50 px-4 py-3 text-sm text-slate-700">
         <strong>Text access:</strong> Workers can text <code className="rounded bg-blue-100 px-1">"SOP for [topic]"</code> to get the latest version over SMS instantly.
       </div>
 
@@ -300,7 +300,7 @@ function SopsTab({ companyId }: { companyId: string }) {
                   {statusBadge(sop.status)}
                   {sop.category && <span className="rounded bg-orange-50 px-2 py-0.5 text-xs text-gray-600">{sop.category}</span>}
                   {sop.department_id && deptMap[sop.department_id] && (
-                    <span className="rounded bg-blue-50 px-2 py-0.5 text-xs text-blue-700">{deptMap[sop.department_id]}</span>
+                    <span className="rounded bg-white px-2.5 py-1 text-xs text-slate-700 border border-slate-200">{deptMap[sop.department_id]}</span>
                   )}
                 </div>
                 {sop.description && <p className="mt-1 truncate text-sm text-gray-500">{sop.description}</p>}
@@ -345,7 +345,7 @@ function SopsTab({ companyId }: { companyId: string }) {
                         await fetch(`/api/sops/${sop.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "deprecated" }) });
                         loadData();
                       }}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
                     >
                       <AlertTriangle className="h-3.5 w-3.5" /> Deprecate
                     </button>
@@ -713,7 +713,7 @@ function GapsTab({ companyId }: { companyId: string }) {
 
   return (
     <div>
-      <div className="mb-4 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+      <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
         <strong>Knowledge gaps</strong> are questions workers asked that Sidekick couldn't answer well. Use these to prioritize new SOPs or articles.
       </div>
       {loading ? (
@@ -732,7 +732,7 @@ function GapsTab({ companyId }: { companyId: string }) {
                 <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-500" />
                 <p className="text-sm text-gray-800">{gap.topic || gap.question}</p>
               </div>
-              <span className="ml-4 flex-shrink-0 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">{gap.frequency || gap.count}x asked</span>
+              <span className="ml-4 flex-shrink-0 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700">{gap.frequency || gap.count}x asked</span>
             </div>
           ))}
         </div>
@@ -832,7 +832,7 @@ function TerminologyTab({ companyId }: { companyId: string }) {
       {showForm && (
         <form onSubmit={handleSave} className="mt-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
           <h3 className="mb-4 text-sm font-semibold text-gray-900">Add Term</h3>
-          {saveError && <p className="mb-3 rounded bg-red-50 px-3 py-2 text-sm text-red-700">{saveError}</p>}
+          {saveError && <p className="mb-3 rounded bg-slate-50 px-3 py-2 text-sm text-slate-700 border border-slate-200">{saveError}</p>}
           <div className="space-y-3">
             <div>
               <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Term *</label>
@@ -885,7 +885,7 @@ function TerminologyTab({ companyId }: { companyId: string }) {
                   </div>
                   <div className="flex items-center gap-2">
                     {term.language && term.language !== "en" && (
-                      <span className="rounded bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-600">{term.language.toUpperCase()}</span>
+                      <span className="rounded bg-white px-2.5 py-1 text-[10px] font-medium text-slate-700 border border-slate-200">{term.language.toUpperCase()}</span>
                     )}
                     <button
                       onClick={async () => {

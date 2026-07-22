@@ -14,7 +14,7 @@ export default function HotelIncidentsPage() {
         <HotelPageHeader
           title="Incident log"
           body="Safety, liability, and property exceptions that need containment and documentation before they become reviews, claims, or revenue leakage."
-          action={<div className="rounded-full bg-[#f7f1e8] px-4 py-2 text-sm font-medium text-black/60">{state.incidentItems.filter((item) => item.status !== "closed").length} active incidents</div>}
+          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.incidentItems.filter((item) => item.status !== "closed").length} active incidents</div>}
         />
 
         <div className="space-y-3">
@@ -33,7 +33,7 @@ export default function HotelIncidentsPage() {
                 {item.status === "open" ? (
                   <button
                     onClick={() => actions.updateIncidentStatus(item.id, "contained")}
-                    className="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Mark contained
                   </button>
@@ -41,7 +41,7 @@ export default function HotelIncidentsPage() {
                 {item.status !== "closed" ? (
                   <button
                     onClick={() => actions.updateIncidentStatus(item.id, "closed")}
-                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Close incident
                   </button>

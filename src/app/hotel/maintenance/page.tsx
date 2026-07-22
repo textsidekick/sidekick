@@ -56,7 +56,7 @@ export default function HotelMaintenancePage() {
                       actions.updateRoomStatus(issue.room.replace(/^Room\s+/i, ""), "maintenance");
                       actions.addTimelineEvent(issue.id, { type: "system", text: "Repair work started.", at: "Now" });
                     }}
-                    className="rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-medium text-[#1C1A16]"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Start repair
                   </button>
@@ -69,7 +69,7 @@ export default function HotelMaintenancePage() {
                       actions.updateRoomNote(issue.room.replace(/^Room\s+/i, ""), "Repair completed; waiting on final room check.");
                       actions.addTimelineEvent(issue.id, { type: "ai", text: "Maintenance completed the repair and the room is being checked.", at: "Now" });
                     }}
-                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Mark fixed
                   </button>

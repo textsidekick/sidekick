@@ -116,9 +116,9 @@ function roleBadge(role?: string | null) {
 
 function KnowledgeScoreBadge({ level, score }: { level: "high" | "medium" | "low"; score: number }) {
   const config = {
-    high: { label: "High", bar: "bg-green-500", bg: "bg-green-50", text: "text-green-700", track: "bg-green-100" },
-    medium: { label: "Medium", bar: "bg-amber-500", bg: "bg-amber-50", text: "text-amber-700", track: "bg-amber-100" },
-    low: { label: "Low", bar: "bg-red-500", bg: "bg-red-50", text: "text-red-700", track: "bg-red-100" },
+    high: { label: "High", bar: "bg-slate-500", bg: "bg-white", text: "text-slate-700", track: "bg-slate-200" },
+    medium: { label: "Medium", bar: "bg-slate-500", bg: "bg-white", text: "text-slate-700", track: "bg-slate-200" },
+    low: { label: "Low", bar: "bg-slate-500", bg: "bg-white", text: "text-slate-700", track: "bg-slate-200" },
   }[level];
   return (
     <div className="flex items-center gap-2">

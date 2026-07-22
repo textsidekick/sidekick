@@ -137,7 +137,7 @@ export default function HotelSmsConsolePage() {
         <HotelPageHeader
           title="SMS console"
           body="Backend-backed hotel SMS simulation. Use this to test guest texts, auto-replies, routing, and how requests land in the hotel operations queues."
-          action={<div className="rounded-full bg-[#f7f1e8] px-4 py-2 text-sm font-medium text-black/60">Prototype backend active</div>}
+          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">Prototype backend active</div>}
         />
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
@@ -175,7 +175,7 @@ export default function HotelSmsConsolePage() {
                 </button>
               ))}
             </div>
-            {error ? <div className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
+        {error ? <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">{error}</div> : null}
           </div>
 
           <div className="space-y-4">
@@ -232,12 +232,12 @@ export default function HotelSmsConsolePage() {
                     <button onClick={sendGuestUpdateFromWorkflow} className="rounded-full bg-[#26251e] px-3 py-2 text-xs font-medium text-white">Send guest update</button>
                     <button onClick={dispatchOwner} className="rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-medium text-black/60">Dispatch owner</button>
                     <button onClick={markAwaitingGuestConfirmation} className="rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-medium text-black/60">Await guest confirm</button>
-                    <button onClick={closeResolvedLoop} className="rounded-full bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-700">Close resolved loop</button>
+                <button onClick={closeResolvedLoop} className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700">Close Resolved Loop</button>
                     {createdRequest?.triageStatus === "needs_review" ? (
                       <button onClick={dispatchOwner} className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700">Approve + dispatch</button>
                     ) : null}
                     {lastResult.workflow.escalationRecommended ? (
-                      <button onClick={openRecoveryCase} className="rounded-full border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-900">Open recovery case</button>
+                <button onClick={openRecoveryCase} className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700">Open Recovery Case</button>
                     ) : null}
                     <Link href={`/hotel/requests/${lastResult.request.id}`} className="rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-medium text-black/60">Open live thread</Link>
                   </div>

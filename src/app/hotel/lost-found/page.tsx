@@ -14,7 +14,7 @@ export default function HotelLostFoundPage() {
         <HotelPageHeader
           title="Lost & found"
           body="Keep found items from turning into front-desk chaos. Log what was found, contact the guest, and track pickup or shipping follow-through."
-          action={<div className="rounded-full bg-[#f7f1e8] px-4 py-2 text-sm font-medium text-black/60">{state.lostFoundItems.length} tracked items</div>}
+          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.lostFoundItems.length} tracked items</div>}
         />
 
         <div className="space-y-3">
@@ -35,7 +35,7 @@ export default function HotelLostFoundPage() {
                 {item.status === "logged" ? (
                   <button
                     onClick={() => actions.updateLostFoundStatus(item.id, "contacted")}
-                    className="rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-medium text-[#1C1A16]"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Contact guest
                   </button>
@@ -43,7 +43,7 @@ export default function HotelLostFoundPage() {
                 {item.status !== "claimed" && item.status !== "shipped" ? (
                   <button
                     onClick={() => actions.updateLostFoundStatus(item.id, "claimed")}
-                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Mark pickup arranged
                   </button>

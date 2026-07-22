@@ -263,7 +263,7 @@ export default function HotelOverviewPage() {
               <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">Supporting views</div>
               <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[#1C1A16]">Specialized tools that support the main operating flow</h2>
             </div>
-            <div className="rounded-full bg-[#f7f1e8] px-4 py-2 text-sm font-medium text-black/60">Useful when needed — not the system of record</div>
+            <div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">Useful when needed — not the system of record</div>
           </div>
 
           <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">

@@ -14,7 +14,7 @@ export default function HotelVipArrivalsPage() {
         <HotelPageHeader
           title="VIP arrivals"
           body="Coordinate repeat guests, high-value stays, and personalized welcome prep so preferences, amenities, and room-readiness details do not fall through the cracks."
-          action={<div className="rounded-full bg-[#f7f1e8] px-4 py-2 text-sm font-medium text-black/60">{state.vipArrivalItems.filter((item) => item.status !== "welcomed").length} arrivals in prep</div>}
+          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.vipArrivalItems.filter((item) => item.status !== "welcomed").length} arrivals in prep</div>}
         />
 
         <div className="space-y-3">
@@ -33,7 +33,7 @@ export default function HotelVipArrivalsPage() {
                 {item.status === "prepping" ? (
                   <button
                     onClick={() => actions.updateVipArrivalStatus(item.id, "ready")}
-                    className="rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-medium text-[#1C1A16]"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Mark room ready
                   </button>
@@ -41,7 +41,7 @@ export default function HotelVipArrivalsPage() {
                 {item.status !== "welcomed" ? (
                   <button
                     onClick={() => actions.updateVipArrivalStatus(item.id, "welcomed")}
-                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Mark guest welcomed
                   </button>

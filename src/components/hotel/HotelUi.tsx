@@ -2,6 +2,13 @@ import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
+function formatChipLabel(value: React.ReactNode) {
+  if (typeof value !== "string") return value;
+  return value
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 export function HotelPageHeader({ eyebrow, title, body, action }: { eyebrow?: string; title: string; body?: string; action?: React.ReactNode }) {
   return (
     <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -63,7 +70,7 @@ export function HotelStatusPill({ tone, children }: { tone: "urgent" | "high" | 
   return (
     <div className={cn("inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold", styles[tone])}>
       <span className={cn("h-1.5 w-1.5 rounded-full", dots[tone])} />
-      {children}
+      {formatChipLabel(children)}
     </div>
   );
 }

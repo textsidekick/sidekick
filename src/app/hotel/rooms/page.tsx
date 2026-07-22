@@ -73,7 +73,7 @@ export default function HotelRoomsPage() {
                     <div className="mt-3 flex flex-wrap gap-2">
                       <button
                         onClick={() => actions.updateRoomNote(stay.room, `${room?.note || ""} Front desk escalated this room for arrival readiness.`.trim())}
-                        className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-950"
+                        className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                       >
                         Rush room
                       </button>
@@ -117,7 +117,7 @@ export default function HotelRoomsPage() {
 
                         <div className="mt-3 text-sm leading-6 text-slate-600">{room.note}</div>
                         {relatedStay ? (
-                          <div className="mt-3 rounded-2xl border border-amber-100 bg-amber-50 px-3 py-3 text-xs leading-5 text-amber-950">
+                          <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-xs leading-5 text-slate-700">
                             <span className="font-semibold">Arrival pressure:</span> {relatedStay.guestName} due {relatedStay.eta}
                           </div>
                         ) : null}
@@ -148,7 +148,7 @@ export default function HotelRoomsPage() {
                             {room.status !== "ready" ? (
                               <button
                                 onClick={() => actions.updateRoomStatus(room.room, "ready")}
-                                className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                                className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                               >
                                 Mark sellable
                               </button>

@@ -14,7 +14,7 @@ export default function HotelRoomMovesPage() {
         <HotelPageHeader
           title="Room moves"
           body="Cross-team coordination for service recovery moves, noise complaints, maintenance relocations, and VIP swaps so the desk can recover the stay without losing operational control."
-          action={<div className="rounded-full bg-[#f7f1e8] px-4 py-2 text-sm font-medium text-black/60">{state.roomMoveItems.filter((item) => item.status !== "completed").length} active room moves</div>}
+          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.roomMoveItems.filter((item) => item.status !== "completed").length} active room moves</div>}
         />
 
         <div className="space-y-3">
@@ -33,7 +33,7 @@ export default function HotelRoomMovesPage() {
                 {item.status === "requested" ? (
                   <button
                     onClick={() => actions.updateRoomMoveStatus(item.id, "coordinating")}
-                    className="rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-medium text-[#1C1A16]"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Start coordination
                   </button>
@@ -41,7 +41,7 @@ export default function HotelRoomMovesPage() {
                 {item.status !== "completed" ? (
                   <button
                     onClick={() => actions.updateRoomMoveStatus(item.id, "completed")}
-                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Mark move complete
                   </button>

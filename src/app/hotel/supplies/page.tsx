@@ -14,7 +14,7 @@ export default function HotelSuppliesPage() {
         <HotelPageHeader
           title="Housekeeping supplies"
           body="Track the stock that quietly breaks hotel operations when it runs low: towels, toiletries, water, pillows, and other guest-comfort essentials."
-          action={<div className="rounded-full bg-[#f7f1e8] px-4 py-2 text-sm font-medium text-black/60">{state.supplies.filter((item) => item.stock !== "ok").length} low-stock items</div>}
+          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.supplies.filter((item) => item.stock !== "ok").length} low-stock items</div>}
         />
 
         <div className="grid gap-4 md:grid-cols-2">
@@ -34,7 +34,7 @@ export default function HotelSuppliesPage() {
                 {item.stock !== "ok" ? (
                   <button
                     onClick={() => actions.updateSupplyStock(item.id, "ok")}
-                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Mark restocked
                   </button>
@@ -42,7 +42,7 @@ export default function HotelSuppliesPage() {
                 {item.stock !== "critical" ? (
                   <button
                     onClick={() => actions.updateSupplyStock(item.id, "critical")}
-                    className="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-700"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Escalate shortage
                   </button>

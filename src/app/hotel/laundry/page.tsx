@@ -14,7 +14,7 @@ export default function HotelLaundryPage() {
         <HotelPageHeader
           title="Laundry board"
           body="Track linen and towel turnaround so housekeeping can release rooms on time, protect guest comfort stock, and catch vendor delays before arrivals stack up."
-          action={<div className="rounded-full bg-[#f7f1e8] px-4 py-2 text-sm font-medium text-black/60">{state.laundryItems.filter((item) => item.status !== "delivered").length} active laundry gaps</div>}
+          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.laundryItems.filter((item) => item.status !== "delivered").length} active laundry gaps</div>}
         />
 
         <div className="space-y-3">
@@ -33,7 +33,7 @@ export default function HotelLaundryPage() {
                 {item.status === "queued" ? (
                   <button
                     onClick={() => actions.updateLaundryStatus(item.id, "washing")}
-                    className="rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-medium text-[#1C1A16]"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Start wash cycle
                   </button>
@@ -41,7 +41,7 @@ export default function HotelLaundryPage() {
                 {item.status !== "delivered" ? (
                   <button
                     onClick={() => actions.updateLaundryStatus(item.id, "delivered")}
-                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Mark delivered
                   </button>

@@ -92,7 +92,7 @@ export default function HotelFrontDeskPage() {
                   </div>
                   <div className="mt-3 text-sm leading-6 text-slate-600">{item.detail}</div>
                   {item.kind === "request" && item.request.triageStatus === "needs_review" ? (
-                    <div className="mt-3 rounded-2xl border border-blue-100 bg-blue-50 px-3 py-3 text-xs leading-5 text-blue-800">
+                    <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-xs leading-5 text-slate-700">
                       <span className="font-semibold">Desk review required:</span> {item.request.handoffNote || "Low-confidence routing or mixed request needs a human decision before the guest gets a final answer."}
                     </div>
                   ) : null}
@@ -153,7 +153,7 @@ export default function HotelFrontDeskPage() {
                               actions.updateRequestWorkflow(item.request.id, { resolutionState: "closed" });
                               actions.addTimelineEvent(item.request.id, { type: "ai", text: "Front desk closed the loop with the guest.", at: "Now" });
                             }}
-                            className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                            className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                           >
                             Close loop
                           </button>
@@ -170,7 +170,7 @@ export default function HotelFrontDeskPage() {
                         </button>
                         <button
                           onClick={() => actions.updateStayStatus(item.stay.id, "checked_in")}
-                          className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                          className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                         >
                           Check in
                         </button>
@@ -186,7 +186,7 @@ export default function HotelFrontDeskPage() {
                         </button>
                         <button
                           onClick={() => actions.updateStayStatus(item.stay.id, "checked_out")}
-                          className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                          className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                         >
                           Check out
                         </button>

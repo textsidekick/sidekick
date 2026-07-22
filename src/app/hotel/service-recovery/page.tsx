@@ -37,7 +37,7 @@ export default function HotelServiceRecoveryPage() {
         <HotelPageHeader
           title="Service recovery"
           body="Save-the-stay cases, refund handling, and high-risk guest issues before they turn into bad reviews, chargebacks, or lost repeat business."
-          action={<div className="rounded-full bg-[#f7f1e8] px-4 py-2 text-sm font-medium text-black/60">{openCases.length} open recovery cases</div>}
+          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{openCases.length} open recovery cases</div>}
         />
 
         <div className="mb-6 grid gap-4 md:grid-cols-4">
@@ -71,7 +71,7 @@ export default function HotelServiceRecoveryPage() {
                         });
                         actions.addTimelineEvent(request.id, { type: "system", text: "Service recovery case opened from the recovery watchlist.", at: "Now" });
                       }}
-                      className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-950"
+                      className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                     >
                       Open recovery case
                     </button>
@@ -145,7 +145,7 @@ export default function HotelServiceRecoveryPage() {
                         actions.addTimelineEvent(linkedRequest.id, { type: "staff", text: "Service recovery was offered to protect the stay while the issue is still active.", at: "Now" });
                       }
                     }}
-                    className="rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-medium text-[#1C1A16]"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Offer recovery
                   </button>
@@ -159,7 +159,7 @@ export default function HotelServiceRecoveryPage() {
                         actions.addTimelineEvent(linkedRequest.id, { type: "ai", text: "We’ve taken care of this and added a make-good on our side. Please let us know if anything still feels off.", at: "Now" });
                       }
                     }}
-                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Mark saved
                   </button>

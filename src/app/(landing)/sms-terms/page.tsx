@@ -63,7 +63,7 @@ export default function SMSTerms() {
 
                 <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#1A1615', marginTop: '40px', marginBottom: '20px' }}>7. Privacy</h2>
                 <p style={{ color: '#1A1615cc', fontSize: '16px', lineHeight: '1.8', marginBottom: '16px' }}>
-                  Your privacy is important to us. Please review our <a href="/privacy" style={{ color: '#C96442' }}>Privacy Policy</a> for information on how we handle your data.
+                  Your privacy is important to us. Please review our <a href="/privacy" style={{ color: '#0060F0' }}>Privacy Policy</a> for information on how we handle your data.
                 </p>
 
                 <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#1A1615', marginTop: '40px', marginBottom: '20px' }}>8. Contact Us</h2>
@@ -76,7 +76,7 @@ export default function SMSTerms() {
                   lineHeight: '1.8',
                 }}>
                   <p style={{ margin: 0 }}><strong>Sidekick AI Inc.</strong></p>
-                  <p style={{ margin: '8px 0' }}>Email: <a href="mailto:hello@textsidekick.com" style={{ color: '#C96442' }}>hello@textsidekick.com</a></p>
+                  <p style={{ margin: '8px 0' }}>Email: <a href="mailto:hello@textsidekick.com" style={{ color: '#0060F0' }}>hello@textsidekick.com</a></p>
                   <p style={{ margin: 0 }}>SMS Support: Text HELP to +1 (888) 707-4659</p>
                 </div>
               </div>

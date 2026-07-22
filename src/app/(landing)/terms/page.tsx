@@ -89,7 +89,7 @@ export default function Terms() {
             <p style={{ marginBottom: "16px" }}>If you have any questions about these Terms, please contact us at:</p>
             <div style={{ borderLeft: "3px solid #C96442", paddingLeft: "20px", marginTop: "16px" }}>
               <p style={{ margin: 0, fontWeight: 600, color: "#1C1A16" }}>Sidekick AI Inc.</p>
-              <p style={{ margin: "6px 0 0" }}>Email: <a href="mailto:hello@textsidekick.com" style={{ color: "#C96442", textDecoration: "none" }}>hello@textsidekick.com</a></p>
+              <p style={{ margin: "6px 0 0" }}>Email: <a href="mailto:hello@textsidekick.com" style={{ color: "#0060F0", textDecoration: "none" }}>hello@textsidekick.com</a></p>
               <p style={{ margin: "4px 0 0" }}>San Francisco, CA</p>
             </div>
           </div>

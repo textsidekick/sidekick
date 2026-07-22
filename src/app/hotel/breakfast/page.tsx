@@ -14,7 +14,7 @@ export default function HotelBreakfastPage() {
         <HotelPageHeader
           title="Breakfast board"
           body="Track breakfast boxes, early-departure bags, group vouchers, and lobby pickup promises so the morning shift does not start with avoidable guest recovery." 
-          action={<div className="rounded-full bg-[#f7f1e8] px-4 py-2 text-sm font-medium text-black/60">{state.breakfastItems.filter((item) => item.status !== "delivered").length} breakfast handoffs pending</div>}
+          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.breakfastItems.filter((item) => item.status !== "delivered").length} breakfast handoffs pending</div>}
         />
 
         <div className="space-y-3">
@@ -34,7 +34,7 @@ export default function HotelBreakfastPage() {
                 {item.status === "prep" ? (
                   <button
                     onClick={() => actions.updateBreakfastStatus(item.id, "ready")}
-                    className="rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-medium text-[#1C1A16]"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Mark ready for pickup
                   </button>
@@ -42,7 +42,7 @@ export default function HotelBreakfastPage() {
                 {item.status !== "delivered" ? (
                   <button
                     onClick={() => actions.updateBreakfastStatus(item.id, "delivered")}
-                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Mark handed off
                   </button>

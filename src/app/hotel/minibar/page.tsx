@@ -14,7 +14,7 @@ export default function HotelMinibarPage() {
         <HotelPageHeader
           title="Minibar & market"
           body="Revenue capture for in-room minibar use and front-desk market sales so housekeeping findings, desk postings, and service-recovery waivers stay synchronized."
-          action={<div className="rounded-full bg-[#f7f1e8] px-4 py-2 text-sm font-medium text-black/60">{state.minibarItems.filter((item) => item.status === "captured").length} unposted charges</div>}
+          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.minibarItems.filter((item) => item.status === "captured").length} unposted charges</div>}
         />
 
         <div className="space-y-3">
@@ -33,7 +33,7 @@ export default function HotelMinibarPage() {
                 {item.status === "captured" ? (
                   <button
                     onClick={() => actions.updateMinibarStatus(item.id, "posted")}
-                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Post to folio
                   </button>
@@ -41,7 +41,7 @@ export default function HotelMinibarPage() {
                 {item.status === "captured" ? (
                   <button
                     onClick={() => actions.updateMinibarStatus(item.id, "waived")}
-                    className="rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-medium text-[#1C1A16]"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Waive charge
                   </button>

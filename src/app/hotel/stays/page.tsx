@@ -97,7 +97,7 @@ export default function HotelStaysPage() {
                   ) : null}
                   <button
                     onClick={() => actions.updateStayStatus(stay.id, "checked_in")}
-                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Check in
                   </button>
@@ -115,7 +115,7 @@ export default function HotelStaysPage() {
               <>
                 <button
                   onClick={() => actions.updateStayStatus(stay.id, "checked_in")}
-                  className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                  className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                 >
                   Check in
                 </button>
@@ -136,7 +136,7 @@ export default function HotelStaysPage() {
               <>
                 <button
                   onClick={() => actions.updateStayStatus(stay.id, "checked_out")}
-                  className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                  className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                 >
                   Check out
                 </button>
@@ -181,7 +181,7 @@ export default function HotelStaysPage() {
               <>
                 <button
                   onClick={() => actions.updateStayNote(stay.id, `${stay.notes} Guest satisfaction check sent by text.`)}
-                  className="rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-medium text-[#1C1A16]"
+                  className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                 >
                   Send satisfaction check
                 </button>

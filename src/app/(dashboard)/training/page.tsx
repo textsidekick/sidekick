@@ -89,10 +89,15 @@ function statusPill(status: string, currentStep: number, total: number) {
     not_started: "bg-slate-400",
     paused: "bg-amber-500",
   };
+  const label = status === "in_progress"
+    ? `Step ${currentStep} · ${pct}%`
+    : status
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase());
   return (
     <span className={cn("inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium", styles[status] || "bg-slate-100 text-slate-600 border border-slate-200")}>
       <span className={cn("h-1.5 w-1.5 rounded-full", dots[status] || "bg-slate-400")} />
-      {status === "in_progress" ? `Step ${currentStep} · ${pct}%` : status.replace("_", " ")}
+      {label}
     </span>
   );
 }
@@ -352,7 +357,7 @@ function PathDetailModal({
                     </div>
                   )}
                   {importTooltip && (
-                    <div className="absolute left-0 top-full z-50 mt-1 rounded-lg border border-blue-100 bg-blue-50 px-3 py-2 text-xs text-blue-700 shadow whitespace-nowrap">
+                    <div className="absolute left-0 top-full z-50 mt-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 shadow whitespace-nowrap">
                       {importTooltip} integration — connect in Settings to enable
                     </div>
                   )}
@@ -521,7 +526,7 @@ function PathDetailModal({
                               )}
                               {filteredRecommended.length > 0 && (
                                 <>
-                                  <div className="sticky top-0 bg-amber-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-amber-700 border-b border-amber-100">
+                                  <div className="sticky top-0 border-b border-slate-200 bg-slate-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-600">
                                     Recommended
                                   </div>
                                   {filteredRecommended.map((w) => renderWorkerRow(w, true))}
@@ -683,7 +688,7 @@ function NewPathForm({ companyId, onSave, onClose }: { companyId: string; onSave
           <h2 className="text-lg font-bold text-gray-900">New Training Path</h2>
           <button type="button" onClick={onClose}><X className="h-5 w-5 text-gray-400" /></button>
         </div>
-        {error && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+        {error && <p className="mb-4 rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700 border border-slate-200">{error}</p>}
 
         <div className="space-y-4">
           <div>

@@ -14,7 +14,7 @@ export default function HotelLuggagePage() {
         <HotelPageHeader
           title="Luggage hold"
           body="Front-desk bag storage for early arrivals, post-checkout holds, and secure claim-tag release before bags walk off or guest handoffs get messy."
-          action={<div className="rounded-full bg-[#f7f1e8] px-4 py-2 text-sm font-medium text-black/60">{state.luggageItems.filter((item) => item.status !== "released").length} active bag holds</div>}
+          action={<div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700">{state.luggageItems.filter((item) => item.status !== "released").length} active bag holds</div>}
         />
 
         <div className="space-y-3">
@@ -33,7 +33,7 @@ export default function HotelLuggagePage() {
                 {item.status === "stored" ? (
                   <button
                     onClick={() => actions.updateLuggageStatus(item.id, "claimed")}
-                    className="rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-medium text-[#1C1A16]"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Verify claim tag
                   </button>
@@ -41,7 +41,7 @@ export default function HotelLuggagePage() {
                 {item.status !== "released" ? (
                   <button
                     onClick={() => actions.updateLuggageStatus(item.id, "released")}
-                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                   >
                     Release bags
                   </button>
