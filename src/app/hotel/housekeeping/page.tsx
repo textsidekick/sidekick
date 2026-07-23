@@ -2,8 +2,10 @@
 
 import { HotelPageHeader, HotelMetric, HotelSourcePill, HotelStatusPill } from "@/components/hotel/HotelUi";
 import { housekeepingProgress, housekeepingTasks } from "@/lib/hotel-demo-view";
+import { useHotelDemoState } from "@/lib/hotel-demo-store";
 
 export default function HotelHousekeepingPage() {
+  const { actions } = useHotelDemoState();
   return (
     <div className="min-h-screen px-6 py-8 sm:px-8 lg:px-10">
       <div className="mx-auto max-w-[1460px]">
@@ -56,7 +58,27 @@ export default function HotelHousekeepingPage() {
                       ))}
                     </div>
                   </div>
-                  <HotelStatusPill tone={task.status === "Guest notified" ? "resolved" : task.status === "Awaiting acknowledgment" || task.status === "Awaiting verification" ? "queued" : task.status === "Issues found" ? "high" : "normal"}>{task.status}</HotelStatusPill>
+                  <div className="flex flex-col items-end gap-2">
+                    <HotelStatusPill tone={task.status === "Guest notified" ? "resolved" : task.status === "Awaiting acknowledgment" || task.status === "Awaiting verification" ? "queued" : task.status === "Issues found" ? "high" : "normal"}>{task.status}</HotelStatusPill>
+                    <div className="flex flex-wrap justify-end gap-2">
+                      <button onClick={() => {
+                        const requestId = task.room === "304" ? "req-304-cleaning" : task.room === "111" ? "req-111-cleaning" : "req-204-lamp";
+                        actions.updateRequest(requestId, { status: "in_progress" });
+                        actions.updateRequestWorkflow(requestId, { resolutionState: "staff_dispatched" });
+                        actions.addTimelineEvent(requestId, { type: "system", text: `Housekeeping acknowledged Room ${task.room}.`, at: "Now" });
+                      }} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Acknowledge</button>
+                      <button onClick={() => {
+                        const requestId = task.room === "304" ? "req-304-cleaning" : task.room === "111" ? "req-111-cleaning" : "req-204-lamp";
+                        actions.updateRequestStatus(requestId, "resolved");
+                        actions.updateRequestWorkflow(requestId, { resolutionState: task.room === "304" ? "closed" : "awaiting_verification" });
+                        actions.updateRoomStatus(task.room, task.room === "304" ? "reported_clean" : task.room === "111" ? "reported_clean" : "manager_review");
+                        actions.addTimelineEvent(requestId, { type: task.room === "304" ? "staff" : "system", text: task.room === "304" ? "Room 304 done." : `Room ${task.room} marked complete by housekeeping.`, at: "Now" });
+                        if (task.room === "304") {
+                          actions.addTimelineEvent(requestId, { type: "ai", text: "Your room has been cleaned and is ready. Let me know if you need anything else.", at: "Now" });
+                        }
+                      }} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Mark complete</button>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}

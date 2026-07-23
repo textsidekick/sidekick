@@ -36,6 +36,20 @@ export type HotelDemoRoom = {
   owner: string;
 };
 
+export type HotelRequestArtifact = {
+  id: string;
+  requestId: string;
+  name: string;
+  kind: "media" | "voice";
+  sourceLabel: string;
+  addedAt: string;
+  originalLanguage?: string;
+  translation?: string;
+  suggestedCategory?: string;
+  suggestedSeverity?: string;
+  status?: string;
+};
+
 export type HotelKnowledgeItem = {
   title: string;
   team: string;
@@ -315,6 +329,7 @@ export type HotelDemoState = {
   deepCleanItems: HotelDeepCleanItem[];
   breakfastItems: HotelBreakfastItem[];
   requestTimelines: Record<string, HotelRequestTimelineEvent[]>;
+  requestArtifacts: Record<string, HotelRequestArtifact[]>;
 };
 
 function defaultState(): HotelDemoState {
@@ -509,6 +524,17 @@ function defaultState(): HotelDemoState {
         { id: "t2", type: "staff", text: "Julio is checking the unit and waiting on a parts decision.", at: "3:02 PM" },
       ],
     },
+    requestArtifacts: {
+      "req-204-lamp": [
+        { id: "artifact-204-1", requestId: "req-204-lamp", name: "room-204-lamp-damage.jpg", kind: "media", sourceLabel: "Uploaded photo", addedAt: "4:37 PM", originalLanguage: "English", translation: "Not needed", suggestedCategory: "Damaged fixture", suggestedSeverity: "High", status: "Awaiting manager review" },
+      ],
+      "req-218-water": [
+        { id: "artifact-218-1", requestId: "req-218-water", name: "room-218-water-note.m4a", kind: "voice", sourceLabel: "Spanish voice note", addedAt: "5:07 PM", originalLanguage: "Spanish", translation: "Water is collecting near the bathroom baseboard in Room 218.", suggestedCategory: "Water damage / plumbing", suggestedSeverity: "Urgent", status: "Awaiting manager review" },
+      ],
+      "req-117-carpet": [
+        { id: "artifact-117-1", requestId: "req-117-carpet", name: "room-117-carpet-stain.jpg", kind: "media", sourceLabel: "Uploaded photo", addedAt: "3:56 PM", originalLanguage: "English", translation: "Not needed", suggestedCategory: "Housekeeping follow-up", suggestedSeverity: "Medium", status: "Awaiting classification" },
+      ],
+    },
   };
 }
 
@@ -576,6 +602,14 @@ export function useHotelDemoState() {
         ),
       }));
     },
+    updateRequest(requestId: string, patch: Partial<HotelDemoRequest>) {
+      setState((prev) => ({
+        ...prev,
+        requests: prev.requests.map((request) =>
+          request.id === requestId ? { ...request, ...patch } : request
+        ),
+      }));
+    },
     updateRequestDetail(requestId: string, detail: string) {
       setState((prev) => ({
         ...prev,
@@ -592,6 +626,18 @@ export function useHotelDemoState() {
           [requestId]: [
             ...(prev.requestTimelines[requestId] || []),
             { ...event, id: `${requestId}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` },
+          ],
+        },
+      }));
+    },
+    addRequestArtifact(requestId: string, artifact: Omit<HotelRequestArtifact, "id" | "requestId">) {
+      setState((prev) => ({
+        ...prev,
+        requestArtifacts: {
+          ...prev.requestArtifacts,
+          [requestId]: [
+            ...(prev.requestArtifacts[requestId] || []),
+            { ...artifact, requestId, id: `${requestId}-artifact-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` },
           ],
         },
       }));
@@ -615,6 +661,10 @@ export function useHotelDemoState() {
             ...event,
             id: `${normalizedRequest.id}-seed-${index}`,
           })),
+        },
+        requestArtifacts: {
+          ...prev.requestArtifacts,
+          [normalizedRequest.id]: prev.requestArtifacts[normalizedRequest.id] || [],
         },
       }));
     },

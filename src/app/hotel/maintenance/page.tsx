@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { HotelPageHeader, HotelMetric, HotelSourcePill, HotelStatusPill } from "@/components/hotel/HotelUi";
 import { maintenanceIssues, maintenanceMetrics } from "@/lib/hotel-demo-view";
+import { useHotelDemoState } from "@/lib/hotel-demo-store";
 
 export default function HotelMaintenancePage() {
+  const { actions } = useHotelDemoState();
   const [activeId, setActiveId] = useState("req-218-water");
   const activeIssue = maintenanceIssues.find((issue) => issue.id === activeId) || maintenanceIssues[0];
 
@@ -68,17 +70,13 @@ export default function HotelMaintenancePage() {
             <div className="mt-5 rounded-2xl border border-[#E1E5E2] bg-[#FCFCFB] p-4 text-sm text-[#5C6975]">
               <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#5C6975]">Manager actions</div>
               <div className="mt-3 flex flex-wrap gap-2">
-                {[
-                  "Confirm category",
-                  "Change severity",
-                  "Reassign",
-                  "Add notes",
-                  "Escalate",
-                  "Resolve",
-                  "Dismiss incorrect suggestion",
-                ].map((action) => (
-                  <button key={action} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">{action}</button>
-                ))}
+                <button onClick={() => actions.addTimelineEvent(activeIssue.id, { type: "system", text: `Manager confirmed category: ${activeIssue.suggestedCategory}.`, at: "Now" })} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Confirm category</button>
+                <button onClick={() => { actions.updateRequest(activeIssue.id, { priority: activeIssue.severity === "Urgent" ? "high" : "urgent" }); actions.addTimelineEvent(activeIssue.id, { type: "system", text: "Manager changed issue severity.", at: "Now" }); }} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Change severity</button>
+                <button onClick={() => { actions.assignRequest(activeIssue.id, activeIssue.assignedTo === "Julio" ? "Vendor" : "Julio"); actions.addTimelineEvent(activeIssue.id, { type: "system", text: "Maintenance issue reassigned.", at: "Now" }); }} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Reassign</button>
+                <button onClick={() => actions.addTimelineEvent(activeIssue.id, { type: "staff", text: "Manager note added from maintenance detail.", at: "Now" })} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Add notes</button>
+                <button onClick={() => { actions.updateRequest(activeIssue.id, { status: "needs_approval" }); actions.updateRequestWorkflow(activeIssue.id, { triageStatus: "escalated", escalationOwner: "Maya" }); }} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Escalate</button>
+                <button onClick={() => { actions.updateRequestStatus(activeIssue.id, "resolved"); actions.updateRequestWorkflow(activeIssue.id, { resolutionState: "awaiting_verification" }); actions.addTimelineEvent(activeIssue.id, { type: "system", text: "Issue marked resolved and awaiting verification.", at: "Now" }); }} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Resolve</button>
+                <button onClick={() => actions.addTimelineEvent(activeIssue.id, { type: "system", text: "Manager dismissed the AI suggestion and requested a manual review.", at: "Now" })} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Dismiss incorrect suggestion</button>
               </div>
             </div>
           </section>

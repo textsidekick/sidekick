@@ -18,8 +18,10 @@ const taskRows = [
 const lifecycle = ["Received", "Assigned", "Acknowledged", "In progress", "Completed", "Guest notified"];
 
 export default function HotelTasksPage() {
-  const { loaded } = useHotelDemoState();
+  const { actions, loaded } = useHotelDemoState();
   const [activeId, setActiveId] = useState("req-218-water");
+  const [manualTitle, setManualTitle] = useState("");
+  const [manualRoom, setManualRoom] = useState("");
 
   if (!loaded) return null;
 
@@ -41,8 +43,32 @@ export default function HotelTasksPage() {
           eyebrow="Tasks"
           title="Operational record of every request requiring human action"
           body="Sidekick creates tasks from guest and staff messages, managers can create them manually, and the full lifecycle stays visible from receipt to guest-notified closeout."
-          action={<button className="rounded-[10px] bg-[#287A65] px-4 py-2 text-sm font-medium text-white">Create task</button>}
+          action={<button onClick={() => {
+            if (!manualTitle.trim() || !manualRoom.trim()) return;
+            const id = `req-manual-${Date.now()}`;
+            actions.createRequest({
+              id,
+              room: manualRoom.trim(),
+              guestName: null,
+              kind: "front_desk",
+              title: manualTitle.trim(),
+              detail: `Manager created a manual task for Room ${manualRoom.trim()}.`,
+              assignedTo: "Front desk",
+              status: "open",
+              priority: "normal",
+              waitMinutes: 0,
+              source: "manager entry",
+            }, [{ type: "system", text: "Manual task created by manager.", at: "Now" }]);
+            setActiveId(id);
+            setManualTitle("");
+            setManualRoom("");
+          }} className="rounded-[10px] bg-[#287A65] px-4 py-2 text-sm font-medium text-white">Create task</button>}
         />
+
+        <div className="mb-6 grid gap-3 md:grid-cols-[minmax(0,1fr)_180px]">
+          <input value={manualTitle} onChange={(e) => setManualTitle(e.target.value)} placeholder="Manual task title" className="rounded-xl border border-[#E1E5E2] bg-white px-3 py-3 text-sm text-[#18222C] outline-none" />
+          <input value={manualRoom} onChange={(e) => setManualRoom(e.target.value)} placeholder="Room or location" className="rounded-xl border border-[#E1E5E2] bg-white px-3 py-3 text-sm text-[#18222C] outline-none" />
+        </div>
 
         <div className="mb-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           {metrics.map((metric) => <HotelMetric key={metric.label} label={metric.label} value={metric.value} sub={metric.detail} />)}
@@ -123,16 +149,11 @@ export default function HotelTasksPage() {
             ) : null}
 
             <div className="mt-5 flex flex-wrap gap-2">
-              {[
-                "Create manual task",
-                "Reassign",
-                "Change priority",
-                "Escalate",
-                "Add internal note",
-                "Mark resolved",
-              ].map((action) => (
-                <button key={action} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">{action}</button>
-              ))}
+              <button onClick={() => actions.assignRequest(activeTask.id, activeTask.assigned === "Front desk" ? "Maya" : "Front desk")} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Reassign</button>
+              <button onClick={() => actions.updateRequest(activeTask.id, { priority: activeTask.priority === "Urgent" ? "high" : "urgent" })} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Change priority</button>
+              <button onClick={() => { actions.updateRequest(activeTask.id, { status: "needs_approval" }); actions.updateRequestWorkflow(activeTask.id, { triageStatus: "escalated", escalationOwner: "Maya" }); }} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Escalate</button>
+              <button onClick={() => actions.addTimelineEvent(activeTask.id, { type: "staff", text: "Manager added a follow-up note from the task panel.", at: "Now" })} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Add internal note</button>
+              <button onClick={() => { actions.updateRequestStatus(activeTask.id, "resolved"); actions.updateRequestWorkflow(activeTask.id, { resolutionState: "closed" }); }} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Mark resolved</button>
             </div>
           </section>
         </div>

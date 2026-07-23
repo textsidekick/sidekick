@@ -19,9 +19,11 @@ const conversationMeta: Record<string, { person: string; role: string; language:
 };
 
 export default function HotelConversationsPage() {
-  const { state, loaded } = useHotelDemoState();
+  const { state, actions, loaded } = useHotelDemoState();
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>("All");
   const [activeId, setActiveId] = useState("req-218-water");
+  const [draftReply, setDraftReply] = useState("");
+  const [internalNote, setInternalNote] = useState("");
 
   if (!loaded) return null;
 
@@ -52,6 +54,12 @@ export default function HotelConversationsPage() {
 
   const activeConversation = filtered.find((item) => item.id === activeId) || filtered[0];
   const timeline = activeConversation ? state.requestTimelines[activeConversation.id] || [] : [];
+
+  function reassignConversation(target: string) {
+    if (!activeConversation) return;
+    actions.assignRequest(activeConversation.id, target);
+    actions.addTimelineEvent(activeConversation.id, { type: "system", text: `Conversation reassigned to ${target}.`, at: "Now" });
+  }
 
   return (
     <div className="min-h-screen px-6 py-8 sm:px-8 lg:px-10">
@@ -110,19 +118,15 @@ export default function HotelConversationsPage() {
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {[
-                    "Take over",
-                    "Pause AI replies",
-                    "Send direct response",
-                    "Reassign",
-                    "Change priority",
-                    "Escalate",
-                    "Add internal note",
-                    "Mark resolved",
-                    "Request guest confirmation",
-                  ].map((action) => (
-                    <button key={action} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">{action}</button>
-                  ))}
+                  <button onClick={() => { actions.assignRequest(activeConversation.id, "Maya"); actions.addTimelineEvent(activeConversation.id, { type: "system", text: "Manager took over the conversation.", at: "Now" }); }} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Take over</button>
+                  <button onClick={() => { actions.updateRequestWorkflow(activeConversation.id, { dispatcher: "AI paused by manager" }); actions.addTimelineEvent(activeConversation.id, { type: "system", text: "AI replies paused by manager.", at: "Now" }); }} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Pause AI replies</button>
+                  <button onClick={() => { if (!draftReply.trim()) return; actions.addTimelineEvent(activeConversation.id, { type: "ai", text: draftReply.trim(), at: "Now" }); actions.updateRequestWorkflow(activeConversation.id, { resolutionState: "guest_updated" }); setDraftReply(""); }} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Send direct response</button>
+                  <button onClick={() => reassignConversation(activeConversation.kind === "maintenance" ? "Front desk" : "Maintenance")} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Reassign</button>
+                  <button onClick={() => { const next = activeConversation.priority === "urgent" ? "high" : activeConversation.priority === "high" ? "normal" : "urgent"; actions.updateRequest(activeConversation.id, { priority: next }); actions.addTimelineEvent(activeConversation.id, { type: "system", text: `Priority changed to ${next}.`, at: "Now" }); }} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Change priority</button>
+                  <button onClick={() => { actions.updateRequest(activeConversation.id, { status: "needs_approval" }); actions.updateRequestWorkflow(activeConversation.id, { triageStatus: "escalated", escalationOwner: "Maya" }); actions.addTimelineEvent(activeConversation.id, { type: "system", text: "Conversation escalated for manager review.", at: "Now" }); }} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Escalate</button>
+                  <button onClick={() => { if (!internalNote.trim()) return; actions.addTimelineEvent(activeConversation.id, { type: "staff", text: internalNote.trim(), at: "Now" }); setInternalNote(""); }} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Add internal note</button>
+                  <button onClick={() => { actions.updateRequestStatus(activeConversation.id, "resolved"); actions.addTimelineEvent(activeConversation.id, { type: "system", text: "Conversation marked resolved.", at: "Now" }); }} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Mark resolved</button>
+                  <button onClick={() => { actions.updateRequestWorkflow(activeConversation.id, { resolutionState: "awaiting_verification" }); actions.addTimelineEvent(activeConversation.id, { type: "ai", text: "Please confirm if everything is resolved on your side.", at: "Now" }); }} className="rounded-[10px] border border-[#E1E5E2] bg-white px-3 py-2 text-xs font-medium text-[#18222C]">Request guest confirmation</button>
                 </div>
               </div>
 
@@ -149,6 +153,17 @@ export default function HotelConversationsPage() {
                   ].map((line) => (
                     <div key={line} className="rounded-xl border border-[#E1E5E2] bg-white px-3 py-3 text-sm text-[#5C6975]">{line}</div>
                   ))}
+                </div>
+              </div>
+
+              <div className="mt-5 grid gap-4 md:grid-cols-2">
+                <div className="rounded-2xl border border-[#E1E5E2] bg-[#FCFCFB] p-4">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#5C6975]">Direct response</div>
+                  <textarea value={draftReply} onChange={(e) => setDraftReply(e.target.value)} className="mt-3 min-h-[96px] w-full rounded-xl border border-[#E1E5E2] bg-white px-3 py-2 text-sm text-[#18222C] outline-none" placeholder="Type a message to the guest or staff member..." />
+                </div>
+                <div className="rounded-2xl border border-[#E1E5E2] bg-[#FCFCFB] p-4">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#5C6975]">Internal note</div>
+                  <textarea value={internalNote} onChange={(e) => setInternalNote(e.target.value)} className="mt-3 min-h-[96px] w-full rounded-xl border border-[#E1E5E2] bg-white px-3 py-2 text-sm text-[#18222C] outline-none" placeholder="Add an internal note for the team..." />
                 </div>
               </div>
 

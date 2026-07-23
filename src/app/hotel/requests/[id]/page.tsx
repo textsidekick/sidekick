@@ -11,7 +11,6 @@ export default function HotelRequestDetailPage() {
   const params = useParams<{ id: string }>();
   const { state, actions, loaded } = useHotelDemoState();
   const [message, setMessage] = useState("");
-  const [attachments, setAttachments] = useState<Array<{ name: string; kind: "media" | "voice" }>>([]);
   const mediaInputRef = useRef<HTMLInputElement | null>(null);
   const voiceInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -30,6 +29,7 @@ export default function HotelRequestDetailPage() {
   }
 
   const timeline = state.requestTimelines[request.id] || [];
+  const attachments = state.requestArtifacts[request.id] || [];
   const guestFacingTimeline = timeline.filter((event) => event.type === "guest" || event.type === "ai");
   const internalTimeline = timeline.filter((event) => event.type === "staff" || event.type === "system");
   const room = state.rooms.find((item) => item.room === request.room);
@@ -53,8 +53,20 @@ export default function HotelRequestDetailPage() {
 
   function attachFiles(files: FileList | null, kind: "media" | "voice") {
     if (!files?.length) return;
-    const added = Array.from(files).map((file) => ({ name: file.name, kind }));
-    setAttachments((current) => [...added, ...current]);
+    const added = Array.from(files);
+    added.forEach((file) => {
+      actions.addRequestArtifact(request.id, {
+        name: file.name,
+        kind,
+        sourceLabel: kind === "voice" ? "Voice note upload" : "Media upload",
+        addedAt: "Now",
+        originalLanguage: kind === "voice" ? "Unknown" : "English",
+        translation: kind === "voice" ? "Pending transcript" : "Not needed",
+        suggestedCategory: kind === "voice" ? "Needs review" : "Media evidence",
+        suggestedSeverity: request.priority === "urgent" ? "Urgent" : "Normal",
+        status: "Awaiting manager review",
+      });
+    });
     actions.addTimelineEvent(request.id, {
       type: "staff",
       text:
@@ -184,7 +196,7 @@ export default function HotelRequestDetailPage() {
                   <div className="text-xs font-semibold uppercase tracking-[0.14em] text-black/35">Attached evidence</div>
                   <div className="flex flex-wrap gap-2">
                     {attachments.map((attachment) => (
-                      <div key={`${attachment.kind}-${attachment.name}`} className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-600">
+                      <div key={attachment.id} className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-600">
                         {attachment.kind === "voice" ? "Voice" : "Media"}: {attachment.name}
                       </div>
                     ))}
