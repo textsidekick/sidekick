@@ -23,8 +23,6 @@ export default function HotelTasksPage() {
   const [manualTitle, setManualTitle] = useState("");
   const [manualRoom, setManualRoom] = useState("");
 
-  if (!loaded) return null;
-
   const activeTask = taskRows.find((task) => task.id === activeId) || taskRows[0];
   const relatedOperation = operationsRows.find((row) => row.id === activeId);
   const relatedMaintenance = maintenanceIssues.find((issue) => issue.id === activeId);
@@ -35,6 +33,8 @@ export default function HotelTasksPage() {
     { label: "In progress", value: 2, detail: "Human work actively underway" },
     { label: "Escalated", value: 2, detail: "Needs manager or high-priority follow-up" },
   ]), []);
+
+  if (!loaded) return null;
 
   return (
     <div className="min-h-screen px-6 py-8 sm:px-8 lg:px-10">

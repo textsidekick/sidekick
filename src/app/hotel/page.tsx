@@ -30,9 +30,9 @@ export default function HotelOverviewPage() {
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [assistantQuestion, setAssistantQuestion] = useState(askSidekickExamples[0]);
 
-  if (!loaded) return null;
-
   const filteredRows = useMemo(() => operationsRows.filter((row) => row.tab === activeTab), [activeTab]);
+
+  if (!loaded) return null;
 
   return (
     <div className="min-h-screen px-6 py-8 sm:px-8 lg:px-10">

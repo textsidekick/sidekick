@@ -25,8 +25,6 @@ export default function HotelConversationsPage() {
   const [draftReply, setDraftReply] = useState("");
   const [internalNote, setInternalNote] = useState("");
 
-  if (!loaded) return null;
-
   const allConversations = state.requests.map((request) => ({
     ...request,
     ...(conversationMeta[request.id] || {
@@ -54,6 +52,8 @@ export default function HotelConversationsPage() {
 
   const activeConversation = filtered.find((item) => item.id === activeId) || filtered[0];
   const timeline = activeConversation ? state.requestTimelines[activeConversation.id] || [] : [];
+
+  if (!loaded) return null;
 
   function reassignConversation(target: string) {
     if (!activeConversation) return;
