@@ -539,18 +539,52 @@ function defaultState(): HotelDemoState {
 }
 
 function readState(): HotelDemoState {
-  if (typeof window === "undefined") return defaultState();
+  const base = defaultState();
+  if (typeof window === "undefined") return base;
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return defaultState();
-    return { ...defaultState(), ...JSON.parse(raw) };
+    if (!raw) return base;
+    const parsed = JSON.parse(raw);
+    return {
+      ...base,
+      ...parsed,
+      property: { ...base.property, ...(parsed?.property || {}) },
+      requests: Array.isArray(parsed?.requests) ? parsed.requests : base.requests,
+      rooms: Array.isArray(parsed?.rooms) ? parsed.rooms : base.rooms,
+      knowledge: Array.isArray(parsed?.knowledge) ? parsed.knowledge : base.knowledge,
+      shiftBoard: Array.isArray(parsed?.shiftBoard) ? parsed.shiftBoard : base.shiftBoard,
+      staff: Array.isArray(parsed?.staff) ? parsed.staff : base.staff,
+      stays: Array.isArray(parsed?.stays) ? parsed.stays : base.stays,
+      peopleTasks: Array.isArray(parsed?.peopleTasks) ? parsed.peopleTasks : base.peopleTasks,
+      serviceCases: Array.isArray(parsed?.serviceCases) ? parsed.serviceCases : base.serviceCases,
+      lostFoundItems: Array.isArray(parsed?.lostFoundItems) ? parsed.lostFoundItems : base.lostFoundItems,
+      inspections: Array.isArray(parsed?.inspections) ? parsed.inspections : base.inspections,
+      supplies: Array.isArray(parsed?.supplies) ? parsed.supplies : base.supplies,
+      auditItems: Array.isArray(parsed?.auditItems) ? parsed.auditItems : base.auditItems,
+      incidentItems: Array.isArray(parsed?.incidentItems) ? parsed.incidentItems : base.incidentItems,
+      parkingItems: Array.isArray(parsed?.parkingItems) ? parsed.parkingItems : base.parkingItems,
+      packageItems: Array.isArray(parsed?.packageItems) ? parsed.packageItems : base.packageItems,
+      luggageItems: Array.isArray(parsed?.luggageItems) ? parsed.luggageItems : base.luggageItems,
+      wakeupItems: Array.isArray(parsed?.wakeupItems) ? parsed.wakeupItems : base.wakeupItems,
+      laundryItems: Array.isArray(parsed?.laundryItems) ? parsed.laundryItems : base.laundryItems,
+      shuttleItems: Array.isArray(parsed?.shuttleItems) ? parsed.shuttleItems : base.shuttleItems,
+      roomMoveItems: Array.isArray(parsed?.roomMoveItems) ? parsed.roomMoveItems : base.roomMoveItems,
+      minibarItems: Array.isArray(parsed?.minibarItems) ? parsed.minibarItems : base.minibarItems,
+      vipArrivalItems: Array.isArray(parsed?.vipArrivalItems) ? parsed.vipArrivalItems : base.vipArrivalItems,
+      groupArrivalItems: Array.isArray(parsed?.groupArrivalItems) ? parsed.groupArrivalItems : base.groupArrivalItems,
+      outOfOrderItems: Array.isArray(parsed?.outOfOrderItems) ? parsed.outOfOrderItems : base.outOfOrderItems,
+      deepCleanItems: Array.isArray(parsed?.deepCleanItems) ? parsed.deepCleanItems : base.deepCleanItems,
+      breakfastItems: Array.isArray(parsed?.breakfastItems) ? parsed.breakfastItems : base.breakfastItems,
+      requestTimelines: parsed?.requestTimelines && typeof parsed.requestTimelines === "object" ? parsed.requestTimelines : base.requestTimelines,
+      requestArtifacts: parsed?.requestArtifacts && typeof parsed.requestArtifacts === "object" ? parsed.requestArtifacts : base.requestArtifacts,
+    };
   } catch {
-    return defaultState();
+    return base;
   }
 }
 
 export function useHotelDemoState() {
-  const [state, setState] = useState<HotelDemoState>(defaultState());
+  const [state, setState] = useState<HotelDemoState>(readState);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -560,7 +594,11 @@ export function useHotelDemoState() {
 
   useEffect(() => {
     if (!loaded || typeof window === "undefined") return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch {
+      // Ignore storage write failures so the demo UI never hard-crashes.
+    }
   }, [state, loaded]);
 
   const actions = useMemo(() => ({
